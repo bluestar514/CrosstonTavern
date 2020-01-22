@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class MainDialogueMenu : MonoBehaviour
 {
-    public NPCSpeachPanelMenu speachPanelMenu;
-    public PlayerResponsePanelMenu playerResponseMenu;
-    public SpeakerTagPanelController speakerTagPanel;
+    public NPCTextBoxController speachPanelMenu;
+    public PlayerTextBoxController playerResponseMenu;
+    public SpeakerTagController speakerTagPanel;
 
 
     public List<SocialMove> NPCActions;
@@ -28,7 +28,7 @@ public class MainDialogueMenu : MonoBehaviour
     void DisplayNPCAction(SocialMove socialMove)
     {
         CloseAll();
-        speachPanelMenu.Fill(socialMove);
+        speachPanelMenu.Fill(socialMove.ToString());
         speachPanelMenu.Open();
     }
 

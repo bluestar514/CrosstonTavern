@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerResponsePanelMenu : MenuElement
+public class SpeakerTagController : MenuElement
 {
 
 }

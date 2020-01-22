@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NPCSpeachPanelMenu : MenuElement
+public class NPCTextBoxController : MenuElement
 {
     public Text speachText;
 
-    public void Fill(SocialMove socialMove)
+    public void Fill(string dialogue)
     {
-        speachText.text = socialMove.ToString();
+        speachText.text = dialogue;
     }
-
 }
