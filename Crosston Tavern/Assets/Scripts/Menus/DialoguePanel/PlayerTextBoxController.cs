@@ -6,9 +6,9 @@ public class PlayerTextBoxController : MenuElement
 {
     public List<PlayerChoiceButton> playerChoiceButtons;
 
-    DialogueBoxController mainMenu;
+    BarSpaceController mainMenu;
 
-    public void Initialize(DialogueBoxController mm)
+    public void Initialize(BarSpaceController mm)
     {
         mainMenu = mm;
     }
@@ -19,13 +19,8 @@ public class PlayerTextBoxController : MenuElement
 
         for(int i=0; i<minNum; i++)
         {
-            playerChoiceButtons[i].LabelButton(playerChoices[i], this);
+            playerChoiceButtons[i].LabelButton(playerChoices[i], mainMenu);
         }
 
-    }
-
-    public void SelectChoice(DialogueUnit dialogueUnit)
-    {
-        mainMenu.PlayerChoiceButtonPush(dialogueUnit);
     }
 }

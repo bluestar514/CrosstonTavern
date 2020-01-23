@@ -7,20 +7,20 @@ public class PlayerChoiceButton : MonoBehaviour
 {
     public Text buttonText;
 
-    PlayerTextBoxController supervisor;
+    BarSpaceController supervisor;
 
     DialogueUnit dialogueUnit;
 
-    public void LabelButton(DialogueUnit content, PlayerTextBoxController ptbc)
+    public void LabelButton(DialogueUnit content, BarSpaceController bsc)
     {
         buttonText.text = content.verbalization;
         dialogueUnit = content;
 
-        supervisor = ptbc;
+        supervisor = bsc;
     }
 
     public void OnClick()
     {
-        supervisor.SelectChoice(dialogueUnit);
+        supervisor.PlayerChoiceButtonPush(dialogueUnit);
     }
 }

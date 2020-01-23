@@ -8,43 +8,14 @@ public class DialogueBoxController : MonoBehaviour
     public PlayerTextBoxController playerResponseMenu;
     public SpeakerTagController speakerTagPanel;
 
-    Patron patron = new Patron("Marco");
-    Patron barkeep = new Patron("Barkeep");
+    
 
-
-    public void Start()
+    public void Initialize(BarSpaceController bsc)
     {
-        playerResponseMenu.Initialize(this);
-
-
-        DisplayPlayerActions();
-        //NPCTakeAction();
+        playerResponseMenu.Initialize(bsc);
     }
 
-    public void OnClick()
-    {
-        if (speachPanelMenu.gameObject.activeInHierarchy)
-        {
-            DisplayPlayerActions();
-        }
-        
-    }
-
-    public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
-    {
-        print(dialogueUnit.ToString());
-        //Add to log...
-
-        NPCTakeAction();
-    }
-
-
-    void NPCTakeAction()
-    {
-        DisplayNPCAction(patron.ExpressSocialMove(patron.PickSocialMove()));
-    }
-
-    void DisplayNPCAction(DialogueUnit dialogueUnit)
+    public void DisplayNPCAction(DialogueUnit dialogueUnit)
     {
         CloseAll();
 
@@ -55,20 +26,13 @@ public class DialogueBoxController : MonoBehaviour
         speachPanelMenu.Open();
     }
 
-    void DisplayPlayerActions()
+    public void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
         CloseAll();
         speakerTagPanel.Fill("Barkeep");
         speakerTagPanel.Open();
 
         playerResponseMenu.Open();
-
-        List<SocialMove> bestSocialMoves = barkeep.PickBestSocialMoves(4);
-        List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
-        foreach(SocialMove socialMove in bestSocialMoves)
-        {
-            dialogueUnits.Add(barkeep.ExpressSocialMove(socialMove));
-        }
         playerResponseMenu.Fill(dialogueUnits);
     }
 
