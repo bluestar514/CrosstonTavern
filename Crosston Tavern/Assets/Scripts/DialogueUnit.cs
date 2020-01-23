@@ -15,10 +15,10 @@ public class DialogueUnit
 
     List<Fact> potentialFacts = new List<Fact>()
     {
-        new Fact("Alicia is busy"),
-        new Fact("The clinic is a mess"),
-        new Fact("Rayne is unemployed"),
-        new Fact("Icecream is tasty")
+        new Fact("Alicia",  "is", "busy"),
+        new Fact("The clinic", "is", "messy"),
+        new Fact("Rayne", "is", "unemployed"),
+        new Fact("Icecream", "is", "tasty")
     };
 
     public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove)
@@ -53,17 +53,3 @@ public class DialogueUnit
     }
 }
 
-public class Fact
-{
-    public string content;
-
-    public Fact(string content)
-    {
-        this.content = content;
-    }
-
-    public override string ToString()
-    {
-        return content;
-    }
-}
