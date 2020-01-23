@@ -13,6 +13,11 @@ public class SocialMove
 {
     public string verb;
 
+    public SocialMove(string verb)
+    {
+        this.verb = verb;
+    }
+
     public override string ToString()
     {
         return "<"+verb+">";
