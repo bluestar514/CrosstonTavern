@@ -6,6 +6,7 @@ public class BarSpaceController : MonoBehaviour
 {
     public DialogueBoxController dbc;
     public NotebookController nc;
+    public LogController lc;
 
     Patron patron = new Patron("Marco");
     Patron barkeep = new Patron("Barkeep");
@@ -13,12 +14,19 @@ public class BarSpaceController : MonoBehaviour
     public void Start()
     {
         dbc.Initialize(this);
+        nc.Initialize(new List<Fact>());
+        lc.Initialize(new List<string>());
+
         NPCPhase();
     }
 
     public void NPCPhase()
     {
-        dbc.DisplayNPCAction(patron.ExpressSocialMove(patron.PickSocialMove()));
+        DialogueUnit npcDialogue = patron.ExpressSocialMove(patron.PickSocialMove());
+
+        dbc.DisplayNPCAction(npcDialogue);
+        lc.AddElement(npcDialogue.speakerName + ": " + npcDialogue.verbalization);
+        AddAllFacts(npcDialogue.facts);
     }
 
     public void PlayerPhase()
@@ -34,8 +42,7 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
-        print(dialogueUnit.ToString());
-        //Add to log...
+        lc.AddElement(dialogueUnit.speakerName + ": " + dialogueUnit.verbalization);
 
         NPCPhase();
     }
@@ -43,6 +50,14 @@ public class BarSpaceController : MonoBehaviour
     public void AdvanceNPCDialogue()
     {
         PlayerPhase();
+    }
+
+
+    void AddAllFacts(List<Fact> facts)
+    {
+        foreach(Fact fact in facts) {
+            nc.AddElement(fact);
+        }
     }
 
 }

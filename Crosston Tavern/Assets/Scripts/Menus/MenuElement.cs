@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class MenuElement : MonoBehaviour
 {
+
     public virtual void Open()
     {
-        this.gameObject.SetActive(true);
+        gameObject.SetActive(true);
     }
 
     public virtual void Close()
     {
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
 }
