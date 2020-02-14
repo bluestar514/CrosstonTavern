@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class Condition 
 {
-    public virtual bool InEffect()
+    public virtual bool InEffect(Person actor, Feature feature, Location location)
     {
         return true;
     }

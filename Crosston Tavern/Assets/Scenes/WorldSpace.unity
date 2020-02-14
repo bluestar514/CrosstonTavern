@@ -300,6 +300,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   people: []
   features: []
+  weightedActions: []
 --- !u!4 &762257167
 Transform:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class GenericAction: WorldAction {
 
+    
     public List<Condition> preconditions;
     public List<Effect> potentialEffects;
 
@@ -12,11 +13,17 @@ public class GenericAction: WorldAction {
     { 
         this.preconditions = preconditions;
         this.potentialEffects = potentialEffects;
+        name = ToString();
     }
 
     public override string ToString()
     {
         return "<"+Id+"(generic)>";
+    }
+
+    public bool SatisfiedPreconditions(Person actor, Feature feature, Location location)
+    {
+        return !preconditions.Exists(condition => !condition.InEffect(actor, feature, location));
     }
 }
 

@@ -5,6 +5,10 @@ using UnityEngine;
 [System.Serializable]
 public class WorldAction
 {
+
+    [SerializeField]
+    protected string name;
+
     [SerializeField]
     private string id;
     public string Id { get => id; private set => id = value; }
@@ -14,5 +18,6 @@ public class WorldAction
     public WorldAction(string id)
     {
         Id = id;
+        name = Id;
     }
 }

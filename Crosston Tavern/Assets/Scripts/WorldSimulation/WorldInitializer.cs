@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class WorldInitializer
@@ -10,13 +11,13 @@ public class WorldInitializer
             {"farm", new Location("farm",
                 new Dictionary<string, List<string>>() {
                     {"fish", new List<string>(){"trout", "goldfish"} },
-                    {"connectedSpaces", new List<string>(){"forest"} }
+                    {"connectedLocation", new List<string>(){"forest"} }
                 }
             ) },
             {"forest", new Location("forest",
                 new Dictionary<string, List<string>>() {
                     {"fish", new List<string>(){"salmon", "tuna"} },
-                    {"connectedSpaces", new List<string>(){"farm"} }
+                    {"connectedLocation", new List<string>(){"farm"} }
                 }
             ) }
         };
@@ -48,6 +49,10 @@ public class WorldInitializer
             );
 
             features.Add(person.feature);
+
+            person.goalPriorityDict = new Dictionary<MicroEffect, float>() {
+                {new Move("forest"), 1 }
+            };
         }
 
         return people;
@@ -64,19 +69,19 @@ public class WorldInitializer
                         new Effect(
                             new ChanceModifierSimple(.4f),
                             new List<MicroEffect>(){
-                                new InvChange(1,1,"Feature.fish")
+                                new InvChange(1,1,new List<string>(){"#fish#" })
                             }
                         ),
                         new Effect(
                             new ChanceModifierSimple(.5f),
                             new List<MicroEffect>(){
-                                new InvChange(1,1,"old boot")
+                                new InvChange(1,1,new List<string>(){"old boot"})
                             }
                         ),
                         new Effect(
                             new ChanceModifierSimple(.5f),
                             new List<MicroEffect>(){
-                                new InvChange(1,3,"algee")
+                                new InvChange(1,3,new List<string>(){"algee" })
                             }
                         )
                     }
@@ -116,7 +121,7 @@ public class WorldInitializer
         return actions;
     }
 
-    public List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions)
+    public List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions, Dictionary<string, Location> locations)
     {
         List<Feature> features = new List<Feature>() {
             new Feature("farm_river", "farm",
@@ -124,7 +129,7 @@ public class WorldInitializer
                     actions["fish"]
                 },
                 new Dictionary<string, List<string>>(){
-                    {"fish", new List<string>(){ "#Location.fish", "smelt"} }
+                    {"fish", new List<string>(){ "#fish#", "smelt"} }
                 }
             ),
             new Feature("forest_river", "forest",
@@ -132,22 +137,25 @@ public class WorldInitializer
                     actions["fish"]
                 },
                 new Dictionary<string, List<string>>(){
-                    {"fish", new List<string>(){ "#Location.fish", "silverfish"} }
+                    {"fish", new List<string>(){ "#fish#", "silverfish"} }
                 }
             ),
-            new Feature("door_farm", "farm",
-                new List<GenericAction>() {
-                    actions["move"]
-                },
-                new Dictionary<string, List<string>>(){ }
-            ),
-            new Feature("door_forest", "forest",
-                new List<GenericAction>() {
-                    actions["move"]
-                },
-                new Dictionary<string, List<string>>(){ }
-            )
+            
         };
+
+        foreach( Location location in locations.Values) {
+            List<Feature> doors = new List<Feature>(
+                    from loc in location.resources["connectedLocation"]
+                    select new Feature("door_" + location.Id + "->" + loc, location.Id,
+                                    new List<GenericAction>() {
+                                        actions["move"]
+                                    },
+                                    new Dictionary<string, List<string>>(){
+                                        {"connectedLocation", new List<string>(){loc} }
+                                    }
+                                )
+                    );
+        }
 
         return features;
     }

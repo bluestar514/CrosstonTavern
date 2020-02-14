@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BoundAction : GenericAction
@@ -14,6 +15,8 @@ public class BoundAction : GenericAction
         this.ActorId = actorId;
         this.FeatureId = featureId;
         this.LocationId = locationId;
+
+        name = ToString();
     }
 
     public BoundAction(GenericAction action, string actorId, string featureId, string locationId): 
@@ -23,5 +26,14 @@ public class BoundAction : GenericAction
     public override string ToString()
     {
         return "<"+Id+"("+ActorId+", "+ FeatureId+ ")>";
+    }
+
+
+    public List<Effect> GenerateKnownEffects(Dictionary<string, List<string>> resources)
+    {
+        return new List<Effect>(
+            from effect in potentialEffects
+            select new Effect(effect.chanceModifier, effect.BindEffects(resources))
+        );
     }
 }
