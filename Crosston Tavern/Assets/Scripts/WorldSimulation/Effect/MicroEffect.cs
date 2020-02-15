@@ -60,12 +60,14 @@ public class InvChange: MicroEffect
 
     public int DeltaMin { get; private set; }
     public int DeltaMax { get; private set; }
+    public string InvOwner { get; private set; }
     public List<string> ItemId { get; private set; }
 
-    public InvChange(int deltaMin, int deltaMax, List<string> itemId)
+    public InvChange(int deltaMin, int deltaMax, string invOwner, List<string> itemId)
     {
         DeltaMin = deltaMin;
         DeltaMax = deltaMax;
+        InvOwner = invOwner;
         ItemId = itemId;
 
         id = ToString();
@@ -73,18 +75,20 @@ public class InvChange: MicroEffect
 
     public override MicroEffect BindEffect(Dictionary<string, List<string>> resources)
     {
-        return new InvChange(DeltaMin, DeltaMax, BindId(ItemId, resources));
+        return new InvChange(DeltaMin, DeltaMax,BindId(InvOwner, resources), BindId(ItemId, resources));
     }
 
     public override string ToString()
     {
-        return "<InvChange({" + DeltaMin + "~" + DeltaMax + "}, {" + String.Join(",", ItemId) + "} )>";
+        return "<InvChange("+InvOwner+", {" + DeltaMin + "~" + DeltaMax + "}, {" + String.Join(",", ItemId) + "} )>";
     }
 }
 
 public class Move: MicroEffect
 {
     private string targetLocation = "#connectedLocation#";
+
+    public string TargetLocation { get => targetLocation; private set => targetLocation = value; }
 
     public Move(string targetLocation)
     {
