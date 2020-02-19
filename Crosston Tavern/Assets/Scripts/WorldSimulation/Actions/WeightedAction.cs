@@ -8,30 +8,35 @@ public class WeightedAction : BoundAction
     public float weight;
     public List<WeightRational> weightRationals;
 
+    public List<Effect> expectedEffects;
+
     public WeightedAction(GenericAction action, 
         string actorId, string featureId, string locationId, 
-        float weight, List<WeightRational> weightRationals) : 
+        float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) : 
         base(action, actorId, featureId, locationId)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
+        this.expectedEffects = expectedEffects;
 
         name = ToString();
     }
 
     public WeightedAction(string id, List<Condition> preconditions, List<Effect> potentialEffects, 
         string actorId, string featureId, string locationId, 
-        float weight, List<WeightRational> weightRationals) : 
+        float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) : 
         base(id, preconditions, potentialEffects, actorId, featureId, locationId)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
+        this.expectedEffects = expectedEffects;
+
         name = ToString();
     }
         
-    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals) :
+    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) :
         this(boundAction.Id, boundAction.preconditions, boundAction.potentialEffects, 
-            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, weight, weightRationals)
+            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, weight, weightRationals, expectedEffects)
     {}
 
 

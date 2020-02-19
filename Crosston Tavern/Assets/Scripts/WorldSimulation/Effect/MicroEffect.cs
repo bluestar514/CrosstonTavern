@@ -19,6 +19,11 @@ public class MicroEffect
         return new MicroEffect();
     }
 
+    public virtual MicroEffect SpecifyEffect()
+    {
+        return new MicroEffect();
+    }
+
     public static List<string> BindId(List<string> idList, Dictionary<string, List<string>> resources)
     {
         List<string> newId = new List<string>();
@@ -78,6 +83,14 @@ public class InvChange: MicroEffect
         return new InvChange(DeltaMin, DeltaMax,BindId(InvOwner, resources), BindId(ItemId, resources));
     }
 
+    public override MicroEffect SpecifyEffect()
+    {
+        int randNum = UnityEngine.Random.Range(DeltaMin, DeltaMax + 1);
+        int randItem = Mathf.FloorToInt(UnityEngine.Random.value * ItemId.Count);
+
+        return new InvChange(randNum, randNum, InvOwner, new List<string>() { ItemId[randItem] });
+    }
+
     public override string ToString()
     {
         return "<InvChange("+InvOwner+", {" + DeltaMin + "~" + DeltaMax + "}, {" + String.Join(",", ItemId) + "} )>";
@@ -104,6 +117,13 @@ public class Move: MicroEffect
     {
         return new Move(BindId(targetLocation, resources));
     }
+
+
+    public override MicroEffect SpecifyEffect()
+    {
+        return new Move(TargetLocation);
+    }
+
 
     public override string ToString()
     {
@@ -136,6 +156,12 @@ public class SocialChange : MicroEffect
                                 BindId(TargetId, resources));
     }
 
+    public override MicroEffect SpecifyEffect()
+    {
+        int randNum = UnityEngine.Random.Range(DeltaMin, DeltaMax + 1);
+
+        return new SocialChange(randNum, randNum, SourceId, TargetId);
+    }
     public override string ToString()
     {
         return "<SocialChange({" + DeltaMin + "~" + DeltaMax + "}, " + SourceId + "->"+TargetId + ")>";

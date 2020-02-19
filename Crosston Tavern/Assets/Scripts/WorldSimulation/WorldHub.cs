@@ -11,6 +11,7 @@ public class WorldHub : MonoBehaviour
 
     public List<WeightedAction> allWeightedActions = new List<WeightedAction>();
     public List<ChosenAction> chosenActions = new List<ChosenAction>();
+    public List<ExecutedAction> executedActions = new List<ExecutedAction>();
 
     private void Start()
     {
@@ -28,7 +29,11 @@ public class WorldHub : MonoBehaviour
         }
 
         foreach(ChosenAction action in chosenActions) {
+            WeightedAction weightedAction = action.Action;
+            List<Effect> potentialEffects = weightedAction.potentialEffects;
 
+            ActionExecutionManager aem = new ActionExecutionManager(registry.GetPerson(weightedAction.ActorId), registry, map);
+            executedActions.Add( aem.ExecuteAction(action) );
 
         }
         

@@ -11,8 +11,8 @@ public class ChosenAction
     WeightedAction chosenAction;
     public WeightedAction Action { get => chosenAction; private set => chosenAction = value; }
 
-    [SerializeField]
-    List<WeightedAction> rejectedChoices;
+    
+    public List<WeightedAction> rejectedChoices;
 
     public ChosenAction(WeightedAction chosenAction, List<WeightedAction> rejectedChoices)
     {

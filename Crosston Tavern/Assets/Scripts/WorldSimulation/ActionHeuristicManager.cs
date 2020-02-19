@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ActionHeuristicManager
+public class ActionHeuristicManager : ActionManager
 {
     Person actor;
     Registry people;
@@ -40,36 +40,6 @@ public class ActionHeuristicManager
         return new ChosenAction(choice, choices);
     }
 
-    public static Dictionary<string, List<string>> AggregateResources(Dictionary<string, List<string>> locationResources,
-        Dictionary<string, List<string>> featureResources)
-    {
-        Dictionary<string, List<string>> resources = new Dictionary<string, List<string>>();
-        foreach (KeyValuePair<string, List<string>> kp in featureResources) {
-            string key = kp.Key;
-            List<string> value = MicroEffect.BindId(kp.Value, locationResources);
-            resources.Add(key, value);
-        }
-        return resources;
-    }
-
-    public static Dictionary<string, List<string>> CopyParticipantData(Dictionary<string, List<string>> mainResources, 
-        Dictionary<string, List<string>> participantData)
-    {
-
-        mainResources = AggregateResources( participantData, mainResources);
-
-        foreach (var data in participantData) {
-            if (mainResources.ContainsKey(data.Key))
-                Debug.Log("key: " + data.Key + 
-                    " {main: " + String.Join(",", mainResources[data.Key]) + 
-                    "} {data: " + String.Join(",", data.Value) + "}");
-
-            mainResources.Add(data.Key, data.Value);
-        }
-
-        return mainResources;
-    }
-
     //Steps toward Generating Weighted Options:
 
 
@@ -95,11 +65,7 @@ public class ActionHeuristicManager
         List<WeightedAction> weightedActions = new List<WeightedAction>();
 
         foreach (BoundAction action in actions) {
-            Feature feature = map.GetFeature(action.FeatureId);
-            Location location = map.GetLocation(action.LocationId);
-
-            Dictionary<string, List<string>> resources = AggregateResources(location.resources, feature.relevantResources);
-            resources = CopyParticipantData(resources, actor.resources);
+            Dictionary<string, List<string>> resources = GetActionResources(map, action, actor);
 
             List<Effect> boundEffects = action.GenerateKnownEffects(resources);
 
@@ -114,7 +80,7 @@ public class ActionHeuristicManager
     {
         List<WeightedAction.WeightRational> weightRationals = new List<WeightedAction.WeightRational>();
         foreach (Effect effect in boundEffects) {
-            float effectLikelyhood = effect.chanceModifier.Chance();
+            float effectLikelyhood = effect.EvaluateChance();
 
             foreach (MicroEffect subeffect in effect.effects) {
                 foreach (KeyValuePair<MicroEffect, float> kvp in actor.goalPriorityDict) {
@@ -133,7 +99,7 @@ public class ActionHeuristicManager
             total += wr.weight;
         }
 
-        return new WeightedAction(action, total, weightRationals);
+        return new WeightedAction(action, total, weightRationals, boundEffects);
 
     }
 

@@ -97,8 +97,7 @@ public class Map
         if (GetLocation(locationId) == null) throw new Exception("Location " + locationId + " does not exist");
 
         if (!respectDoors || Neighboring(person.location, locationId)) {
-            person.location = locationId;
-            person.feature.location = locationId;
+            person.Move(locationId);
         }
 
     }

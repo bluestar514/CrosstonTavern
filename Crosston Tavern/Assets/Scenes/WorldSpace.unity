@@ -298,9 +298,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d009197ee4a503a43979c0214d20d019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  people: []
-  features: []
-  weightedActions: []
+  map:
+    Features: []
+    Locations: []
+  allWeightedActions: []
+  chosenActions: []
 --- !u!4 &762257167
 Transform:
   m_ObjectHideFlags: 0

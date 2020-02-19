@@ -32,7 +32,49 @@ public class Person
                     {ResourceCatagories.r_recipient, new List<string>() { id } }
                 }
             );
+        inventory = new Dictionary<string, int>();
+        relationships = new Dictionary<string, float>();
+    }
 
+    public void Move(string locationId)
+    {
+        location = locationId;
+        feature.location = locationId;
+    }
+
+    public int GetInventoryCount(string itemId)
+    {
+        if (inventory.ContainsKey(itemId)) {
+            return inventory[itemId];
+        } else {
+            return 0;
+        }
+    }
+    public void ChangeInventoryContents(int num, string itemId)
+    {
+        if (inventory.ContainsKey(itemId)) {
+            inventory[itemId] += num;
+        } else {
+            inventory.Add(itemId, num);
+        }
+    }
+
+    public float GetRelationshipValue(string personId)
+    {
+        if (relationships.ContainsKey(personId)) {
+            return relationships[personId];
+        } else {
+            return 0;
+        }
+    }
+
+    public void ChangeRelationshipValue(float num, string personId)
+    {
+        if (relationships.ContainsKey(personId)) {
+            relationships[personId] += num;
+        } else {
+            relationships.Add(personId, num);
+        }
     }
 
     
