@@ -9,34 +9,43 @@ public class WorldHub : MonoBehaviour
     public Map map;
     public Registry registry;
 
-    public List<WeightedAction> allWeightedActions = new List<WeightedAction>();
-    public List<ChosenAction> chosenActions = new List<ChosenAction>();
-    public List<ExecutedAction> executedActions = new List<ExecutedAction>();
+    public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
+
+    public WorldSpaceDisplayManager wsdm;
 
     private void Start()
     {
         InitalizeWorld();
 
-        foreach(Person person in registry.GetPeople()) {
+        wsdm.AddPeople(new List<Person>(registry.GetPeople()));
 
-            ActionHeuristicManager ahm = new ActionHeuristicManager(person, registry, map);
 
-            List<WeightedAction> weightedActions = ahm.GenerateWeightedOptions();
+        for (int i = 0; i < 10; i++) {
+            List<ChosenAction> chosenActions = new List<ChosenAction>();
+            foreach (Person person in registry.GetPeople()) {
 
-            this.allWeightedActions.AddRange(weightedActions);
+                ActionHeuristicManager ahm = new ActionHeuristicManager(person, registry, map);
 
-            chosenActions.Add(ahm.ChooseAction(weightedActions));
+                List<WeightedAction> weightedActions = ahm.GenerateWeightedOptions();
+
+                chosenActions.Add(ahm.ChooseAction(weightedActions));
+            }
+
+            List<ExecutedAction> executedActions = new List<ExecutedAction>();
+            foreach (ChosenAction action in chosenActions) {
+                WeightedAction weightedAction = action.Action;
+                List<Effect> potentialEffects = weightedAction.potentialEffects;
+
+                ActionExecutionManager aem = new ActionExecutionManager(registry.GetPerson(weightedAction.ActorId), registry, map);
+                executedActions.Add(aem.ExecuteAction(action));
+            }
+            timeStep.Add(executedActions);
+
+            foreach(ExecutedAction action in executedActions) {
+                wsdm.AddEvent(action, i);
+            }
         }
 
-        foreach(ChosenAction action in chosenActions) {
-            WeightedAction weightedAction = action.Action;
-            List<Effect> potentialEffects = weightedAction.potentialEffects;
-
-            ActionExecutionManager aem = new ActionExecutionManager(registry.GetPerson(weightedAction.ActorId), registry, map);
-            executedActions.Add( aem.ExecuteAction(action) );
-
-        }
-        
     }
 
     void InitalizeWorld()
@@ -47,11 +56,6 @@ public class WorldHub : MonoBehaviour
         map = wi.InitializeMap(people);
     }
 
-    
-
-    
-    
-
-    
-
 }
+
+

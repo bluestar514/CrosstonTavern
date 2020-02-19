@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WorldSpaceDisplayManager : MonoBehaviour
 {
@@ -13,13 +15,15 @@ public class WorldSpaceDisplayManager : MonoBehaviour
     public GameObject TimeLineContent;
     public GameObject EventContent;
 
+    public PeopleDetailTab PeopleDetailTab;
+
     public GameObject TownieNamePanelPrefab;
     public GameObject TimePanelPrefab;
     public GameObject EventPanelPrefab;
 
-    List<Dictionary<Townie, EventPanel>> history;
+    List<Dictionary<string, EventPanel>> history;
 
-    List<Townie> townieDisplayOrder;
+    List<string> townieDisplayOrder;
 
     public void Start()
     {
@@ -27,42 +31,45 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         w = EventPanelPrefab.GetComponent<RectTransform>().rect.width;
 
 
-        townieDisplayOrder = new List<Townie>() {
-            new Townie("Alicia"),
-            new Townie("Bob"),
-            new Townie("Clara"),
-            new Townie("Darel"),
-            new Townie("Everet"),
-            new Townie("Faraz"),
-            new Townie("Gigi"),
-            new Townie("Howard")
-        };
+        townieDisplayOrder = new List<string>() {};
 
-        history = new List<Dictionary<Townie, EventPanel>>() {
-            new Dictionary<Townie, EventPanel>()
-        };
+        history = new List<Dictionary<string, EventPanel>>() {};
+    }
 
+    public void AddPeople(List<Person> people)
+    {
+        townieDisplayOrder = new List<string>(from person in people
+                                                select person.Id);
 
-        foreach(Townie townie in townieDisplayOrder) {
-            AddTownieRow(townie);
+        foreach(Person person in people) {
+            AddTownieRow(person);
         }
+    }
 
-        AddTimeStep(0);
+    public void AddEvent(ExecutedAction action, int timeStep)
+    {
+        if (history.Count <= timeStep) AddTimeStep(timeStep);
 
-        GameObject obj = AddEventPanel(townieDisplayOrder[2], new WorldAction("test"), 0);
+        string townie = action.Action.ActorId;
 
-        history.Add(new Dictionary<Townie, EventPanel>());
-        history[0].Add(townieDisplayOrder[2], obj.GetComponent<EventPanel>());
+        GameObject obj = AddEventPanel(townie, action, timeStep);
+
+        history[timeStep].Add(townie, obj.GetComponent<EventPanel>());
     }
 
     GameObject AddTimeStep(int step)
     {
-        GameObject timePanel = Instantiate(TimePanelPrefab, TimeLineContent.transform);
-        timePanel.GetComponent<TimePanel>().Set(step);
+        GameObject timePanel = null;
+        while (history.Count <= step) {
+            timePanel = Instantiate(TimePanelPrefab, TimeLineContent.transform);
+            timePanel.GetComponent<TimePanel>().Set(history.Count);
 
-        PositionTimeColumn(timePanel.GetComponent<TimePanel>());
+            PositionTimeColumn(timePanel.GetComponent<TimePanel>());
+
+            history.Add(new Dictionary<string, EventPanel>());
+        }
+
         ResizeContentPanels();
-
         return timePanel;
     }
     void PositionTimeColumn(TimePanel panel)
@@ -75,10 +82,10 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         panel.GetComponent<RectTransform>().localPosition = new Vector3(panelX, -y);
     }
 
-    GameObject AddTownieRow(Townie townie)
+    GameObject AddTownieRow(Person townie)
     {
         GameObject towniePanel = Instantiate(TownieNamePanelPrefab, PeopleContent.transform);
-        towniePanel.GetComponent<TowniePanel>().Set(townie);
+        towniePanel.GetComponent<TowniePanel>().Set(townie, PeopleDetailTab);
 
         PositionTownieRow(towniePanel.GetComponent<TowniePanel>());
         ResizeContentPanels();
@@ -95,10 +102,10 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         panel.GetComponent<RectTransform>().localPosition = new Vector3(x, -panelY);
     }
 
-    GameObject AddEventPanel(Townie townie, WorldAction worldAction, int timeStep)
+    GameObject AddEventPanel(string townie, ExecutedAction action, int timeStep)
     {
         GameObject eventPanel = Instantiate(EventPanelPrefab, EventContent.transform);
-        eventPanel.GetComponent<EventPanel>().Set(townie, worldAction, timeStep);
+        eventPanel.GetComponent<EventPanel>().Set(townie, action, timeStep);
 
         PositionEventPanel(eventPanel.GetComponent<EventPanel>());
         ResizeContentPanels();
@@ -128,21 +135,6 @@ public class WorldSpaceDisplayManager : MonoBehaviour
 
         float tHeight = TimeLineContent.GetComponent<RectTransform>().rect.height;
         TimeLineContent.GetComponent<RectTransform>().sizeDelta = new Vector2(width, tHeight);
-    }
-}
-
-public class Townie
-{
-    string name;
-
-    public Townie(string name)
-    {
-        this.name = name;
-    }
-
-    public override string ToString()
-    {
-        return name;
     }
 }
 

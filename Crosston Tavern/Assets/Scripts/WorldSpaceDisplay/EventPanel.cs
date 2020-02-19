@@ -5,13 +5,13 @@ using UnityEngine.UI;
 
 public class EventPanel : MonoBehaviour
 {
-    public Townie townieRow;
+    public string townieRow;
     public int timeStep;
-    public WorldAction action;
+    public ExecutedAction action;
 
     public Text display;
 
-    public void Set(Townie townie, WorldAction action, int time)
+    public void Set(string townie, ExecutedAction action, int time)
     {
         townieRow = townie;
         timeStep = time;

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -77,6 +78,26 @@ public class Person
         }
     }
 
-    
+    public string StringifyStats()
+    {
+        string body = "";
+
+        body += "resources:\n";
+        foreach (string key in resources.Keys) {
+            body += "\t" + key + ": " + String.Join(", ", resources[key]) + "\n";
+        }
+
+        body += "\ninventory:\n";
+        foreach(string key in inventory.Keys) {
+            body += "\t" + key + ": " + inventory[key] + "\n";
+        }
+
+        body += "\nrelationships:\n";
+        foreach (string key in relationships.Keys) {
+            body += "\t" + key + ": " + relationships[key] + "\n";
+        }
+
+        return body;
+    }
 
 }

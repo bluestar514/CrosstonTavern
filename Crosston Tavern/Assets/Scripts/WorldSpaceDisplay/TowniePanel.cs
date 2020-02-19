@@ -5,13 +5,24 @@ using UnityEngine.UI;
 
 public class TowniePanel : MonoBehaviour
 {
-    public Townie townie;
+    public string townie;
+    public Person person;
     public Text display;
 
-    public void Set(Townie townie)
-    {
-        this.townie = townie;
+    public PeopleDetailTab PeopleDetailTab;
 
-        display.text = this.townie.ToString();
+    public void Set(Person person, PeopleDetailTab PeopleDetailTab)
+    {
+        this.person = person;
+        this.townie = person.Id;
+        this.PeopleDetailTab = PeopleDetailTab;
+
+        display.text = this.townie;
+    }
+
+    public void OpenPeopleDetailTab()
+    {
+        PeopleDetailTab.gameObject.SetActive(true);
+        PeopleDetailTab.Set(person);
     }
 }
