@@ -12,6 +12,8 @@ public class Person
     public string location = "uninitialized";
     public Feature feature; //this is them as a feature, gets moved around the map.
 
+    public List<ExecutedAction> history = new List<ExecutedAction>();
+
     public Dictionary<string, int> inventory;
     public Dictionary<string, float> relationships;
 

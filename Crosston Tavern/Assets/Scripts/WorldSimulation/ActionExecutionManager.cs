@@ -50,8 +50,10 @@ public class ActionExecutionManager : ActionManager
             }
         }
 
+        ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
 
-        return new ExecutedAction(chosenAction, chosenEffect);
+        actor.history.Add(finalAction);
+        return finalAction;
     }
 
     Effect PickEffect(WeightedAction action)
