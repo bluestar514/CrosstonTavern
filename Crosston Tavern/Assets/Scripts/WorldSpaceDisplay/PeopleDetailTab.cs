@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class PeopleDetailTab : DetailTab
 {
+    public Text location;
+    public Text body;
 
     public Person displayedPerson;
 

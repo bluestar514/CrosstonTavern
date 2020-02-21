@@ -11,13 +11,22 @@ public class EventPanel : MonoBehaviour
 
     public Text display;
 
-    public void Set(string townie, ExecutedAction action, int time)
+    public EventDetailPanel eventDetailPanel;
+
+    public void Set(string townie, ExecutedAction action, int time, EventDetailPanel eventDetailPanel)
     {
         townieRow = townie;
         timeStep = time;
         this.action = action;
 
+        this.eventDetailPanel = eventDetailPanel;
 
         display.text = action.ToString();
+    }
+
+    public void OpenEventDetailsPanel()
+    {
+        eventDetailPanel.Set(action);
+        eventDetailPanel.OpenTab();
     }
 }

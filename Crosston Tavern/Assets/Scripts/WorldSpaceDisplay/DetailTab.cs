@@ -6,8 +6,6 @@ using UnityEngine.UI;
 public class DetailTab : MonoBehaviour
 {
     public Text displayName;
-    public Text location;
-    public Text body;
 
     public bool startOpen = false;
 
@@ -17,7 +15,13 @@ public class DetailTab : MonoBehaviour
         gameObject.SetActive(startOpen);
     }
 
-    public void CloseTab()
+    public void OpenTab()
+    {
+
+        gameObject.SetActive(true);
+    }
+
+    public virtual void CloseTab()
     {
         gameObject.SetActive(false);
     }

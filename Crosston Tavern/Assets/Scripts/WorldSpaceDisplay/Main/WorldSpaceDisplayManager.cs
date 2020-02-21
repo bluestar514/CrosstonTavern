@@ -16,6 +16,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
     public GameObject EventContent;
 
     public PeopleDetailTab PeopleDetailTab;
+    public EventDetailPanel EventDetailTab;
 
     public GameObject TownieNamePanelPrefab;
     public GameObject TimePanelPrefab;
@@ -25,7 +26,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
 
     List<string> townieDisplayOrder;
 
-    public void Start()
+    public void Awake()
     {
         h = EventPanelPrefab.GetComponent<RectTransform>().rect.height;
         w = EventPanelPrefab.GetComponent<RectTransform>().rect.width;
@@ -105,7 +106,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
     GameObject AddEventPanel(string townie, ExecutedAction action, int timeStep)
     {
         GameObject eventPanel = Instantiate(EventPanelPrefab, EventContent.transform);
-        eventPanel.GetComponent<EventPanel>().Set(townie, action, timeStep);
+        eventPanel.GetComponent<EventPanel>().Set(townie, action, timeStep, EventDetailTab);
 
         PositionEventPanel(eventPanel.GetComponent<EventPanel>());
         ResizeContentPanels();
