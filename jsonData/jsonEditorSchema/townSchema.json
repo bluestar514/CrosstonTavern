@@ -1,0 +1,38 @@
+{ 
+	"type": "array",
+	"format" : "tab",
+	"items": {
+		"title" : "Location",
+		"type" : "object",
+		"headerTemplate": "{{i1}} - {{self.id}}",
+		"required":[
+			"id",
+			"connected",
+			"resources"
+		],
+		"properties":{
+			"id" :{
+				"type" :  "string",
+				"description" : "system's identifier for location"
+			},
+			"connected" :{
+				"type" : "array", 
+				"format" : "table",
+				"uniqueItems": true,
+				"items":{
+					"type" : "string",
+					"title": "locations"
+				},
+				"default": null
+			},
+			"resources" :{
+				"type" : "array",
+				"format" : "tab",
+				"uniqueItems" : true,
+				"items":{
+					"type": "object"
+				}
+			}
+		}
+	}
+}

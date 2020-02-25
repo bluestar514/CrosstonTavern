@@ -19,15 +19,16 @@ public class Person
 
     public Dictionary<MicroEffect, float> goalPriorityDict;
 
-    public Dictionary<string, List<string>> resources;
+    public StringStringListDictionary resources;
 
     public Person(string id)
     {
         Id = id;
 
-        resources = new Dictionary<string, List<string>>() {
+        resources = new StringStringListDictionary();
+        resources.CopyFrom(    new Dictionary<string, List<string>>() {
             {ResourceCatagories.r_initiator, new List<string>(){id } }
-        };
+        });
 
         feature = new Feature("person_" + Id, location,
                 new List<GenericAction>() { },

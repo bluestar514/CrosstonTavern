@@ -11,7 +11,14 @@ public class WorldHub : MonoBehaviour
 
     public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
 
+    public LoadWorldData wi;
     public WorldSpaceDisplayManager wsdm;
+    public TextAsset locationData;
+    public TextAsset featureData;
+
+    public StringStringListDictionary test = new StringStringListDictionary() {
+        {"ahhh", new List<string>(){"wee", "woo"} }
+    };
 
     private void Start()
     {
@@ -57,12 +64,19 @@ public class WorldHub : MonoBehaviour
 
     void InitalizeWorld()
     {
-        WorldInitializer wi = new WorldInitializer();
-        List<Person> people = wi.InitializePeople();
+        wi = new LoadWorldData(locationData, featureData); //new WorldInitializer();
+        List <Person> people = wi.InitializePeople();
         registry = wi.InitializeRegistry(people);
         map = wi.InitializeMap(people);
     }
 
 }
 
+[Serializable]
+public class StringListStorage : SerializableDictionary.Storage<List<string>>
+{ }
 
+[Serializable]
+public class StringStringListDictionary : SerializableDictionary<string,
+List<string>, StringListStorage>
+{ }

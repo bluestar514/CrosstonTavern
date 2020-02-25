@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
 public class WorldInitializer
 {
-    List<Location> InitializeLocations()
+
+    protected virtual List<Location> InitializeLocations()
     {
         List<Location> locations = new List<Location>() {
             new Location("farm",
@@ -116,7 +118,7 @@ public class WorldInitializer
         return locations;
     }
 
-    public List<Person> InitializePeople()
+    public virtual List<Person> InitializePeople()
     {
         List<Person> people = new List<Person>() {
             new Person("Alicia"),
@@ -133,7 +135,7 @@ public class WorldInitializer
         return people;
     }
 
-    public Dictionary<string, GenericAction> InitializeActions()
+    public virtual Dictionary<string, GenericAction> InitializeActions()
     {
         Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>() {
             {
@@ -196,7 +198,7 @@ public class WorldInitializer
         return actions;
     }
 
-    List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions, List<Location> locations, List<Person> people)
+    protected virtual List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions, List<Location> locations, List<Person> people)
     {
         List<Feature> features = new List<Feature>() {
             new Feature("farm_river", "farm",
@@ -218,10 +220,19 @@ public class WorldInitializer
             
         };
 
-        foreach( Location location in locations) {
+        AddDoors(features, actions, locations);
+
+        AddPeople(features, people, actions);
+
+        return features;
+    }
+
+    protected void AddDoors(List<Feature> features, Dictionary<string, GenericAction> actions, List<Location> locations)
+    {
+        foreach (Location location in locations) {
             List<Feature> doors = new List<Feature>(
                     from loc in location.resources["connectedLocation"]
-                    select new Feature("door_" + location.Id + "->" + loc, 
+                    select new Feature("door_" + location.Id + "->" + loc,
                                         location.Id,
                                         new List<GenericAction>() {
                                             actions["move"]
@@ -234,9 +245,10 @@ public class WorldInitializer
 
             features.AddRange(doors);
         }
+    }
 
-
-
+    protected void AddPeople(List<Feature> features, List<Person> people, Dictionary<string, GenericAction> actions)
+    {
         foreach (Person person in people) {
             person.location = "farm";
             person.feature.providedActions.Add(actions["talk"]);
@@ -248,12 +260,9 @@ public class WorldInitializer
                 {new Move("forest"), 1 }
             };
         }
-
-
-        return features;
     }
 
-    public Map InitializeMap(List<Person> people)
+    public virtual Map InitializeMap(List<Person> people)
     {
         List<Location> locations = InitializeLocations();
         List<Feature> features = InitializeFeatures(InitializeActions(), locations, people);
@@ -261,7 +270,7 @@ public class WorldInitializer
         return new Map(features, locations);
     }
 
-    public Registry InitializeRegistry(List<Person> people)
+    public virtual Registry InitializeRegistry(List<Person> people)
     {
         return new Registry(people);
     }

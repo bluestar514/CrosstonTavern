@@ -1,0 +1,41 @@
+{
+	"features":
+	[
+		{
+			"id": "farm_river",
+			"location": "farm",
+			"actions": ["fish"],
+			"resources": {
+				"fish": ["#fish#", "smelt"],
+				"trash": ["#trash#"]
+			}
+		},
+		{
+			"id": "forest_river",
+			"location": "forest",
+			"actions": ["fish"],
+			"resources":{
+				"fish": ["#fish#"],
+				"trash": ["#trash#"]
+			}
+		},
+		{
+			"id": "town_river",
+			"location": "townSquare",
+			"actions": ["fish"],
+			"resources":{
+				"fish": ["#fish#"],
+				"trash": ["#trash#"]
+			}
+		},
+		{
+			"id": "ocean",
+			"location": "port",
+			"actions": ["fish"],
+			"resources":{
+				"fish": ["#fish#"],
+				"trash": ["#trash#"]
+			}
+		}
+	]
+}

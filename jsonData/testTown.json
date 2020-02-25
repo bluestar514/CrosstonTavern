@@ -1,0 +1,60 @@
+{
+	"locations":[
+		{
+			"id": "farm",
+			"resources":{
+				"fish": ["trout", "goldfish"],
+				"herb": ["blue_herb", "red_herb"]
+			}
+		},
+		{
+			"id": "townSquare",
+			"resources":{
+				"fish": ["trout", "goldfish"],
+				"herb": ["blue_herb", "red_herb"]
+			}
+		}, 
+		{
+			"id": "field",
+			"resources":{
+				"herb":["green_herb", "red_herb"],
+				"mushroom": ["common_mushroom"], 
+				"poisonous_mushroom" : ["red_cap_mushroom"],
+				"flower": ["dandilions", "clover", "yellow_flower"]
+			}
+		},
+		{
+			"id": "caves",
+			"resources":{
+				"mushroom": ["common_mushroom"], 
+				"poisonous_mushroom" : ["red_cap_mushroom"],
+				"mineral":["iron_ore", "copper_ore", "gold_ore", "silver_ore"],
+				"gems":["ruby", "saphire", "emerald", "diamond"]
+			}
+		},
+		{
+			"id": "port",
+			"resources":{
+				"fish": ["tuna", "bat_ray", "sunfish", "smelt"],
+				"trash": ["algee", "old_boot", "tin_can", "newspaper"]
+			}
+		},
+		{
+			"id":"forest",
+			"resources":{
+				"fish" : ["trout", "salmon", "goldfish"],
+				"trash": ["algee", "old_boot", "tin_can", "newspaper"],
+				"mushroom": ["common_mushroom"], 
+				"poisonous_mushroom" : ["red_cap_mushroom"],
+				"herb":["green_herb", "red_herb"]
+			}
+		}
+	],
+	"connections": [
+		{"a" : ["farm", "field"]},
+		{"a" :["field", "caves"]},
+		{"a" :["forest", "townSquare"]},
+		{"a" :["townSquare", "port"]},
+		{"a" :["field", "forest"]}
+	]
+}

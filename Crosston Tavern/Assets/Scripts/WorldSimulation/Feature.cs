@@ -11,13 +11,14 @@ public class Feature
     public string location;
 
     public List<GenericAction> providedActions;
-    public Dictionary<string, List<string>> relevantResources;
+    public StringStringListDictionary relevantResources;
 
     public Feature(string id, string location, List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources)
     {
         Id = id;
         this.location = location;
         this.providedActions = providedActions;
-        this.relevantResources = relevantResources;
+        this.relevantResources = new StringStringListDictionary();
+        this.relevantResources.CopyFrom(relevantResources);
     }
 }

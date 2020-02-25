@@ -1463,6 +1463,15 @@ MonoBehaviour:
   registry:
     People: []
   wsdm: {fileID: 844642311}
+  locationData: {fileID: 4900000, guid: da838b5b3064e734cb15c555cfa8763e, type: 3}
+  featureData: {fileID: 4900000, guid: af4fff6c6f554654fa275fe1b123c1cd, type: 3}
+  test:
+    m_keys:
+    - ahhh
+    m_values:
+    - data:
+      - wee
+      - woo
 --- !u!4 &762257167
 Transform:
   m_ObjectHideFlags: 0
@@ -2000,7 +2009,13 @@ MonoBehaviour:
       id: 
       location: 
       providedActions: []
+      relevantResources:
+        m_keys: []
+        m_values: []
     history: []
+    resources:
+      m_keys: []
+      m_values: []
 --- !u!224 &1255531079
 RectTransform:
   m_ObjectHideFlags: 0

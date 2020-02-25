@@ -1,0 +1,29 @@
+{
+	"title" : "Feature",
+	"type"	: "object",
+	"required": [
+		"id",
+		"location",
+		"resources"
+	],
+	"properties" :{
+		"id":{
+			"type":"string"
+		},
+		"location": {
+			"type":"string",
+			"enum":[
+				"farm",
+				"town"
+			]
+		},
+		"resources" :{
+			"type" : "array",
+			"format" : "table",
+			"uniqueItems" : true,
+			"items":{
+				"type": "object"
+			}
+		}
+	}
+}
