@@ -10,3 +10,11 @@ public class Condition
         return true;
     }
 }
+
+public class ConditionNotYou : Condition
+{
+    public override bool InEffect(Person actor, Feature feature, Location location)
+    {
+        return actor.feature.Id != feature.Id;
+    }
+}

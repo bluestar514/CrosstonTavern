@@ -51,10 +51,10 @@
 		}
 	],
 	"connections": [
-		{"a" : ["farm", "field"]},
-		{"a" :["field", "caves"]},
-		{"a" :["forest", "townSquare"]},
-		{"a" :["townSquare", "port"]},
-		{"a" :["field", "forest"]}
+		["farm", "field"],
+		["field", "caves"],
+		["forest", "townSquare"],
+		["townSquare", "port"],
+		["field", "forest"]
 	]
 }

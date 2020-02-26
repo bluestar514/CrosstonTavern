@@ -1,17 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leguar.TotalJSON;
 
 public class LoadWorldData : WorldInitializer
 {
-    JSONLocationFile jsonLocObj;
-    JSONFeatureFile jsonFeatObj;
+    JSON totalJsonLocation;
+    JSON totalJsonFeature;
 
     public LoadWorldData(TextAsset locationsJsonFile, TextAsset featuresJsonFile)
     {
-        jsonLocObj = JsonUtility.FromJson<JSONLocationFile>(locationsJsonFile.text);
 
-        jsonFeatObj = JsonUtility.FromJson<JSONFeatureFile>(featuresJsonFile.text);
+        totalJsonLocation = JSON.ParseString(locationsJsonFile.text);
+        totalJsonLocation.DebugInEditor("Locations");
+
+        totalJsonFeature = JSON.ParseString(featuresJsonFile.text);
+        totalJsonFeature.DebugInEditor("Features");
     }
 
     protected override List<Location> InitializeLocations()
@@ -19,10 +23,10 @@ public class LoadWorldData : WorldInitializer
         Dictionary<string, HashSet<string>> connections = new Dictionary<string, HashSet<string>>();
 
 
-        foreach(JSONPairs pair in jsonLocObj.connections) {
-            List<string> connection = pair.a;
-            string a = connection[0];
-            string b = connection[1];
+        foreach (JArray connection in totalJsonLocation.GetJArray("connections").AsJArrayArray()) {
+            string[] con = connection.AsStringArray();
+            string a = con[0];
+            string b = con[1];
 
             if (connections.ContainsKey(a)) {
                 connections[a].Add(b);
@@ -42,27 +46,51 @@ public class LoadWorldData : WorldInitializer
         }
 
         List<Location> locations = new List<Location>();
-        foreach(JSONLocation jsonLoc in jsonLocObj.locations) {
-            Dictionary<string, List<string>> resources = jsonLoc.resources;
-            resources.Add(ResourceCatagories.r_connectedLocation,new List<string>(connections[jsonLoc.id]));
-            locations.Add(new Location(jsonLoc.id, resources));
+        foreach(JSON location in totalJsonLocation.GetJArray("locations").AsJSONArray()) {
+            string id = location.GetString("id");
+
+            JSON jsonResources = location.GetJSON("resources");
+            StringStringListDictionary resources = ParseResources(jsonResources);
+
+            resources.Add(ResourceCatagories.r_connectedLocation, new List<string>(connections[id]));
+
+            locations.Add(new Location(id, resources));
         }
 
+
         return locations;
+    }
+
+    StringStringListDictionary ParseResources(JSON jsonResources)
+    {
+        StringStringListDictionary resources = new StringStringListDictionary();
+        
+        foreach (string jsonResource in jsonResources.Keys) {
+            List<string> list = new List<string>(jsonResources.GetJArray(jsonResource).AsStringArray());
+            resources.Add(jsonResource, list);
+        }
+
+        return resources;
     }
 
     protected override List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions, List<Location> locations, List<Person> people)
     {
         List<Feature> features = new List<Feature>();
 
-        foreach(JSONFeature jsonFeat in jsonFeatObj.features) {
+        foreach(JSON feature in totalJsonFeature.GetJArray("features").AsJSONArray()) {
+            string id = feature.GetString("id");
+            string location = feature.GetString("location");
+
             List<GenericAction> genericActions = new List<GenericAction>();
-            foreach(string actionId in jsonFeat.actions) {
+            foreach (string actionId in feature.GetJArray("actions").AsStringArray()) {
                 Debug.Log(actionId);
                 genericActions.Add(actions[actionId]);
             }
 
-            features.Add(new Feature(jsonFeat.id, jsonFeat.location, genericActions, jsonFeat.resources));
+            JSON jsonResources = feature.GetJSON("resources");
+            StringStringListDictionary resources = ParseResources(jsonResources);
+
+            features.Add(new Feature(id, location, genericActions, resources));
         }
 
 
@@ -73,38 +101,5 @@ public class LoadWorldData : WorldInitializer
         return features;
     }
 
-    [System.Serializable]
-    class JSONPairs
-    {
-        public List<string> a;
-    }
 
-    [System.Serializable]
-    class JSONLocationFile
-    {
-        public List<JSONLocation> locations;
-        public List<JSONPairs> connections;
-    }
-
-    [System.Serializable]
-    class JSONLocation
-    {
-        public string id;
-        public StringStringListDictionary resources;
-    }
-
-    [System.Serializable]
-    class JSONFeatureFile
-    {
-        public List<JSONFeature> features;
-    }
-
-    [System.Serializable]
-    class JSONFeature
-    {
-        public string id;
-        public string location;
-        public List<string> actions;
-        public StringStringListDictionary resources;
-    }
 }

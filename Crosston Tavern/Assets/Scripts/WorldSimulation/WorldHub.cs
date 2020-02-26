@@ -16,10 +16,6 @@ public class WorldHub : MonoBehaviour
     public TextAsset locationData;
     public TextAsset featureData;
 
-    public StringStringListDictionary test = new StringStringListDictionary() {
-        {"ahhh", new List<string>(){"wee", "woo"} }
-    };
-
     private void Start()
     {
         InitalizeWorld();
@@ -72,11 +68,3 @@ public class WorldHub : MonoBehaviour
 
 }
 
-[Serializable]
-public class StringListStorage : SerializableDictionary.Storage<List<string>>
-{ }
-
-[Serializable]
-public class StringStringListDictionary : SerializableDictionary<string,
-List<string>, StringListStorage>
-{ }

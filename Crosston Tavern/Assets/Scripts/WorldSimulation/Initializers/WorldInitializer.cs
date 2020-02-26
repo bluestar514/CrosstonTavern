@@ -180,7 +180,7 @@ public class WorldInitializer
             },
             {
                 "talk",
-                new GenericAction("talk", new List<Condition>(),
+                new GenericAction("talk", new List<Condition>(){ new ConditionNotYou()},
                     new List<Effect>(){
                         new Effect(
                             new ChanceModifier(),
@@ -257,7 +257,9 @@ public class WorldInitializer
             features.Add(person.feature);
 
             person.goalPriorityDict = new Dictionary<MicroEffect, float>() {
-                {new Move("forest"), 1 }
+                {new Move("forest"), 1 },
+                {new InvChange(5, 1000, person.Id, new List<string>(){"goldfish" }), 1 }
+
             };
         }
     }
