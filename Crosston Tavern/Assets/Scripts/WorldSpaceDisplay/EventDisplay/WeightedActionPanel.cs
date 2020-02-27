@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WeightedActionPanel : MonoBehaviour
+public class WeightedActionPanel : SubDisplayPanel<WeightedAction>
 {
     public Text idText;
     public GameObject RationalsPanel;
@@ -11,7 +11,7 @@ public class WeightedActionPanel : MonoBehaviour
 
     WeightedAction action;
 
-    public void Set(WeightedAction action)
+    public override void Set(WeightedAction action)
     {
         this.action = action;
 

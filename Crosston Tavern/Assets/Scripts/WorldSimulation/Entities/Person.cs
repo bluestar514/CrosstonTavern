@@ -30,7 +30,7 @@ public class Person
             {ResourceCatagories.r_initiator, new List<string>(){id } }
         });
 
-        feature = new Feature("person_" + Id, location,
+        feature = new Feature("person_" + Id, location, 2,
                 new List<GenericAction>() { },
                 new Dictionary<string, List<string>> {
                     {ResourceCatagories.r_recipient, new List<string>() { id } }

@@ -41,10 +41,6 @@ public class LoadWorldData : WorldInitializer
             }
         }
 
-        foreach(string key in connections.Keys) {
-            Debug.Log(key + ": " + string.Join(",", connections[key]));
-        }
-
         List<Location> locations = new List<Location>();
         foreach(JSON location in totalJsonLocation.GetJArray("locations").AsJSONArray()) {
             string id = location.GetString("id");
@@ -80,17 +76,17 @@ public class LoadWorldData : WorldInitializer
         foreach(JSON feature in totalJsonFeature.GetJArray("features").AsJSONArray()) {
             string id = feature.GetString("id");
             string location = feature.GetString("location");
+            int maxUsers = feature.GetInt("maxUsers");
 
             List<GenericAction> genericActions = new List<GenericAction>();
             foreach (string actionId in feature.GetJArray("actions").AsStringArray()) {
-                Debug.Log(actionId);
                 genericActions.Add(actions[actionId]);
             }
 
             JSON jsonResources = feature.GetJSON("resources");
             StringStringListDictionary resources = ParseResources(jsonResources);
 
-            features.Add(new Feature(id, location, genericActions, resources));
+            features.Add(new Feature(id, location, maxUsers, genericActions, resources));
         }
 
 

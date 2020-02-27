@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EffectPanel : MonoBehaviour
+public class EffectPanel : SubDisplayPanel<MicroEffect>
 {
     public Text idText;
 
     MicroEffect effect;
 
-    public void Set(MicroEffect effect)
+    public override void Set(MicroEffect effect)
     {
         this.effect = effect;
 

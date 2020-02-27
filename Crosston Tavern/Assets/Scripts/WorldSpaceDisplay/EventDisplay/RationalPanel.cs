@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RationalPanel : MonoBehaviour
+public class RationalPanel : SubDisplayPanel<WeightedAction.WeightRational>
 {
     public Text idText;
 
     WeightedAction.WeightRational rational;
 
-    public void Set(WeightedAction.WeightRational rational)
+    public override void Set(WeightedAction.WeightRational rational)
     {
         this.rational = rational;
 

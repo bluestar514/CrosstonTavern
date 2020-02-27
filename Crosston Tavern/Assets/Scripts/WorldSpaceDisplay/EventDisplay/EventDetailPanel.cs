@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class EventDetailPanel : DetailTab
 {
+    public GameObject InvalidActionsPanel;
     public GameObject RejectedActionsPanel;
     public GameObject RationalsPanel;
     public GameObject EffectsPanel;
 
+    public GameObject InvalidActionsPrefab;
     public GameObject WeightedActionPrefab;
     public GameObject RationalsPrefab;
     public GameObject EffectsPrefab;
@@ -27,27 +29,34 @@ public class EventDetailPanel : DetailTab
     {
         displayName.text = action.ToString();
 
-        foreach (Transform child in RejectedActionsPanel.transform) {
-            GameObject.Destroy(child.gameObject);
-        }
-        foreach (Transform child in RationalsPanel.transform) {
-            GameObject.Destroy(child.gameObject);
-        }
-        foreach (Transform child in EffectsPanel.transform) {
-            GameObject.Destroy(child.gameObject);
-        }
+        ClearPanel(InvalidActionsPanel);
+        ClearPanel(RejectedActionsPanel);
+        ClearPanel(RationalsPanel);
+        ClearPanel(EffectsPanel);
 
-        foreach (WeightedAction wa in action.rejectedChoices) {
-            GameObject panel = Instantiate(WeightedActionPrefab, RejectedActionsPanel.transform);
-            panel.GetComponent<WeightedActionPanel>().Set(wa);
+
+        FillPanel(InvalidActionsPanel, InvalidActionsPrefab, action.invalidChoices);
+        FillPanel(RejectedActionsPanel, WeightedActionPrefab, action.rejectedChoices);
+        FillPanel(RationalsPanel, RationalsPrefab, action.Action.weightRationals);
+        FillPanel(EffectsPanel, EffectsPrefab, action.executedEffect.effects);
+
+    }
+
+
+    void ClearPanel(GameObject panel)
+    {
+        foreach (Transform child in panel.transform) {
+            GameObject.Destroy(child.gameObject);
         }
-        foreach(WeightedAction.WeightRational rational in action.Action.weightRationals) {
-            GameObject panel = Instantiate(RationalsPrefab, RationalsPanel.transform);
-            panel.GetComponent<RationalPanel>().Set(rational);
-        }
-        foreach (MicroEffect effect in action.executedEffect.effects) {
-            GameObject panel = Instantiate(EffectsPrefab, EffectsPanel.transform);
-            panel.GetComponent<EffectPanel>().Set(effect);
+    }
+
+    void FillPanel<T>(GameObject parentPanel, GameObject prefab, List<T> contents)
+    {
+        foreach (T content in contents) {
+            GameObject panel = Instantiate(prefab, parentPanel.transform);
+            panel.GetComponent<SubDisplayPanel<T>>().Set(content);
         }
     }
 }
+
+

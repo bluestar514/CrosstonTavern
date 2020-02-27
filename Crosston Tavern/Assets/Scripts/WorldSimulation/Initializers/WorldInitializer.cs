@@ -140,8 +140,8 @@ public class WorldInitializer
         Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>() {
             {
                 "fish",
-                new GenericAction("fish",
-                    new List<Condition>(),
+                new GenericAction("fish", 5,
+                    new List<Condition>(){ new ConditionSpaceAtFeature()},
                     new List<Effect>() {
                         new Effect(
                             new ChanceModifierSimple(.4f),
@@ -166,8 +166,8 @@ public class WorldInitializer
             },
             {
                 "move",
-                new GenericAction("move",
-                    new List<Condition>(),
+                new GenericAction("move", 0,
+                    new List<Condition>(){ new ConditionSpaceAtFeature()},
                     new List<Effect>() {
                         new Effect(
                             new ChanceModifier(),
@@ -179,8 +179,34 @@ public class WorldInitializer
                 )
             },
             {
+                "forage",
+                new GenericAction("forage", 3,
+                    new List<Condition>(){ new ConditionSpaceAtFeature()},
+                    new List<Effect>() {
+                        new Effect(
+                            new ChanceModifierSimple(.5f),
+                            new List<MicroEffect>() {
+                                new InvChange(1, 5, "#"+ResourceCatagories.r_initiator+"#", new List<string>(){"#mushroom#", "#herb#" })
+                            }
+                        ),
+                        new Effect(
+                            new ChanceModifierSimple(.25f),
+                            new List<MicroEffect>() {
+                                new InvChange(1, 3, "#"+ResourceCatagories.r_initiator+"#", new List<string>(){"#flower#" })
+                            }
+                        ),
+                        new Effect(
+                            new ChanceModifierSimple(.25f),
+                            new List<MicroEffect>() {
+                                new InvChange(1, 5, "#"+ResourceCatagories.r_initiator+"#", new List<string>(){"#poisonous_mushroom#" })
+                            }
+                        )
+                    }
+                )
+            },
+            {
                 "talk",
-                new GenericAction("talk", new List<Condition>(){ new ConditionNotYou()},
+                new GenericAction("talk", 1, new List<Condition>(){ new ConditionNotYou(), new ConditionSpaceAtFeature()},
                     new List<Effect>(){
                         new Effect(
                             new ChanceModifier(),
@@ -201,7 +227,7 @@ public class WorldInitializer
     protected virtual List<Feature> InitializeFeatures(Dictionary<string, GenericAction> actions, List<Location> locations, List<Person> people)
     {
         List<Feature> features = new List<Feature>() {
-            new Feature("farm_river", "farm",
+            new Feature("farm_river", "farm", 2,
                 new List<GenericAction>(){
                     actions["fish"]
                 },
@@ -209,7 +235,7 @@ public class WorldInitializer
                     {"fish", new List<string>(){ "#fish#", "smelt"} }
                 }
             ),
-            new Feature("forest_river", "forest",
+            new Feature("forest_river", "forest", 2,
                 new List<GenericAction>(){
                     actions["fish"]
                 },
@@ -233,7 +259,7 @@ public class WorldInitializer
             List<Feature> doors = new List<Feature>(
                     from loc in location.resources["connectedLocation"]
                     select new Feature("door_" + location.Id + "->" + loc,
-                                        location.Id,
+                                        location.Id, 10000,
                                         new List<GenericAction>() {
                                             actions["move"]
                                         },

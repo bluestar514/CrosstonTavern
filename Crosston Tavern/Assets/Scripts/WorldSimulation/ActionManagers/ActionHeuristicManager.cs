@@ -31,13 +31,15 @@ public class ActionHeuristicManager : ActionManager
     public ChosenAction ChooseAction(List<WeightedAction> choices)
     {
         choices = new List<WeightedAction>(choices.OrderByDescending(action => action.weight));
+        if (choices.Count == 0) return null;
 
         int rand = Mathf.FloorToInt(UnityEngine.Random.value * 3);
+        rand = Mathf.Clamp(rand, 0, choices.Count-1);
 
         WeightedAction choice = choices[rand];
         choices.RemoveAt(rand);
 
-        return new ChosenAction(choice, choices);
+        return new ChosenAction(choice,GetRejectedOnPrecondition(GatherProvidedActionsFor()), choices);
     }
 
     //Steps toward Generating Weighted Options:
@@ -58,6 +60,16 @@ public class ActionHeuristicManager : ActionManager
                                                          map.GetLocation(action.LocationId))
                                      select action);
 
+    }
+
+    List<BoundAction> GetRejectedOnPrecondition(List<BoundAction> actions)
+    {
+        return new List<BoundAction>(from action in actions
+                                     where !action.SatisfiedPreconditions(
+                                                         actor,
+                                                         map.GetFeature(action.FeatureId),
+                                                         map.GetLocation(action.LocationId))
+                                     select action);
     }
 
     List<WeightedAction> WeighOptions(List<BoundAction> actions)

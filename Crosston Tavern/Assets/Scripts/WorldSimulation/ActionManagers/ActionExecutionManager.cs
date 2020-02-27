@@ -16,44 +16,53 @@ public class ActionExecutionManager : ActionManager
         this.map = map;
     }
 
-
-
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
         WeightedAction action = chosenAction.Action;
-
-        Effect chosenEffect = PickEffect(action);
-
-        foreach(MicroEffect effect in chosenEffect.effects) {
-            if (effect is InvChange) {
-                InvChange invChange = (InvChange)effect;
-
-                Person subject = people.GetPerson(invChange.InvOwner);
-
-                subject.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
-            }
-
-
-            if (effect is Move) {
-                Move move = (Move)effect;
-
-                actor.Move(move.TargetLocation);
-            }
-
-
-            if (effect is SocialChange) {
-                SocialChange socialChange = (SocialChange)effect;
-
-                Person source = people.GetPerson(socialChange.SourceId);
-
-                source.ChangeRelationshipValue(socialChange.DeltaMin, socialChange.TargetId);
-            }
+        Feature feature = this.map.GetFeature(action.FeatureId);
+        if (!chosenAction.Started()) {
+            feature.Use();
         }
 
-        ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
+        if (chosenAction.Complete()) {
+            feature.FinishUse();
 
-        actor.history.Add(finalAction);
-        return finalAction;
+            Effect chosenEffect = PickEffect(action);
+
+            foreach (MicroEffect effect in chosenEffect.effects) {
+                if (effect is InvChange) {
+                    InvChange invChange = (InvChange)effect;
+
+                    Person subject = people.GetPerson(invChange.InvOwner);
+                    subject.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
+                }
+
+
+                if (effect is Move) {
+                    Move move = (Move)effect;
+
+                    actor.Move(move.TargetLocation);
+                }
+
+
+                if (effect is SocialChange) {
+                    SocialChange socialChange = (SocialChange)effect;
+
+                    Person source = people.GetPerson(socialChange.SourceId);
+
+                    source.ChangeRelationshipValue(socialChange.DeltaMin, socialChange.TargetId);
+                }
+            }
+
+            ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
+
+            actor.history.Add(finalAction);
+            return finalAction;
+        }
+
+        chosenAction.Progress();
+
+        return null;
     }
 
     Effect PickEffect(WeightedAction action)
