@@ -77,6 +77,15 @@
         "flower": [ "#flower#" ]
       }
 
+    },
+    {
+      "id": "town_fishShop",
+      "location": "town",
+      "maxUsers": 2,
+      "actions": [ ],
+      "resources": {
+        "stock": ["trout", "goldfish", "salmon"] 
+      }
     }
   ]
 }

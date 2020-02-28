@@ -27,6 +27,9 @@ public class WorldHub : MonoBehaviour
         foreach (Person person in registry.GetPeople()) {
             chosenActions.Add(person, null);
         }
+
+        registry.GetPerson("Alicia").placeOfWork = "town_fishShop";
+
         for (int i = 0; i < 1; i++) {
             TimeStep();
         }
@@ -39,6 +42,7 @@ public class WorldHub : MonoBehaviour
 
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
         foreach (Person person in registry.GetPeople()) {
+            
 
             if(chosenActions[person] == null) {
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person, registry, map);
@@ -60,6 +64,13 @@ public class WorldHub : MonoBehaviour
                 executedActions.Add(executedAction);
 
                 chosenActions[person] = null;
+
+
+                FisherGoalManager gm = new FisherGoalManager(map, registry, person);
+                gm.ClearCompletedGoals();
+
+                List<MicroEffect> newGoals = gm.GenerateNewGoals(GoalManager.State.gatherer);
+                gm.AddGoals(newGoals);
             }
         }
         timeStep.Add(executedActions);

@@ -19,11 +19,14 @@ public class ActionHeuristicManager : ActionManager
 
     //Public Facing:
 
-    public List<WeightedAction> GenerateWeightedOptions()
+    public List<WeightedAction> GenerateWeightedOptions(string location = "", int depth = 0)
     {
-        List<BoundAction> boundActions = GatherProvidedActionsFor();
+        if (depth >= 3) return new List<WeightedAction>();
+
+
+        List<BoundAction> boundActions = GatherProvidedActionsFor(location);
         boundActions = FilterOnPrecondition(boundActions);
-        List<WeightedAction> weightedActions = WeighOptions(boundActions);
+        List<WeightedAction> weightedActions = WeighOptions(boundActions, depth);
 
         return weightedActions;
     }
@@ -33,11 +36,25 @@ public class ActionHeuristicManager : ActionManager
         choices = new List<WeightedAction>(choices.OrderByDescending(action => action.weight));
         if (choices.Count == 0) return null;
 
-        int rand = Mathf.FloorToInt(UnityEngine.Random.value * 3);
-        rand = Mathf.Clamp(rand, 0, choices.Count-1);
+        //int rand = Mathf.FloorToInt(UnityEngine.Random.value * 3);
+        //rand = Mathf.Clamp(rand, 0, choices.Count-1);
 
-        WeightedAction choice = choices[rand];
-        choices.RemoveAt(rand);
+        float totalWeight = 0;
+        foreach(WeightedAction option in choices) {
+            totalWeight += option.weight;
+        }
+
+        float rand = UnityEngine.Random.value * totalWeight;
+        WeightedAction choice = choices[0];
+        foreach (WeightedAction option in choices) {
+            if (option.weight > rand) {
+                choice = option;
+                break;
+            }
+            rand -= option.weight;
+        }
+
+        choices.Remove(choice);
 
         return new ChosenAction(choice,GetRejectedOnPrecondition(GatherProvidedActionsFor()), choices);
     }
@@ -45,9 +62,10 @@ public class ActionHeuristicManager : ActionManager
     //Steps toward Generating Weighted Options:
 
 
-    List<BoundAction> GatherProvidedActionsFor()
+    List<BoundAction> GatherProvidedActionsFor(string location="")
     {
-        return map.GatherProvidedActionsForActorAt(actor.Id, actor.location);
+        if (location == "") location = actor.location;
+        return map.GatherProvidedActionsForActorAt(actor.Id, location);
     }
 
     List<BoundAction> FilterOnPrecondition(List<BoundAction> actions)
@@ -72,7 +90,7 @@ public class ActionHeuristicManager : ActionManager
                                      select action);
     }
 
-    List<WeightedAction> WeighOptions(List<BoundAction> actions)
+    List<WeightedAction> WeighOptions(List<BoundAction> actions, int depth)
     {
         List<WeightedAction> weightedActions = new List<WeightedAction>();
 
@@ -81,15 +99,16 @@ public class ActionHeuristicManager : ActionManager
 
             List<Effect> boundEffects = action.GenerateKnownEffects(resources);
 
-            weightedActions.Add(EvaluateAction(action, boundEffects));
+            weightedActions.Add(EvaluateAction(action, boundEffects, depth));
         }
 
         return weightedActions;
     }
 
 
-    WeightedAction EvaluateAction(BoundAction action, List<Effect> boundEffects)
+    WeightedAction EvaluateAction(BoundAction action, List<Effect> boundEffects, int depth)
     {
+
         List<WeightedAction.WeightRational> weightRationals = new List<WeightedAction.WeightRational>();
         foreach (Effect effect in boundEffects) {
             float effectLikelyhood = effect.EvaluateChance();
@@ -99,7 +118,7 @@ public class ActionHeuristicManager : ActionManager
                     MicroEffect goal = kvp.Key;
                     float priority = kvp.Value;
 
-                    float weight = priority * effectLikelyhood * EvaluateEffectTowardGoal(subeffect, goal);
+                    float weight = priority * effectLikelyhood * EvaluateEffectTowardGoal(subeffect, goal, depth);
 
                     weightRationals.Add(new WeightedAction.WeightRational(subeffect, goal, weight));
                 }
@@ -115,14 +134,15 @@ public class ActionHeuristicManager : ActionManager
 
     }
 
-    float EvaluateEffectTowardGoal(MicroEffect effect, MicroEffect goal)
+    float EvaluateEffectTowardGoal(MicroEffect effect, MicroEffect goal, int depth)
     {
+
         goal = goal.BindEffect(actor.resources);
 
         if (goal is InvChange) {
             InvChange invGoal = (InvChange)goal;
 
-            return EvaluateInvGoals(effect, invGoal);
+            return EvaluateInvGoals(effect, invGoal, depth);
         }
 
 
@@ -140,8 +160,9 @@ public class ActionHeuristicManager : ActionManager
         return 0;
     }
 
-    float EvaluateInvGoals(MicroEffect effect, InvChange goal)
+    float EvaluateInvGoals(MicroEffect effect, InvChange goal, int depth)
     {
+
         if (effect is InvChange) {
             InvChange invChange = (InvChange)effect;
 
@@ -171,9 +192,16 @@ public class ActionHeuristicManager : ActionManager
         }
 
         if (effect is Move) {
-            //Move move = (Move)effect;
+            Move move = (Move)effect;
 
-            return 0;
+            List<WeightedAction> actionsInNewLocation = GenerateWeightedOptions(move.TargetLocation, depth+1);
+
+            float weight = 0;
+            foreach (WeightedAction action in actionsInNewLocation) {
+                weight += action.weight / (2 * actionsInNewLocation.Count);
+            }
+
+            return weight;
         }
 
         if (effect is SocialChange) {
@@ -192,7 +220,7 @@ public class ActionHeuristicManager : ActionManager
 
             int dist = map.GetDistance(move.TargetLocation, goal.TargetLocation);
 
-            return map.LocationCount - dist;
+            return (map.LocationCount - dist)/map.LocationCount;
         }
 
         return 0;

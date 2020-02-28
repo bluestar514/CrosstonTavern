@@ -24,6 +24,11 @@ public class MicroEffect
         return new MicroEffect();
     }
 
+    public virtual bool GoalComplete(Map map, Registry registry, Person actor)
+    {
+        return false;
+    }
+
     public static List<string> BindId(List<string> idList, Dictionary<string, List<string>> resources)
     {
         List<string> newId = new List<string>();
@@ -91,6 +96,18 @@ public class InvChange: MicroEffect
         return new InvChange(randNum, randNum, InvOwner, new List<string>() { ItemId[randItem] });
     }
 
+    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    {
+        StringIntDictionary inv = registry.GetPerson(InvOwner).inventory;
+
+        int count = 0;
+        foreach (string item in ItemId) {
+            if (inv.ContainsKey(item)) count += inv[item];
+        }
+
+
+        return count >= DeltaMin && count <= DeltaMax;
+    }
     public override string ToString()
     {
         return "<InvChange("+InvOwner+", {" + DeltaMin + "~" + DeltaMax + "}, {" + String.Join(",", ItemId) + "} )>";
@@ -124,6 +141,10 @@ public class Move: MicroEffect
         return new Move(TargetLocation);
     }
 
+    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    {
+        return actor.location == targetLocation;
+    }
 
     public override string ToString()
     {
@@ -162,6 +183,15 @@ public class SocialChange : MicroEffect
 
         return new SocialChange(randNum, randNum, SourceId, TargetId);
     }
+
+    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    {
+        Person person = registry.GetPerson(SourceId);
+        float val = person.GetRelationshipValue(TargetId);
+
+        return  val >= DeltaMin && val <= DeltaMax;
+    }
+
     public override string ToString()
     {
         return "<SocialChange({" + DeltaMin + "~" + DeltaMax + "}, " + SourceId + "->"+TargetId + ")>";

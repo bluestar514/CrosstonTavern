@@ -14,8 +14,9 @@ public class Person
 
     public List<ExecutedAction> history = new List<ExecutedAction>();
 
-    public Dictionary<string, int> inventory;
-    public Dictionary<string, float> relationships;
+    public StringIntDictionary inventory;
+    public StringFloatDictionary relationships;
+    public string placeOfWork="unemployed"; //a feautreID
 
     public Dictionary<MicroEffect, float> goalPriorityDict;
 
@@ -36,8 +37,8 @@ public class Person
                     {ResourceCatagories.r_recipient, new List<string>() { id } }
                 }
             );
-        inventory = new Dictionary<string, int>();
-        relationships = new Dictionary<string, float>();
+        inventory = new StringIntDictionary();
+        relationships = new StringFloatDictionary();
     }
 
     public void Move(string locationId)

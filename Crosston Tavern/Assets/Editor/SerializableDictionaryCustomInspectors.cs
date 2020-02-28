@@ -5,6 +5,8 @@ public class StringListStoragePropertyDrawer :
 SerializableDictionaryStoragePropertyDrawer
 { }
 [CustomPropertyDrawer(typeof(StringStringListDictionary))]
-public class StringStringListStoragePropertyDrawer :
+[CustomPropertyDrawer(typeof(StringIntDictionary))]
+[CustomPropertyDrawer(typeof(StringFloatDictionary))]
+public class AnyDictionaryPropertyDrawer :
 SerializableDictionaryPropertyDrawer
 { }
