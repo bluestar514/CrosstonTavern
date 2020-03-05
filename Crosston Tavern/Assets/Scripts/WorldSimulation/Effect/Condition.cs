@@ -7,32 +7,53 @@ public class Condition
 {
     [SerializeField]
     protected string name = "GenericCondition";
-    public virtual bool InEffect(Person actor, Feature feature, Location location)
+    public virtual bool InEffect(Person actor, Feature feature, Location location, WorldState ws)
     {
         return true;
     }
+
+    public override string ToString()
+    {
+        return name;
+    }
 }
 
-public class ConditionNotYou : Condition
+public class Condition_NotYou : Condition
 {
-    public ConditionNotYou()
+    public Condition_NotYou()
     {
         name = "Condition:Don'tTargetSelf";
     }
-    public override bool InEffect(Person actor, Feature feature, Location location)
+    public override bool InEffect(Person actor, Feature feature, Location location, WorldState ws)
     { 
         return actor.feature.Id != feature.Id;
     }
 }
 
-public class ConditionSpaceAtFeature: Condition
+public class Condition_SpaceAtFeature: Condition
 {
-    public ConditionSpaceAtFeature()
+    public Condition_SpaceAtFeature()
     {
         name = "Condition:Can'tTargetFullFeature";
     }
-    public override bool InEffect(Person actor, Feature feature, Location location)
+    public override bool InEffect(Person actor, Feature feature, Location location, WorldState ws)
     {
         return feature.currentUsers < feature.maxUsers;
+    }
+}
+
+public class Condition_IsState: Condition
+{
+    public MicroEffect state;
+
+    public Condition_IsState(MicroEffect state) {
+        this.state = state;
+
+        name = "Condition:" + state.ToString();
+    }
+
+    public override bool InEffect(Person actor, Feature feature, Location location, WorldState ws)
+    {
+        return state.GoalComplete(ws, actor);
     }
 }

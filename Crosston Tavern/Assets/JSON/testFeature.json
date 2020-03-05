@@ -67,7 +67,7 @@
     },
     {
       "id": "town_riverBank",
-      "location": "town",
+      "location": "townSquare",
       "maxUsers": 2,
       "actions": [ "forage" ],
       "resources": {
@@ -80,11 +80,11 @@
     },
     {
       "id": "town_fishShop",
-      "location": "town",
+      "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ ],
+      "actions": [ "buy_fishing_rod" ],
       "resources": {
-        "stock": ["trout", "goldfish", "salmon"] 
+        "stock": [ "trout", "goldfish", "salmon" ]
       }
     }
   ]

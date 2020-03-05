@@ -115,6 +115,9 @@ public class Map
 
         List<Feature> nearByFeatures = GatherFeaturesAt(locationId);
 
+        //Debug.Log("Features at: " + locationId);
+        //nearByFeatures.ForEach(Debug.Log);
+
         List<BoundAction> availableActions = new List<BoundAction>();
         foreach (Feature feature in nearByFeatures) {
 
@@ -123,5 +126,12 @@ public class Map
         }
 
         return availableActions;
+    }
+
+
+    public List<string> GetNameOfLocations()
+    {
+        return new List<string>(from location in Locations
+                            select location.Id);
     }
 }

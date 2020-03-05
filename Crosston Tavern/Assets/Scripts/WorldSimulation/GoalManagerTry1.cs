@@ -3,23 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GoalManager 
+public class GoalManagerTry1
 {
-    protected Map map;
-    protected Registry registry;
+    protected WorldState ws;
     protected Person actor;
 
-    public GoalManager(Map map, Registry registry, Person actor)
+    public GoalManagerTry1(WorldState WS, Person actor)
     {
-        this.map = map;
-        this.registry = registry;
+        this.ws = WS;
         this.actor = actor;
     }
 
     public List<MicroEffect> GetCompletedGoals(List<MicroEffect> goals)
     {
         return new List<MicroEffect>(from goal in goals
-                                     where goal.GoalComplete(map, registry, actor)
+                                     where goal.GoalComplete(ws, actor)
                                      select goal);
     }
 
@@ -59,9 +57,9 @@ public class GoalManager
     } 
 }
 
-public class FisherGoalManager: GoalManager
+public class FisherGoalManager: GoalManagerTry1
 {
-    public FisherGoalManager(Map map, Registry registry, Person actor) : base(map, registry, actor)
+    public FisherGoalManager(WorldState ws, Person actor) : base(ws, actor)
     {
     }
 
@@ -98,7 +96,7 @@ public class FisherGoalManager: GoalManager
     {
         string placeOfWork = actor.placeOfWork;
         if (placeOfWork == "unemployed") return null;
-        return map.GetFeature(placeOfWork);
+        return ws.map.GetFeature(placeOfWork);
     }
 
     

@@ -6,8 +6,7 @@ using System;
 
 public class WorldHub : MonoBehaviour
 {
-    public Map map;
-    public Registry registry;
+    public WorldState ws;
 
     public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
 
@@ -21,14 +20,14 @@ public class WorldHub : MonoBehaviour
     {
         InitalizeWorld();
 
-        wsdm.AddPeople(new List<Person>(registry.GetPeople()));
+        wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
         
-        foreach (Person person in registry.GetPeople()) {
+        foreach (Person person in ws.registry.GetPeople()) {
             chosenActions.Add(person, null);
         }
 
-        registry.GetPerson("Alicia").placeOfWork = "town_fishShop";
+        ws.registry.GetPerson("Alicia").placeOfWork = "town_fishShop";
 
         for (int i = 0; i < 1; i++) {
             TimeStep();
@@ -39,13 +38,14 @@ public class WorldHub : MonoBehaviour
     public void TimeStep()
     {
         int i = timeStep.Count;
+        
 
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
-        foreach (Person person in registry.GetPeople()) {
+        foreach (Person person in ws.registry.GetPeople()) {
             
 
             if(chosenActions[person] == null) {
-                ActionHeuristicManager ahm = new ActionHeuristicManager(person, registry, map);
+                ActionHeuristicManager ahm = new ActionHeuristicManager(person, ws);
 
                 List<WeightedAction> weightedActions = ahm.GenerateWeightedOptions();
 
@@ -57,7 +57,7 @@ public class WorldHub : MonoBehaviour
             WeightedAction weightedAction = action.Action;
             List<Effect> potentialEffects = weightedAction.potentialEffects;
 
-            ActionExecutionManager aem = new ActionExecutionManager(registry.GetPerson(weightedAction.ActorId), registry, map);
+            ActionExecutionManager aem = new ActionExecutionManager(ws.registry.GetPerson(weightedAction.ActorId), ws);
 
             ExecutedAction executedAction = aem.ExecuteAction(action);
             if(executedAction != null) {
@@ -66,11 +66,18 @@ public class WorldHub : MonoBehaviour
                 chosenActions[person] = null;
 
 
-                FisherGoalManager gm = new FisherGoalManager(map, registry, person);
-                gm.ClearCompletedGoals();
+                GoalManager gm = new GoalManager(ws, person);
+                gm.AddModule(new GoalModule(person, new List<Goal>() {
+                    new Goal(new InvChange(1, 1, person.Id, new List<string>(){"salmon","trout"}), 1, 1)
+                }));
 
-                List<MicroEffect> newGoals = gm.GenerateNewGoals(GoalManager.State.gatherer);
-                gm.AddGoals(newGoals);
+                person.goals = gm.GetGoalsList();
+
+                person.goalPriorityDict = new GoalDictionary();
+                foreach (Goal goal in person.goals) {
+                    if(!person.goalPriorityDict.ContainsKey(goal.state))
+                        person.goalPriorityDict.Add(goal.state, goal.priority);
+                }
             }
         }
         timeStep.Add(executedActions);
@@ -78,10 +85,7 @@ public class WorldHub : MonoBehaviour
         foreach (ExecutedAction action in executedActions) {
             wsdm.AddEvent(action, i);
         }
-
-
-
-
+        ws.Tick(10);
 
     }
 
@@ -89,8 +93,10 @@ public class WorldHub : MonoBehaviour
     {
         wi = new LoadWorldData(locationData, featureData); //new WorldInitializer();
         List <Person> people = wi.InitializePeople();
-        registry = wi.InitializeRegistry(people);
-        map = wi.InitializeMap(people);
+        Registry registry = wi.InitializeRegistry(people);
+        Map map = wi.InitializeMap(people);
+
+        ws = new WorldState(map, registry, WorldTime.DayZeroEightAM);
     }
 
 }

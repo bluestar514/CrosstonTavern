@@ -18,7 +18,8 @@ public class Person
     public StringFloatDictionary relationships;
     public string placeOfWork="unemployed"; //a feautreID
 
-    public Dictionary<MicroEffect, float> goalPriorityDict;
+    public GoalDictionary goalPriorityDict;
+    public List<Goal> goals;
 
     public StringStringListDictionary resources;
 

@@ -29,12 +29,22 @@ public class BoundAction : GenericAction
         return "<"+Id+"("+ActorId+", "+ FeatureId+ ")>";
     }
 
-
-    public List<Effect> GenerateKnownEffects(Dictionary<string, List<string>> resources)
+    public bool SatisfiedPreconditions(WorldState ws)
     {
-        return new List<Effect>(
-            from effect in potentialEffects
-            select new Effect(effect.chanceModifier, effect.BindEffects(resources))
-        );
+        Person actor = ws.registry.GetPerson(ActorId);
+        Feature feature = ws.map.GetFeature(FeatureId);
+        Location location = ws.map.GetLocation(LocationId);
+
+        return base.SatisfiedPreconditions(actor, feature, location, ws);
+    }
+
+    public List<Condition> GetBoundConditions(WorldState ws)
+    {
+        return base.GetBoundConditions(ws, ActorId, FeatureId, LocationId);
+    }
+
+        public List<Effect> GenerateExpectedEffects(WorldState ws)
+    {
+        return base.GenerateExpectedEffects(ws, ActorId, FeatureId, LocationId);
     }
 }

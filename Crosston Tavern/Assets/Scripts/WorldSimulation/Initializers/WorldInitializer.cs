@@ -122,13 +122,13 @@ public class WorldInitializer
     {
         List<Person> people = new List<Person>() {
             new Person("Alicia"),
-            new Person("Bob"),
-            new Person("Clara"),
-            new Person("Darel"),
-            new Person("Everet"),
-            new Person("Faraz"),
-            new Person("Gigi"),
-            new Person("Howard")
+            //new Person("Bob"),
+            //new Person("Clara"),
+            //new Person("Darel"),
+            //new Person("Everet"),
+            //new Person("Faraz"),
+            //new Person("Gigi"),
+            //new Person("Howard")
         };
 
 
@@ -141,7 +141,10 @@ public class WorldInitializer
             {
                 "fish",
                 new GenericAction("fish", 5,
-                    new List<Condition>(){ new ConditionSpaceAtFeature()},
+                    new List<Condition>(){
+                        new Condition_SpaceAtFeature(),
+                        new Condition_IsState(new InvChange(1, 10000, "#"+ResourceCatagories.r_initiator+"#", new List<string>(){"fishing_rod" }))
+                    },
                     new List<Effect>() {
                         new Effect(
                             new ChanceModifierSimple(.4f),
@@ -165,9 +168,20 @@ public class WorldInitializer
                 )
             },
             {
+                "buy_fishing_rod",
+                new GenericAction("buy_fishing_rod", 0, new List<Condition>(){ }, 
+                    new List<Effect>() {
+                        new Effect( 
+                            new ChanceModifier(), 
+                            new List<MicroEffect>() {
+                                new InvChange(1, 1, "#"+ResourceCatagories.r_initiator+"#", new List<string>(){"fishing_rod" })
+                            })
+                    })
+            },
+            {
                 "move",
                 new GenericAction("move", 0,
-                    new List<Condition>(){ new ConditionSpaceAtFeature()},
+                    new List<Condition>(){ new Condition_SpaceAtFeature()},
                     new List<Effect>() {
                         new Effect(
                             new ChanceModifier(),
@@ -181,7 +195,7 @@ public class WorldInitializer
             {
                 "forage",
                 new GenericAction("forage", 3,
-                    new List<Condition>(){ new ConditionSpaceAtFeature()},
+                    new List<Condition>(){ new Condition_SpaceAtFeature()},
                     new List<Effect>() {
                         new Effect(
                             new ChanceModifierSimple(.5f),
@@ -206,7 +220,7 @@ public class WorldInitializer
             },
             {
                 "talk",
-                new GenericAction("talk", 1, new List<Condition>(){ new ConditionNotYou(), new ConditionSpaceAtFeature()},
+                new GenericAction("talk", 1, new List<Condition>(){ new Condition_NotYou(), new Condition_SpaceAtFeature()},
                     new List<Effect>(){
                         new Effect(
                             new ChanceModifier(),
@@ -282,7 +296,7 @@ public class WorldInitializer
 
             features.Add(person.feature);
 
-            person.goalPriorityDict = new Dictionary<MicroEffect, float>() {
+            person.goalPriorityDict = new GoalDictionary() {
                 {new Move("forest"), 1 },
                 {new InvChange(5, 1000, person.Id, new List<string>(){"goldfish" }), 1 }
 

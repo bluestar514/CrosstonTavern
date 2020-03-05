@@ -7,6 +7,7 @@ SerializableDictionaryStoragePropertyDrawer
 [CustomPropertyDrawer(typeof(StringStringListDictionary))]
 [CustomPropertyDrawer(typeof(StringIntDictionary))]
 [CustomPropertyDrawer(typeof(StringFloatDictionary))]
+[CustomPropertyDrawer(typeof(GoalDictionary))]
 public class AnyDictionaryPropertyDrawer :
 SerializableDictionaryPropertyDrawer
 { }

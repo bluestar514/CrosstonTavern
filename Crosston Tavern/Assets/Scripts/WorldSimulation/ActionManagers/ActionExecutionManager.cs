@@ -8,13 +8,16 @@ public class ActionExecutionManager : ActionManager
     Person actor;
     Registry people;
     Map map;
+    WorldState WS;
 
-    public ActionExecutionManager(Person actor, Registry people, Map map)
+    public ActionExecutionManager(Person actor, WorldState ws)
     {
         this.actor = actor;
-        this.people = people;
-        this.map = map;
+        WS = ws;
+        people = WS.registry;
+        map = WS.map;
     }
+
 
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
@@ -67,9 +70,7 @@ public class ActionExecutionManager : ActionManager
 
     Effect PickEffect(WeightedAction action)
     {
-        Dictionary<string, List<string>> resources = GetActionResources(map, action, actor);
-
-        List<Effect> potentialEffects = action.GenerateKnownEffects(resources);
+        List<Effect> potentialEffects = action.GenerateExpectedEffects(WS);
         EvaluateChances(potentialEffects);
 
         potentialEffects.OrderBy(effect => effect.evaluatedChance);

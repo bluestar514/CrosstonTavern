@@ -20,7 +20,6 @@ public class EventDetailPanel : DetailTab
     public void Set(ExecutedAction action)
     {
         this.action = action;
-        print(action);
 
         Display();
     }

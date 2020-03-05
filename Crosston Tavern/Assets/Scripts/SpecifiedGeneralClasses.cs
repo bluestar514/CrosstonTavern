@@ -15,3 +15,6 @@ List<string>, StringListStorage>
 public class StringIntDictionary: SerializableDictionary<string, int> { }
 [Serializable]
 public class StringFloatDictionary : SerializableDictionary<string, float> { }
+
+[Serializable]
+public class GoalDictionary : SerializableDictionary<MicroEffect, float> { }

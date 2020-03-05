@@ -24,7 +24,7 @@ public class MicroEffect
         return new MicroEffect();
     }
 
-    public virtual bool GoalComplete(Map map, Registry registry, Person actor)
+    public virtual bool GoalComplete(WorldState ws, Person actor)
     {
         return false;
     }
@@ -96,8 +96,10 @@ public class InvChange: MicroEffect
         return new InvChange(randNum, randNum, InvOwner, new List<string>() { ItemId[randItem] });
     }
 
-    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    public override bool GoalComplete(WorldState ws, Person actor)
     {
+        Registry registry = ws.registry;
+
         StringIntDictionary inv = registry.GetPerson(InvOwner).inventory;
 
         int count = 0;
@@ -141,7 +143,7 @@ public class Move: MicroEffect
         return new Move(TargetLocation);
     }
 
-    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    public override bool GoalComplete(WorldState ws, Person actor)
     {
         return actor.location == targetLocation;
     }
@@ -184,8 +186,10 @@ public class SocialChange : MicroEffect
         return new SocialChange(randNum, randNum, SourceId, TargetId);
     }
 
-    public override bool GoalComplete(Map map, Registry registry, Person actor)
+    public override bool GoalComplete(WorldState ws, Person actor)
     {
+        Registry registry = ws.registry;
+
         Person person = registry.GetPerson(SourceId);
         float val = person.GetRelationshipValue(TargetId);
 
