@@ -21,7 +21,7 @@ public class WorldTime : IComparable
     public static WorldTime DayZeroEightAM = new WorldTime(1, 1, 1, 8, 0);
 
 
-    public WorldTime(int day, int month, int year, int hour, int minute)
+    public WorldTime(int year, int month, int day, int hour, int minute)
     {
         this.day = day;
         this.month = month;
@@ -30,9 +30,9 @@ public class WorldTime : IComparable
         this.minute = minute;
     }
 
-    public static WorldTime Date(int day, int month, int year)
+    public static WorldTime Date(int year, int month, int day)
     {
-        return new WorldTime(day, month, year, 0, 0);
+        return new WorldTime(year, month, day, 0, 0);
     }
 
     public static WorldTime Time(int hour, int minute)
@@ -51,40 +51,40 @@ public class WorldTime : IComparable
         minute += i;
 
         if(minute >= MinInHour) {
-            hour += minute % MinInHour;
-            minute -= (minute % MinInHour) * MinInHour;
+            hour += minute / MinInHour;
+            minute = minute % MinInHour;
         }
         if(hour >= HourInDay) {
-            if(day >= 0) day += hour % HourInDay;
-            hour -= (minute % HourInDay) * HourInDay;
+            if(day >= 0) day += hour / HourInDay;
+            hour = hour % HourInDay;
         }
-        if(month > DayInMonth) {
-            if (day >= 0) month += day % DayInMonth;
-            day -= (day % DayInMonth) * DayInMonth;
+        if(day > DayInMonth) {
+            if (month >= 0) month += day / DayInMonth;
+            day = day % DayInMonth;
         }
         if(month >= MonthInYear) {
-            if (year >= 0) year += month % MonthInYear;
-            month -= (month % MonthInYear) * MonthInYear;
+            if (year >= 0) year += month / MonthInYear;
+            month = month % MonthInYear;
         }
     }
 
     public void AdvanceHour(int h = 1)
     {
-        Tick(MinInHour);
+        Tick(MinInHour*h);
     }
 
     public void AdvanceDay(int d = 1)
     {
-        AdvanceHour(HourInDay);
+        AdvanceHour(HourInDay*d);
     }
 
     public void AdvanceMonth(int m = 1)
     {
-        AdvanceDay(DayInMonth);
+        AdvanceDay(DayInMonth*m);
     }
     public void AdvanceYear(int y = 1)
     {
-        AdvanceMonth(MonthInYear);
+        AdvanceMonth(MonthInYear*y);
     }
 
     public void AdvanceToStartOfHour(int h = 1)
