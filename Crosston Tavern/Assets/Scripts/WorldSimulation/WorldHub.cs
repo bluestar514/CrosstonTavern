@@ -22,12 +22,12 @@ public class WorldHub : MonoBehaviour
 
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
-        
+
         foreach (Person person in ws.registry.GetPeople()) {
             chosenActions.Add(person, null);
-        }
 
-        ws.registry.GetPerson("Alicia").placeOfWork = "town_fishShop";
+            person.goalPriorityDict = new GoalDictionary();
+        }
 
         for (int i = 0; i < 1; i++) {
             TimeStep();
@@ -65,13 +65,7 @@ public class WorldHub : MonoBehaviour
 
                 chosenActions[person] = null;
 
-
-                GoalManager gm = new GoalManager(ws, person);
-                gm.AddModule(new GoalModule(person, new List<Goal>() {
-                    new Goal(new InvChange(1, 1, person.Id, new List<string>(){"salmon","trout"}), 1, 1)
-                }));
-
-                person.goals = gm.GetGoalsList();
+                person.goals = person.gm.GetGoalsList();
 
                 person.goalPriorityDict = new GoalDictionary();
                 foreach (Goal goal in person.goals) {
@@ -97,6 +91,24 @@ public class WorldHub : MonoBehaviour
         Map map = wi.InitializeMap(people);
 
         ws = new WorldState(map, registry, WorldTime.DayZeroEightAM);
+
+
+        Person person = ws.registry.GetPerson("Alicia");
+        person.placeOfWork = "town_fishShop";
+        person.gm = new GoalManager(ws, person);
+        person.gm.AddModule(new GM_ManLocation(
+                                    new List<GM_Precondition>() {
+                                        new GM_Precondition_Time(new WorldTime(-1, -1, -1, 8, 30), new WorldTime(-1, -1, -1, 10, 50))
+                                    },
+                                    new List<Goal>() { }, 
+                                    ws.map.GetFeature(person.placeOfWork).location));
+        person.gm.AddModule(new GM_StockFeature(
+                                    new List<GM_Precondition>() {
+                                        new GM_Precondition_Time(new WorldTime(-1, -1, -1, 11, 0), new WorldTime(-1, -1, -1, 23, 0))
+                                    },
+                                    new List<Goal>() { }, 
+                                    person.Id,
+                                    person.placeOfWork, ws));
     }
 
 }

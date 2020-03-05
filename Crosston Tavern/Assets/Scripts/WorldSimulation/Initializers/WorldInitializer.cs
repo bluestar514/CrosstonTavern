@@ -131,7 +131,6 @@ public class WorldInitializer
             //new Person("Howard")
         };
 
-
         return people;
     }
 
@@ -296,11 +295,11 @@ public class WorldInitializer
 
             features.Add(person.feature);
 
-            person.goalPriorityDict = new GoalDictionary() {
-                {new Move("forest"), 1 },
-                {new InvChange(5, 1000, person.Id, new List<string>(){"goldfish" }), 1 }
+            //person.goalPriorityDict = new GoalDictionary() {
+            //    {new Move("forest"), 1 },
+            //    {new InvChange(5, 1000, person.Id, new List<string>(){"goldfish" }), 1 }
 
-            };
+            //};
         }
     }
 

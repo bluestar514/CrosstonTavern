@@ -3,7 +3,7 @@
     {
       "id": "farm_river",
       "location": "farm",
-      "maxUsers":  2,
+      "maxUsers": 2,
       "actions": [ "fish" ],
       "resources": {
         "fish": [ "#fish#", "smelt" ],
@@ -85,6 +85,15 @@
       "actions": [ "buy_fishing_rod" ],
       "resources": {
         "stock": [ "trout", "goldfish", "salmon" ]
+      }
+    },
+    {
+      "id": "town_herbShop",
+      "location": "townSquare",
+      "maxUsers": 2,
+      "actions": [ ],
+      "resources": {
+        "stock": [ "red_herb", "green_herb", "blue_herb" ]
       }
     }
   ]

@@ -1,21 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GoalModule
 {
-    protected Person actor;
 
+    public List<GM_Precondition> preconditions;
     public List<Goal> goals;
 
-    public GoalModule(Person actor, List<Goal> goals)
+    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals)
     {
-        this.actor = actor;
+        this.preconditions = preconditions;
         this.goals = goals;
     }
 
     public virtual bool Precondtion(WorldState ws) {
-        return true;
+        if (preconditions.Any(p => !p.Satisfied(ws))) return false;
+        else return true;
     }
 
     
@@ -23,19 +25,33 @@ public class GoalModule
 }
 
 
-public class GM_Profession: GoalModule
+public class GM_ManLocation: GoalModule
 {
-    WorldTime startTime;
-    WorldTime endTime;
+    string location;
 
-    public GM_Profession(Person actor, List<Goal> goals, WorldTime startTime, WorldTime endTime) : base(actor, goals)
+    public GM_ManLocation(List<GM_Precondition> preconditions, List<Goal> goals, string locationId) : base(preconditions, goals)
     {
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
+        location = locationId;
 
-    public override bool Precondtion(WorldState ws)
-    {
-        return ws.time <= endTime && ws.time >= startTime;
+        this.goals.Add(new Goal(new Move(location), 10, 1));
     }
 }
+
+public class GM_StockFeature: GoalModule
+{
+    string featureId;
+
+    public GM_StockFeature(List<GM_Precondition> preconditions, List<Goal> goals, string actorId, string featureId, WorldState ws): base(preconditions, goals)
+    {
+        this.featureId = featureId;
+
+        List<string> stock = ws.map.GetFeature(featureId).relevantResources["stock"];
+
+        foreach (string s in stock) {
+            this.goals.Add(new Goal(new InvChange(3, 1000, actorId, new List<string>() { s }), 5, 1));
+        }
+
+        this.goals.Add(new Goal(new InvChange(10, 1000, actorId, stock), 3, 1));
+    }
+}
+

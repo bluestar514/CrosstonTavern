@@ -18,6 +18,8 @@ public class Person
     public StringFloatDictionary relationships;
     public string placeOfWork="unemployed"; //a feautreID
 
+
+    public GoalManager gm;
     public GoalDictionary goalPriorityDict;
     public List<Goal> goals;
 

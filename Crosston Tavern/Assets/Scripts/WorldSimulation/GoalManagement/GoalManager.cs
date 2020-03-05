@@ -9,6 +9,8 @@ public class GoalManager
     Person actor;
     List<GoalModule> modules = new List<GoalModule>();
 
+    int lookAhead = 5;
+
     public GoalManager(WorldState ws, Person actor)
     {
         this.ws = ws;
@@ -31,7 +33,7 @@ public class GoalManager
         }
 
         List<Goal> newGoals = currentGoals;
-        for(int i =0; i< 5; i++) {
+        for(int i =0; i< lookAhead; i++) {
             newGoals = UnravelCausality(newGoals);
 
             if (newGoals.Count <= 0) break;
