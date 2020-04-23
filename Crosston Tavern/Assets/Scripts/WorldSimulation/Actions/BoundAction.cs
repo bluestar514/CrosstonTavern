@@ -9,19 +9,22 @@ public class BoundAction : GenericAction
     public string ActorId { get; private set; }
     public string FeatureId { get; private set; }
     public string LocationId { get; private set; }
+    public StringStringDictionary OtherBindings { get; private set; }
 
-    public BoundAction(string id, int executionTime, List<Condition> preconditions, List<Effect> potentialEffects, 
-        string actorId, string featureId, string locationId):base(id, executionTime, preconditions, potentialEffects)
+    public BoundAction(string id, int executionTime, List<Condition> preconditions, List<Outcome> potentialEffects, 
+        string actorId, string featureId, string locationId, StringStringDictionary bindings):base(id, executionTime, preconditions, potentialEffects)
     {
         this.ActorId = actorId;
         this.FeatureId = featureId;
         this.LocationId = locationId;
+        if (bindings == null) bindings = new StringStringDictionary();
+        this.OtherBindings = bindings;
 
         name = ToString();
     }
 
-    public BoundAction(GenericAction action, string actorId, string featureId, string locationId): 
-        this(action.Id, action.executionTime, action.preconditions, action.potentialEffects, actorId, featureId, locationId)
+    public BoundAction(GenericAction action, string actorId, string featureId, string locationId, StringStringDictionary bindings): 
+        this(action.Id, action.executionTime, action.preconditions, action.potentialEffects, actorId, featureId, locationId, bindings)
     { }
 
     public override string ToString()
@@ -43,7 +46,7 @@ public class BoundAction : GenericAction
         return base.GetBoundConditions(ws, ActorId, FeatureId, LocationId);
     }
 
-        public List<Effect> GenerateExpectedEffects(WorldState ws)
+        public List<Outcome> GenerateExpectedEffects(WorldState ws)
     {
         return base.GenerateExpectedEffects(ws, ActorId, FeatureId, LocationId);
     }

@@ -82,7 +82,13 @@
       "id": "town_fishShop",
       "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ "buy_fishing_rod" ],
+      "actions": [ "buy_fishing_rod", 
+                    "buy_trout_1", "buy_trout_5",
+                    "buy_goldfish_1", "buy_goldfish_5", 
+                    "buy_salmon_1", "buy_salmon_5",
+                    "stock_trout_1", "stock_trout_5",
+                    "stock_goldfish_1", "stock_goldfish_5", 
+                    "stock_salmon_1", "stock_salmon_5" ],
       "resources": {
         "stock": [ "trout", "goldfish", "salmon" ]
       }
@@ -91,10 +97,58 @@
       "id": "town_herbShop",
       "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ ],
+      "actions": [ "buy_red_herb_1", "buy_red_herb_5",
+                    "buy_green_herb_1", "buy_green_herb_5",
+                    "buy_blue_herb_1", "buy_blue_herb_5",
+                    "stock_red_herb_1", "stock_red_herb_5",
+                    "stock_green_herb_1", "stock_green_herb_5",
+                    "stock_blue_herb_1", "stock_blue_herb_5"  ],
       "resources": {
         "stock": [ "red_herb", "green_herb", "blue_herb" ]
       }
+    },
+    {
+      "id": "town_inn",
+      "location": "townSquare",
+      "maxUsers": 2,
+      "actions": [ "buy_red_herb_1", "buy_red_herb_5",
+                    "buy_trout_1", "buy_trout_5",
+                    "buy_common_mushroom_1", "buy_common_mushroom_5",
+                    "stock_red_herb_1", "stock_red_herb_5",
+                    "stock_trout_1", "stock_trout_5",
+                    "stock_common_mushroom_1", "stock_common_mushroom_5" ],
+      "resources": {
+        "stock": [ "red_herb", "trout", "common_mushroom" ]
+      }
+    },
+    {
+      "id": "town_blacksmith",
+      "location": "townSquare",
+      "maxUsers": 2,
+      "actions": [ "buy_iron_ore_1", "buy_iron_ore_5",
+                    "buy_gold_ore_1", "buy_gold_ore_5",
+                    "buy_saphire_1", "buy_saphire_5",
+                    "stock_iron_ore_1", "stock_iron_ore_5",
+                    "stock_gold_ore_1", "stock_gold_ore_5",
+                    "stock_saphire_1", "stock_saphire_5" ],
+      "resources": {
+        "stock": [ "iron_ore", "gold_ore", "saphire" ]
+      }
+    },
+    {
+      "id": "caves_mineshaft",
+      "location": "caves",
+      "maxUsers": 2,
+      "actions": [ "mine", "forage" ],
+      "resources": {
+        "mushroom": [ "#mushroom#" ],
+        "poisonous_mushroom": [ "#poisonous_mushroom#" ],
+        "herb": [ "#herb#" ],
+        "flower": [ "#herb#", "#mushroom#" ],
+        "mineral": ["#mineral#"],
+        "gems": ["#gems#"]
+      }
+
     }
   ]
 }

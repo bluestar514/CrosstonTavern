@@ -21,4 +21,30 @@ public class WorldState
     {
         time.Tick(t);
     }
+
+
+    public Inventory GetInventory(string id)
+    {
+        if(registry.GetPerson(id) != null) {
+            return registry.GetPerson(id).inventory;
+        }
+        if(map.GetFeature(id) != null) {
+            return map.GetFeature(id).inventory;
+        }
+
+        Debug.LogWarning("Could not find an inventory for " + id);
+
+        return null;
+    }
+
+    public Relationship GetRelationshipsFor(string id)
+    {
+        if (registry.GetPerson(id) != null) {
+            return registry.GetPerson(id).relationships;
+        }
+
+        Debug.LogWarning("Could not find " + id);
+
+        return null;
+    }
 }

@@ -12,8 +12,10 @@ public class WorldHub : MonoBehaviour
 
     public LoadWorldData wi;
     public WorldSpaceDisplayManager wsdm;
+    public TextAsset actionData;
     public TextAsset locationData;
     public TextAsset featureData;
+    public TextAsset peopleData;
 
     Dictionary<Person, ChosenAction> chosenActions = new Dictionary<Person, ChosenAction>();
     private void Start()
@@ -26,7 +28,9 @@ public class WorldHub : MonoBehaviour
         foreach (Person person in ws.registry.GetPeople()) {
             chosenActions.Add(person, null);
 
-            person.goalPriorityDict = new GoalDictionary();
+
+            person.goals = person.gm.GetGoalsList();
+
         }
 
         for (int i = 0; i < 1; i++) {
@@ -47,15 +51,13 @@ public class WorldHub : MonoBehaviour
             if(chosenActions[person] == null) {
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person, ws);
 
-                List<WeightedAction> weightedActions = ahm.GenerateWeightedOptions();
-
-                chosenActions[person]= ahm.ChooseAction(weightedActions);
+                chosenActions[person]= ahm.ChooseAction();
             }
             
             ChosenAction action = chosenActions[person];
 
             WeightedAction weightedAction = action.Action;
-            List<Effect> potentialEffects = weightedAction.potentialEffects;
+            List<Outcome> potentialEffects = weightedAction.potentialEffects;
 
             ActionExecutionManager aem = new ActionExecutionManager(ws.registry.GetPerson(weightedAction.ActorId), ws);
 
@@ -67,11 +69,6 @@ public class WorldHub : MonoBehaviour
 
                 person.goals = person.gm.GetGoalsList();
 
-                person.goalPriorityDict = new GoalDictionary();
-                foreach (Goal goal in person.goals) {
-                    if(!person.goalPriorityDict.ContainsKey(goal.state))
-                        person.goalPriorityDict.Add(goal.state, goal.priority);
-                }
             }
         }
         timeStep.Add(executedActions);
@@ -85,30 +82,10 @@ public class WorldHub : MonoBehaviour
 
     void InitalizeWorld()
     {
-        wi = new LoadWorldData(locationData, featureData); //new WorldInitializer();
-        List <Person> people = wi.InitializePeople();
-        Registry registry = wi.InitializeRegistry(people);
-        Map map = wi.InitializeMap(people);
+        wi = new LoadWorldData(actionData, locationData, featureData, peopleData);
 
-        ws = new WorldState(map, registry, WorldTime.DayZeroEightAM);
-
-
-        Person person = ws.registry.GetPerson("Alicia");
-        person.placeOfWork = "town_fishShop";
-        person.gm = new GoalManager(ws, person);
-        person.gm.AddModule(new GM_ManLocation(
-                                    new List<GM_Precondition>() {
-                                        new GM_Precondition_Time(new WorldTime(-1, -1, -1, 8, 30), new WorldTime(-1, -1, -1, 10, 50))
-                                    },
-                                    new List<Goal>() { }, 
-                                    ws.map.GetFeature(person.placeOfWork).location));
-        person.gm.AddModule(new GM_StockFeature(
-                                    new List<GM_Precondition>() {
-                                        new GM_Precondition_Time(new WorldTime(-1, -1, -1, 11, 0), new WorldTime(-1, -1, -1, 23, 0))
-                                    },
-                                    new List<Goal>() { }, 
-                                    person.Id,
-                                    person.placeOfWork, ws));
+        ws = wi.BuildWorld();
+        
     }
 
 }

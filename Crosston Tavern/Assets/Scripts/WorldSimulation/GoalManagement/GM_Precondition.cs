@@ -23,6 +23,7 @@ public class GM_Precondition_Time : GM_Precondition
 
     public override bool Satisfied(WorldState ws)
     {
-        return ws.time <= endTime && ws.time >= startTime;
+        if (startTime < endTime) return ws.time <= endTime && ws.time >= startTime;
+        else return ws.time >= startTime || ws.time <= endTime;
     }
 }

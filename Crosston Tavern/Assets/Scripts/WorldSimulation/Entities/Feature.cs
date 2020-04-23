@@ -12,6 +12,8 @@ public class Feature
 
     public List<GenericAction> providedActions;
     public StringStringListDictionary relevantResources;
+    public Inventory inventory;
+
     public int maxUsers;
     public int currentUsers= 0;
 
@@ -22,7 +24,10 @@ public class Feature
         this.providedActions = providedActions;
         this.relevantResources = new StringStringListDictionary();
         this.relevantResources.CopyFrom(relevantResources);
+        this.relevantResources.Add("recipient", new List<string>() { id });
         this.maxUsers = maxUsers;
+
+        inventory = new Inventory(id);
     }
 
     public void Use()

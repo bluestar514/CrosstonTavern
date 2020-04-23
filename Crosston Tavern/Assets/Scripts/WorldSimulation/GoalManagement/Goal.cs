@@ -8,7 +8,7 @@ public class Goal
 {
     public string name;
 
-    public MicroEffect state;
+    public Effect state;
     float priorityBase;
 
     public float priority;
@@ -17,10 +17,10 @@ public class Goal
     public int priTimer;
     int priTimerCurrent;
 
-    public List<Goal> parentGoals = new List<Goal>();
+    //public List<Goal> parentGoals = new List<Goal>();
     public List<BoundAction> enablingActions = new List<BoundAction>();
 
-    public Goal(MicroEffect state, float priority, float priModifier)
+    public Goal(Effect state, float priority, float priModifier)
     {
         this.state = state;
         this.priority = priority;
@@ -30,9 +30,9 @@ public class Goal
         name = state.ToString() + ":" + priority;
     }
 
-    public Goal(MicroEffect state, float priority, float priModifier, List<Goal> parent, List<BoundAction> enabledActions):this(state, priority, priModifier)
+    public Goal(Effect state, float priority, float priModifier,  List<BoundAction> enabledActions):this(state, priority, priModifier)
     {
-        parentGoals.AddRange(parent);
+        //parentGoals.AddRange(parent);
         enablingActions.AddRange(enabledActions);
     }
 
@@ -65,6 +65,7 @@ public class Goal
 
             if (socState.TargetId != socOther.TargetId) return false;
             if (socState.SourceId != socOther.SourceId) return false;
+            if (socState.RelationType != socOther.RelationType) return false;
 
             return true;
         }
@@ -87,9 +88,9 @@ public class Goal
         float combinedPriority = priority + other.priority;
         float combinedMod = priModifier + other.priModifier;
 
-        List<Goal> combinedParents = new List<Goal>();
-        combinedParents.AddRange(parentGoals);
-        combinedParents.AddRange(other.parentGoals);
+        //List<Goal> combinedParents = new List<Goal>();
+        //combinedParents.AddRange(parentGoals);
+        //combinedParents.AddRange(other.parentGoals);
 
         List<BoundAction> combinedActions = new List<BoundAction>();
         combinedActions.AddRange(enablingActions);
@@ -104,14 +105,14 @@ public class Goal
 
             if(deltaMax < deltaMin) {
                 if (priority >= other.priority) {
-                    return new Goal(state, priority * 2, priModifier, parentGoals, enablingActions);
+                    return new Goal(state, priority * 2, priModifier,  enablingActions);
                 } else {
-                    return new Goal(other.state, other.priority * 2, other.priModifier, other.parentGoals, other.enablingActions);
+                    return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
                 }
             }
 
             return new Goal(new InvChange(deltaMin, deltaMax, invState.InvOwner, invState.ItemId), 
-                                combinedPriority, combinedMod, combinedParents, combinedActions);
+                                combinedPriority, combinedMod, combinedActions);
         }
 
         if (state is SocialChange) {
@@ -123,18 +124,18 @@ public class Goal
 
             if (deltaMax < deltaMin) {
                 if (priority >= other.priority) {
-                    return new Goal(state, priority * 2, priModifier, parentGoals, enablingActions);
+                    return new Goal(state, priority * 2, priModifier, enablingActions);
                 } else {
-                    return new Goal(other.state, other.priority * 2, other.priModifier, other.parentGoals, other.enablingActions);
+                    return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
                 }
             }
 
-            return new Goal(new SocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId),
-                                combinedPriority, combinedMod, combinedParents, combinedActions);
+            return new Goal(new SocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId, socState.RelationType),
+                                combinedPriority, combinedMod, combinedActions);
         }
 
         if (state is Move) {
-            return new Goal(state, combinedPriority, combinedMod, combinedParents, combinedActions);
+            return new Goal(state, combinedPriority, combinedMod, combinedActions);
         }
 
         return null;

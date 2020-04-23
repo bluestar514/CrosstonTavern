@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// Job is to determine the exact outcome of a Chosen Action.
+/// Generates a Executed Action
+/// </summary>
+
 public class ActionExecutionManager : ActionManager
 {
     Person actor;
@@ -30,14 +35,14 @@ public class ActionExecutionManager : ActionManager
         if (chosenAction.Complete()) {
             feature.FinishUse();
 
-            Effect chosenEffect = PickEffect(action);
+            Outcome chosenEffect = PickEffect(action);
 
-            foreach (MicroEffect effect in chosenEffect.effects) {
+            foreach (Effect effect in chosenEffect.effects) {
                 if (effect is InvChange) {
                     InvChange invChange = (InvChange)effect;
 
-                    Person subject = people.GetPerson(invChange.InvOwner);
-                    subject.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
+                    Inventory inventory = WS.GetInventory(invChange.InvOwner);
+                    inventory.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
                 }
 
 
@@ -53,7 +58,7 @@ public class ActionExecutionManager : ActionManager
 
                     Person source = people.GetPerson(socialChange.SourceId);
 
-                    source.ChangeRelationshipValue(socialChange.DeltaMin, socialChange.TargetId);
+                    //source.ChangeRelationshipValue(socialChange.DeltaMin, socialChange.TargetId);
                 }
             }
 
@@ -68,47 +73,47 @@ public class ActionExecutionManager : ActionManager
         return null;
     }
 
-    Effect PickEffect(WeightedAction action)
+    Outcome PickEffect(WeightedAction action)
     {
-        List<Effect> potentialEffects = action.GenerateExpectedEffects(WS);
+        List<Outcome> potentialEffects = action.GenerateExpectedEffects(WS);
         EvaluateChances(potentialEffects);
 
         potentialEffects.OrderBy(effect => effect.evaluatedChance);
 
         float randomNumber = Random.value * MaxChance(potentialEffects);
 
-        foreach (Effect effect in potentialEffects) {
+        foreach (Outcome effect in potentialEffects) {
             if (randomNumber < effect.evaluatedChance) return PickSpecificEffect(effect);
             else randomNumber -= effect.evaluatedChance;
         }
 
         return PickSpecificEffect(potentialEffects.Last());
     }
-    Effect PickSpecificEffect(Effect effect)
+    Outcome PickSpecificEffect(Outcome effect)
     {
-        List<MicroEffect> microEffects = new List<MicroEffect>();
+        List<Effect> microEffects = new List<Effect>();
 
-        foreach(MicroEffect microEffect in effect.effects) {
+        foreach(Effect microEffect in effect.effects) {
 
             microEffects.Add(microEffect.SpecifyEffect());
 
         }
 
-        return new Effect(effect.chanceModifier, microEffects);
+        return new Outcome(effect.chanceModifier, microEffects);
     }
 
-    void EvaluateChances(List<Effect> effects)
+    void EvaluateChances(List<Outcome> effects)
     {
-        foreach(Effect effect in effects) {
+        foreach(Outcome effect in effects) {
             effect.EvaluateChance();
         }
     }
 
-    float MaxChance(List<Effect> possibleEffects)
+    float MaxChance(List<Outcome> possibleEffects)
     {
         float sum = 0;
 
-        foreach (Effect effect in possibleEffects) {
+        foreach (Outcome effect in possibleEffects) {
             sum += effect.evaluatedChance;
         }
 

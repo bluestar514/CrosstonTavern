@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+[System.Serializable]
 public class GoalModule
 {
+    public string name;
+
 
     public List<GM_Precondition> preconditions;
     public List<Goal> goals;
@@ -13,6 +16,8 @@ public class GoalModule
     {
         this.preconditions = preconditions;
         this.goals = goals;
+
+        name = "GENERIC GOAL";
     }
 
     public virtual bool Precondtion(WorldState ws) {
@@ -24,7 +29,7 @@ public class GoalModule
 
 }
 
-
+[System.Serializable]
 public class GM_ManLocation: GoalModule
 {
     string location;
@@ -34,9 +39,12 @@ public class GM_ManLocation: GoalModule
         location = locationId;
 
         this.goals.Add(new Goal(new Move(location), 10, 1));
+
+        name = "Man " + location;
     }
 }
 
+[System.Serializable]
 public class GM_StockFeature: GoalModule
 {
     string featureId;
@@ -52,6 +60,9 @@ public class GM_StockFeature: GoalModule
         }
 
         this.goals.Add(new Goal(new InvChange(10, 1000, actorId, stock), 3, 1));
+
+
+        name = "Stock " + featureId;
     }
 }
 

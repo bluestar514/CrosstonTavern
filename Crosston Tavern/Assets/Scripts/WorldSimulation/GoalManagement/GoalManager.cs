@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
 public class GoalManager 
 {
     WorldState ws;
     Person actor;
+    [SerializeField]
     List<GoalModule> modules = new List<GoalModule>();
 
     int lookAhead = 5;
@@ -46,9 +48,11 @@ public class GoalManager
 
     List<BoundAction> GetAllActions()
     {
+        ActionBuilder ab = new ActionBuilder(ws, actor);
+
         List<BoundAction> lba = new List<BoundAction>();
         foreach(string location in ws.map.GetNameOfLocations()) {
-            lba.AddRange(ws.map.GatherProvidedActionsForActorAt(actor.Id, location));
+            lba.AddRange(ab.BindActions(location));
         }
 
         return lba;
@@ -64,21 +68,25 @@ public class GoalManager
                                            select action);
     }
 
-    List<BoundAction> GetActionsThatAdvanceState(MicroEffect state, List<BoundAction> actionPool)
+    List<BoundAction> GetActionsThatAdvanceState(Effect state, List<BoundAction> actionPool)
     {
         ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
 
         List<BoundAction> goodActions = new List<BoundAction>();
 
         foreach (BoundAction action in actionPool) {
-            List<Effect> potentialEffects = action.GenerateExpectedEffects(ws);
+            List<Outcome> potentialEffects = action.GenerateExpectedEffects(ws);
 
-            foreach(Effect effect in potentialEffects) {
-                if( effect.effects.Any(subeffect => ahm.EvaluateEffectTowardGoal(subeffect, state, 0) > 0)) {
-                    goodActions.Add(action);
-                    break;
+            float weight = 0;
+            foreach(Outcome outcome in potentialEffects) {
+                float chance = outcome.chanceModifier.Chance();
+
+                foreach (Effect effect in outcome.effects) {
+                    weight += chance * ahm.EvaluateEffectTowardGoal(effect, state, 0);
                 }
             }
+
+            if (weight > 0) goodActions.Add(action);
         }
 
         return goodActions;
@@ -132,15 +140,14 @@ public class GoalManager
     List<Goal> UnravelCausality(List<Goal> currentGoals)
     {
         List<BoundAction> invalidActions = GetInvalidActions();
-
-        invalidActions.ForEach(Debug.Log);
+        //invalidActions.ForEach(Debug.Log);
 
         List<Goal> newGoals = new List<Goal>();
         foreach (Goal goal in currentGoals) {
             List<BoundAction> relevantActions = GetActionsThatAdvanceState(goal.state, invalidActions);
 
             List<Goal> fromThisGoal = GenerateGoalsFromPreconditions(relevantActions, goal.priority);
-            fromThisGoal.ForEach(g => g.parentGoals.Add(goal));
+            //fromThisGoal.ForEach(g => g.parentGoals.Add(goal));
 
             newGoals.AddRange(fromThisGoal);
         }

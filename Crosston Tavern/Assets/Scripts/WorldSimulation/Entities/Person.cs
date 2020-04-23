@@ -14,13 +14,13 @@ public class Person
 
     public List<ExecutedAction> history = new List<ExecutedAction>();
 
-    public StringIntDictionary inventory;
-    public StringFloatDictionary relationships;
-    public string placeOfWork="unemployed"; //a feautreID
+    public Inventory inventory;
+    public Relationship relationships;
 
+    public EmploymentData employmentData;
+    public List<FamilyData> family;
 
     public GoalManager gm;
-    public GoalDictionary goalPriorityDict;
     public List<Goal> goals;
 
     public StringStringListDictionary resources;
@@ -36,12 +36,11 @@ public class Person
 
         feature = new Feature("person_" + Id, location, 2,
                 new List<GenericAction>() { },
-                new Dictionary<string, List<string>> {
-                    {ResourceCatagories.r_recipient, new List<string>() { id } }
-                }
+                new Dictionary<string, List<string>> { }
             );
-        inventory = new StringIntDictionary();
-        relationships = new StringFloatDictionary();
+        inventory = new Inventory(id);
+        relationships = new Relationship();
+        family = new List<FamilyData>();
     }
 
     public void Move(string locationId)
@@ -50,40 +49,6 @@ public class Person
         feature.location = locationId;
     }
 
-    public int GetInventoryCount(string itemId)
-    {
-        if (inventory.ContainsKey(itemId)) {
-            return inventory[itemId];
-        } else {
-            return 0;
-        }
-    }
-    public void ChangeInventoryContents(int num, string itemId)
-    {
-        if (inventory.ContainsKey(itemId)) {
-            inventory[itemId] += num;
-        } else {
-            inventory.Add(itemId, num);
-        }
-    }
-
-    public float GetRelationshipValue(string personId)
-    {
-        if (relationships.ContainsKey(personId)) {
-            return relationships[personId];
-        } else {
-            return 0;
-        }
-    }
-
-    public void ChangeRelationshipValue(float num, string personId)
-    {
-        if (relationships.ContainsKey(personId)) {
-            relationships[personId] += num;
-        } else {
-            relationships.Add(personId, num);
-        }
-    }
 
     public string StringifyStats()
     {
@@ -95,16 +60,32 @@ public class Person
         }
 
         body += "\ninventory:\n";
-        foreach(string key in inventory.Keys) {
-            body += "\t" + key + ": " + inventory[key] + "\n";
-        }
+        body += inventory.Print();
 
         body += "\nrelationships:\n";
-        foreach (string key in relationships.Keys) {
-            body += "\t" + key + ": " + relationships[key] + "\n";
+        foreach (string key in relationships.GetKnownPeople()) {
+            body += "\t" + key + ": " + relationships.Get(key, Relationship.RelationType.friendly)+ "," + relationships.Get(key, Relationship.RelationType.romantic) + "\n";
         }
 
         return body;
     }
 
+}
+
+
+[System.Serializable]
+public class EmploymentData
+{
+    public string title;
+    public string establishment;
+    public WorldTime shiftStart;
+    public WorldTime shiftEnd;
+}
+
+
+[System.Serializable]
+public class FamilyData
+{
+    public string id;
+    public string relation;
 }

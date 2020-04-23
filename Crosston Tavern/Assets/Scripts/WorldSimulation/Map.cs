@@ -110,25 +110,6 @@ public class Map
         return nearbyFeatures;
     }
 
-    public List<BoundAction> GatherProvidedActionsForActorAt(string actorId, string locationId)
-    {
-
-        List<Feature> nearByFeatures = GatherFeaturesAt(locationId);
-
-        //Debug.Log("Features at: " + locationId);
-        //nearByFeatures.ForEach(Debug.Log);
-
-        List<BoundAction> availableActions = new List<BoundAction>();
-        foreach (Feature feature in nearByFeatures) {
-
-            availableActions.AddRange(from action in feature.providedActions
-                                      select new BoundAction(action, actorId, feature.Id, locationId));
-        }
-
-        return availableActions;
-    }
-
-
     public List<string> GetNameOfLocations()
     {
         return new List<string>(from location in Locations

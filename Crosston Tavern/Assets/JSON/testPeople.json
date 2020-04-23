@@ -1,0 +1,101 @@
+{
+	"people":[
+		{"id": "Alicia",
+			"location": "farm",
+			"job": {
+				"title": "fishMonger",
+				"location": "town_fishShop",
+				"shiftStart": [8,30],
+				"shiftEnd": [15,50]
+			},
+			"inventory":{
+				"currency": 10,
+				"trout": 10
+			},
+			"family":[
+				{"id":"Bob", 
+				"relation":"brother"}
+			]
+		},
+		{"id": "Bob",
+			"location": "farm",
+			"job": {
+				"title": "herbalist",
+				"location": "town_herbShop",
+				"shiftStart": [9,0],
+				"shiftEnd": [17,0]
+			},
+			"inventory":{
+				"currency": 10
+			},
+			"family":[
+				{"id":"Alicia", 
+				"relation":"sister"}
+			]
+		},
+		{"id": "Clara",
+			"location": "farm",
+			"job": {
+				"title": "innkeeper",
+				"location": "town_inn",
+				"shiftStart": [7,0],
+				"shiftEnd": [12,30]
+			},
+			"inventory":{
+				"currency": 10
+			},
+			"family":[
+				{"id":"Daryl", 
+				"relation":"brother"}
+			]
+		},
+		{"id": "Daryl",
+			"location": "farm",
+			"job": {
+				"title": "fishMonger",
+				"location": "town_fishShop",
+				"shiftStart": [12,30],
+				"shiftEnd": [20,0]
+			},
+			"inventory":{
+				"currency": 10
+			},
+			"family":[
+				{"id":"Clara", 
+				"relation":"sister"}
+			]
+		},
+		{"id": "Emeret",
+			"location": "farm",
+			"job": {
+				"title": "miner",
+				"location": "town_blacksmith",
+				"shiftStart": [10,30],
+				"shiftEnd": [19,0]
+			},
+			"inventory":{
+				"currency": 10
+			},
+			"family":[
+				{"id":"Faraz", 
+				"relation":"brother"}
+			]
+		},
+		{"id": "Faraz",
+			"location": "farm",
+			"job": {
+				"title": "innkeeper",
+				"location": "town_inn",
+				"shiftStart": [11,0],
+				"shiftEnd": [23,30]
+			},
+			"inventory":{
+				"currency": 10
+			},
+			"family":[
+				{"id":"Emeret", 
+				"relation":"brother"}
+			]
+		}
+	]
+}

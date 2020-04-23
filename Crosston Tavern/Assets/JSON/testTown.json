@@ -11,7 +11,8 @@
 			"id": "townSquare",
 			"resources":{
 				"fish": ["trout", "goldfish"],
-				"herb": ["blue_herb", "red_herb"]
+				"herb": ["blue_herb", "red_herb"],
+				"flower": ["rose"]
 			}
 		}, 
 		{
@@ -46,7 +47,8 @@
 				"trash": ["algee", "old_boot", "tin_can", "newspaper"],
 				"mushroom": ["common_mushroom"], 
 				"poisonous_mushroom" : ["red_cap_mushroom"],
-				"herb":["green_herb", "red_herb"]
+				"herb":["green_herb", "red_herb"],
+				"flower": ["dandilions", "clover", "red_flower"]
 			}
 		}
 	],

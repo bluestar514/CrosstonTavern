@@ -44,9 +44,9 @@ public class Condition_SpaceAtFeature: Condition
 
 public class Condition_IsState: Condition
 {
-    public MicroEffect state;
+    public Effect state;
 
-    public Condition_IsState(MicroEffect state) {
+    public Condition_IsState(Effect state) {
         this.state = state;
 
         name = "Condition:" + state.ToString();

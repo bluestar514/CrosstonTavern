@@ -8,13 +8,13 @@ public class GenericAction: WorldAction {
 
     public int executionTime;
     public List<Condition> preconditions;
-    public List<Effect> potentialEffects;
+    public List<Outcome> potentialEffects;
 
-    public GenericAction(string id, int executionTime, List<Condition> preconditions, List<Effect> potentialEffects):base(id)
+    public GenericAction(string id, int executionTime, List<Condition> preconditions, List<Outcome> potentialEffects):base(id)
     {
         this.executionTime = executionTime;
         this.preconditions = new List<Condition>(preconditions);
-        this.potentialEffects = new List<Effect>(potentialEffects);
+        this.potentialEffects = new List<Outcome>(potentialEffects);
         name = ToString();
     }
 
@@ -49,18 +49,18 @@ public class GenericAction: WorldAction {
         return boundConditions;
     }
 
-    public List<Effect> GenerateExpectedEffects(WorldState ws, string ActorId, string FeatureId, string LocationId)
+    public List<Outcome> GenerateExpectedEffects(WorldState ws, string ActorId, string FeatureId, string LocationId)
     {
         Dictionary<string, List<string>> resources = GetActionResources(ws.map, ws.registry.GetPerson(ActorId), FeatureId, LocationId);
 
         return GenerateKnownEffects(resources);
     }
 
-    List<Effect> GenerateKnownEffects(Dictionary<string, List<string>> resources)
+    List<Outcome> GenerateKnownEffects(Dictionary<string, List<string>> resources)
     {
-        return new List<Effect>(
+        return new List<Outcome>(
             from effect in potentialEffects
-            select new Effect(effect.chanceModifier, effect.BindEffects(resources))
+            select new Outcome(effect.chanceModifier, effect.BindEffects(resources))
         );
     }
 
@@ -70,7 +70,7 @@ public class GenericAction: WorldAction {
         Dictionary<string, List<string>> resources = new Dictionary<string, List<string>>();
         foreach (KeyValuePair<string, List<string>> kp in featureResources) {
             string key = kp.Key;
-            List<string> value = MicroEffect.BindId(kp.Value, locationResources);
+            List<string> value = Effect.BindId(kp.Value, locationResources);
             resources.Add(key, value);
         }
         return resources;

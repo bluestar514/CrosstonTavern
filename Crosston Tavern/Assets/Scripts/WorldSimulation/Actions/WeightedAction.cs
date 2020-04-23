@@ -8,12 +8,12 @@ public class WeightedAction : BoundAction
     public float weight;
     public List<WeightRational> weightRationals;
 
-    public List<Effect> expectedEffects;
+    public List<Outcome> expectedEffects;
 
     public WeightedAction(GenericAction action, 
-        string actorId, string featureId, string locationId, 
-        float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) : 
-        base(action, actorId, featureId, locationId)
+        string actorId, string featureId, string locationId, StringStringDictionary bindings,
+        float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
+        base(action, actorId, featureId, locationId, bindings)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
@@ -22,10 +22,10 @@ public class WeightedAction : BoundAction
         name = ToString();
     }
 
-    public WeightedAction(string id, int executionTime, List<Condition> preconditions, List<Effect> potentialEffects, 
-        string actorId, string featureId, string locationId, 
-        float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) : 
-        base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId)
+    public WeightedAction(string id, int executionTime, List<Condition> preconditions, List<Outcome> potentialEffects, 
+        string actorId, string featureId, string locationId, StringStringDictionary bindings,
+        float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
+        base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
@@ -34,9 +34,9 @@ public class WeightedAction : BoundAction
         name = ToString();
     }
         
-    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals, List<Effect> expectedEffects) :
+    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) :
         this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialEffects, 
-            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, weight, weightRationals, expectedEffects)
+            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.OtherBindings, weight, weightRationals, expectedEffects)
     {}
 
 
@@ -51,11 +51,11 @@ public class WeightedAction : BoundAction
         [SerializeField]
         string name;
 
-        public MicroEffect effect;
-        public MicroEffect goal;
+        public Effect effect;
+        public Effect goal;
         public float weight;
 
-        public WeightRational(MicroEffect effect, MicroEffect goal, float weight)
+        public WeightRational(Effect effect, Effect goal, float weight)
         {
             this.effect = effect;
             this.goal = goal;

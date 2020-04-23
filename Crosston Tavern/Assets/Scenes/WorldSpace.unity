@@ -1540,9 +1540,17 @@ MonoBehaviour:
       Locations: []
     registry:
       People: []
+    time:
+      day: 0
+      month: 0
+      year: 0
+      hour: 0
+      minute: 0
   wsdm: {fileID: 844642311}
+  actionData: {fileID: 4900000, guid: c0f6f27e11d8d8a4f9530f6535fb1c8b, type: 3}
   locationData: {fileID: 4900000, guid: da838b5b3064e734cb15c555cfa8763e, type: 3}
   featureData: {fileID: 4900000, guid: af4fff6c6f554654fa275fe1b123c1cd, type: 3}
+  peopleData: {fileID: 4900000, guid: e0b6bc0621968c242b3ced960508be15, type: 3}
 --- !u!4 &762257167
 Transform:
   m_ObjectHideFlags: 0
@@ -2162,16 +2170,26 @@ MonoBehaviour:
       maxUsers: 0
       currentUsers: 0
     history: []
-    inventory:
-      m_keys: []
-      m_values: 
     relationships:
       m_keys: []
       m_values: []
-    placeOfWork: 
-    goalPriorityDict:
-      m_keys: []
-      m_values: []
+    employmentData:
+      title: 
+      establishment: 
+      shiftStart:
+        day: 0
+        month: 0
+        year: 0
+        hour: 0
+        minute: 0
+      shiftEnd:
+        day: 0
+        month: 0
+        year: 0
+        hour: 0
+        minute: 0
+    gm:
+      modules: []
     goals: []
     resources:
       m_keys: []

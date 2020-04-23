@@ -4,29 +4,44 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// Two Jobs:
+/// 1. Create Weights for all potential Bound Actions (ie, make the Weighted Actions)
+/// 2. Pick the "Best" next action, given those weighted Choices (Generate a single Chosen Action)
+/// </summary>
+
 public class ActionHeuristicManager : ActionManager
 {
     Person actor;
     Registry people;
     Map map;
     WorldState WS;
-
+    ActionBuilder ab;
     public ActionHeuristicManager(Person actor, WorldState ws)
     {
         this.actor = actor;
         WS = ws;
         people = WS.registry;
         map = WS.map;
+
+        ab = new ActionBuilder(WS, actor);
     }
 
     //Public Facing:
 
+    /// <summary>
+    /// Create Weights for all potential Bound Actions (ie, make the Weighted Actions)
+    /// </summary>
+    /// <param name="location"></param>
+    /// <param name="depth"></param>
+    /// <param name="considerPreconditions"></param>
+    /// <returns></returns>
     public List<WeightedAction> GenerateWeightedOptions(string location = "", int depth = 0, bool considerPreconditions = true)
     {
-        if (depth >= 3) return new List<WeightedAction>();
+        if (depth >= 5) return new List<WeightedAction>();
 
 
-        List<BoundAction> boundActions = GatherProvidedActionsFor(location);
+        List<BoundAction> boundActions = ab.BindActions(location);
         if(considerPreconditions) boundActions = FilterOnPrecondition(boundActions);
         List<WeightedAction> weightedActions = WeighOptions(boundActions, depth);
 
@@ -58,17 +73,25 @@ public class ActionHeuristicManager : ActionManager
 
         choices.Remove(choice);
 
-        return new ChosenAction(choice,GetRejectedOnPrecondition(GatherProvidedActionsFor()), choices);
+        
+
+        return new ChosenAction(choice,GetRejectedOnPrecondition(ab.BindActions()), choices);
+    }
+
+    /// <summary>
+    /// Pick the "Best" next action, from all possible weighted actions
+    /// </summary>
+    /// <returns></returns>
+    public ChosenAction ChooseAction()
+    {
+        List<WeightedAction> choices = GenerateWeightedOptions();
+
+        Debug.Log(choices.Count);
+
+        return ChooseAction(choices);
     }
 
     //Steps toward Generating Weighted Options:
-
-
-    public List<BoundAction> GatherProvidedActionsFor(string location="")
-    {
-        if (location == "") location = actor.location;
-        return map.GatherProvidedActionsForActorAt(actor.Id, location);
-    }
 
     List<BoundAction> FilterOnPrecondition(List<BoundAction> actions)
     {
@@ -92,7 +115,7 @@ public class ActionHeuristicManager : ActionManager
 
         foreach (BoundAction action in actions) {
 
-            List<Effect> boundEffects = action.GenerateExpectedEffects(WS);
+            List<Outcome> boundEffects = action.GenerateExpectedEffects(WS);
 
             weightedActions.Add(EvaluateAction(action, boundEffects, depth));
         }
@@ -101,17 +124,16 @@ public class ActionHeuristicManager : ActionManager
     }
 
 
-    WeightedAction EvaluateAction(BoundAction action, List<Effect> boundEffects, int depth)
+    WeightedAction EvaluateAction(BoundAction action, List<Outcome> boundEffects, int depth)
     {
-
         List<WeightedAction.WeightRational> weightRationals = new List<WeightedAction.WeightRational>();
-        foreach (Effect effect in boundEffects) {
+        foreach (Outcome effect in boundEffects) {
             float effectLikelyhood = effect.EvaluateChance();
 
-            foreach (MicroEffect subeffect in effect.effects) {
-                foreach (KeyValuePair<MicroEffect, float> kvp in actor.goalPriorityDict) {
-                    MicroEffect goal = kvp.Key;
-                    float priority = kvp.Value;
+            foreach (Effect subeffect in effect.effects) {
+                foreach (Goal g in actor.goals) {
+                    Effect goal = g.state;
+                    float priority = g.priority;
 
                     float weight = priority * effectLikelyhood * EvaluateEffectTowardGoal(subeffect, goal, depth);
 
@@ -129,7 +151,7 @@ public class ActionHeuristicManager : ActionManager
 
     }
 
-    public float EvaluateEffectTowardGoal(MicroEffect effect, MicroEffect goal, int depth)
+    public float EvaluateEffectTowardGoal(Effect effect, Effect goal, int depth)
     {
 
         goal = goal.BindEffect(actor.resources);
@@ -149,13 +171,13 @@ public class ActionHeuristicManager : ActionManager
 
         if (goal is SocialChange) {
             SocialChange socialGoal = (SocialChange)goal;
-            return 1;
+            return EvaluateSocialGoals(effect, socialGoal);
         }
 
         return 0;
     }
 
-    float EvaluateInvGoals(MicroEffect effect, InvChange goal, int depth)
+    float EvaluateInvGoals(Effect effect, InvChange goal, int depth)
     {
 
         if (effect is InvChange) {
@@ -163,13 +185,15 @@ public class ActionHeuristicManager : ActionManager
 
             //stop if the inventory this would add to is not the one we want
             if (invChange.InvOwner != goal.InvOwner) return 0;
+            Inventory inventory = WS.GetInventory(goal.InvOwner);
+
 
             //stop if the item being changed isn't what we are looking for
             int matches = 0;
             int count = 0;
             foreach (string item in goal.ItemId) {
                 if (invChange.ItemId.Contains(item)) matches++;
-                if (actor.inventory.ContainsKey(item)) count += actor.inventory[item];
+                count += inventory.GetInventoryCount(item);
             }
             if (matches == 0) return 0;
 
@@ -179,6 +203,7 @@ public class ActionHeuristicManager : ActionManager
             if ((count < goal.DeltaMin && invChange.DeltaMin >= 0 && invChange.DeltaMax > 0)
                 || (count > goal.DeltaMax && invChange.DeltaMax <= 0 && invChange.DeltaMin < 0))// moving in the right direction
                 weight += Mathf.Abs(DeltaAverage);
+            else weight -= Mathf.Abs(DeltaAverage); //or we are moving in the wrong direction, and account for that too!
             if (count + DeltaAverage <= goal.DeltaMax && count + DeltaAverage >= goal.DeltaMin)
                 weight += Mathf.Abs(DeltaAverage);
 
@@ -186,29 +211,10 @@ public class ActionHeuristicManager : ActionManager
 
         }
 
-        if (effect is Move) {
-            //Move move = (Move)effect;
-
-            //List<WeightedAction> actionsInNewLocation = GenerateWeightedOptions(move.TargetLocation, depth+1);
-
-            float weight = 0;
-            //foreach (WeightedAction action in actionsInNewLocation) {
-            //    weight += action.weight / (2 * actionsInNewLocation.Count);
-            //}
-
-            return weight;
-        }
-
-        if (effect is SocialChange) {
-            //SocialChange socChange = (SocialChange)effect;
-
-            return 0;
-        }
-
         return 0;
     }
 
-    float EvaluateMoveGoals(MicroEffect effect, Move goal)
+    float EvaluateMoveGoals(Effect effect, Move goal)
     {
         if (effect is Move) {
             Move move = (Move)effect;
@@ -218,6 +224,36 @@ public class ActionHeuristicManager : ActionManager
             float dist = map.GetDistance(move.TargetLocation, goal.TargetLocation);
 
             return (currentDist - dist)*((map.LocationCount - dist)/ map.LocationCount);
+        }
+
+        return 0;
+    }
+
+    float EvaluateSocialGoals(Effect effect, SocialChange goal)
+    {
+        if (effect is SocialChange) {
+            SocialChange socChange = (SocialChange)effect;
+
+            //stop if the source or target don't match or the value changing isn't what we are looking for
+            if (socChange.SourceId != goal.SourceId) return 0;
+            if (socChange.TargetId != goal.TargetId) return 0;
+            if (socChange.RelationType != goal.RelationType) return 0;
+
+            Relationship relations = WS.GetRelationshipsFor(socChange.SourceId);
+
+            float value = relations.Get(socChange.TargetId, socChange.RelationType);
+
+            //Determine how much this helps us
+            float DeltaAverage = (socChange.DeltaMin + socChange.DeltaMax) / 2;
+            float weight = 0;
+            if ((value < goal.DeltaMin && socChange.DeltaMin >= 0 && socChange.DeltaMax > 0)
+                || (value > goal.DeltaMax && socChange.DeltaMax <= 0 && socChange.DeltaMin < 0))// moving in the right direction
+                weight += Mathf.Abs(DeltaAverage);
+            if (value + DeltaAverage <= goal.DeltaMax && value + DeltaAverage >= goal.DeltaMin)
+                weight += Mathf.Abs(DeltaAverage);
+
+            return weight;
+
         }
 
         return 0;
