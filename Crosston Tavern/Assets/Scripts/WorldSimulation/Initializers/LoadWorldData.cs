@@ -89,7 +89,7 @@ public class LoadWorldData
                         string type = jsonCondition.GetString("type");
                         switch (type) {
                             case "inv":
-                                preconditions.Add(new Condition_IsState(ParseMicroEffect(jsonCondition, number, cost, new List<string>() { item })));
+                                preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition, number, cost, new List<string>() { item })));
                                 break;
                             default:
                                 Debug.LogWarning("Action (" + specificId + ") condition is of unrecognized type (" + type + ")");
@@ -118,7 +118,7 @@ public class LoadWorldData
 
                         List<Effect> effects = new List<Effect>();
                         foreach (JSON jsonEffect in jsonOutcome.GetJArray("effects").AsJSONArray()) {
-                            effects.Add(ParseMicroEffect(jsonEffect, number, cost, new List<string>() { item }));
+                            effects.Add(ParseEffect(jsonEffect, number, cost, new List<string>() { item }));
                         }
 
                         outcomes.Add(new Outcome(chance, effects));
@@ -255,16 +255,16 @@ public class LoadWorldData
                     new GM_Precondition_Time(person.employmentData.shiftStart, person.employmentData.shiftEnd)
                 },
                 new List<Goal>() {
-                    new Goal(new Move(ws.map.GetFeature(establishment).location), 5, 1 )
+                    new Goal(new EffectMove(ws.map.GetFeature(establishment).location), 5, 1 )
                 });
             profession.name = "profession";
 
             List<string> stock = ws.map.GetFeature(establishment).relevantResources["stock"];
             List<Goal> goals = new List<Goal>();
             foreach (string s in stock) {
-                goals.Add(new Goal(new InvChange(3, 1000, establishment, new List<string>() { s }), 3, 1));
+                goals.Add(new Goal(new EffectInvChange(3, 1000, establishment, new List<string>() { s }), 3, 1));
             }
-            goals.Add(new Goal(new InvChange(10, 1000, establishment, stock), 2, 1));
+            goals.Add(new Goal(new EffectInvChange(10, 1000, establishment, stock), 2, 1));
 
             GoalModule restock = new GoalModule(new List<GM_Precondition>(), goals);
             restock.name = "restock";
@@ -275,7 +275,7 @@ public class LoadWorldData
 
             foreach(FamilyData family in person.family) {
                 GoalModule maintainFamily = new GoalModule(new List<GM_Precondition>(), new List<Goal>() {
-                    new Goal(new SocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 1, 1)
+                    new Goal(new EffectSocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 1, 1)
                 });
 
                 maintainFamily.name = "maintain family relation(" + family.id + ")";
@@ -317,34 +317,13 @@ public class LoadWorldData
         }
     }
 
-    Effect ParseMicroEffect(JSON jsonMicroeffect, int number = 1, int cost = 1, List<string> items = null)
+    Effect ParseEffect(JSON jsonMicroeffect, int number = 1, int cost = 1, List<string> items = null)
     {
         string type = jsonMicroeffect.GetString("type");
 
         switch (type) {
             case "inv":
-                JArray jRange = jsonMicroeffect.GetJArray("range");
-                int[] range = new int[2];
-                for(int i=0; i< jRange.Length; i++) {
-
-                    if (jRange[i] is JString) { 
-                        JString str = (JString)jRange[i];
-                        string result = str.AsString();
-                        int value = 1;
-                        if (result.Contains("-")) value *= -1;
-                        if (result.Contains("#number#")) value *= number;
-                        if (result.Contains("#cost#")) value *= cost;
-
-                        range[i] = value;
-                    }else { range[i] = jRange.GetInt(i); }
-
-                }
-
-                int min = range[0];
-                int max = range[0];
-                if (jRange.Length > 1) {
-                    max = range[1];
-                }
+                
 
                 string owner = "#" + jsonMicroeffect.GetString("owner") + "#";
                 List<string> itemsMain = new List<string>(jsonMicroeffect.GetJArray("items").AsStringArray());
@@ -353,11 +332,11 @@ public class LoadWorldData
                     itemsMain.AddRange(items);
                 }
 
-                return new InvChange(min, max, owner, itemsMain);
+                return new EffectInvChange(ParseNumericValue(), owner, itemsMain);
             case "social":
-                range = jsonMicroeffect.GetJArray("range").AsIntArray();
-                min = range[0];
-                max = range[0];
+                int[] range = jsonMicroeffect.GetJArray("range").AsIntArray();
+                int min = range[0];
+                int max = range[0];
                 if (range.Length > 1) {
                     max = range[1];
                 }
@@ -368,13 +347,24 @@ public class LoadWorldData
                 string relType = jsonMicroeffect.GetString("relType");
                 Relationship.RelationType rel = (Relationship.RelationType)Enum.Parse(typeof(Relationship.RelationType),relType);
 
-                return new SocialChange(min, max, source, dest, rel);
+                return new EffectSocialChange(min, max, source, dest, rel);
             case "move":
-                return new Move();
+                return new EffectMove();
             default:
                 Debug.LogWarning("MicroEffect of unrecognized type (" + type + ") found!");
                 return null;
         }
+    }
+
+
+    int ParseValue(string result, int number, int cost)
+    {
+        int value = 1;
+        if (result.Contains("-")) value *= -1;
+        if (result.Contains("#number#")) value *= number;
+        if (result.Contains("#cost#")) value *= cost;
+
+        return value;
     }
 
     StringStringListDictionary ParseResources(JSON jsonResources)

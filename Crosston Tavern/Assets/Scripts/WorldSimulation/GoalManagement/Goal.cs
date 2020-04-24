@@ -42,9 +42,9 @@ public class Goal
     {
         if (other.state.GetType() != this.state.GetType()) return false;
 
-        if(state is InvChange) {
-            InvChange invState = (InvChange)state;
-            InvChange invOther = (InvChange)other.state;
+        if(state is EffectInvChange) {
+            EffectInvChange invState = (EffectInvChange)state;
+            EffectInvChange invOther = (EffectInvChange)other.state;
 
             if (invState.InvOwner != invOther.InvOwner) return false;
             if (!(invState.ItemId.All(invOther.ItemId.Contains) &&
@@ -59,9 +59,9 @@ public class Goal
             return true;
         }
 
-        if(state is SocialChange) {
-            SocialChange socState = (SocialChange)state;
-            SocialChange socOther = (SocialChange)other.state;
+        if(state is EffectSocialChange) {
+            EffectSocialChange socState = (EffectSocialChange)state;
+            EffectSocialChange socOther = (EffectSocialChange)other.state;
 
             if (socState.TargetId != socOther.TargetId) return false;
             if (socState.SourceId != socOther.SourceId) return false;
@@ -70,9 +70,9 @@ public class Goal
             return true;
         }
 
-        if(state is Move) {
-            Move moveState = (Move)state;
-            Move moveOther = (Move)other.state;
+        if(state is EffectMove) {
+            EffectMove moveState = (EffectMove)state;
+            EffectMove moveOther = (EffectMove)other.state;
 
             return moveState.TargetLocation == moveOther.TargetLocation;
         }
@@ -96,9 +96,9 @@ public class Goal
         combinedActions.AddRange(enablingActions);
         combinedActions.AddRange(other.enablingActions);
 
-        if (state is InvChange) {
-            InvChange invState = (InvChange)state;
-            InvChange invOther = (InvChange)other.state;
+        if (state is EffectInvChange) {
+            EffectInvChange invState = (EffectInvChange)state;
+            EffectInvChange invOther = (EffectInvChange)other.state;
 
             int deltaMin = Mathf.Max(invState.DeltaMin, invOther.DeltaMin);
             int deltaMax = Mathf.Min(invState.DeltaMax, invOther.DeltaMax);
@@ -111,13 +111,13 @@ public class Goal
                 }
             }
 
-            return new Goal(new InvChange(deltaMin, deltaMax, invState.InvOwner, invState.ItemId), 
+            return new Goal(new EffectInvChange(new NumericValue<int>(deltaMin, deltaMax), invState.InvOwner, invState.ItemId), 
                                 combinedPriority, combinedMod, combinedActions);
         }
 
-        if (state is SocialChange) {
-            SocialChange socState = (SocialChange)state;
-            SocialChange socOther = (SocialChange)other.state;
+        if (state is EffectSocialChange) {
+            EffectSocialChange socState = (EffectSocialChange)state;
+            EffectSocialChange socOther = (EffectSocialChange)other.state;
 
             int deltaMin = Mathf.Max(socState.DeltaMin, socOther.DeltaMin);
             int deltaMax = Mathf.Min(socState.DeltaMax, socOther.DeltaMax);
@@ -130,11 +130,11 @@ public class Goal
                 }
             }
 
-            return new Goal(new SocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId, socState.RelationType),
+            return new Goal(new EffectSocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId, socState.RelationType),
                                 combinedPriority, combinedMod, combinedActions);
         }
 
-        if (state is Move) {
+        if (state is EffectMove) {
             return new Goal(state, combinedPriority, combinedMod, combinedActions);
         }
 

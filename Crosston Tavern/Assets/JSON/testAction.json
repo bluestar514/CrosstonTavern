@@ -297,13 +297,13 @@
 					"effects":[
 						{
 							"type": "inv",
-							"range": [-1],
+							"range": ["-#inventory_item_count#", 0],
 							"owner": "initiator",
 							"items":["#inventory_item#"]
 						},
 						{
 							"type": "inv",
-							"range": [1],
+							"range": [0, "#inventory_item_count#"],
 							"owner": "recipient",
 							"items":["#inventory_item#"]
 						}

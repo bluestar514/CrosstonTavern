@@ -86,8 +86,6 @@ public class ActionHeuristicManager : ActionManager
     {
         List<WeightedAction> choices = GenerateWeightedOptions();
 
-        Debug.Log(choices.Count);
-
         return ChooseAction(choices);
     }
 
@@ -156,32 +154,32 @@ public class ActionHeuristicManager : ActionManager
 
         goal = goal.BindEffect(actor.resources);
 
-        if (goal is InvChange) {
-            InvChange invGoal = (InvChange)goal;
+        if (goal is EffectInvChange) {
+            EffectInvChange invGoal = (EffectInvChange)goal;
 
             return EvaluateInvGoals(effect, invGoal, depth);
         }
 
 
-        if (goal is Move) {
-            Move locationGoal = (Move)goal;
+        if (goal is EffectMove) {
+            EffectMove locationGoal = (EffectMove)goal;
             return EvaluateMoveGoals(effect, locationGoal);
         }
 
 
-        if (goal is SocialChange) {
-            SocialChange socialGoal = (SocialChange)goal;
+        if (goal is EffectSocialChange) {
+            EffectSocialChange socialGoal = (EffectSocialChange)goal;
             return EvaluateSocialGoals(effect, socialGoal);
         }
 
         return 0;
     }
 
-    float EvaluateInvGoals(Effect effect, InvChange goal, int depth)
+    float EvaluateInvGoals(Effect effect, EffectInvChange goal, int depth)
     {
 
-        if (effect is InvChange) {
-            InvChange invChange = (InvChange)effect;
+        if (effect is EffectInvChange) {
+            EffectInvChange invChange = (EffectInvChange)effect;
 
             //stop if the inventory this would add to is not the one we want
             if (invChange.InvOwner != goal.InvOwner) return 0;
@@ -214,10 +212,10 @@ public class ActionHeuristicManager : ActionManager
         return 0;
     }
 
-    float EvaluateMoveGoals(Effect effect, Move goal)
+    float EvaluateMoveGoals(Effect effect, EffectMove goal)
     {
-        if (effect is Move) {
-            Move move = (Move)effect;
+        if (effect is EffectMove) {
+            EffectMove move = (EffectMove)effect;
 
 
             float currentDist = map.GetDistance(actor.location, goal.TargetLocation);
@@ -229,10 +227,10 @@ public class ActionHeuristicManager : ActionManager
         return 0;
     }
 
-    float EvaluateSocialGoals(Effect effect, SocialChange goal)
+    float EvaluateSocialGoals(Effect effect, EffectSocialChange goal)
     {
-        if (effect is SocialChange) {
-            SocialChange socChange = (SocialChange)effect;
+        if (effect is EffectSocialChange) {
+            EffectSocialChange socChange = (EffectSocialChange)effect;
 
             //stop if the source or target don't match or the value changing isn't what we are looking for
             if (socChange.SourceId != goal.SourceId) return 0;

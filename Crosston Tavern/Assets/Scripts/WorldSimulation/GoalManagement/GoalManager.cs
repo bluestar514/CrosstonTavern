@@ -110,7 +110,7 @@ public class GoalManager
                 }
 
             }
-            Goal goal = new Goal(new Move(action.LocationId), parentPriority, 1);
+            Goal goal = new Goal(new EffectMove(action.LocationId), parentPriority, 1);
             goal.enablingActions.Add(action);
 
             newGoals.Add(goal);

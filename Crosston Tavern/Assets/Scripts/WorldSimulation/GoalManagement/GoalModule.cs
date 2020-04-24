@@ -38,7 +38,7 @@ public class GM_ManLocation: GoalModule
     {
         location = locationId;
 
-        this.goals.Add(new Goal(new Move(location), 10, 1));
+        this.goals.Add(new Goal(new EffectMove(location), 10, 1));
 
         name = "Man " + location;
     }
@@ -56,10 +56,10 @@ public class GM_StockFeature: GoalModule
         List<string> stock = ws.map.GetFeature(featureId).relevantResources["stock"];
 
         foreach (string s in stock) {
-            this.goals.Add(new Goal(new InvChange(3, 1000, actorId, new List<string>() { s }), 5, 1));
+            this.goals.Add(new Goal(new EffectInvChange(new NumericValue<int>(3, 1000), actorId, new List<string>() { s }), 5, 1));
         }
 
-        this.goals.Add(new Goal(new InvChange(10, 1000, actorId, stock), 3, 1));
+        this.goals.Add(new Goal(new EffectInvChange(new NumericValue<int>(10, 1000), actorId, stock), 3, 1));
 
 
         name = "Stock " + featureId;

@@ -38,23 +38,23 @@ public class ActionExecutionManager : ActionManager
             Outcome chosenEffect = PickEffect(action);
 
             foreach (Effect effect in chosenEffect.effects) {
-                if (effect is InvChange) {
-                    InvChange invChange = (InvChange)effect;
+                if (effect is EffectInvChange) {
+                    EffectInvChange invChange = (EffectInvChange)effect;
 
                     Inventory inventory = WS.GetInventory(invChange.InvOwner);
                     inventory.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
                 }
 
 
-                if (effect is Move) {
-                    Move move = (Move)effect;
+                if (effect is EffectMove) {
+                    EffectMove move = (EffectMove)effect;
 
                     actor.Move(move.TargetLocation);
                 }
 
 
-                if (effect is SocialChange) {
-                    SocialChange socialChange = (SocialChange)effect;
+                if (effect is EffectSocialChange) {
+                    EffectSocialChange socialChange = (EffectSocialChange)effect;
 
                     Person source = people.GetPerson(socialChange.SourceId);
 

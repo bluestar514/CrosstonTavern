@@ -112,8 +112,8 @@ public class ActionBuilder
     Effect RebindMicroEffect(Effect effect, string newItem)
     { 
 
-        if(effect is InvChange) {
-            InvChange inventoryState = (InvChange)effect;
+        if(effect is EffectInvChange) {
+            EffectInvChange inventoryState = (EffectInvChange)effect;
 
             List<string> items = new List<string>();
             foreach(string item in items) {
@@ -121,7 +121,7 @@ public class ActionBuilder
                 else items.Add(item);
             }
 
-            return new InvChange(inventoryState.DeltaMin, inventoryState.DeltaMax, inventoryState.InvOwner, items);
+            return new EffectInvChange(new NumericValue<int>(inventoryState.DeltaMin, inventoryState.DeltaMax), inventoryState.InvOwner, items);
 
         }
 
