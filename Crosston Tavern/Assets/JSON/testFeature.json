@@ -83,56 +83,56 @@
       "location": "townSquare",
       "maxUsers": 2,
       "actions": [ "buy_fishing_rod", 
-                    "buy_trout_1", "buy_trout_5",
-                    "buy_goldfish_1", "buy_goldfish_5", 
-                    "buy_salmon_1", "buy_salmon_5",
-                    "stock_trout_1", "stock_trout_5",
-                    "stock_goldfish_1", "stock_goldfish_5", 
-                    "stock_salmon_1", "stock_salmon_5" ],
+                    "buy_#stock_item#", "stock_#stock_item#" ],
       "resources": {
         "stock": [ "trout", "goldfish", "salmon" ]
+      },
+      "stock":{
+        "trout": 2,
+        "goldfish": 1,
+        "salmon": 3
       }
     },
     {
       "id": "town_herbShop",
       "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ "buy_red_herb_1", "buy_red_herb_5",
-                    "buy_green_herb_1", "buy_green_herb_5",
-                    "buy_blue_herb_1", "buy_blue_herb_5",
-                    "stock_red_herb_1", "stock_red_herb_5",
-                    "stock_green_herb_1", "stock_green_herb_5",
-                    "stock_blue_herb_1", "stock_blue_herb_5"  ],
+      "actions": [ "buy_#stock_item#", "stock_#stock_item#"],
       "resources": {
         "stock": [ "red_herb", "green_herb", "blue_herb" ]
+      },
+      "stock":{
+        "red_herb": 1,
+        "green_herb": 1,
+        "blue_herb": 2
       }
     },
     {
       "id": "town_inn",
       "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ "buy_red_herb_1", "buy_red_herb_5",
-                    "buy_trout_1", "buy_trout_5",
-                    "buy_common_mushroom_1", "buy_common_mushroom_5",
-                    "stock_red_herb_1", "stock_red_herb_5",
-                    "stock_trout_1", "stock_trout_5",
-                    "stock_common_mushroom_1", "stock_common_mushroom_5" ],
+      "actions": [ "buy_#stock_item#", "stock_#stock_item#"],
       "resources": {
         "stock": [ "red_herb", "trout", "common_mushroom" ]
+      },
+      "stock":{
+        "red_herb": 2,
+        "trout": 4,
+        "common_mushroom": 2
       }
     },
     {
       "id": "town_blacksmith",
       "location": "townSquare",
       "maxUsers": 2,
-      "actions": [ "buy_iron_ore_1", "buy_iron_ore_5",
-                    "buy_gold_ore_1", "buy_gold_ore_5",
-                    "buy_saphire_1", "buy_saphire_5",
-                    "stock_iron_ore_1", "stock_iron_ore_5",
-                    "stock_gold_ore_1", "stock_gold_ore_5",
-                    "stock_saphire_1", "stock_saphire_5" ],
+      "actions": [ "buy_#stock_item#", "stock_#stock_item#"],
       "resources": {
         "stock": [ "iron_ore", "gold_ore", "saphire" ]
+      },
+      "stock":{
+        "iron_ore": 3,
+        "gold_ore": 10,
+        "saphire": 25      
       }
     },
     {

@@ -53,82 +53,57 @@ public class LoadWorldData
     {
         Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>();
 
-        Dictionary<string, int> costDict = new Dictionary<string, int>();
-        JSON costs = totalJsonAction.GetJSON("cost");
-        foreach(string key in costs.Keys) {
-            costDict.Add(key, costs.GetInt(key));
-        }
-
         foreach(JSON jsonAction in totalJsonAction.GetJArray("actions").AsJSONArray()) {
             string id = jsonAction.GetString("id");
             int time = jsonAction.GetInt("time");
 
-            Dictionary<string, int> items = new Dictionary<string, int>();
-            List<int> counts = new List<int>() { 1 };
-            if (id.Contains("#item#")) {
-                items = costDict;
-            } else {
-                items.Add("filler", 1);
+            
+
+            List<Condition> preconditions = new List<Condition>() {
+                new Condition_SpaceAtFeature()
+            };
+            foreach (JSON jsonCondition in jsonAction.GetJArray("conditions").AsJSONArray()) {
+                string type = jsonCondition.GetString("type");
+                switch (type) {
+                    case "inv":
+                        preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition)));
+                        break;
+                    default:
+                        Debug.LogWarning("Action (" + id + ") condition is of unrecognized type (" + type + ")");
+                        break;
+                }
             }
 
-            if (id.Contains("#number#")) {
-                counts = new List<int>() { 1, 5 };
-            }
+            List<Outcome> outcomes = new List<Outcome>();
+            foreach (JSON jsonOutcome in jsonAction.GetJArray("outcomes").AsJSONArray()) {
+                JSON jsonChance = jsonOutcome.GetJSON("chance");
 
-            foreach(int number in counts) {
-                foreach(KeyValuePair<string, int> itemCost in items) {
-                    string item = itemCost.Key;
-                    int cost = itemCost.Value;
-
-                    string specificId = id.Replace("#item#", item).Replace("#number#", number.ToString());
-
-                    List<Condition> preconditions = new List<Condition>() {
-                        new Condition_SpaceAtFeature()
-                    };
-                    foreach (JSON jsonCondition in jsonAction.GetJArray("conditions").AsJSONArray()) {
-                        string type = jsonCondition.GetString("type");
-                        switch (type) {
-                            case "inv":
-                                preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition, number, cost, new List<string>() { item })));
-                                break;
-                            default:
-                                Debug.LogWarning("Action (" + specificId + ") condition is of unrecognized type (" + type + ")");
-                                break;
-                        }
-                    }
-
-                    List<Outcome> outcomes = new List<Outcome>();
-                    foreach (JSON jsonOutcome in jsonAction.GetJArray("outcomes").AsJSONArray()) {
-                        JSON jsonChance = jsonOutcome.GetJSON("chance");
-
-                        ChanceModifier chance = null;
-                        string type = jsonChance.GetString("type");
-                        switch (type) {
-                            case "simple":
-                                float value = jsonChance.GetJNumber("value").AsFloat();
-                                chance = new ChanceModifierSimple(value);
-                                break;
-                            case "base":
-                                chance = new ChanceModifier();
-                                break;
-                            default:
-                                Debug.LogWarning("Action (" + specificId + ") chanceModifier type is of unrecognized type (" + type + ")");
-                                break;
-                        }
-
-                        List<Effect> effects = new List<Effect>();
-                        foreach (JSON jsonEffect in jsonOutcome.GetJArray("effects").AsJSONArray()) {
-                            effects.Add(ParseEffect(jsonEffect, number, cost, new List<string>() { item }));
-                        }
-
-                        outcomes.Add(new Outcome(chance, effects));
-                    }
-
-                    GenericAction action = new GenericAction(specificId, time, preconditions, outcomes);
-                    actions.Add(specificId, action);
+                ChanceModifier chance = null;
+                string type = jsonChance.GetString("type");
+                switch (type) {
+                    case "simple":
+                        float value = jsonChance.GetJNumber("value").AsFloat();
+                        chance = new ChanceModifierSimple(value);
+                        break;
+                    case "base":
+                        chance = new ChanceModifier();
+                        break;
+                    default:
+                        Debug.LogWarning("Action (" + id + ") chanceModifier type is of unrecognized type (" + type + ")");
+                        break;
                 }
 
+                List<Effect> effects = new List<Effect>();
+                foreach (JSON jsonEffect in jsonOutcome.GetJArray("effects").AsJSONArray()) {
+                    effects.Add(ParseEffect(jsonEffect));
+                }
+
+                outcomes.Add(new Outcome(chance, effects));
             }
+
+            GenericAction action = new GenericAction(id, time, preconditions, outcomes);
+            actions.Add(id, action);
+            
         }
 
         return actions;
@@ -194,7 +169,15 @@ public class LoadWorldData
             JSON jsonResources = feature.GetJSON("resources");
             StringStringListDictionary resources = ParseResources(jsonResources);
 
-            features.Add(new Feature(id, location, maxUsers, genericActions, resources));
+
+            Dictionary<string, int> stockTable = new Dictionary<string, int>();
+            if (feature.ContainsKey("stock")) {
+                JSON jsonStock = feature.GetJSON("stock");
+                stockTable = ParseStockTable(jsonStock);
+            }
+            
+
+            features.Add(new Feature(id, location, maxUsers, genericActions, resources, stockTable));
         }
 
 
@@ -317,55 +300,51 @@ public class LoadWorldData
         }
     }
 
-    Effect ParseEffect(JSON jsonMicroeffect, int number = 1, int cost = 1, List<string> items = null)
+    Effect ParseEffect(JSON jsonEffect)
     {
-        string type = jsonMicroeffect.GetString("type");
+        string type = jsonEffect.GetString("type");
+
+        string[] range = new string[2];
+        if (type != "move") { 
+            
+            JArray jRange = jsonEffect.GetJArray("range");
+
+            if (jRange.Length > 2) throw new Exception("Effect has more than two values specifying its range!");
+
+            for (int i = 0; i < jRange.Length; i++) {
+                if (jRange[i] is JString) {
+                    range[i] = ((JString)jRange[i]).AsString();
+                }
+                if (jRange[i] is JNumber) {
+                    range[i] = ((JNumber)jRange[i]).AsString();
+                }
+            }
+            if (jRange.Length == 1) range[1] = range[0];
+        }
 
         switch (type) {
             case "inv":
-                
+                string owner = jsonEffect.GetString("owner");
+                List<string> items = new List<string>(jsonEffect.GetJArray("items").AsStringArray());
 
-                string owner = "#" + jsonMicroeffect.GetString("owner") + "#";
-                List<string> itemsMain = new List<string>(jsonMicroeffect.GetJArray("items").AsStringArray());
-                if (itemsMain.Contains("#item#")) {
-                    itemsMain.Remove("#item#");
-                    itemsMain.AddRange(items);
-                }
-
-                return new EffectInvChange(ParseNumericValue(), owner, itemsMain);
+                return new EffectGenericInv(range[0], range[1], owner, items);
             case "social":
-                int[] range = jsonMicroeffect.GetJArray("range").AsIntArray();
-                int min = range[0];
-                int max = range[0];
-                if (range.Length > 1) {
-                    max = range[1];
-                }
 
-                string source = "#" + jsonMicroeffect.GetString("source") + "#";
-                string dest = "#" + jsonMicroeffect.GetString("dest") + "#";
+                string source = jsonEffect.GetString("source");
+                string dest = jsonEffect.GetString("dest");
+                Relationship.RelationType relType = (Relationship.RelationType)
+                                                    Enum.Parse(typeof(Relationship.RelationType), 
+                                                    jsonEffect.GetString("relType"));
 
-                string relType = jsonMicroeffect.GetString("relType");
-                Relationship.RelationType rel = (Relationship.RelationType)Enum.Parse(typeof(Relationship.RelationType),relType);
+                return new EffectSocialChange(int.Parse(range[0]), int.Parse(range[1]), source, dest, relType);
 
-                return new EffectSocialChange(min, max, source, dest, rel);
             case "move":
                 return new EffectMove();
             default:
-                Debug.LogWarning("MicroEffect of unrecognized type (" + type + ") found!");
-                return null;
-        }
+                throw new Exception("Effect with type " + type + " found. This is not a supported type.");
+        }      
     }
 
-
-    int ParseValue(string result, int number, int cost)
-    {
-        int value = 1;
-        if (result.Contains("-")) value *= -1;
-        if (result.Contains("#number#")) value *= number;
-        if (result.Contains("#cost#")) value *= cost;
-
-        return value;
-    }
 
     StringStringListDictionary ParseResources(JSON jsonResources)
     {
@@ -390,5 +369,14 @@ public class LoadWorldData
         return inv;
     }
 
+    Dictionary<string, int> ParseStockTable(JSON jsonTable)
+    {
+        Dictionary<string, int> table = new Dictionary<string, int>();
 
+        foreach(string jsonStock in jsonTable.Keys) {
+            table.Add(jsonStock, jsonTable.GetInt(jsonStock));
+        }
+
+        return table;
+    }
 }

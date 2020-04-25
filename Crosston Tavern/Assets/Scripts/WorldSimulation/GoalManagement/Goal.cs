@@ -111,7 +111,7 @@ public class Goal
                 }
             }
 
-            return new Goal(new EffectInvChange(new NumericValue<int>(deltaMin, deltaMax), invState.InvOwner, invState.ItemId), 
+            return new Goal(new EffectInvChange(deltaMin, deltaMax, invState.InvOwner, invState.ItemId), 
                                 combinedPriority, combinedMod, combinedActions);
         }
 

@@ -218,19 +218,19 @@
 				}
 			]
 		},		
-		{"id": "buy_#item#_#number#",
+		{"id": "buy_#stock_item#",
 			"time": 0,
 			"conditions":[
 				{	"type": "inv",
-					"range": ["#cost#*#number#", 10000],
+					"range": ["#stock_price#*#stock_count#", 10000],
 					"owner": "initiator",
 					"items": ["currency"]
 				},
 				{
 					"type": "inv",
-					"range": ["#number#", 10000],
+					"range": ["#stock_count#", 10000],
 					"owner": "recipient",
-					"items": ["#item#"]
+					"items": ["#stock_item#"]
 				}
 			],
 			"outcomes":[
@@ -239,33 +239,33 @@
 					"effects":[
 						{
 							"type": "inv",
-							"range": ["#number#"],
+							"range": ["#stock_count#"],
 							"owner": "initiator",
-							"items": ["#item#"]
+							"items": ["#stock_item#"]
 						},
 						{
 							"type": "inv",
-							"range": ["-#cost#*#number#"],
+							"range": ["-#stock_price#*#stock_count#"],
 							"owner": "initiator",
 							"items": ["currency"]
 						},
 						{
 							"type": "inv",
-							"range": ["-#number#"],
+							"range": ["-#stock_count#"],
 							"owner": "recipient",
-							"items": ["#item#"]
+							"items": ["#stock_item#"]
 						}
 					]
 				}
 			]
 		},
-		{"id": "stock_#item#_#number#",
+		{"id": "stock_#stock_item#",
 			"time": 0,
 			"conditions":[
 				{	"type": "inv",
-					"range": ["#number#", 10000],
+					"range": [1, 10000],
 					"owner": "initiator",
-					"items": ["#item#"]
+					"items": ["#stock_item#"]
 				}
 			],
 			"outcomes":[
@@ -274,15 +274,15 @@
 					"effects":[
 						{
 							"type": "inv",
-							"range": ["-#number#"],
+							"range": ["-#stock_count#"],
 							"owner": "initiator",
-							"items": ["#item#"]
+							"items": ["#stock_item#"]
 						},
 						{
 							"type": "inv",
-							"range": ["#number#"],
+							"range": ["#stock_count#"],
 							"owner": "recipient",
-							"items": ["#item#"]
+							"items": ["#stock_item#"]
 						}
 					]
 				}
@@ -297,13 +297,13 @@
 					"effects":[
 						{
 							"type": "inv",
-							"range": ["-#inventory_item_count#", 0],
+							"range": ["-#inventory_item_count#"],
 							"owner": "initiator",
 							"items":["#inventory_item#"]
 						},
 						{
 							"type": "inv",
-							"range": [0, "#inventory_item_count#"],
+							"range": ["#inventory_item_count#"],
 							"owner": "recipient",
 							"items":["#inventory_item#"]
 						}
@@ -311,30 +311,5 @@
 				}
 			]
 		}
-	],
-	"cost":{
-		"trout": 2,
-		"goldfish": 1,
-		"salmon" : 3,
-		"tuna": 3,
-		"bat_ray": 2,
-		"sunfish": 2,
-		"smelt": 1,
-		"blue_herb":2,
-		"red_herb":1,
-		"green_herb":1,
-		"rose": 2,
-		"clover": 1,
-		"yellow_flower": 2,
-		"red_flower": 2,
-		"common_mushroom": 1,
-		"iron_ore": 3,
-		"copper_ore": 5,
-		"gold_ore": 10, 
-		"silver_ore": 10,
-		"ruby": 20,
-		"saphire": 25, 
-		"emerald": 25, 
-		"diamond": 40
-	}
+	]
 }
