@@ -126,7 +126,7 @@ public class ActionHeuristicManager : ActionManager
     {
         List<WeightedAction.WeightRational> weightRationals = new List<WeightedAction.WeightRational>();
         foreach (Outcome effect in boundEffects) {
-            float effectLikelyhood = effect.EvaluateChance();
+            float effectLikelyhood = effect.EvaluateChance(WS);
 
             foreach (Effect subeffect in effect.effects) {
                 foreach (Goal g in actor.goals) {
@@ -233,8 +233,8 @@ public class ActionHeuristicManager : ActionManager
             EffectSocialChange socChange = (EffectSocialChange)effect;
 
             //stop if the source or target don't match or the value changing isn't what we are looking for
-            if (socChange.SourceId != goal.SourceId) return 0;
-            if (socChange.TargetId != goal.TargetId) return 0;
+            if (!checkIfPeopleMatch(socChange.SourceId, goal.SourceId)) return 0;
+            if (!checkIfPeopleMatch(socChange.TargetId, goal.TargetId)) return 0;
             if (socChange.RelationType != goal.RelationType) return 0;
 
             Relationship relations = WS.GetRelationshipsFor(socChange.SourceId);
@@ -255,5 +255,14 @@ public class ActionHeuristicManager : ActionManager
         }
 
         return 0;
+    }
+
+
+    bool checkIfPeopleMatch(string effect, string goal)
+    {
+        effect = effect.Replace("person_", "");
+        goal = goal.Replace("person_", "");
+
+        return effect == goal;
     }
 }

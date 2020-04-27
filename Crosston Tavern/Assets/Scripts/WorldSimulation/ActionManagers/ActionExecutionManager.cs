@@ -56,9 +56,11 @@ public class ActionExecutionManager : ActionManager
                 if (effect is EffectSocialChange) {
                     EffectSocialChange socialChange = (EffectSocialChange)effect;
 
-                    Person source = people.GetPerson(socialChange.SourceId);
+                    Debug.Log(socialChange);
 
-                    //source.ChangeRelationshipValue(socialChange.DeltaMin, socialChange.TargetId);
+                    Person source = people.GetPerson(socialChange.SourceId.Replace("person_", ""));
+
+                    source.relationships.Increase(socialChange.TargetId.Replace("person_", ""), socialChange.RelationType, socialChange.DeltaMax);
                 }
             }
 
@@ -105,7 +107,7 @@ public class ActionExecutionManager : ActionManager
     void EvaluateChances(List<Outcome> effects)
     {
         foreach(Outcome effect in effects) {
-            effect.EvaluateChance();
+            effect.EvaluateChance(WS);
         }
     }
 

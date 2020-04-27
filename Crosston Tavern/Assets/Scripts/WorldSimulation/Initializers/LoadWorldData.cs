@@ -81,6 +81,13 @@ public class LoadWorldData
                 ChanceModifier chance = null;
                 string type = jsonChance.GetString("type");
                 switch (type) {
+                    case "relation":
+                        int boundry = jsonChance.GetJNumber("boundry").AsInt();
+                        EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
+                        bool positive = jsonChance.GetBool("positive");
+
+                        chance = new ChanceModifierRelation(socialState, boundry, positive);
+                        break;
                     case "simple":
                         float value = jsonChance.GetJNumber("value").AsFloat();
                         chance = new ChanceModifierSimple(value);
@@ -258,7 +265,7 @@ public class LoadWorldData
 
             foreach(FamilyData family in person.family) {
                 GoalModule maintainFamily = new GoalModule(new List<GM_Precondition>(), new List<Goal>() {
-                    new Goal(new EffectSocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 1, 1)
+                    new Goal(new EffectSocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 10, 1)
                 });
 
                 maintainFamily.name = "maintain family relation(" + family.id + ")";
@@ -300,9 +307,11 @@ public class LoadWorldData
         }
     }
 
-    Effect ParseEffect(JSON jsonEffect)
+    Effect ParseEffect(JSON jsonEffect, string type="")
     {
-        string type = jsonEffect.GetString("type");
+        if(type =="")
+            type = jsonEffect.GetString("type");
+
 
         string[] range = new string[2];
         if (type != "move") { 

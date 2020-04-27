@@ -79,7 +79,7 @@ public class GoalManager
 
             float weight = 0;
             foreach(Outcome outcome in potentialEffects) {
-                float chance = outcome.chanceModifier.Chance();
+                float chance = outcome.chanceModifier.Chance(ws);
 
                 foreach (Effect effect in outcome.effects) {
                     weight += chance * ahm.EvaluateEffectTowardGoal(effect, state, 0);

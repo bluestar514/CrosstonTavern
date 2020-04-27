@@ -198,7 +198,14 @@
 			"conditions":[],
 			"outcomes":[
 				{
-					"chance": {"type": "base"},
+					"chance": {"type": "relation",
+								"range": [-20, 10],
+								"boundry" : -1,
+								"source": "initiator",
+								"dest": "recipient",
+								"relType": "friendly",
+								"positive" : true
+					},
 					"effects":[
 						{
 							"type": "social",
@@ -210,6 +217,32 @@
 						{
 							"type": "social",
 							"range": [1,1],
+							"source": "recipient",
+							"dest": "initiator",
+							"relType": "friendly"
+						}
+					]
+				},
+				{
+					"chance": {"type": "relation",
+								"range": [-20, 10],
+								"boundry" : -1,
+								"source": "initiator",
+								"dest": "recipient",
+								"relType": "friendly",
+								"positive" : false
+					},
+					"effects":[
+						{
+							"type": "social",
+							"range": [-1,-1],
+							"source": "initiator",
+							"dest": "recipient",
+							"relType": "friendly"
+						},
+						{
+							"type": "social",
+							"range": [-1,-1],
 							"source": "recipient",
 							"dest": "initiator",
 							"relType": "friendly"

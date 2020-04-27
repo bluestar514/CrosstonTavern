@@ -23,9 +23,9 @@ public class Outcome
                                      select effect.BindEffect(resources));        
     }
 
-    public float EvaluateChance()
+    public float EvaluateChance(WorldState ws)
     {
-        evaluatedChance = chanceModifier.Chance();
+        evaluatedChance = chanceModifier.Chance(ws);
         return evaluatedChance;
     }
 

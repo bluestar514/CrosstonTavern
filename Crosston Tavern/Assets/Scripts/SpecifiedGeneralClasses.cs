@@ -7,9 +7,8 @@ public class StringListStorage : SerializableDictionary.Storage<List<string>>
 { }
 
 [Serializable]
-public class StringStringListDictionary : SerializableDictionary<string,
-List<string>, StringListStorage>
-{ }
+public class StringStringListDictionary : SerializableDictionary<string, List<string>, StringListStorage>
+{ }[Serializable]public class FloatArrayStorage : SerializableDictionary.Storage<float[]> { }[Serializable]public class StringFloatArrayDictionary : SerializableDictionary<string, float[], FloatArrayStorage> { }
 
 [Serializable]
 public class StringIntDictionary: SerializableDictionary<string, int> { }

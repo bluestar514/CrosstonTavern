@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Relationship
 {
-    Dictionary<string, float[]> relationships;
+    [SerializeField]
+    StringFloatArrayDictionary relationships;
 
     public enum RelationType
     {
@@ -16,7 +18,7 @@ public class Relationship
 
     public Relationship()
     {
-        relationships = new Dictionary<string, float[]>();
+        relationships = new StringFloatArrayDictionary();
     }
 
     public void Increase(string target, RelationType axis, float value)
@@ -34,7 +36,11 @@ public class Relationship
 
     public float Get(string target, RelationType axis)
     {
-        return relationships[target][(int)axis];
+        if (target.StartsWith("person_")) target = target.Replace("person_", "");
+
+        if (relationships.ContainsKey(target))
+            return relationships[target][(int)axis];
+        else return 0;
     }
 
     public List<string> GetKnownPeople()

@@ -20,6 +20,9 @@ public class ActionBuilder
     static string STOCKCOST = "#stock_price#";
     static string STOCKCOUNT = "#stock_count#";
 
+    static string INITIATOR = "initiator";
+    static string RECIPIENT = "recipient";
+
     public ActionBuilder(WorldState worldState, Person actor)
     {
         ws = worldState;
@@ -37,7 +40,49 @@ public class ActionBuilder
 
         allActions = MakeNonGeneric(allActions);
 
+        allActions = BindInitatorRecipient(allActions);
+
         return allActions;
+    }
+
+    private List<BoundAction> BindInitatorRecipient(List<BoundAction> allActions)
+    {
+        List<BoundAction> actions = new List<BoundAction>();
+
+        foreach(BoundAction action in allActions) {
+            List<Condition> conditions = new List<Condition>();
+            foreach(Condition condition in action.preconditions) {
+                if(condition is Condition_IsState) {
+                    Condition_IsState state = (Condition_IsState)condition;
+                    conditions.Add(new Condition_IsState(BindEffectToPerson(state.state, action.FeatureId)));
+                } else {
+                    conditions.Add(condition);
+                }
+            }
+
+            List<Outcome> outcomes = new List<Outcome>();
+            foreach(Outcome outcome in action.potentialEffects) {
+                ChanceModifier chance = outcome.chanceModifier;
+                if (chance is ChanceModifierRelation) {
+                    ChanceModifierRelation relChance = (ChanceModifierRelation)chance;
+                    EffectSocialChange socialState = (EffectSocialChange)BindEffectToPerson(relChance.socialState, action.FeatureId);
+
+                    chance = new ChanceModifierRelation(socialState, relChance.boundry, relChance.positive);
+                }
+
+                List<Effect> effects = new List<Effect>();
+                foreach (Effect effect in outcome.effects) {
+                    effects.Add(BindEffectToPerson(effect, action.FeatureId));
+                }
+
+                outcomes.Add(new Outcome(chance, effects));
+            }
+
+            actions.Add(new BoundAction(action.Id, action.executionTime, conditions, outcomes,
+                action.ActorId, action.FeatureId, action.LocationId, action.OtherBindings));
+        }
+
+        return actions;
     }
 
     public List<BoundAction> BindActions()
@@ -46,7 +91,7 @@ public class ActionBuilder
     }
 
 
-    List<BoundAction> GatherProvidedActionsForActorAt(string locationId)
+    List<BoundAction> GatherProvidedActionsForActorAt( string locationId)
     {
 
         List<Feature> nearByFeatures = ws.map.GatherFeaturesAt(locationId);
@@ -96,7 +141,7 @@ public class ActionBuilder
 
                     string id = action.Id.Replace(STOCKITEM, item);
 
-                    for (int num = 0; num <= feature.inventory.GetInventoryCount(item); num ++) {
+                    for (int num = 1; num <= feature.inventory.GetInventoryCount(item); num ++) {
                         List<Condition> precondition = RebindPreconditionsItems(action.preconditions, item, num, RebindEffectStockItems);
                         List<Outcome> outcomes = RebindPotentialOutcomesItems(action.potentialEffects, item, num, RebindEffectStockItems);
 
@@ -334,30 +379,54 @@ public class ActionBuilder
         return effect;
     }
 
+    Effect BindEffectToPerson(Effect effect, string recipientId)
+    {
+        if(effect is EffectSocialChange) {
+            EffectSocialChange socialChange = (EffectSocialChange)effect;
+
+            string source = hookUpString(socialChange.SourceId, recipientId);
+            string dest = hookUpString(socialChange.TargetId, recipientId);
+
+
+            return new EffectSocialChange(socialChange.DeltaMin, socialChange.DeltaMax, source, dest, socialChange.RelationType);
+        }
+        if(effect is EffectInvChange) {
+            EffectInvChange invChange = (EffectInvChange)effect;
+
+            string owner = hookUpString(invChange.InvOwner, recipientId);
+
+            return new EffectInvChange(invChange.DeltaMin, invChange.DeltaMax, owner, invChange.ItemId);
+        }
+
+        return effect;
+    }
+
+    string hookUpString(string source, string recipientId)
+    {
+        if (source == INITIATOR) source = actor.Id;
+        if (source == RECIPIENT) source = recipientId;
+
+        return source;
+    }
+
+
     int EvalExp(string exp)
     {
-        //largely stolen from https://docs.microsoft.com/en-us/dotnet/api/system.string.split?view=netcore-3.1
-        string pattern = @"(\d+)\s+([-+*/])\s+(\d+)";
-
-        foreach (System.Text.RegularExpressions.Match m in
-            System.Text.RegularExpressions.Regex.Matches(exp, pattern)) {
-            int value1 = int.Parse(m.Groups[1].Value);
-            int value2 = int.Parse(m.Groups[3].Value);
-            switch (m.Groups[2].Value) {
-                case "+":
-                    return value1 + value2;
-                case "-":
-                    return value1 - value2;
-                case "*":
-                    return value1 * value2;
-                case "/":
-                    return value1 / value2;
-            }
+        if(exp.Any(x => char.IsLetter(x))) {
+            Debug.LogError("Something probably went wrong while parsing: " + exp);
+            return 0;
         }
+
         int output = 0;
         if (int.TryParse(exp, out output)) return output;
+        else {
 
-        Debug.LogError("Something probably went wrong while parsing: " + exp);
-        return 0;
+            string[] expParts = exp.Split('*');
+
+            int one = EvalExp(expParts[0]);
+            int two = EvalExp(expParts[1]);
+
+            return one * two;
+        }
     }
 }
