@@ -34,7 +34,13 @@ public class GoalManager
             }
         }
 
-        List<Goal> newGoals = currentGoals;
+        List<Goal> newGoals = new List<Goal>();
+        foreach(Goal goal in currentGoals) {
+            newGoals.AddRange(MakeActionableGoals(goal));
+        }
+
+        currentGoals = newGoals;
+
         for(int i =0; i< lookAhead; i++) {
             newGoals = UnravelCausality(newGoals);
 
@@ -153,5 +159,17 @@ public class GoalManager
         }
 
         return CondenseGoals(newGoals);
+    }
+
+
+    List<Goal> MakeActionableGoals(Goal goal)
+    {
+        Effect effect = goal.state;
+        if (effect is State) {
+            State state = (State)effect;
+
+            return new List<Goal>(from s in state.MakeActionable(ws, actor)
+                                  select new Goal(s, goal.priority, 1));
+        } else return new List<Goal>() { goal };
     }
 }

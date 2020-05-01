@@ -44,7 +44,9 @@ public class LoadWorldData
 
         WorldState ws = new WorldState(map, reg, worldTime);
 
+        SetRelations(ws.registry);
         SetGoals(ws, people);
+        
 
         return ws;
     }
@@ -272,6 +274,89 @@ public class LoadWorldData
                 person.gm.AddModule(maintainFamily);
             }
 
+
+            GoalModule notLonely = new GoalModule(
+                new List<GM_Precondition>(),
+                new List<Goal>() {
+                    new Goal(new State_HasRelations(3, Relationship.CodifiedRelationships.friends), 3, 1),
+                    new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.lovers), 2, 1),
+                }
+            );
+
+            notLonely.name = "have some interpersonal relations!";
+
+            person.gm.AddModule(notLonely);
+
+        }
+    }
+
+    void SetRelations(Registry reg)
+    {
+
+        Dictionary<string, List<List<int>>> relationValues = new Dictionary<string, List<List<int>>>() {
+            {"acquaintance", new List<List<int>>() {
+                new List<int>(){-2, 2},
+                new List<int>(){-4, 4}
+            } },
+            {"friend", new List<List<int>>(){
+                new List<int>(){2, 6},
+                new List<int>(){-4, 6}
+            } },
+            {"enemy", new List<List<int>>(){
+                new List<int>(){-6, -2},
+                new List<int>(){-6, 4}
+            } },
+            {"lover", new List<List<int>>(){
+                new List<int>(){2, 6},
+                new List<int>(){4, 10}
+            } }
+        };
+
+        List<string> relations = new List<string>(relationValues.Keys);
+
+        Dictionary<string, Dictionary<string, string>> relationMatrix = new Dictionary<string, Dictionary<string, string>>();
+
+        foreach(Person personA in reg.GetPeople()) {
+            string a = personA.Id;
+
+            foreach(Person personB in reg.GetPeople()) {
+                string b = personB.Id;
+
+                if (!relationMatrix.ContainsKey(a)) relationMatrix[a] = new Dictionary<string, string>();
+                if (!relationMatrix.ContainsKey(b)) relationMatrix[b] = new Dictionary<string, string>();
+
+                if (relationMatrix[b].ContainsKey(a)) {
+                    relationMatrix[a][b] = relationMatrix[b][a];
+                    continue;
+                }
+
+                if (a == b) {
+                    relationMatrix[a].Add(b, "self");
+                    continue;
+                }
+
+                int num = Mathf.FloorToInt(UnityEngine.Random.value * relations.Count);
+
+                relationMatrix[a].Add(b, relations[num]);
+            }
+        }
+
+
+        foreach(Person person in reg.GetPeople()) {
+            foreach(Person other in reg.GetPeople()) {
+                string relation = relationMatrix[person.Id][other.Id];
+
+                if (relation == "self") continue;
+                else {
+                    List<List<int>> valueRange = relationValues[relation];
+
+                    int friendly = UnityEngine.Random.Range(valueRange[0][0], valueRange[0][1]);
+                    int romance = UnityEngine.Random.Range(valueRange[1][0], valueRange[1][1]);
+
+                    person.relationships.Increase(other.Id, Relationship.RelationType.friendly, friendly);
+                    person.relationships.Increase(other.Id, Relationship.RelationType.romantic, romance);
+                }
+            }
         }
     }
 

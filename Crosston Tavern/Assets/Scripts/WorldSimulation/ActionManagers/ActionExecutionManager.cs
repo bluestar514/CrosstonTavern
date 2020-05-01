@@ -56,8 +56,6 @@ public class ActionExecutionManager : ActionManager
                 if (effect is EffectSocialChange) {
                     EffectSocialChange socialChange = (EffectSocialChange)effect;
 
-                    Debug.Log(socialChange);
-
                     Person source = people.GetPerson(socialChange.SourceId.Replace("person_", ""));
 
                     source.relationships.Increase(socialChange.TargetId.Replace("person_", ""), socialChange.RelationType, socialChange.DeltaMax);

@@ -39,6 +39,8 @@ public class WorldState
 
     public Relationship GetRelationshipsFor(string id)
     {
+        if (id.StartsWith("person_")) id = id.Replace("person_", "");
+
         if (registry.GetPerson(id) != null) {
             return registry.GetPerson(id).relationships;
         }
