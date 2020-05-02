@@ -16,6 +16,8 @@ public class Person
 
     public Inventory inventory;
     public Relationship relationships;
+    public StringStringListDictionary preferences;
+
 
     public EmploymentData employmentData;
     public List<FamilyData> family;
@@ -41,6 +43,11 @@ public class Person
         inventory = new Inventory(id);
         relationships = new Relationship();
         family = new List<FamilyData>();
+
+        preferences = new StringStringListDictionary() {
+            {"liked", new List<string>(){"red_flower"} },
+            {"disliked", new List<string>(){"yellow_flower"} }
+        };
     }
 
     public void Move(string locationId)
