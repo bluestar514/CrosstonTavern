@@ -69,6 +69,15 @@ public class ActionBuilder
 
                     chance = new ChanceModifierRelation(socialState, relChance.boundry, relChance.positive);
                 }
+                if(chance is ChanceModifierItemOpinion) {
+                    ChanceModifierItemOpinion itemChance = (ChanceModifierItemOpinion)chance;
+
+                    if (itemChance.person == RECIPIENT)
+                        chance = new ChanceModifierItemOpinion(itemChance.item, action.FeatureId, itemChance.minValue, itemChance.maxValue);
+                    if(itemChance.person == INITIATOR) {
+                        chance = new ChanceModifierItemOpinion(itemChance.item, action.ActorId, itemChance.minValue, itemChance.maxValue);
+                    }
+                }
 
                 List<Effect> effects = new List<Effect>();
                 foreach (Effect effect in outcome.effects) {
@@ -259,11 +268,18 @@ public class ActionBuilder
         List<Outcome> potentialOutcomes = new List<Outcome>();
 
         foreach(Outcome outcome in originalOutcomes) {
+            ChanceModifier chance = outcome.chanceModifier;
+            if(chance is ChanceModifierItemOpinion) {
+                ChanceModifierItemOpinion chanceItem = (ChanceModifierItemOpinion)chance;
+                if (chanceItem.item == INVITEM)
+                    chance = new ChanceModifierItemOpinion(item, chanceItem.person, chanceItem.minValue, chanceItem.maxValue);
+            }
+
             List<Effect> effects = new List<Effect>();
             foreach (Effect effect in outcome.effects) {
                 effects.Add(RebindEffectItems(effect, item, count));
             }
-            potentialOutcomes.Add(new Outcome(outcome.chanceModifier, effects));
+            potentialOutcomes.Add(new Outcome(chance, effects));
         }
 
         return potentialOutcomes;
@@ -276,7 +292,7 @@ public class ActionBuilder
             EffectGenericInv inventoryState = (EffectGenericInv)effect;
 
             List<string> items = new List<string>();
-            foreach(string item in items) {
+            foreach(string item in inventoryState.ItemId) {
                 if (item == INVITEM ) items.Add(newItem);
                 else items.Add(item);
             }

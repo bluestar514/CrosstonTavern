@@ -52,6 +52,19 @@ public class GoalManager
         return CondenseGoals( currentGoals);
     }
 
+    public bool NeedItem(string item)
+    {
+        List<Goal> goals = GetGoalsList();
+        foreach(Goal g in goals) {
+            if(g.state is EffectInvChange) {
+                EffectInvChange state = (EffectInvChange)g.state;
+                if (state.ItemId.Contains(item)) return true;
+            }
+        }
+
+        return false;
+    }
+
     List<BoundAction> GetAllActions()
     {
         ActionBuilder ab = new ActionBuilder(ws, actor);

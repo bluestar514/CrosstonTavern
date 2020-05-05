@@ -30,7 +30,7 @@ public class EffectInvChange : Effect
     {
         int randNum = UnityEngine.Random.Range(DeltaMin, DeltaMax + 1);
         int randItem = Mathf.FloorToInt(UnityEngine.Random.value * ItemId.Count);
-
+        Debug.Log(ToString()+" "+ ItemId.Count +" "+randItem);
         return new EffectInvChange(randNum, randNum, InvOwner, new List<string>() { ItemId[randItem] });
     }
 

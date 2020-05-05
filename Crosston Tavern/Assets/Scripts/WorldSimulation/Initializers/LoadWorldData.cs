@@ -83,6 +83,14 @@ public class LoadWorldData
                 ChanceModifier chance = null;
                 string type = jsonChance.GetString("type");
                 switch (type) {
+                    case "item":
+                        string item = jsonChance.GetString("item");
+                        string person = jsonChance.GetString("person");
+                        string[] range = ParseRange(jsonChance.GetJArray("range"));
+                        float minValue = float.Parse(range[0]);
+                        float maxValue = float.Parse(range[1]);
+                        chance = new ChanceModifierItemOpinion(item, person, minValue, maxValue);
+                        break;
                     case "relation":
                         int boundry = jsonChance.GetJNumber("boundry").AsInt();
                         EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
@@ -280,6 +288,7 @@ public class LoadWorldData
                 new List<Goal>() {
                     new Goal(new State_HasRelations(3, Relationship.CodifiedRelationships.friends), 3, 1),
                     new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.lovers), 2, 1),
+                    new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.enemies), 2, 1),
                 }
             );
 
@@ -403,17 +412,7 @@ public class LoadWorldData
             
             JArray jRange = jsonEffect.GetJArray("range");
 
-            if (jRange.Length > 2) throw new Exception("Effect has more than two values specifying its range!");
-
-            for (int i = 0; i < jRange.Length; i++) {
-                if (jRange[i] is JString) {
-                    range[i] = ((JString)jRange[i]).AsString();
-                }
-                if (jRange[i] is JNumber) {
-                    range[i] = ((JNumber)jRange[i]).AsString();
-                }
-            }
-            if (jRange.Length == 1) range[1] = range[0];
+            range = ParseRange(jRange);
         }
 
         switch (type) {
@@ -439,6 +438,23 @@ public class LoadWorldData
         }      
     }
 
+    string[] ParseRange(JArray jRange)
+    {
+        if (jRange.Length > 2) throw new Exception("Effect has more than two values specifying its range!");
+
+        string[] range = new string[2];
+        for (int i = 0; i < jRange.Length; i++) {
+            if (jRange[i] is JString) {
+                range[i] = ((JString)jRange[i]).AsString();
+            }
+            if (jRange[i] is JNumber) {
+                range[i] = ((JNumber)jRange[i]).AsString();
+            }
+        }
+        if (jRange.Length == 1) range[1] = range[0];
+
+        return range;
+    }
 
     StringStringListDictionary ParseResources(JSON jsonResources)
     {

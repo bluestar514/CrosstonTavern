@@ -23,6 +23,8 @@ public class Registry
 
     public Person GetPerson(string id)
     {
+        id = id.Replace("person_", "");
+
         if (people.ContainsKey(id)) return people[id];
         return null;
     }

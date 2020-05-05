@@ -34,7 +34,7 @@ public class ActionExecutionManager : ActionManager
 
         if (chosenAction.Complete()) {
             feature.FinishUse();
-
+            Debug.Log(chosenAction);
             Outcome chosenEffect = PickEffect(action);
 
             foreach (Effect effect in chosenEffect.effects) {
