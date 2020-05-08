@@ -67,9 +67,9 @@ public class LoadWorldData
             foreach (JSON jsonCondition in jsonAction.GetJArray("conditions").AsJSONArray()) {
                 string type = jsonCondition.GetString("type");
                 switch (type) {
-                    case "inv":
-                        preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition)));
-                        break;
+                    //case "inv":
+                    //    preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition)));
+                    //    break;
                     default:
                         Debug.LogWarning("Action (" + id + ") condition is of unrecognized type (" + type + ")");
                         break;
@@ -91,13 +91,13 @@ public class LoadWorldData
                         float maxValue = float.Parse(range[1]);
                         chance = new ChanceModifierItemOpinion(item, person, minValue, maxValue);
                         break;
-                    case "relation":
-                        int boundry = jsonChance.GetJNumber("boundry").AsInt();
-                        EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
-                        bool positive = jsonChance.GetBool("positive");
+                    //case "relation":
+                    //    int boundry = jsonChance.GetJNumber("boundry").AsInt();
+                    //    EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
+                    //    bool positive = jsonChance.GetBool("positive");
 
-                        chance = new ChanceModifierRelation(socialState, boundry, positive);
-                        break;
+                    //    chance = new ChanceModifierRelation(socialState, boundry, positive);
+                    //    break;
                     case "simple":
                         float value = jsonChance.GetJNumber("value").AsFloat();
                         chance = new ChanceModifierSimple(value);
@@ -118,7 +118,7 @@ public class LoadWorldData
                 outcomes.Add(new Outcome(chance, effects));
             }
 
-            GenericAction action = new GenericAction(id, time, preconditions, outcomes);
+            GenericAction action = new GenericAction(id, time, preconditions, outcomes, null);
             actions.Add(id, action);
             
         }
@@ -255,16 +255,16 @@ public class LoadWorldData
                     new GM_Precondition_Time(person.employmentData.shiftStart, person.employmentData.shiftEnd)
                 },
                 new List<Goal>() {
-                    new Goal(new EffectMove(ws.map.GetFeature(establishment).location), 5, 1 )
+                    new Goal(new EffectMovement(person.Id, ws.map.GetFeature(establishment).location), 5, 1 )
                 });
             profession.name = "profession";
 
             List<string> stock = ws.map.GetFeature(establishment).relevantResources["stock"];
             List<Goal> goals = new List<Goal>();
-            foreach (string s in stock) {
-                goals.Add(new Goal(new EffectInvChange(3, 1000, establishment, new List<string>() { s }), 3, 1));
-            }
-            goals.Add(new Goal(new EffectInvChange(10, 1000, establishment, stock), 2, 1));
+            //foreach (string s in stock) {
+            //    goals.Add(new Goal(new EffectInvChange(3, 1000, establishment, new List<string>() { s }), 3, 1));
+            //}
+            //goals.Add(new Goal(new EffectInvChange(10, 1000, establishment, stock), 2, 1));
 
             GoalModule restock = new GoalModule(new List<GM_Precondition>(), goals);
             restock.name = "restock";
@@ -273,28 +273,28 @@ public class LoadWorldData
             person.gm.AddModule(restock);
 
 
-            foreach(FamilyData family in person.family) {
-                GoalModule maintainFamily = new GoalModule(new List<GM_Precondition>(), new List<Goal>() {
-                    new Goal(new EffectSocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 10, 1)
-                });
+            //foreach(FamilyData family in person.family) {
+            //    GoalModule maintainFamily = new GoalModule(new List<GM_Precondition>(), new List<Goal>() {
+            //        new Goal(new EffectSocialChange(5, 1000000, person.Id, family.id, Relationship.RelationType.friendly), 10, 1)
+            //    });
 
-                maintainFamily.name = "maintain family relation(" + family.id + ")";
-                person.gm.AddModule(maintainFamily);
-            }
+            //    maintainFamily.name = "maintain family relation(" + family.id + ")";
+            //    person.gm.AddModule(maintainFamily);
+            //}
 
 
-            GoalModule notLonely = new GoalModule(
-                new List<GM_Precondition>(),
-                new List<Goal>() {
-                    new Goal(new State_HasRelations(3, Relationship.CodifiedRelationships.friends), 3, 1),
-                    new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.lovers), 2, 1),
-                    new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.enemies), 2, 1),
-                }
-            );
+            //GoalModule notLonely = new GoalModule(
+            //    new List<GM_Precondition>(),
+            //    new List<Goal>() {
+            //        new Goal(new State_HasRelations(3, Relationship.CodifiedRelationships.friends), 3, 1),
+            //        new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.lovers), 2, 1),
+            //        new Goal(new State_HasRelations(1, Relationship.CodifiedRelationships.enemies), 2, 1),
+            //    }
+            //);
 
-            notLonely.name = "have some interpersonal relations!";
+            //notLonely.name = "have some interpersonal relations!";
 
-            person.gm.AddModule(notLonely);
+            //person.gm.AddModule(notLonely);
 
         }
     }
@@ -415,27 +415,29 @@ public class LoadWorldData
             range = ParseRange(jRange);
         }
 
-        switch (type) {
-            case "inv":
-                string owner = jsonEffect.GetString("owner");
-                List<string> items = new List<string>(jsonEffect.GetJArray("items").AsStringArray());
+        //switch (type) {
+        //    case "inv":
+        //        string owner = jsonEffect.GetString("owner");
+        //        List<string> items = new List<string>(jsonEffect.GetJArray("items").AsStringArray());
 
-                return new EffectGenericInv(range[0], range[1], owner, items);
-            case "social":
+        //        return new EffectGenericInv(range[0], range[1], owner, items);
+        //    case "social":
 
-                string source = jsonEffect.GetString("source");
-                string dest = jsonEffect.GetString("dest");
-                Relationship.RelationType relType = (Relationship.RelationType)
-                                                    Enum.Parse(typeof(Relationship.RelationType), 
-                                                    jsonEffect.GetString("relType"));
+        //        string source = jsonEffect.GetString("source");
+        //        string dest = jsonEffect.GetString("dest");
+        //        Relationship.RelationType relType = (Relationship.RelationType)
+        //                                            Enum.Parse(typeof(Relationship.RelationType), 
+        //                                            jsonEffect.GetString("relType"));
 
-                return new EffectSocialChange(int.Parse(range[0]), int.Parse(range[1]), source, dest, relType);
+        //        return new EffectSocialChange(int.Parse(range[0]), int.Parse(range[1]), source, dest, relType);
 
-            case "move":
-                return new EffectMove();
-            default:
-                throw new Exception("Effect with type " + type + " found. This is not a supported type.");
-        }      
+        //    case "move":
+        //        return new EffectMove();
+        //    default:
+        //        throw new Exception("Effect with type " + type + " found. This is not a supported type.");
+
+        return new Effect();
+        //}      
     }
 
     string[] ParseRange(JArray jRange)

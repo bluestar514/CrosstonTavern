@@ -54,13 +54,13 @@ public class GoalManager
 
     public bool NeedItem(string item)
     {
-        List<Goal> goals = GetGoalsList();
-        foreach(Goal g in goals) {
-            if(g.state is EffectInvChange) {
-                EffectInvChange state = (EffectInvChange)g.state;
-                if (state.ItemId.Contains(item)) return true;
-            }
-        }
+        //List<Goal> goals = GetGoalsList();
+        //foreach(Goal g in goals) {
+        //    if(g.state is EffectInvChange) {
+        //        EffectInvChange state = (EffectInvChange)g.state;
+        //        if (state.ItemId.Contains(item)) return true;
+        //    }
+        //}
 
         return false;
     }
@@ -71,7 +71,7 @@ public class GoalManager
 
         List<BoundAction> lba = new List<BoundAction>();
         foreach(string location in ws.map.GetNameOfLocations()) {
-            lba.AddRange(ab.BindActions(location));
+            lba.AddRange(ab.GetAllActions(location));
         }
 
         return lba;
@@ -81,10 +81,10 @@ public class GoalManager
     {
         List<BoundAction> allActions = GetAllActions();
 
-        return new List<BoundAction>(from action in allActions
-                                           where (!action.SatisfiedPreconditions(ws) || action.LocationId != actor.location) &&
-                                                    action.Id != "move"
-                                           select action);
+        return new List<BoundAction>();//from action in allActions
+                                           //where (!action.SatisfiedPreconditions(ws) || action.LocationId != actor.location) &&
+                                           //         action.Id != "move"
+                                           //select action);
     }
 
     List<BoundAction> GetActionsThatAdvanceState(Effect state, List<BoundAction> actionPool)
@@ -93,20 +93,20 @@ public class GoalManager
 
         List<BoundAction> goodActions = new List<BoundAction>();
 
-        foreach (BoundAction action in actionPool) {
-            List<Outcome> potentialEffects = action.GenerateExpectedEffects(ws);
+        //foreach (BoundAction action in actionPool) {
+        //    List<Outcome> potentialEffects = action.GenerateExpectedEffects(ws);
 
-            float weight = 0;
-            foreach(Outcome outcome in potentialEffects) {
-                float chance = outcome.chanceModifier.Chance(ws);
+        //    float weight = 0;
+        //    foreach(Outcome outcome in potentialEffects) {
+        //        float chance = outcome.chanceModifier.Chance(ws);
 
-                foreach (Effect effect in outcome.effects) {
-                    weight += chance * ahm.EvaluateEffectTowardGoal(effect, state, 0);
-                }
-            }
+        //        foreach (Effect effect in outcome.effects) {
+        //            weight += chance * ahm.EvaluateEffectTowardGoal(effect, state, 0);
+        //        }
+        //    }
 
-            if (weight > 0) goodActions.Add(action);
-        }
+        //    if (weight > 0) goodActions.Add(action);
+        //}
 
         return goodActions;
     }
@@ -115,25 +115,25 @@ public class GoalManager
     {
         List<Goal> newGoals = new List<Goal>();
 
-        foreach(BoundAction action in invalidActions) {
-            foreach(Condition condition in action.GetBoundConditions(ws)) {
-                if (condition.InEffect(actor, ws.map.GetFeature(action.FeatureId), ws.map.GetLocation(action.LocationId), ws)) continue;
+        //foreach(BoundAction action in invalidActions) {
+        //    foreach(Condition condition in action.GetBoundConditions(ws)) {
+        //        if (condition.InEffect(actor, ws.map.GetFeature(action.FeatureId), ws.map.GetLocation(action.LocationId), ws)) continue;
 
-                if(condition is Condition_IsState) {
-                    Condition_IsState stateCondition = (Condition_IsState)condition;
+        //        if(condition is Condition_IsState) {
+        //            Condition_IsState stateCondition = (Condition_IsState)condition;
 
-                    Goal g = new Goal(stateCondition.state, parentPriority, 1);
-                    g.enablingActions.Add(action);
+        //            Goal g = new Goal(stateCondition.state, parentPriority, 1);
+        //            g.enablingActions.Add(action);
 
-                    newGoals.Add(g);
-                }
+        //            newGoals.Add(g);
+        //        }
 
-            }
-            Goal goal = new Goal(new EffectMove(action.LocationId), parentPriority, 1);
-            goal.enablingActions.Add(action);
+        //    }
+        //    Goal goal = new Goal(new EffectMove(action.LocationId), parentPriority, 1);
+        //    goal.enablingActions.Add(action);
 
-            newGoals.Add(goal);
-        }
+        //    newGoals.Add(goal);
+        //}
 
         return newGoals;
     }
@@ -177,12 +177,13 @@ public class GoalManager
 
     List<Goal> MakeActionableGoals(Goal goal)
     {
-        Effect effect = goal.state;
-        if (effect is State) {
-            State state = (State)effect;
+        //Effect effect = goal.state;
+        //if (effect is State) {
+        //    State state = (State)effect;
 
-            return new List<Goal>(from s in state.MakeActionable(ws, actor)
-                                  select new Goal(s, goal.priority, 1));
-        } else return new List<Goal>() { goal };
+        //    return new List<Goal>(from s in state.MakeActionable(ws, actor)
+        //                          select new Goal(s, goal.priority, 1));
+        //} else 
+        return new List<Goal>() { goal };
     }
 }

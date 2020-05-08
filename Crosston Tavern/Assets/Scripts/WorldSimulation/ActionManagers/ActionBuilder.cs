@@ -13,436 +13,177 @@ public class ActionBuilder
     WorldState ws;
     Person actor;
 
-    static string INVITEM = "#inventory_item#";
-    static string INVITEMCOUNT = "#inventory_item_count#";
-
-    static string STOCKITEM = "#stock_item#";
-    static string STOCKCOST = "#stock_price#";
-    static string STOCKCOUNT = "#stock_count#";
-
-    static string INITIATOR = "initiator";
-    static string RECIPIENT = "recipient";
-
     public ActionBuilder(WorldState worldState, Person actor)
     {
         ws = worldState;
         this.actor = actor;
     }
 
-    public List<BoundAction> BindActions(string locationId)
+    public List<BoundAction> GetAllActions(string locationId="")
     {
         if (locationId == "") locationId = actor.location;
 
+
+        List<ActionData> genericActions = GatherProvidedActionsForActorAt(locationId);
+
+
+
         List<BoundAction> allActions = new List<BoundAction>();
-        allActions.AddRange(GatherProvidedActionsForActorAt(locationId));
+        foreach(ActionData data in genericActions) {
+            allActions.AddRange(FillOutBindings(data));
+        }
 
-        allActions = GenerateBoundActionsFromInventory(allActions);
-
-        allActions = MakeNonGeneric(allActions);
-
-        allActions = BindInitatorRecipient(allActions);
 
         return allActions;
     }
 
-    private List<BoundAction> BindInitatorRecipient(List<BoundAction> allActions)
+   
+    public List<ActionData> GatherProvidedActionsForActorAt( string locationId)
     {
+
+        List<Feature> nearByFeatures = ws.map.GatherFeaturesAt(locationId);
+
+        List<ActionData> availableActions = new List<ActionData>();
+        foreach (Feature feature in nearByFeatures) {
+
+            availableActions.AddRange(from action in feature.providedActions
+                                      select new ActionData(action, feature.Id, locationId));
+                                      
+        }
+
+        return availableActions;
+    }
+
+    public List<BoundAction> FillOutBindings(ActionData data)
+    {
+        Dictionary<string, List<BoundBindingPort>> potentialBindings = new Dictionary<string, List<BoundBindingPort>>();
+
+        //bind entities
+        foreach(BindingPort port in data.action.bindings) {
+            if(port is BindingPortEntity) {
+                BindingPortEntity entity = (BindingPortEntity)port;
+
+                switch (entity.role) {
+                    case ActionRole.initiator:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, actor.Id) });
+                        break;
+                    case ActionRole.recipient:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, data.featureId) });
+                        break;
+                    case ActionRole.bystander:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.GetBystanders(data.locationId)
+                                                                                     select new BoundPortEntity(entity.tag, person)));
+                        break;
+                    case ActionRole.any:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.registry.GetPeople()
+                                                                                     select new BoundPortEntity(entity.tag, person.Id)));
+                        break;
+                }
+            }
+        }
+
+        //combine entity variations
+        List<List<BoundBindingPort>> potentialCombinations = new List<List<BoundBindingPort>>() { new List<BoundBindingPort>()};
+        foreach(List<BoundBindingPort> potentialBinding in potentialBindings.Values) {
+            potentialCombinations = CreatePortCombinations(potentialCombinations, potentialBinding);
+        }
+
+        //bind items:
+        List<List<BoundBindingPort>> itemBoundCombinations = new List<List<BoundBindingPort>>() {  };
+        foreach (List<BoundBindingPort> bindings in potentialCombinations) {
+
+            Dictionary<string, List<BoundBindingPort>> itemCombinations = new Dictionary<string, List<BoundBindingPort>>();
+            foreach (BindingPort port in data.action.bindings) {
+                if (port is BindingPortInventoryItem) {
+                    BindingPortInventoryItem invPort = (BindingPortInventoryItem)port;
+
+                    string ownerId = ((BoundPortEntity)GetPortWithTag(invPort.owner, bindings)).participantId;
+
+                    Inventory inv = ws.registry.GetPerson(ownerId).inventory;
+
+                    itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in inv.GetItemList()
+                                                                              select new BoundPortInventoryItem(port.tag, item, inv.GetInventoryCount(item))));
+
+
+                } else if (port is BindingPortStockItem) {
+                    BindingPortStockItem shopPort = (BindingPortStockItem)port;
+
+                    string shopId = shopPort.shopId;
+
+                    StringIntDictionary stockTable = ws.map.GetFeature(shopId).stockTable;
+                    Inventory inv = ws.map.GetFeature(shopId).inventory;
+                    itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in inv.GetItemList()
+                                                                              select new BoundPortStockItem(port.tag, item,
+                                                                                        inv.GetInventoryCount(item), stockTable[item])));
+
+                }
+
+            }
+            if (itemCombinations.Count > 0) {
+                foreach (List<BoundBindingPort> itemBinding in itemCombinations.Values) {
+                    itemBoundCombinations.AddRange(CreatePortCombinations(new List<List<BoundBindingPort>>() { bindings }, itemBinding));
+                }
+            } else {
+                itemBoundCombinations.Add(bindings);
+            }
+
+        }
+
+        //itemBoundCombinations = potentialCombinations;
+
+        //make into actions
         List<BoundAction> actions = new List<BoundAction>();
+        foreach(List<BoundBindingPort> bindings in itemBoundCombinations) {
 
-        foreach(BoundAction action in allActions) {
-            List<Condition> conditions = new List<Condition>();
-            foreach(Condition condition in action.preconditions) {
-                if(condition is Condition_IsState) {
-                    Condition_IsState state = (Condition_IsState)condition;
-                    conditions.Add(new Condition_IsState(BindEffectToPerson(state.state, action.FeatureId)));
-                } else {
-                    conditions.Add(condition);
-                }
-            }
-
-            List<Outcome> outcomes = new List<Outcome>();
-            foreach(Outcome outcome in action.potentialEffects) {
-                ChanceModifier chance = outcome.chanceModifier;
-                if (chance is ChanceModifierRelation) {
-                    ChanceModifierRelation relChance = (ChanceModifierRelation)chance;
-                    EffectSocialChange socialState = (EffectSocialChange)BindEffectToPerson(relChance.socialState, action.FeatureId);
-
-                    chance = new ChanceModifierRelation(socialState, relChance.boundry, relChance.positive);
-                }
-                if(chance is ChanceModifierItemOpinion) {
-                    ChanceModifierItemOpinion itemChance = (ChanceModifierItemOpinion)chance;
-
-                    if (itemChance.person == RECIPIENT)
-                        chance = new ChanceModifierItemOpinion(itemChance.item, action.FeatureId, itemChance.minValue, itemChance.maxValue);
-                    if(itemChance.person == INITIATOR) {
-                        chance = new ChanceModifierItemOpinion(itemChance.item, action.ActorId, itemChance.minValue, itemChance.maxValue);
-                    }
-                }
-
-                List<Effect> effects = new List<Effect>();
-                foreach (Effect effect in outcome.effects) {
-                    effects.Add(BindEffectToPerson(effect, action.FeatureId));
-                }
-
-                outcomes.Add(new Outcome(chance, effects));
-            }
-
-            actions.Add(new BoundAction(action.Id, action.executionTime, conditions, outcomes,
-                action.ActorId, action.FeatureId, action.LocationId, action.OtherBindings));
+            actions.Add(new BoundAction(data.action, actor.Id, data.featureId, data.locationId, bindings));
         }
 
         return actions;
     }
 
-    public List<BoundAction> BindActions()
+
+    List<List<BoundBindingPort>> CreatePortCombinations(List<List<BoundBindingPort>> existingPorts, List<BoundBindingPort> newPortBindings)
     {
-        return BindActions(actor.location);
-    }
+        List<List<BoundBindingPort>> newCombinations = new List<List<BoundBindingPort>>(); 
 
-
-    List<BoundAction> GatherProvidedActionsForActorAt( string locationId)
-    {
-
-        List<Feature> nearByFeatures = ws.map.GatherFeaturesAt(locationId);
-
-        List<BoundAction> availableActions = new List<BoundAction>();
-        foreach (Feature feature in nearByFeatures) {
-
-            availableActions.AddRange(from action in feature.providedActions
-                                      select new BoundAction(action, actor.Id, feature.Id, locationId, null));
-        }
-
-        return availableActions;
-    }
-
-    List<BoundAction> GenerateBoundActionsFromInventory(List<BoundAction> actions)
-    {
-        List <BoundAction> availableActions = new List<BoundAction>();
-
-        foreach(BoundAction action in actions) {
-            if (ActionNeedsInventoryItemBinding(action)) {
-                foreach(string item in actor.inventory.GetItemList()) {
-                    for(int num= 0; num <=actor.inventory.GetInventoryCount(item); num++) {
-                        string id = action.Id.Replace(INVITEM, item);
-
-                        List<Condition> precondition = RebindPreconditionsItems(action.preconditions, item, num, RebindEffectInventoryItems);
-                        List<Outcome> outcomes = RebindPotentialOutcomesItems(action.potentialEffects, item, num, RebindEffectInventoryItems);
-
-                        availableActions.Add(new BoundAction(id, action.executionTime, precondition, outcomes, actor.Id,
-                            action.FeatureId, action.LocationId, action.OtherBindings));
-                    }
-                }
-            } else {
-                availableActions.Add(action);
+        foreach(List < BoundBindingPort> existingCombination in existingPorts) {
+            foreach(BoundBindingPort newPort in newPortBindings) {
+                List<BoundBindingPort> newCombination = new List<BoundBindingPort>(existingCombination);
+                newCombination.Add(newPort);
+                newCombinations.Add(newCombination);
             }
         }
 
-        actions = availableActions;
-        availableActions = new List<BoundAction>();
-
-        foreach (BoundAction action in actions) {
-            if (ActionNeedsStockItemBinding(action)) {
-                Feature feature = ws.map.GetFeature(action.FeatureId);
-
-                foreach (KeyValuePair<string, int> itemCost in feature.stockTable) {
-                    string item = itemCost.Key;
-                    int cost = itemCost.Value;
-
-                    string id = action.Id.Replace(STOCKITEM, item);
-
-                    for (int num = 1; num <= feature.inventory.GetInventoryCount(item); num ++) {
-                        List<Condition> precondition = RebindPreconditionsItems(action.preconditions, item, num, RebindEffectStockItems);
-                        List<Outcome> outcomes = RebindPotentialOutcomesItems(action.potentialEffects, item, num, RebindEffectStockItems);
-
-                        precondition = RebindPreconditionsItems(precondition, item, cost, RebindEffectStockCost);
-                        outcomes = RebindPotentialOutcomesItems(outcomes, item, cost, RebindEffectStockCost);
-
-                        availableActions.Add(new BoundAction(id, action.executionTime, precondition, outcomes, actor.Id,
-                            action.FeatureId, action.LocationId, action.OtherBindings));
-                    }
-                }
-
-
-            } else {
-                availableActions.Add(action);
-            }
-        }
-
-
-
-        return availableActions;
+        return newCombinations;
     }
 
-    bool ActionNeedsInventoryItemBinding(BoundAction action)
+
+    BoundBindingPort GetPortWithTag(string tag, List<BoundBindingPort> ports)
     {
-        return ActionNeedsBinding(action, EffectNeedsInventoryItemBinding);
+        foreach(BoundBindingPort port in ports) {
+            if (port.tag == tag) return port;
+        }
+        return null;
     }
 
-    bool ActionNeedsStockItemBinding(BoundAction action)
+    public class ActionData
     {
-        return ActionNeedsBinding(action, EffectNeedsStockItemBinding);
-    }
+        public GenericAction action;
+        public string featureId;
+        public string locationId;
 
-    bool ActionNeedsBinding(BoundAction action, Func<Effect, bool> EffectNeedsKindOfBinding)
-    {
-        if (EffectNeedsKindOfBinding is null) {
-            throw new ArgumentNullException(nameof(EffectNeedsKindOfBinding));
+
+        public ActionData(GenericAction action, string featureId, string locationId)
+        {
+            this.action = action;
+            this.featureId = featureId;
+            this.locationId = locationId;
         }
 
-        foreach (Condition condition in action.preconditions) {
-            if (condition is Condition_IsState) {
-                Condition_IsState condition_IsState = (Condition_IsState)condition;
-                Effect state = condition_IsState.state;
-
-                if (EffectNeedsKindOfBinding(state)) return true;
-            }
-        }
-
-        foreach (Outcome outcome in action.potentialEffects) {
-            foreach (Effect effect in outcome.effects) {
-                if (EffectNeedsKindOfBinding(effect)) return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool EffectNeedsInventoryItemBinding(Effect effect)
-    {
-        if (effect is EffectGenericInv) {
-            EffectGenericInv invState = (EffectGenericInv)effect;
-
-            List<string> items = invState.ItemId;
-            if (items.Contains(INVITEM)) return true;
-
-            string min = invState.DeltaMin;
-            string max = invState.DeltaMax;
-            if (min.Contains(INVITEMCOUNT) || max.Contains(INVITEMCOUNT) ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool EffectNeedsStockItemBinding(Effect effect)
-    {
-        if (effect is EffectGenericInv) {
-            EffectGenericInv invState = (EffectGenericInv)effect;
-
-            List<string> items = invState.ItemId;
-            if (items.Contains(STOCKITEM)) return true;
-
-            string min = invState.DeltaMin;
-            string max = invState.DeltaMax;
-            if (min.Contains(STOCKCOUNT) || min.Contains(STOCKCOST) ||
-                max.Contains(STOCKCOUNT) || max.Contains(STOCKCOST)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    List<Condition> RebindPreconditionsItems(List<Condition> origninalPreconditions, string newItem, int count,
-                                            Func<Effect, string, int, Effect> RebindEffectItems)
-    {
-        List<Condition> preconditions = new List<Condition>();
-
-        foreach(Condition condition in origninalPreconditions) {
-            if(condition is Condition_IsState) {
-                Condition_IsState condition_IsState = (Condition_IsState)condition;
-                preconditions.Add(new Condition_IsState(RebindEffectItems(condition_IsState.state, newItem, count)));
-                continue;
-            }
-
-            preconditions.Add(condition);
-        }
-
-        return preconditions;
-    }
-
-    List<Outcome> RebindPotentialOutcomesItems(List<Outcome> originalOutcomes, string item, int count, 
-                                                Func<Effect, string, int, Effect> RebindEffectItems)
-    {
-        List<Outcome> potentialOutcomes = new List<Outcome>();
-
-        foreach(Outcome outcome in originalOutcomes) {
-            ChanceModifier chance = outcome.chanceModifier;
-            if(chance is ChanceModifierItemOpinion) {
-                ChanceModifierItemOpinion chanceItem = (ChanceModifierItemOpinion)chance;
-                if (chanceItem.item == INVITEM)
-                    chance = new ChanceModifierItemOpinion(item, chanceItem.person, chanceItem.minValue, chanceItem.maxValue);
-            }
-
-            List<Effect> effects = new List<Effect>();
-            foreach (Effect effect in outcome.effects) {
-                effects.Add(RebindEffectItems(effect, item, count));
-            }
-            potentialOutcomes.Add(new Outcome(chance, effects));
-        }
-
-        return potentialOutcomes;
-    }
-
-    Effect RebindEffectInventoryItems(Effect effect, string newItem, int count)
-    { 
-
-        if(effect is EffectGenericInv) {
-            EffectGenericInv inventoryState = (EffectGenericInv)effect;
-
-            List<string> items = new List<string>();
-            foreach(string item in inventoryState.ItemId) {
-                if (item == INVITEM ) items.Add(newItem);
-                else items.Add(item);
-            }
-
-            string min = inventoryState.DeltaMin.Replace(INVITEMCOUNT, count.ToString());
-            string max = inventoryState.DeltaMax.Replace(INVITEMCOUNT, count.ToString());
-
-            return new EffectGenericInv(min, max, inventoryState.InvOwner, items);
-
-        }
-
-        return effect;
-    }
-
-    Effect RebindEffectStockItems(Effect effect, string newItem, int count)
-    {
-
-        if (effect is EffectGenericInv) {
-            EffectGenericInv inventoryState = (EffectGenericInv)effect;
-
-            List<string> items = new List<string>();
-            foreach (string item in items) {
-                if (item == STOCKITEM) items.Add(newItem);
-                else items.Add(item);
-            }
-
-            string min = inventoryState.DeltaMin.Replace(STOCKCOUNT, count.ToString());
-            string max = inventoryState.DeltaMax.Replace(STOCKCOUNT, count.ToString());
-
-            return new EffectGenericInv(min, max, inventoryState.InvOwner, items);
-
-        }
-
-        return effect;
-    }
-
-    Effect RebindEffectStockCost(Effect effect, string newItem, int count)
-    {
-
-        if (effect is EffectGenericInv) {
-            EffectGenericInv inventoryState = (EffectGenericInv)effect;
-
-            string min = inventoryState.DeltaMin.Replace(STOCKCOST, count.ToString());
-            string max = inventoryState.DeltaMax.Replace(STOCKCOST, count.ToString());
-
-            return new EffectGenericInv(min, max, inventoryState.InvOwner, inventoryState.ItemId);
-
-        }
-
-        return effect;
-    }
-
-    List<BoundAction> MakeNonGeneric(List<BoundAction> actions)
-    {
-        List<BoundAction> allActions = new List<BoundAction>();
-
-        foreach(BoundAction action in actions) {
-            allActions.Add(MakeActionNonGeneric(action));
-        }
-
-        return allActions;
-    }
-
-    BoundAction MakeActionNonGeneric(BoundAction action)
-    {
-
-        List<Condition> preconditions = new List<Condition>();
-
-        foreach (Condition condition in action.preconditions) {
-            if (condition is Condition_IsState) {
-                Condition_IsState condition_IsState = (Condition_IsState)condition;
-                preconditions.Add(new Condition_IsState(MakeEffectNonGeneric(condition_IsState.state)));
-
-            } else preconditions.Add(condition);
-        }
-
-        List<Outcome> potentialOutcomes = new List<Outcome>();
-
-        foreach (Outcome outcome in action.potentialEffects) {
-            List<Effect> effects = new List<Effect>();
-            foreach (Effect effect in outcome.effects) {
-                effects.Add(MakeEffectNonGeneric(effect));
-            }
-            potentialOutcomes.Add(new Outcome(outcome.chanceModifier, effects));
-        }
-
-        return new BoundAction(action.Id, action.executionTime, preconditions, potentialOutcomes,
-            action.ActorId, action.FeatureId, action.LocationId, action.OtherBindings);
-    }
-
-
-    Effect MakeEffectNonGeneric(Effect effect)
-    {
-        if (effect is EffectGenericInv) {
-            EffectGenericInv inv = (EffectGenericInv)effect;
-
-            return new EffectInvChange(EvalExp(inv.DeltaMin), EvalExp(inv.DeltaMax), inv.InvOwner, inv.ItemId);
-        }
-
-        return effect;
-    }
-
-    Effect BindEffectToPerson(Effect effect, string recipientId)
-    {
-        if(effect is EffectSocialChange) {
-            EffectSocialChange socialChange = (EffectSocialChange)effect;
-
-            string source = hookUpString(socialChange.SourceId, recipientId);
-            string dest = hookUpString(socialChange.TargetId, recipientId);
-
-
-            return new EffectSocialChange(socialChange.DeltaMin, socialChange.DeltaMax, source, dest, socialChange.RelationType);
-        }
-        if(effect is EffectInvChange) {
-            EffectInvChange invChange = (EffectInvChange)effect;
-
-            string owner = hookUpString(invChange.InvOwner, recipientId);
-
-            return new EffectInvChange(invChange.DeltaMin, invChange.DeltaMax, owner, invChange.ItemId);
-        }
-
-        return effect;
-    }
-
-    string hookUpString(string source, string recipientId)
-    {
-        if (source == INITIATOR) source = actor.Id;
-        if (source == RECIPIENT) source = recipientId;
-
-        return source;
-    }
-
-
-    int EvalExp(string exp)
-    {
-        if(exp.Any(x => char.IsLetter(x))) {
-            Debug.LogError("Something probably went wrong while parsing: " + exp);
-            return 0;
-        }
-
-        int output = 0;
-        if (int.TryParse(exp, out output)) return output;
-        else {
-
-            string[] expParts = exp.Split('*');
-
-            int one = EvalExp(expParts[0]);
-            int two = EvalExp(expParts[1]);
-
-            return one * two;
+        public override string ToString()
+        {
+            return action.ToString();
         }
     }
 }
+

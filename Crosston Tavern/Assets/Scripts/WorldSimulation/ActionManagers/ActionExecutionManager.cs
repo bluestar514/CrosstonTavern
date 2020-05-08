@@ -26,98 +26,98 @@ public class ActionExecutionManager : ActionManager
 
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
-        WeightedAction action = chosenAction.Action;
-        Feature feature = this.map.GetFeature(action.FeatureId);
-        if (!chosenAction.Started()) {
-            feature.Use();
-        }
+        //WeightedAction action = chosenAction.Action;
+        //Feature feature = this.map.GetFeature(action.FeatureId);
+        //if (!chosenAction.Started()) {
+        //    feature.Use();
+        //}
 
-        if (chosenAction.Complete()) {
-            feature.FinishUse();
-            Debug.Log(chosenAction);
-            Outcome chosenEffect = PickEffect(action);
+        //if (chosenAction.Complete()) {
+        //    feature.FinishUse();
+        //    Debug.Log(chosenAction);
+        //    Outcome chosenEffect = PickEffect(action);
 
-            foreach (Effect effect in chosenEffect.effects) {
-                if (effect is EffectInvChange) {
-                    EffectInvChange invChange = (EffectInvChange)effect;
+        //    foreach (Effect effect in chosenEffect.effects) {
+        //        if (effect is EffectInvChange) {
+        //            EffectInvChange invChange = (EffectInvChange)effect;
 
-                    Inventory inventory = WS.GetInventory(invChange.InvOwner);
-                    inventory.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
-                }
-
-
-                if (effect is EffectMove) {
-                    EffectMove move = (EffectMove)effect;
-
-                    actor.Move(move.TargetLocation);
-                }
+        //            Inventory inventory = WS.GetInventory(invChange.InvOwner);
+        //            inventory.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
+        //        }
 
 
-                if (effect is EffectSocialChange) {
-                    EffectSocialChange socialChange = (EffectSocialChange)effect;
+        //        if (effect is EffectMove) {
+        //            EffectMove move = (EffectMove)effect;
 
-                    Person source = people.GetPerson(socialChange.SourceId.Replace("person_", ""));
+        //            actor.Move(move.TargetLocation);
+        //        }
 
-                    source.relationships.Increase(socialChange.TargetId.Replace("person_", ""), socialChange.RelationType, socialChange.DeltaMax);
-                }
-            }
 
-            ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
+        //        if (effect is EffectSocialChange) {
+        //            EffectSocialChange socialChange = (EffectSocialChange)effect;
 
-            actor.history.Add(finalAction);
-            return finalAction;
-        }
+        //            Person source = people.GetPerson(socialChange.SourceId.Replace("person_", ""));
 
-        chosenAction.Progress();
+        //            source.relationships.Increase(socialChange.TargetId.Replace("person_", ""), socialChange.RelationType, socialChange.DeltaMax);
+        //        }
+        //    }
+
+        //    ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
+
+        //    actor.history.Add(finalAction);
+        //    return finalAction;
+        //}
+
+        //chosenAction.Progress();
 
         return null;
     }
 
-    Outcome PickEffect(WeightedAction action)
-    {
-        List<Outcome> potentialEffects = action.GenerateExpectedEffects(WS);
-        EvaluateChances(potentialEffects);
+    //Outcome PickEffect(WeightedAction action)
+    //{
+    //    List<Outcome> potentialEffects = action.GenerateExpectedEffects(WS);
+    //    EvaluateChances(potentialEffects);
 
-        potentialEffects.OrderBy(effect => effect.evaluatedChance);
+    //    potentialEffects.OrderBy(effect => effect.evaluatedChance);
 
-        float randomNumber = Random.value * MaxChance(potentialEffects);
+    //    float randomNumber = Random.value * MaxChance(potentialEffects);
 
-        foreach (Outcome effect in potentialEffects) {
-            if (randomNumber < effect.evaluatedChance) return PickSpecificEffect(effect);
-            else randomNumber -= effect.evaluatedChance;
-        }
+    //    foreach (Outcome effect in potentialEffects) {
+    //        if (randomNumber < effect.evaluatedChance) return PickSpecificEffect(effect);
+    //        else randomNumber -= effect.evaluatedChance;
+    //    }
 
-        return PickSpecificEffect(potentialEffects.Last());
-    }
-    Outcome PickSpecificEffect(Outcome effect)
-    {
-        List<Effect> microEffects = new List<Effect>();
+    //    return PickSpecificEffect(potentialEffects.Last());
+    //}
+    //Outcome PickSpecificEffect(Outcome effect)
+    //{
+    //    List<Effect> microEffects = new List<Effect>();
 
-        foreach(Effect microEffect in effect.effects) {
+    //    foreach(Effect microEffect in effect.effects) {
 
-            microEffects.Add(microEffect.SpecifyEffect());
+    //        microEffects.Add(microEffect.SpecifyEffect());
 
-        }
+    //    }
 
-        return new Outcome(effect.chanceModifier, microEffects);
-    }
+    //    return new Outcome(effect.chanceModifier, microEffects);
+    //}
 
-    void EvaluateChances(List<Outcome> effects)
-    {
-        foreach(Outcome effect in effects) {
-            effect.EvaluateChance(WS);
-        }
-    }
+    //void EvaluateChances(List<Outcome> effects)
+    //{
+    //    foreach(Outcome effect in effects) {
+    //        effect.EvaluateChance(WS);
+    //    }
+    //}
 
-    float MaxChance(List<Outcome> possibleEffects)
-    {
-        float sum = 0;
+    //float MaxChance(List<Outcome> possibleEffects)
+    //{
+    //    float sum = 0;
 
-        foreach (Outcome effect in possibleEffects) {
-            sum += effect.evaluatedChance;
-        }
+    //    foreach (Outcome effect in possibleEffects) {
+    //        sum += effect.evaluatedChance;
+    //    }
 
-        return sum;
-    }
+    //    return sum;
+    //}
 
 }

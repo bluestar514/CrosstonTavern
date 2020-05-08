@@ -44,9 +44,9 @@ public class Condition_SpaceAtFeature: Condition
 
 public class Condition_IsState: Condition
 {
-    public Effect state;
+    public State state;
 
-    public Condition_IsState(Effect state) {
+    public Condition_IsState(State state) {
         this.state = state;
 
         name = "Condition:" + state.ToString();
@@ -54,6 +54,6 @@ public class Condition_IsState: Condition
 
     public override bool InEffect(Person actor, Feature feature, Location location, WorldState ws)
     {
-        return state.GoalComplete(ws, actor);
+        return false;//state.GoalComplete(ws, actor);
     }
 }

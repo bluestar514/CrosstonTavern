@@ -11,7 +11,7 @@ public class WeightedAction : BoundAction
     public List<Outcome> expectedEffects;
 
     public WeightedAction(GenericAction action, 
-        string actorId, string featureId, string locationId, StringStringDictionary bindings,
+        string actorId, string featureId, string locationId, List<BoundBindingPort> bindings,
         float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
         base(action, actorId, featureId, locationId, bindings)
     {
@@ -23,7 +23,7 @@ public class WeightedAction : BoundAction
     }
 
     public WeightedAction(string id, int executionTime, List<Condition> preconditions, List<Outcome> potentialEffects, 
-        string actorId, string featureId, string locationId, StringStringDictionary bindings,
+        string actorId, string featureId, string locationId, List<BoundBindingPort> bindings,
         float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
         base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings)
     {
@@ -36,7 +36,7 @@ public class WeightedAction : BoundAction
         
     public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) :
         this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialEffects, 
-            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.OtherBindings, weight, weightRationals, expectedEffects)
+            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, null, weight, weightRationals, expectedEffects)
     {}
 
 

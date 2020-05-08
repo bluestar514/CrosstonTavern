@@ -19,8 +19,8 @@ public class Outcome
 
     public List<Effect> BindEffects(Dictionary<string, List<string>> resources)
     {
-        return new List<Effect>(from effect in effects
-                                     select effect.BindEffect(resources));        
+        return new List<Effect>();//from effect in effects
+                                     //select effect.BindEffect(resources));        
     }
 
     public float EvaluateChance(WorldState ws)

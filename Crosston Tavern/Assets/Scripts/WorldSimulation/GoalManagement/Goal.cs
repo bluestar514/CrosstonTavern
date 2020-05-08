@@ -42,40 +42,40 @@ public class Goal
     {
         if (other.state.GetType() != this.state.GetType()) return false;
 
-        if(state is EffectInvChange) {
-            EffectInvChange invState = (EffectInvChange)state;
-            EffectInvChange invOther = (EffectInvChange)other.state;
+        //if(state is EffectInvChange) {
+        //    EffectInvChange invState = (EffectInvChange)state;
+        //    EffectInvChange invOther = (EffectInvChange)other.state;
 
-            if (invState.InvOwner != invOther.InvOwner) return false;
-            if (!(invState.ItemId.All(invOther.ItemId.Contains) &&
-                invState.ItemId.Count == invOther.ItemId.Count)) return false;
+        //    if (invState.InvOwner != invOther.InvOwner) return false;
+        //    if (!(invState.ItemId.All(invOther.ItemId.Contains) &&
+        //        invState.ItemId.Count == invOther.ItemId.Count)) return false;
 
 
-            //float deltaAverageState = (invState.DeltaMin + invState.DeltaMax) / 2f;
-            //float deltaAverageOther = (invState.DeltaMin + invState.DeltaMax) / 2f;
-            //if (!((deltaAverageState >= 0 && deltaAverageOther >= 0) ||
-            //    (deltaAverageState <= 0 && deltaAverageOther <= 0))) return false;
+        //    //float deltaAverageState = (invState.DeltaMin + invState.DeltaMax) / 2f;
+        //    //float deltaAverageOther = (invState.DeltaMin + invState.DeltaMax) / 2f;
+        //    //if (!((deltaAverageState >= 0 && deltaAverageOther >= 0) ||
+        //    //    (deltaAverageState <= 0 && deltaAverageOther <= 0))) return false;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        if(state is EffectSocialChange) {
-            EffectSocialChange socState = (EffectSocialChange)state;
-            EffectSocialChange socOther = (EffectSocialChange)other.state;
+        //if(state is EffectSocialChange) {
+        //    EffectSocialChange socState = (EffectSocialChange)state;
+        //    EffectSocialChange socOther = (EffectSocialChange)other.state;
 
-            if (socState.TargetId != socOther.TargetId) return false;
-            if (socState.SourceId != socOther.SourceId) return false;
-            if (socState.RelationType != socOther.RelationType) return false;
+        //    if (socState.TargetId != socOther.TargetId) return false;
+        //    if (socState.SourceId != socOther.SourceId) return false;
+        //    if (socState.RelationType != socOther.RelationType) return false;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        if(state is EffectMove) {
-            EffectMove moveState = (EffectMove)state;
-            EffectMove moveOther = (EffectMove)other.state;
+        //if(state is EffectMove) {
+        //    EffectMove moveState = (EffectMove)state;
+        //    EffectMove moveOther = (EffectMove)other.state;
 
-            return moveState.TargetLocation == moveOther.TargetLocation;
-        }
+        //    return moveState.TargetLocation == moveOther.TargetLocation;
+        //}
 
         return false;
     }
@@ -96,47 +96,47 @@ public class Goal
         combinedActions.AddRange(enablingActions);
         combinedActions.AddRange(other.enablingActions);
 
-        if (state is EffectInvChange) {
-            EffectInvChange invState = (EffectInvChange)state;
-            EffectInvChange invOther = (EffectInvChange)other.state;
+        //if (state is EffectInvChange) {
+        //    EffectInvChange invState = (EffectInvChange)state;
+        //    EffectInvChange invOther = (EffectInvChange)other.state;
 
-            int deltaMin = Mathf.Max(invState.DeltaMin, invOther.DeltaMin);
-            int deltaMax = Mathf.Min(invState.DeltaMax, invOther.DeltaMax);
+        //    int deltaMin = Mathf.Max(invState.DeltaMin, invOther.DeltaMin);
+        //    int deltaMax = Mathf.Min(invState.DeltaMax, invOther.DeltaMax);
 
-            if(deltaMax < deltaMin) {
-                if (priority >= other.priority) {
-                    return new Goal(state, priority * 2, priModifier,  enablingActions);
-                } else {
-                    return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
-                }
-            }
+        //    if(deltaMax < deltaMin) {
+        //        if (priority >= other.priority) {
+        //            return new Goal(state, priority * 2, priModifier,  enablingActions);
+        //        } else {
+        //            return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
+        //        }
+        //    }
 
-            return new Goal(new EffectInvChange(deltaMin, deltaMax, invState.InvOwner, invState.ItemId), 
-                                combinedPriority, combinedMod, combinedActions);
-        }
+        //    return new Goal(new EffectInvChange(deltaMin, deltaMax, invState.InvOwner, invState.ItemId), 
+        //                        combinedPriority, combinedMod, combinedActions);
+        //}
 
-        if (state is EffectSocialChange) {
-            EffectSocialChange socState = (EffectSocialChange)state;
-            EffectSocialChange socOther = (EffectSocialChange)other.state;
+        //if (state is EffectSocialChange) {
+        //    EffectSocialChange socState = (EffectSocialChange)state;
+        //    EffectSocialChange socOther = (EffectSocialChange)other.state;
 
-            int deltaMin = Mathf.Max(socState.DeltaMin, socOther.DeltaMin);
-            int deltaMax = Mathf.Min(socState.DeltaMax, socOther.DeltaMax);
+        //    int deltaMin = Mathf.Max(socState.DeltaMin, socOther.DeltaMin);
+        //    int deltaMax = Mathf.Min(socState.DeltaMax, socOther.DeltaMax);
 
-            if (deltaMax < deltaMin) {
-                if (priority >= other.priority) {
-                    return new Goal(state, priority * 2, priModifier, enablingActions);
-                } else {
-                    return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
-                }
-            }
+        //    if (deltaMax < deltaMin) {
+        //        if (priority >= other.priority) {
+        //            return new Goal(state, priority * 2, priModifier, enablingActions);
+        //        } else {
+        //            return new Goal(other.state, other.priority * 2, other.priModifier,  other.enablingActions);
+        //        }
+        //    }
 
-            return new Goal(new EffectSocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId, socState.RelationType),
-                                combinedPriority, combinedMod, combinedActions);
-        }
+        //    return new Goal(new EffectSocialChange(deltaMin, deltaMax, socState.SourceId, socState.TargetId, socState.RelationType),
+        //                        combinedPriority, combinedMod, combinedActions);
+        //}
 
-        if (state is EffectMove) {
-            return new Goal(state, combinedPriority, combinedMod, combinedActions);
-        }
+        //if (state is EffectMove) {
+        //    return new Goal(state, combinedPriority, combinedMod, combinedActions);
+        //}
 
         return null;
     }

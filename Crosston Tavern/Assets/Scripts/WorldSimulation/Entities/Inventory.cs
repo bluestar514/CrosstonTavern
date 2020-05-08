@@ -32,7 +32,7 @@ public class Inventory
         }
     }
 
-    public IEnumerable GetItemList()
+    public IEnumerable<string> GetItemList()
     {
         return inventory.Keys;
     }

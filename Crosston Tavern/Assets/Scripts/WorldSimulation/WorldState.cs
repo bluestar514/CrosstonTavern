@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -48,5 +49,12 @@ public class WorldState
         Debug.LogWarning("Could not find " + id);
 
         return null;
+    }
+
+    public List<string> GetBystanders(string locationId)
+    {
+        return new List<string>(from person in map.GatherFeaturesAt(locationId)
+                                where person.Id.StartsWith("person_")
+                                select person.Id.Replace("person_", ""));
     }
 }
