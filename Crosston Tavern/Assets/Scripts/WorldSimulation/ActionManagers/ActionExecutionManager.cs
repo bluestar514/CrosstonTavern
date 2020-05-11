@@ -11,16 +11,12 @@ using System.Linq;
 public class ActionExecutionManager : ActionManager
 {
     Person actor;
-    Registry people;
-    Map map;
     WorldState WS;
 
     public ActionExecutionManager(Person actor, WorldState ws)
     {
         this.actor = actor;
         WS = ws;
-        people = WS.registry;
-        map = WS.map;
     }
 
 

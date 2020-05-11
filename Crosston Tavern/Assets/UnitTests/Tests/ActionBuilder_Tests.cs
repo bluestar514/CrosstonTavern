@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 namespace Tests
 {
-    public class GenericAction_Tests
+    public class ActionBuilder_Tests
     {
         [Test]
         public void SimpleDeclareEffects()
@@ -14,8 +14,8 @@ namespace Tests
             //Assert.IsTrue(true, "true");
 
 
-            EffectInventoryStatic<int> getGoldfish = new EffectInventoryStatic<int>("#a#", "goldfish", 1);
-            EffectInventoryVariable<int> getAlgee = new EffectInventoryVariable<int>("#a#", new List<string>() { "algee" }, 1, 5);
+            EffectInventoryStatic getGoldfish = new EffectInventoryStatic("#a#", "goldfish", 1);
+            EffectInventoryVariable getAlgee = new EffectInventoryVariable("#a#", new List<string>() { "algee" }, 1, 5);
             EffectSocialStatic makeFriends = new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2);
             EffectSocialVariable tryToMakeFriends = new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -2, 2);
             EffectMovement move = new EffectMovement("#a#", "#connected_space#");
@@ -27,20 +27,20 @@ namespace Tests
 
 
             GenericAction action = new GenericAction("fish", 1,
-                new List<Condition>() {
+                new Precondition( new List<Condition>() {
                     new Condition_IsState(new StateInventory("#a#", "fishing_rod", 1, 100000000))
-                },
+                }),
                 new List<Outcome>() {
                     new Outcome(
                         new ChanceModifierSimple(.5f),
                         new List<Effect>() {
-                            new EffectInventoryStatic<int>("#a#", "goldfish", 1)
+                            new EffectInventoryStatic("#a#", "goldfish", 1)
                         }
                     ),
                     new Outcome(
                         new ChanceModifierSimple(.5f),
                         new List<Effect>() {
-                            new EffectInventoryVariable<int>("#a#", new List<string>(){"algee" }, 1, 5)
+                            new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5)
                         }
                     )
                 },
@@ -93,7 +93,7 @@ namespace Tests
 
             Assert.AreEqual(1, allActions[0].Bindings.Count, string.Join(",", allActions[0].Bindings));
 
-            Assert.AreEqual("<a:alicia>", allActions[0].Bindings[0].ToString());
+            Assert.AreEqual("<a:alicia>", allActions[0].Bindings.bindings[0].ToString());
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace Tests
             Assert.AreEqual(3, allActions.Count, string.Join(",", allActions));
             Assert.AreEqual(2, allActions[1].Bindings.Count);
 
-            Assert.AreEqual("<a:alicia>,<b:person_bob>", string.Join(",",allActions[2].Bindings));
+            Assert.AreEqual("<a:alicia>,<b:person_bob>", string.Join(",",allActions[2].Bindings.bindings));
         }
 
         [Test]
@@ -183,7 +183,7 @@ namespace Tests
             Assert.AreEqual(1, allActions.Count, string.Join(",", allActions));
             Assert.AreEqual(3, allActions[0].Bindings.Count);
 
-            Assert.AreEqual("<a:alicia>,<b:person_bob>,<item:taco(3)>", string.Join(",", allActions[0].Bindings));
+            Assert.AreEqual("<a:alicia>,<b:person_bob>,<item:taco(3)>", string.Join(",", allActions[0].Bindings.bindings));
         }
 
         [Test]
@@ -229,9 +229,9 @@ namespace Tests
             Assert.AreEqual(3, allActions[0].Bindings.Count);
 
             Assert.AreEqual("<give_taco(alicia, person_bob)>,<give_ice(alicia, person_bob)>,<give_jade(alicia, person_bob)>", string.Join(",", allActions), 
-                allActions[0].ToString()+ string.Join(",", allActions[0].Bindings));
+                allActions[0].ToString()+ string.Join(",", allActions[0].Bindings.bindings));
 
-            Assert.AreEqual("<a:alicia>,<b:person_bob>,<item:taco(3)>", string.Join(",", allActions[0].Bindings));
+            Assert.AreEqual("<a:alicia>,<b:person_bob>,<item:taco(3)>", string.Join(",", allActions[0].Bindings.bindings));
         }
     }
 }

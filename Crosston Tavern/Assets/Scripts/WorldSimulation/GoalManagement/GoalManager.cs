@@ -87,7 +87,7 @@ public class GoalManager
                                            //select action);
     }
 
-    List<BoundAction> GetActionsThatAdvanceState(Effect state, List<BoundAction> actionPool)
+    List<BoundAction> GetActionsThatAdvanceState(State state, List<BoundAction> actionPool)
     {
         ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
 

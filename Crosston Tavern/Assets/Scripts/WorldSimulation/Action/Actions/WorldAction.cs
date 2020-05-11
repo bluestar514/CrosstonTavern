@@ -13,11 +13,17 @@ public class WorldAction
     private string id;
     public string Id { get => id; private set => id = value; }
 
+    public int executionTime;
+    public Precondition preconditions;
+    public List<Outcome> potentialEffects;
 
-
-    public WorldAction(string id)
+    public WorldAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects)
     {
         Id = id;
         name = Id;
+
+        this.executionTime = executionTime;
+        this.preconditions = preconditions;
+        this.potentialEffects = new List<Outcome>(potentialEffects);
     }
 }

@@ -28,7 +28,17 @@ public class ChosenAction
 
     public override string ToString()
     {
-        return chosenAction.ToString();
+        return "<"+chosenAction.ToString()+"("+inProgress+"/"+chosenAction.executionTime+")>";
+    }
+
+    public string VerboseString()
+    {
+        string str = ToString() +
+            "\nRationals:\n\t"+ string.Join("\n\t", chosenAction.weightRationals)+
+            "\nInvalid Actions: \n\t" + string.Join("\n\t", invalidChoices)+
+            "\nRejected Actions:\n\t" + string.Join("\n\t", rejectedChoices);
+
+        return chosenAction.Bindings.BindString(str);
     }
 
     public void Progress()

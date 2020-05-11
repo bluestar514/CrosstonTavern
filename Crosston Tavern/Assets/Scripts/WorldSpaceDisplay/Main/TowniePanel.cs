@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TowniePanel : MonoBehaviour
 {
     public string townie;
+    [System.NonSerialized]
     public Person person;
     public Text display;
 

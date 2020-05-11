@@ -67,12 +67,12 @@ public class Relationship
         relationships[target][(int)axis] += value;
     }
 
-    public float Get(string target, RelationType axis)
+    public int Get(string target, RelationType axis)
     {
         if (target.StartsWith("person_")) target = target.Replace("person_", "");
 
         if (relationships.ContainsKey(target))
-            return relationships[target][(int)axis];
+            return (int)relationships[target][(int)axis];
         else return 0;
     }
 

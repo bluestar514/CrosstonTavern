@@ -59,7 +59,7 @@ public class ActionBuilder
         Dictionary<string, List<BoundBindingPort>> potentialBindings = new Dictionary<string, List<BoundBindingPort>>();
 
         //bind entities
-        foreach(BindingPort port in data.action.bindings) {
+        foreach(BindingPort port in data.action.bindingPorts) {
             if(port is BindingPortEntity) {
                 BindingPortEntity entity = (BindingPortEntity)port;
 
@@ -93,7 +93,7 @@ public class ActionBuilder
         foreach (List<BoundBindingPort> bindings in potentialCombinations) {
 
             Dictionary<string, List<BoundBindingPort>> itemCombinations = new Dictionary<string, List<BoundBindingPort>>();
-            foreach (BindingPort port in data.action.bindings) {
+            foreach (BindingPort port in data.action.bindingPorts) {
                 if (port is BindingPortInventoryItem) {
                     BindingPortInventoryItem invPort = (BindingPortInventoryItem)port;
 
@@ -135,7 +135,7 @@ public class ActionBuilder
         List<BoundAction> actions = new List<BoundAction>();
         foreach(List<BoundBindingPort> bindings in itemBoundCombinations) {
 
-            actions.Add(new BoundAction(data.action, actor.Id, data.featureId, data.locationId, bindings));
+            actions.Add(new BoundAction(data.action, actor.Id, data.featureId, data.locationId, new BoundBindingCollection( bindings)));
         }
 
         return actions;

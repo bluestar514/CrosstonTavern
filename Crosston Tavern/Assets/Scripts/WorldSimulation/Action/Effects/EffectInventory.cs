@@ -12,13 +12,13 @@ public class EffectInventory : Effect
     }
 }
 
-public class EffectInventoryVariable<T> : EffectInventory
+public class EffectInventoryVariable : EffectInventory
 {
     public List<string> itemIds= new List<string>();
-    public T min;
-    public T max;
+    public int min;
+    public int max;
 
-    public EffectInventoryVariable(string ownerId, List<string> itemIds, T min, T max)
+    public EffectInventoryVariable(string ownerId, List<string> itemIds, int min, int max)
     {
         this.ownerId = ownerId;
         this.itemIds = new List<string>(itemIds);
@@ -34,34 +34,12 @@ public class EffectInventoryVariable<T> : EffectInventory
     }
 }
 
-public class EffectInventoryRange<T> : EffectInventory
+public class EffectInventoryStatic : EffectInventory
 {
     public string itemId;
-    public T min;
-    public T max;
+    public int delta;
 
-    public EffectInventoryRange(string ownerId, string itemId, T min, T max)
-    {
-        this.ownerId = ownerId;
-        this.itemId = itemId;
-        this.min = min;
-        this.max = max;
-
-        id = ToString();
-    }
-
-    public override string ToString()
-    {
-        return base.ToString() + ",{" + min + "~" + max + "}," +  itemId+ ")>";
-    }
-}
-
-public class EffectInventoryStatic<T> : EffectInventory
-{
-    public string itemId;
-    public T delta;
-
-    public EffectInventoryStatic(string ownerId, string itemId, T delta)
+    public EffectInventoryStatic(string ownerId, string itemId, int delta)
     {
         this.ownerId = ownerId;
         this.itemId = itemId;

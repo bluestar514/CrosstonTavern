@@ -51,7 +51,7 @@ public class WorldHub : MonoBehaviour
             if(chosenActions[person] == null) {
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person, ws);
 
-                chosenActions[person]= ahm.ChooseAction();
+                //chosenActions[person]= ahm.ChooseAction();
             }
             
             ChosenAction action = chosenActions[person];

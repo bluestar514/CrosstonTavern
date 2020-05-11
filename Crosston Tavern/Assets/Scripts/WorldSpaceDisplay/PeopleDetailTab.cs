@@ -8,6 +8,7 @@ public class PeopleDetailTab : DetailTab
     public Text location;
     public Text body;
 
+    [System.NonSerialized]
     public Person displayedPerson;
 
     public void Set(Person person)

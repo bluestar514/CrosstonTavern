@@ -8,29 +8,25 @@ public class Goal
 {
     public string name;
 
-    public Effect state;
-    float priorityBase;
+    public State state;
 
     public float priority;
 
-    float priModifier;
     public int priTimer;
     int priTimerCurrent;
 
     //public List<Goal> parentGoals = new List<Goal>();
     public List<BoundAction> enablingActions = new List<BoundAction>();
 
-    public Goal(Effect state, float priority, float priModifier)
+    public Goal(State state, float priority)
     {
         this.state = state;
         this.priority = priority;
-        priorityBase = priority;
-        this.priModifier = priModifier;
 
         name = state.ToString() + ":" + priority;
     }
 
-    public Goal(Effect state, float priority, float priModifier,  List<BoundAction> enabledActions):this(state, priority, priModifier)
+    public Goal(State state, float priority, List<BoundAction> enabledActions):this(state, priority)
     {
         //parentGoals.AddRange(parent);
         enablingActions.AddRange(enabledActions);
@@ -86,7 +82,6 @@ public class Goal
         if (!OperatingOnSameState(other)) return null;
 
         float combinedPriority = priority + other.priority;
-        float combinedMod = priModifier + other.priModifier;
 
         //List<Goal> combinedParents = new List<Goal>();
         //combinedParents.AddRange(parentGoals);

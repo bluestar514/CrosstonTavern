@@ -12,257 +12,255 @@ using UnityEngine;
 
 public class ActionHeuristicManager : ActionManager
 {
+    WorldState ws;
     Person actor;
-    Registry people;
-    Map map;
-    WorldState WS;
-    ActionBuilder ab;
+
     public ActionHeuristicManager(Person actor, WorldState ws)
     {
+        this.ws = ws;
         this.actor = actor;
-        WS = ws;
-        people = WS.registry;
-        map = WS.map;
-
-        ab = new ActionBuilder(WS, actor);
     }
 
-    //Public Facing:
-
-    /// <summary>
-    /// Create Weights for all potential Bound Actions (ie, make the Weighted Actions)
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="depth"></param>
-    /// <param name="considerPreconditions"></param>
-    /// <returns></returns>
-    public List<WeightedAction> GenerateWeightedOptions(string location = "", int depth = 0, bool considerPreconditions = true)
+    public List<WeightedAction> WeighActions(List<BoundAction> boundActions = null)
     {
-        //if (depth >= 5) return new List<WeightedAction>();
+        if(boundActions == null) {
+            ActionBuilder ab = new ActionBuilder(ws, actor);
+            boundActions = ab.GetAllActions();
+        }
 
+        Dictionary<bool, List<BoundAction>> validActions = GetPossibleActions(boundActions);
 
-        //List<BoundAction> boundActions = ab.BindActions(location);
-        //if(considerPreconditions) boundActions = FilterOnPrecondition(boundActions);
-        //List<WeightedAction> weightedActions = WeighOptions(boundActions, depth);
+        List<BoundAction> possibleActions = validActions[true];
 
-        return new List<WeightedAction>(); //weightedActions;
+        List<WeightedAction> weightedActions = new List<WeightedAction>();
+        foreach(BoundAction action in possibleActions) {
+            weightedActions.Add(GetWeightOfBoundAction(action));
+        }
+
+        return weightedActions;
+
     }
 
-    public ChosenAction ChooseAction(List<WeightedAction> choices)
+    public ChosenAction ChooseBestAction(List<WeightedAction> weightedActions = null, List<BoundAction> rejectedActions=null)
     {
-        //choices = new List<WeightedAction>(choices.OrderByDescending(action => action.weight));
-        //if (choices.Count == 0) return null;
+        if(weightedActions == null) {
+            weightedActions = WeighActions();
+        }
+        if(rejectedActions == null) {
+            rejectedActions = GetPossibleActions(new ActionBuilder(ws, actor).GetAllActions())[false];
+        }
 
-        ////int rand = Mathf.FloorToInt(UnityEngine.Random.value * 3);
-        ////rand = Mathf.Clamp(rand, 0, choices.Count-1);
+        weightedActions.OrderByDescending(a => a.weight);
 
-        //float totalWeight = 0;
-        //foreach(WeightedAction option in choices) {
-        //    totalWeight += option.weight;
-        //}
+        int maxConsideration = Mathf.Min(5, weightedActions.Count);
 
-        //float rand = UnityEngine.Random.value * totalWeight;
-        //WeightedAction choice = choices[0];
-        //foreach (WeightedAction option in choices) {
-        //    if (option.weight > rand) {
-        //        choice = option;
-        //        break;
-        //    }
-        //    rand -= option.weight;
-        //}
+        float totalWeight = 0;
+        for(int i = 0; i< maxConsideration; i++) {
+            totalWeight += weightedActions[i].weight;
+        }
 
-        //choices.Remove(choice);
+        float rand = UnityEngine.Random.Range(0, totalWeight);
+        WeightedAction action = weightedActions[0];
+        for(int i=0; i< maxConsideration; i++) {
+            if (rand < weightedActions[i].weight) action = weightedActions[i];
+            else rand -= weightedActions[i].weight;
+        }
 
+        weightedActions.Remove(action);
 
-
-        return null; //new ChosenAction(choice,GetRejectedOnPrecondition(ab.BindActions()), choices);
+        return new ChosenAction(action, rejectedActions, weightedActions);
     }
 
-    /// <summary>
-    /// Pick the "Best" next action, from all possible weighted actions
-    /// </summary>
-    /// <returns></returns>
-    public ChosenAction ChooseAction()
+    public Dictionary<bool, List<BoundAction>> GetPossibleActions(List<BoundAction> boundActions)
     {
-        //List<WeightedAction> choices = GenerateWeightedOptions();
+        List<BoundAction> possibleActions = new List<BoundAction>();
+        List<BoundAction> rejectedActions = new List<BoundAction>();
 
-        return null;// ChooseAction(choices);
+        foreach (BoundAction action in boundActions) {
+            if (action.preconditions.Valid(ws, actor, action.Bindings)) possibleActions.Add(action);
+            else rejectedActions.Add(action);
+        }
+
+        return new Dictionary<bool, List<BoundAction>>() {
+            {true, possibleActions },
+            {false, rejectedActions }
+        };
     }
 
-    //Steps toward Generating Weighted Options:
+    WeightedAction GetWeightOfBoundAction(BoundAction boundAction)
+    {
+        //Weight = sum of(chance of occuring * desirablity of outcome)
 
-    //List<BoundAction> FilterOnPrecondition(List<BoundAction> actions)
-    //{
+        List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
+        float weight = 0;
+        foreach(Outcome outcome in boundAction.potentialEffects) {
+            KeyValuePair < float, List<WeightedAction.WeightRational> > result = GetWeightOfOutcome(outcome, boundAction.Bindings);
 
-    //    return new List<BoundAction>(from action in actions
-    //                                 where action.SatisfiedPreconditions(WS)
-    //                                 select action);
+            weight += result.Key;
+            rationals.AddRange(result.Value);
+        }
 
-    //}
+        return new WeightedAction(boundAction, weight, rationals);
+    }
 
-    //List<BoundAction> GetRejectedOnPrecondition(List<BoundAction> actions)
-    //{
-    //    return new List<BoundAction>(from action in actions
-    //                                 where !action.SatisfiedPreconditions(WS)
-    //                                 select action);
-    //}
+    KeyValuePair<float, List<WeightedAction.WeightRational>> 
+        GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings)
+    {
+        float chance = outcome.EvaluateChance(ws);
+        float weight = 0;
+        List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
+        foreach (Goal goal in actor.gm.GetGoalsList()) {
+            foreach (Effect effect in outcome.effects) {
+                float value = GetWeightOfEffectGivenGoal(effect, bindings, goal) * chance;
+                weight += value;
+                if (value != 0)
+                    rationals.Add(new WeightedAction.WeightRational(effect, goal.state, value));
+            }
+        }
+        return new KeyValuePair<float, List<WeightedAction.WeightRational>>(weight, rationals) ;
+    }
 
-    //List<WeightedAction> WeighOptions(List<BoundAction> actions, int depth)
-    //{
-    //    List<WeightedAction> weightedActions = new List<WeightedAction>();
+    float GetWeightOfEffectGivenGoal(Effect effect, BoundBindingCollection bindings, Goal goal)
+    {
+        if(effect is EffectInventory) {
+            return GetWeightOfInventoryEffect((EffectInventory)effect, bindings, goal);
+        }else if(effect is EffectSocial) {
+            return GetWeightOfSocialEffect((EffectSocial)effect, bindings, goal);
+        }else if(effect is EffectMovement) {
+            return GetWeightOfMovementEffect((EffectMovement)effect, bindings, goal);
+        } else {
+            throw new Exception("Effect (" + effect + ") of unplanned for type. Cannot determine desirable weight.");
+        }
+    }
 
-    //    foreach (BoundAction action in actions) {
+    float GetWeightOfInventoryEffect(EffectInventory effect, BoundBindingCollection bindings, Goal goal)
+    {
+        if (!(goal.state is StateInventory)) return 0;
+        StateInventory state = (StateInventory)goal.state;
 
-    //        List<Outcome> boundEffects = action.GenerateExpectedEffects(WS);
+        string goalInvOwner = state.ownerId;
+        string goalItem = state.itemId;
 
-    //        weightedActions.Add(EvaluateAction(action, boundEffects, depth));
-    //    }
+        string owner = bindings.BindString(effect.ownerId);
 
-    //    return weightedActions;
-    //}
+        if (goalInvOwner != owner.Replace("person_", "")) return 0;
+        Inventory inv = ws.GetInventory(owner);
 
+        if (effect is EffectInventoryStatic) {
+            EffectInventoryStatic invEffect = (EffectInventoryStatic)effect;
 
-    //WeightedAction EvaluateAction(BoundAction action, List<Outcome> boundEffects, int depth)
-    //{
-    //    List<WeightedAction.WeightRational> weightRationals = new List<WeightedAction.WeightRational>();
-    //    foreach (Outcome effect in boundEffects) {
-    //        float effectLikelyhood = effect.EvaluateChance(WS);
+            string item = bindings.BindString(invEffect.itemId);
+            if (item != goalItem) return 0;
+            int count = inv.GetInventoryCount(item);
 
-    //        foreach (Effect subeffect in effect.effects) {
-    //            foreach (Goal g in actor.goals) {
-    //                Effect goal = g.state;
-    //                float priority = g.priority;
+            return CountInRange(count, invEffect.delta, state.min, state.max);
+        } else if (effect is EffectInventoryVariable) {
+            EffectInventoryVariable invVariable = (EffectInventoryVariable)effect;
 
-    //                float weight = priority * effectLikelyhood * EvaluateEffectTowardGoal(subeffect, goal, depth);
+            List<string> items = new List<string>(from item in invVariable.itemIds
+                                                  select bindings.BindString(item));
+            if (!items.Contains(state.itemId)) return 0;
+            int count = inv.GetInventoryCount(goalItem);
 
-    //                weightRationals.Add(new WeightedAction.WeightRational(subeffect, goal, weight));
-    //            }
-    //        }
-    //    }
+            return (CountInRange(count, invVariable.min, state.min, state.max) + 
+                    CountInRange(count, invVariable.max, state.min, state.max)) 
+                    / 2;
+        } else {
+            return 0;
+        }
+    }
 
-    //    float total = 0;
-    //    foreach (WeightedAction.WeightRational wr in weightRationals) {
-    //        total += wr.weight;
-    //    }
-
-    //    return new WeightedAction(action, total, weightRationals, boundEffects);
-
-    //}
-
-    //public float EvaluateEffectTowardGoal(Effect effect, Effect goal, int depth)
-    //{
-
-    //    goal = goal.BindEffect(actor.resources);
-
-    //    if (goal is EffectInvChange) {
-    //        EffectInvChange invGoal = (EffectInvChange)goal;
-
-    //        return EvaluateInvGoals(effect, invGoal, depth);
-    //    }
-
-
-    //    if (goal is EffectMove) {
-    //        EffectMove locationGoal = (EffectMove)goal;
-    //        return EvaluateMoveGoals(effect, locationGoal);
-    //    }
-
-
-    //    if (goal is EffectSocialChange) {
-    //        EffectSocialChange socialGoal = (EffectSocialChange)goal;
-    //        return EvaluateSocialGoals(effect, socialGoal);
-    //    }
-
-    //    return 0;
-    //}
-
-    //float EvaluateInvGoals(Effect effect, EffectInvChange goal, int depth)
-    //{
-
-    //    if (effect is EffectInvChange) {
-    //        EffectInvChange invChange = (EffectInvChange)effect;
-
-    //        //stop if the inventory this would add to is not the one we want
-    //        if (invChange.InvOwner != goal.InvOwner) return 0;
-    //        Inventory inventory = WS.GetInventory(goal.InvOwner);
+    float GetWeightOfSocialEffect(EffectSocial effect, BoundBindingCollection bindings, Goal goal)
+    {
+        if (!(goal.state is StateSocial)) return 0;
+        StateSocial state = (StateSocial)goal.state;
 
 
-    //        //stop if the item being changed isn't what we are looking for
-    //        int matches = 0;
-    //        int count = 0;
-    //        foreach (string item in goal.ItemId) {
-    //            if (invChange.ItemId.Contains(item)) matches++;
-    //            count += inventory.GetInventoryCount(item);
-    //        }
-    //        if (matches == 0) return 0;
+        string source = bindings.BindString(effect.sourceId);
+        string target = bindings.BindString(effect.targetId);
+        Relationship.RelationType axis = effect.axis;
 
-    //        //Determine how much this helps us
-    //        float DeltaAverage = (invChange.DeltaMin + invChange.DeltaMax) / 2;
-    //        float weight = 0;
-    //        if ((count < goal.DeltaMin && invChange.DeltaMin >= 0 && invChange.DeltaMax > 0)
-    //            || (count > goal.DeltaMax && invChange.DeltaMax <= 0 && invChange.DeltaMin < 0))// moving in the right direction
-    //            weight += Mathf.Abs(DeltaAverage);
-    //        else weight -= Mathf.Abs(DeltaAverage); //or we are moving in the wrong direction, and account for that too!
-    //        if (count + DeltaAverage <= goal.DeltaMax && count + DeltaAverage >= goal.DeltaMin)
-    //            weight += Mathf.Abs(DeltaAverage);
+        string goalSource = state.sourceId;
+        string goalTarget = state.targetId;
+        Relationship.RelationType goalAxis = state.axis;
 
-    //        return weight;
+        if (source != goalSource ||
+            target != goalTarget ||
+            axis != goalAxis) return 0;
 
-    //    }
+        Relationship rel = ws.GetRelationshipsFor(source);
+        int value = rel.Get(target, axis);
 
-    //    return 0;
-    //}
+        if (effect is EffectSocialStatic) {
+            EffectSocialStatic social = (EffectSocialStatic)effect;
 
-    //float EvaluateMoveGoals(Effect effect, EffectMove goal)
-    //{
-    //    if (effect is EffectMove) {
-    //        EffectMove move = (EffectMove)effect;
+            return CountInRange(value, social.delta, state.min, state.max);
+        } else if (effect is EffectSocialVariable) {
+            EffectSocialVariable social = (EffectSocialVariable)effect;
 
+            return (CountInRange(value, social.min, state.min, state.max) +
+                    CountInRange(value, social.max, state.min, state.max))
+                    / 2;
+        } else {
+            return 0;
+        }
+    }
 
-    //        float currentDist = map.GetDistance(actor.location, goal.TargetLocation);
-    //        float dist = map.GetDistance(move.TargetLocation, goal.TargetLocation);
+    float GetWeightOfMovementEffect(EffectMovement effect, BoundBindingCollection bindings, Goal goal)
+    {
+        if (!(goal.state is StatePosition)) return 0;
+        StatePosition state = (StatePosition)goal.state;
 
-    //        return (currentDist - dist)*((map.LocationCount - dist)/ map.LocationCount);
-    //    }
+        string mover = bindings.BindString(effect.moverId);
+        string location = bindings.BindString(effect.newLocationId);
 
-    //    return 0;
-    //}
+        Map map = ws.map;
 
-    //float EvaluateSocialGoals(Effect effect, EffectSocialChange goal)
-    //{
-    //    if (effect is EffectSocialChange) {
-    //        EffectSocialChange socChange = (EffectSocialChange)effect;
+        string currentLocation = ws.registry.GetPerson(mover).location;
+        string goalLocation = state.locationId;
 
-    //        //stop if the source or target don't match or the value changing isn't what we are looking for
-    //        if (!checkIfPeopleMatch(socChange.SourceId, goal.SourceId)) return 0;
-    //        if (!checkIfPeopleMatch(socChange.TargetId, goal.TargetId)) return 0;
-    //        if (socChange.RelationType != goal.RelationType) return 0;
+        if (mover != state.moverId) return 0;
 
-    //        Relationship relations = WS.GetRelationshipsFor(socChange.SourceId);
+        float weight = 0;
 
-    //        float value = relations.Get(socChange.TargetId, socChange.RelationType);
+        //get there in one step
+        if (location == goalLocation) weight += 2;
+        else weight -= 1;
+        //Move in right direction
+        if (map.GetDistance(currentLocation, goalLocation) > map.GetDistance(location, goalLocation))
+            weight += 2*(map.LocationCount - map.GetDistance(location, goalLocation))/map.LocationCount;
+        //Don't leave the goalLocation
+        if (currentLocation == goalLocation) weight -= 1;
 
-    //        //Determine how much this helps us
-    //        float DeltaAverage = (socChange.DeltaMin + socChange.DeltaMax) / 2;
-    //        float weight = 0;
-    //        if ((value < goal.DeltaMin && socChange.DeltaMin >= 0 && socChange.DeltaMax > 0)
-    //            || (value > goal.DeltaMax && socChange.DeltaMax <= 0 && socChange.DeltaMin < 0))// moving in the right direction
-    //            weight += Mathf.Abs(DeltaAverage);
-    //        if (value + DeltaAverage <= goal.DeltaMax && value + DeltaAverage >= goal.DeltaMin)
-    //            weight += Mathf.Abs(DeltaAverage);
+        return weight;
+    }
 
-    //        return weight;
+    float CountInRange(int count, int delta, int min, int max)
+    {
+        float weight = 0;
 
-    //    }
+        int newCount = count + delta;
 
-    //    return 0;
-    //}
+        //get there in one step:
+        // in range -> +1
+        // outside -> -1
+        if (newCount <= max && newCount >= min) weight += 1;
+        else weight -= 1;
 
+        //less important if we are already in range
+        // were in range -> -1
+        if (count <= max && count >= min) weight -= 1;
 
-    //bool checkIfPeopleMatch(string effect, string goal)
-    //{
-    //    effect = effect.Replace("person_", "");
-    //    goal = goal.Replace("person_", "");
+        //move in the right direction:
+        // if move in right direction from outside range -> +2
+        // if move in wrong direction from outside range -> -2
+        // if move from inside the range -> 0
+        if (Mathf.Abs(newCount - min) <= Mathf.Abs(count - min)) weight += 1;
+        else weight -= 1;
+        if (Mathf.Abs(newCount - max) <= Mathf.Abs(count - max)) weight += 1;
+        else weight -= 1;
 
-    //    return effect == goal;
-    //}
+        return weight;
+    }
+
 }

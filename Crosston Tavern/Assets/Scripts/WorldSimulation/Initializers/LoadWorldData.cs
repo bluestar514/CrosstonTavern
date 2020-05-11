@@ -55,73 +55,73 @@ public class LoadWorldData
     {
         Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>();
 
-        foreach(JSON jsonAction in totalJsonAction.GetJArray("actions").AsJSONArray()) {
-            string id = jsonAction.GetString("id");
-            int time = jsonAction.GetInt("time");
+        //foreach(JSON jsonAction in totalJsonAction.GetJArray("actions").AsJSONArray()) {
+        //    string id = jsonAction.GetString("id");
+        //    int time = jsonAction.GetInt("time");
 
             
 
-            List<Condition> preconditions = new List<Condition>() {
-                new Condition_SpaceAtFeature()
-            };
-            foreach (JSON jsonCondition in jsonAction.GetJArray("conditions").AsJSONArray()) {
-                string type = jsonCondition.GetString("type");
-                switch (type) {
-                    //case "inv":
-                    //    preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition)));
-                    //    break;
-                    default:
-                        Debug.LogWarning("Action (" + id + ") condition is of unrecognized type (" + type + ")");
-                        break;
-                }
-            }
+        //    List<Condition> preconditions = new List<Condition>() {
+        //        new Condition_SpaceAtFeature()
+        //    };
+        //    foreach (JSON jsonCondition in jsonAction.GetJArray("conditions").AsJSONArray()) {
+        //        string type = jsonCondition.GetString("type");
+        //        switch (type) {
+        //            //case "inv":
+        //            //    preconditions.Add(new Condition_IsState(ParseEffect(jsonCondition)));
+        //            //    break;
+        //            default:
+        //                Debug.LogWarning("Action (" + id + ") condition is of unrecognized type (" + type + ")");
+        //                break;
+        //        }
+        //    }
 
-            List<Outcome> outcomes = new List<Outcome>();
-            foreach (JSON jsonOutcome in jsonAction.GetJArray("outcomes").AsJSONArray()) {
-                JSON jsonChance = jsonOutcome.GetJSON("chance");
+        //    List<Outcome> outcomes = new List<Outcome>();
+        //    foreach (JSON jsonOutcome in jsonAction.GetJArray("outcomes").AsJSONArray()) {
+        //        JSON jsonChance = jsonOutcome.GetJSON("chance");
 
-                ChanceModifier chance = null;
-                string type = jsonChance.GetString("type");
-                switch (type) {
-                    case "item":
-                        string item = jsonChance.GetString("item");
-                        string person = jsonChance.GetString("person");
-                        string[] range = ParseRange(jsonChance.GetJArray("range"));
-                        float minValue = float.Parse(range[0]);
-                        float maxValue = float.Parse(range[1]);
-                        chance = new ChanceModifierItemOpinion(item, person, minValue, maxValue);
-                        break;
-                    //case "relation":
-                    //    int boundry = jsonChance.GetJNumber("boundry").AsInt();
-                    //    EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
-                    //    bool positive = jsonChance.GetBool("positive");
+        //        ChanceModifier chance = null;
+        //        string type = jsonChance.GetString("type");
+        //        switch (type) {
+        //            case "item":
+        //                string item = jsonChance.GetString("item");
+        //                string person = jsonChance.GetString("person");
+        //                string[] range = ParseRange(jsonChance.GetJArray("range"));
+        //                float minValue = float.Parse(range[0]);
+        //                float maxValue = float.Parse(range[1]);
+        //                chance = new ChanceModifierItemOpinion(item, person, minValue, maxValue);
+        //                break;
+        //            //case "relation":
+        //            //    int boundry = jsonChance.GetJNumber("boundry").AsInt();
+        //            //    EffectSocialChange socialState = (EffectSocialChange)ParseEffect(jsonChance, "social");
+        //            //    bool positive = jsonChance.GetBool("positive");
 
-                    //    chance = new ChanceModifierRelation(socialState, boundry, positive);
-                    //    break;
-                    case "simple":
-                        float value = jsonChance.GetJNumber("value").AsFloat();
-                        chance = new ChanceModifierSimple(value);
-                        break;
-                    case "base":
-                        chance = new ChanceModifier();
-                        break;
-                    default:
-                        Debug.LogWarning("Action (" + id + ") chanceModifier type is of unrecognized type (" + type + ")");
-                        break;
-                }
+        //            //    chance = new ChanceModifierRelation(socialState, boundry, positive);
+        //            //    break;
+        //            case "simple":
+        //                float value = jsonChance.GetJNumber("value").AsFloat();
+        //                chance = new ChanceModifierSimple(value);
+        //                break;
+        //            case "base":
+        //                chance = new ChanceModifier();
+        //                break;
+        //            default:
+        //                Debug.LogWarning("Action (" + id + ") chanceModifier type is of unrecognized type (" + type + ")");
+        //                break;
+        //        }
 
-                List<Effect> effects = new List<Effect>();
-                foreach (JSON jsonEffect in jsonOutcome.GetJArray("effects").AsJSONArray()) {
-                    effects.Add(ParseEffect(jsonEffect));
-                }
+        //        List<Effect> effects = new List<Effect>();
+        //        foreach (JSON jsonEffect in jsonOutcome.GetJArray("effects").AsJSONArray()) {
+        //            effects.Add(ParseEffect(jsonEffect));
+        //        }
 
-                outcomes.Add(new Outcome(chance, effects));
-            }
+        //        outcomes.Add(new Outcome(chance, effects));
+        //    }
 
-            GenericAction action = new GenericAction(id, time, preconditions, outcomes, null);
-            actions.Add(id, action);
+        //    GenericAction action = new GenericAction(id, time, preconditions, outcomes, null);
+        //    actions.Add(id, action);
             
-        }
+        //}
 
         return actions;
     }
@@ -255,7 +255,7 @@ public class LoadWorldData
                     new GM_Precondition_Time(person.employmentData.shiftStart, person.employmentData.shiftEnd)
                 },
                 new List<Goal>() {
-                    new Goal(new EffectMovement(person.Id, ws.map.GetFeature(establishment).location), 5, 1 )
+                    new Goal(new StatePosition(person.Id, ws.map.GetFeature(establishment).location), 5)
                 });
             profession.name = "profession";
 

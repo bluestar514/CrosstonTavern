@@ -23,6 +23,20 @@ public class Inventory
             return 0;
         }
     }
+
+    public int GetInventoryCount(List<string> itemIds)
+    {
+        int count = 0;
+        foreach (string itemId in itemIds) {
+
+            if (inventory.ContainsKey(itemId)) {
+                count+= inventory[itemId];
+            }
+        }
+
+        return count;
+    }
+
     public void ChangeInventoryContents(int num, string itemId)
     {
         if (inventory.ContainsKey(itemId)) {

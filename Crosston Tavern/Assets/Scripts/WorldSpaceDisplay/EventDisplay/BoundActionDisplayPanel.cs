@@ -26,7 +26,7 @@ public class BoundActionDisplayPanel : SubDisplayPanel<BoundAction>
         foreach (Transform child in PreconditionsPanel.transform) {
             GameObject.Destroy(child.gameObject);
         }
-        foreach (Condition condition in action.preconditions) {
+        foreach (Condition condition in action.preconditions.conditions) {
             GameObject panel = Instantiate(PreconditionsPrefab, PreconditionsPanel.transform);
             panel.GetComponent<PreconditionsDisplayPanel>().Set(condition);
         }

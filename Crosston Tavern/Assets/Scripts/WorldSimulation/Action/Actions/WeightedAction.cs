@@ -10,39 +10,39 @@ public class WeightedAction : BoundAction
 
     public List<Outcome> expectedEffects;
 
-    public WeightedAction(GenericAction action, 
-        string actorId, string featureId, string locationId, List<BoundBindingPort> bindings,
-        float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
-        base(action, actorId, featureId, locationId, bindings)
-    {
-        this.weight = weight;
-        this.weightRationals = weightRationals;
-        this.expectedEffects = expectedEffects;
-
-        name = ToString();
-    }
-
-    public WeightedAction(string id, int executionTime, List<Condition> preconditions, List<Outcome> potentialEffects, 
-        string actorId, string featureId, string locationId, List<BoundBindingPort> bindings,
-        float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) : 
+    public WeightedAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, 
+        string actorId, string featureId, string locationId, BoundBindingCollection bindings,
+        float weight, List<WeightRational> weightRationals) : 
         base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
-        this.expectedEffects = expectedEffects;
 
         name = ToString();
     }
         
-    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals, List<Outcome> expectedEffects) :
+    public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals) :
         this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialEffects, 
-            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, null, weight, weightRationals, expectedEffects)
+            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.Bindings, weight, weightRationals)
     {}
 
 
     public override string ToString()
     {
-        return "<" + Id + "(" + ActorId + ", " + FeatureId + "):"+ weight +">";
+        string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";
+        if (Bindings == null) return n;
+
+        return Bindings.BindString(n);
+    }
+
+    public string VerboseString()
+    {
+        string str = ToString() +
+            "\nOutcomes:\n\t" + string.Join("\n\t", potentialEffects) +
+            "\nBindings:\n\t" + string.Join("\n\t", Bindings.bindings) +
+            "\nRational:\n\t" + string.Join("\n\t", weightRationals);
+
+        return Bindings.BindString(str);
     }
 
     [System.Serializable]
@@ -52,10 +52,10 @@ public class WeightedAction : BoundAction
         string name;
 
         public Effect effect;
-        public Effect goal;
+        public State goal;
         public float weight;
 
-        public WeightRational(Effect effect, Effect goal, float weight)
+        public WeightRational(Effect effect, State goal, float weight)
         {
             this.effect = effect;
             this.goal = goal;
