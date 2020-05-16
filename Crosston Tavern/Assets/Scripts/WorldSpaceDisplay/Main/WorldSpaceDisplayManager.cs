@@ -40,7 +40,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
     public void AddPeople(List<Person> people)
     {
         townieDisplayOrder = new List<string>(from person in people
-                                                select person.Id);
+                                                select person.id);
 
         foreach(Person person in people) {
             AddTownieRow(person);

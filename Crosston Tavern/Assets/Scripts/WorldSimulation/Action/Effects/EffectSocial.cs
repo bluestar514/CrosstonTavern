@@ -8,6 +8,7 @@ public class EffectSocial : Effect
     public string targetId;
     public Relationship.RelationType axis;
 
+    public virtual int delta { get; protected set; }
     public override string ToString()
     {
         return "<EffectSocial(" + sourceId + "-(" + axis.ToString() + ")->" + targetId;
@@ -18,6 +19,10 @@ public class EffectSocialVariable : EffectSocial
 {
     public int min;
     public int max;
+
+    public override int delta {
+        get => Mathf.RoundToInt((UnityEngine.Random.value * (max - min)) + min);
+    }
 
     public EffectSocialVariable(string sourceId, string targetId, Relationship.RelationType axis, int min, int max)
     {
@@ -37,7 +42,6 @@ public class EffectSocialVariable : EffectSocial
 
 public class EffectSocialStatic : EffectSocial
 {
-    public int delta;
 
     public EffectSocialStatic(string sourceId, string targetId, Relationship.RelationType axis, int delta)
     {

@@ -15,11 +15,11 @@ public class PeopleDetailTab : DetailTab
     {
         displayedPerson = person;
 
-        displayName.text = person.Id;
+        displayName.text = person.id;
         location.text = person.location;
 
 
-        body.text = person.StringifyStats();
+        //body.text = person.StringifyStats();
     }
 
 

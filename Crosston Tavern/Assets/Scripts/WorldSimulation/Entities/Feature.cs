@@ -6,12 +6,12 @@ using UnityEngine;
 public class Feature 
 {
     [SerializeField]
-    private string id;
-    public string Id { get => id; private set => id = value; }
+    public string id;
     public string location;
 
     public List<GenericAction> providedActions;
-    public StringStringListDictionary relevantResources;
+    public FeatureResources relevantResources;
+
     public Inventory inventory;
     public StringIntDictionary stockTable;
 
@@ -21,12 +21,13 @@ public class Feature
     public Feature(string id, string location, int maxUsers, List<GenericAction> providedActions, 
         Dictionary<string, List<string>> relevantResources, Dictionary<string, int> stockTable=null)
     {
-        Id = id;
+        this.id = id;
         this.location = location;
         this.providedActions = providedActions;
-        this.relevantResources = new StringStringListDictionary();
-        this.relevantResources.CopyFrom(relevantResources);
-        this.relevantResources.Add("recipient", new List<string>() { id });
+        StringStringListDictionary resources = new StringStringListDictionary();
+        resources.CopyFrom(relevantResources);
+        this.relevantResources = new FeatureResources(resources);
+
         this.maxUsers = maxUsers;
         this.stockTable = new StringIntDictionary();
         if(stockTable != null) this.stockTable.CopyFrom(stockTable);

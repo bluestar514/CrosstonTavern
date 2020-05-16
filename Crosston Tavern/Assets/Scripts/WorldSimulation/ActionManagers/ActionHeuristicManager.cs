@@ -94,7 +94,8 @@ public class ActionHeuristicManager : ActionManager
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         float weight = 0;
         foreach(Outcome outcome in boundAction.potentialEffects) {
-            KeyValuePair < float, List<WeightedAction.WeightRational> > result = GetWeightOfOutcome(outcome, boundAction.Bindings);
+            KeyValuePair < float, List<WeightedAction.WeightRational> > result = 
+                GetWeightOfOutcome(outcome, boundAction.Bindings, ws.map.GetFeature(boundAction.FeatureId).relevantResources);
 
             weight += result.Key;
             rationals.AddRange(result.Value);
@@ -104,14 +105,14 @@ public class ActionHeuristicManager : ActionManager
     }
 
     KeyValuePair<float, List<WeightedAction.WeightRational>> 
-        GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings)
+        GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources)
     {
         float chance = outcome.EvaluateChance(ws);
         float weight = 0;
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
-        foreach (Goal goal in actor.gm.GetGoalsList()) {
+        foreach (Goal goal in actor.knownGoals) {
             foreach (Effect effect in outcome.effects) {
-                float value = GetWeightOfEffectGivenGoal(effect, bindings, goal) * chance;
+                float value = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal) * chance;
                 weight += value;
                 if (value != 0)
                     rationals.Add(new WeightedAction.WeightRational(effect, goal.state, value));
@@ -120,20 +121,20 @@ public class ActionHeuristicManager : ActionManager
         return new KeyValuePair<float, List<WeightedAction.WeightRational>>(weight, rationals) ;
     }
 
-    float GetWeightOfEffectGivenGoal(Effect effect, BoundBindingCollection bindings, Goal goal)
+    float GetWeightOfEffectGivenGoal(Effect effect, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
         if(effect is EffectInventory) {
-            return GetWeightOfInventoryEffect((EffectInventory)effect, bindings, goal);
+            return GetWeightOfInventoryEffect((EffectInventory)effect, bindings, resources, goal);
         }else if(effect is EffectSocial) {
             return GetWeightOfSocialEffect((EffectSocial)effect, bindings, goal);
         }else if(effect is EffectMovement) {
-            return GetWeightOfMovementEffect((EffectMovement)effect, bindings, goal);
+            return GetWeightOfMovementEffect((EffectMovement)effect, bindings, resources, goal);
         } else {
             throw new Exception("Effect (" + effect + ") of unplanned for type. Cannot determine desirable weight.");
         }
     }
 
-    float GetWeightOfInventoryEffect(EffectInventory effect, BoundBindingCollection bindings, Goal goal)
+    float GetWeightOfInventoryEffect(EffectInventory effect, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
         if (!(goal.state is StateInventory)) return 0;
         StateInventory state = (StateInventory)goal.state;
@@ -157,8 +158,12 @@ public class ActionHeuristicManager : ActionManager
         } else if (effect is EffectInventoryVariable) {
             EffectInventoryVariable invVariable = (EffectInventoryVariable)effect;
 
-            List<string> items = new List<string>(from item in invVariable.itemIds
-                                                  select bindings.BindString(item));
+            List<string> items = new List<string>();
+            foreach(string item in from item in invVariable.itemIds
+                                   select bindings.BindString(item)) {
+                items.AddRange(resources.BindString(item));
+            }
+
             if (!items.Contains(state.itemId)) return 0;
             int count = inv.GetInventoryCount(goalItem);
 
@@ -206,13 +211,15 @@ public class ActionHeuristicManager : ActionManager
         }
     }
 
-    float GetWeightOfMovementEffect(EffectMovement effect, BoundBindingCollection bindings, Goal goal)
+    float GetWeightOfMovementEffect(EffectMovement effect, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
         if (!(goal.state is StatePosition)) return 0;
         StatePosition state = (StatePosition)goal.state;
 
         string mover = bindings.BindString(effect.moverId);
-        string location = bindings.BindString(effect.newLocationId);
+        string loc = bindings.BindString(effect.newLocationId);
+
+        List<string> locations = resources.BindString(loc);
 
         Map map = ws.map;
 
@@ -223,16 +230,18 @@ public class ActionHeuristicManager : ActionManager
 
         float weight = 0;
 
-        //get there in one step
-        if (location == goalLocation) weight += 2;
-        else weight -= 1;
-        //Move in right direction
-        if (map.GetDistance(currentLocation, goalLocation) > map.GetDistance(location, goalLocation))
-            weight += 2*(map.LocationCount - map.GetDistance(location, goalLocation))/map.LocationCount;
-        //Don't leave the goalLocation
-        if (currentLocation == goalLocation) weight -= 1;
+        foreach (string location in locations) {
+            //get there in one step
+            if (location == goalLocation) weight += 2;
+            else weight -= 1;
+            //Move in right direction
+            if (map.GetDistance(currentLocation, goalLocation) > map.GetDistance(location, goalLocation))
+                weight += 2 * (map.LocationCount - map.GetDistance(location, goalLocation)) / map.LocationCount;
+            //Don't leave the goalLocation
+            if (currentLocation == goalLocation) weight -= 1;
+        }
 
-        return weight;
+        return weight/locations.Count;
     }
 
     float CountInRange(int count, int delta, int min, int max)

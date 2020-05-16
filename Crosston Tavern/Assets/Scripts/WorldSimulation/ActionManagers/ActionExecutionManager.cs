@@ -11,109 +11,98 @@ using System.Linq;
 public class ActionExecutionManager : ActionManager
 {
     Person actor;
-    WorldState WS;
+    WorldState ws;
 
     public ActionExecutionManager(Person actor, WorldState ws)
     {
         this.actor = actor;
-        WS = ws;
+        this.ws = ws;
     }
 
 
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
-        //WeightedAction action = chosenAction.Action;
-        //Feature feature = this.map.GetFeature(action.FeatureId);
-        //if (!chosenAction.Started()) {
-        //    feature.Use();
-        //}
 
-        //if (chosenAction.Complete()) {
-        //    feature.FinishUse();
-        //    Debug.Log(chosenAction);
-        //    Outcome chosenEffect = PickEffect(action);
+        Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
 
-        //    foreach (Effect effect in chosenEffect.effects) {
-        //        if (effect is EffectInvChange) {
-        //            EffectInvChange invChange = (EffectInvChange)effect;
+        List<Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, chosenAction.Action.Bindings, 
+                                                ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources);
 
-        //            Inventory inventory = WS.GetInventory(invChange.InvOwner);
-        //            inventory.ChangeInventoryContents(invChange.DeltaMax, invChange.ItemId[0]);
-        //        }
+        Outcome realizedOutcome = new Outcome(new ChanceModifierSimple(1), realizedEffects);
 
+        return new ExecutedAction(chosenAction, realizedOutcome);
 
-        //        if (effect is EffectMove) {
-        //            EffectMove move = (EffectMove)effect;
-
-        //            actor.Move(move.TargetLocation);
-        //        }
-
-
-        //        if (effect is EffectSocialChange) {
-        //            EffectSocialChange socialChange = (EffectSocialChange)effect;
-
-        //            Person source = people.GetPerson(socialChange.SourceId.Replace("person_", ""));
-
-        //            source.relationships.Increase(socialChange.TargetId.Replace("person_", ""), socialChange.RelationType, socialChange.DeltaMax);
-        //        }
-        //    }
-
-        //    ExecutedAction finalAction = new ExecutedAction(chosenAction, chosenEffect);
-
-        //    actor.history.Add(finalAction);
-        //    return finalAction;
-        //}
-
-        //chosenAction.Progress();
-
-        return null;
     }
 
-    //Outcome PickEffect(WeightedAction action)
-    //{
-    //    List<Outcome> potentialEffects = action.GenerateExpectedEffects(WS);
-    //    EvaluateChances(potentialEffects);
+    Outcome ChooseOutcome(WeightedAction action)
+    {
+        float totalChance = action.potentialEffects.Sum(outcome => outcome.chanceModifier.Chance(ws));
+        float rand = UnityEngine.Random.value * totalChance;
 
-    //    potentialEffects.OrderBy(effect => effect.evaluatedChance);
+        foreach(Outcome outcome in action.potentialEffects) {
+            float num = outcome.chanceModifier.Chance(ws);
+            if (num >= rand) return outcome;
+            rand -= num;
+        }
 
-    //    float randomNumber = Random.value * MaxChance(potentialEffects);
+        throw new System.Exception("Something was not programed correctly, we should not be making it to this line of code");
+    }
 
-    //    foreach (Outcome effect in potentialEffects) {
-    //        if (randomNumber < effect.evaluatedChance) return PickSpecificEffect(effect);
-    //        else randomNumber -= effect.evaluatedChance;
-    //    }
+    List<Effect> RealizeEffectsOfOutcome(Outcome chosenOutcome, BoundBindingCollection bindings, FeatureResources resources)
+    {
+        List<Effect> realizedEffects = new List<Effect>();
 
-    //    return PickSpecificEffect(potentialEffects.Last());
-    //}
-    //Outcome PickSpecificEffect(Outcome effect)
-    //{
-    //    List<Effect> microEffects = new List<Effect>();
+        foreach(Effect effect in chosenOutcome.effects) {
+            if(effect is EffectInventory) {
+                EffectInventory effectInv = (EffectInventory)effect;
 
-    //    foreach(Effect microEffect in effect.effects) {
+                string owner = bindings.BindString(effectInv.ownerId);
+                string itemid = bindings.BindString(effectInv.itemId);
 
-    //        microEffects.Add(microEffect.SpecifyEffect());
+                List<string> items = resources.BindString(itemid);
+                itemid = items[Mathf.FloorToInt(UnityEngine.Random.value * items.Count)];
 
-    //    }
+                int delta = effectInv.delta;
 
-    //    return new Outcome(effect.chanceModifier, microEffects);
-    //}
+                realizedEffects.Add(new EffectInventoryStatic(owner, itemid, delta));
 
-    //void EvaluateChances(List<Outcome> effects)
-    //{
-    //    foreach(Outcome effect in effects) {
-    //        effect.EvaluateChance(WS);
-    //    }
-    //}
 
-    //float MaxChance(List<Outcome> possibleEffects)
-    //{
-    //    float sum = 0;
+                Inventory inv = ws.GetInventory(owner);
+                inv.ChangeInventoryContents(delta, itemid);
+            } else
+            if(effect is EffectSocial) {
+                EffectSocial effectSoc = (EffectSocial)effect;
 
-    //    foreach (Outcome effect in possibleEffects) {
-    //        sum += effect.evaluatedChance;
-    //    }
+                string sourceId = bindings.BindString(effectSoc.sourceId);
+                string targetId = bindings.BindString(effectSoc.targetId);
+                Relationship.RelationType axis = effectSoc.axis;
+                int delta = effectSoc.delta;
 
-    //    return sum;
-    //}
+                realizedEffects.Add(new EffectSocialStatic(sourceId, targetId, axis, delta));
 
+
+                Relationship rel = ws.GetRelationshipsFor(sourceId);
+                rel.Increase(targetId, axis, delta);
+            } else
+            if(effect is EffectMovement) {
+                EffectMovement effectMove = (EffectMovement)effect;
+
+                string moverId = bindings.BindString(effectMove.moverId);
+                string newLocationId = bindings.BindString(effectMove.newLocationId);
+
+                List<string> potentialIds = resources.BindString(newLocationId);
+                newLocationId = potentialIds[Mathf.FloorToInt(UnityEngine.Random.value * potentialIds.Count)];
+
+                realizedEffects.Add(new EffectMovement(moverId, newLocationId));
+
+                ws.map.MovePerson(moverId, newLocationId);
+            } else {
+                realizedEffects.Add(effect);
+
+                Debug.LogWarning("Effect ("+effect+") of unaccounted for Effect Type failed to be executed!");
+            }
+        }
+
+        return realizedEffects;
+    }
 }

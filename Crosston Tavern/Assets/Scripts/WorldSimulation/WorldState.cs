@@ -23,7 +23,6 @@ public class WorldState
         time.Tick(t);
     }
 
-
     public Inventory GetInventory(string id)
     {
         if(registry.GetPerson(id) != null) {
@@ -54,7 +53,7 @@ public class WorldState
     public List<string> GetBystanders(string locationId)
     {
         return new List<string>(from person in map.GatherFeaturesAt(locationId)
-                                where person.Id.StartsWith("person_")
-                                select person.Id.Replace("person_", ""));
+                                where person.id.StartsWith("person_")
+                                select person.id.Replace("person_", ""));
     }
 }

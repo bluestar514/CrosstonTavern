@@ -27,7 +27,7 @@ public class Map
 
         this.features = new Dictionary<string, Feature>();
         foreach(Feature feature in Features) {
-            this.features.Add(feature.Id, feature);
+            this.features.Add(feature.id, feature);
         }
 
         this.locations = new Dictionary<string, Location>();
@@ -91,13 +91,13 @@ public class Map
 
     }
 
-    public void MovePerson(Person person, string locationId, bool respectDoors = true)
+    public void MovePerson(string person, string locationId, bool respectDoors = true)
     {
-
+        if (GetFeature(person) == null) throw new Exception("Person " + person + " does not exist");
         if (GetLocation(locationId) == null) throw new Exception("Location " + locationId + " does not exist");
 
-        if (!respectDoors || Neighboring(person.location, locationId)) {
-            person.Move(locationId);
+        if (!respectDoors || Neighboring(GetFeature(person).location, locationId)) {
+            GetFeature(person).location = locationId;
         }
 
     }

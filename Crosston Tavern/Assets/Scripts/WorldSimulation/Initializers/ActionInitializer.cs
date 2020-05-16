@@ -16,11 +16,17 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierSimple(.5f),
                     new List<Effect>() {
-                        new EffectInventoryVariable("#a#", new List<string>(){"goldfish", "trout"}, 1, 1)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#common_fish#"}, 1, 1)
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSimple(.5f),
+                    new ChanceModifierSimple(.35f),
+                    new List<Effect>() {
+                        new EffectInventoryVariable("#a#", new List<string>(){"#rare_fish#"}, 1, 1)
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierSimple(.15f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5)
                     }
@@ -54,7 +60,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifier(),
                     new List<Effect>() {
-                        new EffectMovement("#a#", Map.R_CONNECTEDLOCATION)
+                        new EffectMovement("#a#", "#"+Map.R_CONNECTEDLOCATION+"#")
                     }
                 )
             },

@@ -1,98 +1,43 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Person
+public class Person: Feature
 {
-    [SerializeField]
-    private string id;
-    public string Id { get => id; private set => id = value; }
-    public string location = "uninitialized";
-    public Feature feature; //this is them as a feature, gets moved around the map.
-
-    public List<ExecutedAction> history = new List<ExecutedAction>();
-
-    public Inventory inventory;
     public Relationship relationships;
     public StringStringListDictionary preferences;
 
+    public List<Goal> knownGoals;
 
-    public EmploymentData employmentData;
-    public List<FamilyData> family;
-
-    public GoalManager gm;
-    public List<Goal> goals;
-
-    public StringStringListDictionary resources;
-
-    public Person(string id)
+    public Person(string id, string location, int maxUsers,
+            List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
+            StringStringListDictionary preferences,
+            Dictionary<string, int> stockTable = null) :
+    base(id, location, maxUsers, providedActions, relevantResources, stockTable)
     {
-        Id = id;
-
-        resources = new StringStringListDictionary();
-        resources.CopyFrom(    new Dictionary<string, List<string>>() {
-            {ResourceCatagories.r_initiator, new List<string>(){id } }
-        });
-
-        feature = new Feature("person_" + Id, location, 2,
-                new List<GenericAction>() { },
-                new Dictionary<string, List<string>> { }
-            );
-        inventory = new Inventory(id);
-        relationships = new Relationship();
-        family = new List<FamilyData>();
-
-        preferences = new StringStringListDictionary() {
-            {"liked", new List<string>(){"red_flower"} },
-            {"disliked", new List<string>(){"yellow_flower"} }
-        };
-    }
-
-    public void Move(string locationId)
-    {
-        location = locationId;
-        feature.location = locationId;
+        knownGoals = new List<Goal>();
+        this.relationships = new Relationship();
+        this.preferences = preferences;
     }
 
 
-    public string StringifyStats()
+    public bool NeedItem(string item)
     {
-        string body = "";
 
-        body += "resources:\n";
-        foreach (string key in resources.Keys) {
-            body += "\t" + key + ": " + String.Join(", ", resources[key]) + "\n";
-        }
+        //foreach(Goal g in knownGoals) {
+        //    if(g.state is EffectInvChange) {
+        //        EffectInvChange state = (EffectInvChange)g.state;
+        //        if (state.ItemId.Contains(item)) return true;
+        //    }
+        //}
 
-        body += "\ninventory:\n";
-        body += inventory.Print();
-
-        body += "\nrelationships:\n";
-        foreach (string key in relationships.GetKnownPeople()) {
-            body += "\t" + key + ": " + relationships.Get(key, Relationship.RelationType.friendly)+ "," + relationships.Get(key, Relationship.RelationType.romantic) + "\n";
-        }
-
-        return body;
+        return false;
     }
 
+    public override string ToString()
+    {
+        return "<"+id+">";
+    }
 }
 
-
-[System.Serializable]
-public class EmploymentData
-{
-    public string title;
-    public string establishment;
-    public WorldTime shiftStart;
-    public WorldTime shiftEnd;
-}
-
-
-[System.Serializable]
-public class FamilyData
-{
-    public string id;
-    public string relation;
-}

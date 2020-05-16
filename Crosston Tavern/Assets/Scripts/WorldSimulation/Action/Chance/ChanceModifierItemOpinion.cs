@@ -29,7 +29,7 @@ public class ChanceModifierItemOpinion : ChanceModifier
         if (p.preferences["disliked"].Contains(item)) {
             value -= 1;
         }
-        if (p.gm.NeedItem(item)) {
+        if (p.NeedItem(item)) {
             value += 1;
         }
 

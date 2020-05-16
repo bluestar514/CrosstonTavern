@@ -7,29 +7,26 @@ using System;
 public class WorldHub : MonoBehaviour
 {
     public WorldState ws;
+    public List<Townie> allPeople;
 
     public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
 
-    public LoadWorldData wi;
     public WorldSpaceDisplayManager wsdm;
-    public TextAsset actionData;
-    public TextAsset locationData;
-    public TextAsset featureData;
-    public TextAsset peopleData;
 
-    Dictionary<Person, ChosenAction> chosenActions = new Dictionary<Person, ChosenAction>();
+    Dictionary<Townie, ChosenAction> chosenActions = new Dictionary<Townie, ChosenAction>();
     private void Start()
     {
-        InitalizeWorld();
+        ws = WorldStateInitializer.GetWorldState();
 
+        allPeople = WorldStateInitializer.GetTownies(); 
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
 
-        foreach (Person person in ws.registry.GetPeople()) {
+        foreach (Townie person in allPeople) {
             chosenActions.Add(person, null);
 
 
-            person.goals = person.gm.GetGoalsList();
+            person.townieInformation.knownGoals = person.gm.GetGoalsList();
 
         }
 
@@ -45,13 +42,13 @@ public class WorldHub : MonoBehaviour
         
 
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
-        foreach (Person person in ws.registry.GetPeople()) {
+        foreach (Townie person in allPeople) {
             
 
             if(chosenActions[person] == null) {
-                ActionHeuristicManager ahm = new ActionHeuristicManager(person, ws);
+                ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, ws);
 
-                //chosenActions[person]= ahm.ChooseAction();
+                chosenActions[person]= ahm.ChooseBestAction();
             }
             
             ChosenAction action = chosenActions[person];
@@ -67,7 +64,7 @@ public class WorldHub : MonoBehaviour
 
                 chosenActions[person] = null;
 
-                person.goals = person.gm.GetGoalsList();
+                person.townieInformation.knownGoals = person.gm.GetGoalsList();
 
             }
         }
@@ -80,13 +77,6 @@ public class WorldHub : MonoBehaviour
 
     }
 
-    void InitalizeWorld()
-    {
-        wi = new LoadWorldData(actionData, locationData, featureData, peopleData);
-
-        ws = wi.BuildWorld();
-        
-    }
 
 }
 

@@ -16,7 +16,7 @@ public class Registry
 
         this.people = new Dictionary<string, Person>();
         foreach (Person person in People) {
-            this.people.Add(person.Id, person);
+            this.people.Add(person.id, person);
         }
     }
 

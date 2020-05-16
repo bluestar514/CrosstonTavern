@@ -47,7 +47,7 @@ public class ActionBuilder
         foreach (Feature feature in nearByFeatures) {
 
             availableActions.AddRange(from action in feature.providedActions
-                                      select new ActionData(action, feature.Id, locationId));
+                                      select new ActionData(action, feature.id, locationId));
                                       
         }
 
@@ -65,7 +65,7 @@ public class ActionBuilder
 
                 switch (entity.role) {
                     case ActionRole.initiator:
-                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, actor.Id) });
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, actor.id) });
                         break;
                     case ActionRole.recipient:
                         potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, data.featureId) });
@@ -76,7 +76,7 @@ public class ActionBuilder
                         break;
                     case ActionRole.any:
                         potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.registry.GetPeople()
-                                                                                     select new BoundPortEntity(entity.tag, person.Id)));
+                                                                                     select new BoundPortEntity(entity.tag, person.id)));
                         break;
                 }
             }
@@ -135,7 +135,7 @@ public class ActionBuilder
         List<BoundAction> actions = new List<BoundAction>();
         foreach(List<BoundBindingPort> bindings in itemBoundCombinations) {
 
-            actions.Add(new BoundAction(data.action, actor.Id, data.featureId, data.locationId, new BoundBindingCollection( bindings)));
+            actions.Add(new BoundAction(data.action, actor.id, data.featureId, data.locationId, new BoundBindingCollection( bindings)));
         }
 
         return actions;

@@ -5,7 +5,8 @@ using UnityEngine;
 public class EffectInventory : Effect
 {
     public string ownerId;
-
+    public virtual string itemId { get; protected set; }
+    public virtual int delta { get; protected set; }
     public override string ToString()
     {
         return "<EffectInventory("+ownerId;
@@ -17,6 +18,13 @@ public class EffectInventoryVariable : EffectInventory
     public List<string> itemIds= new List<string>();
     public int min;
     public int max;
+
+    public override int delta {
+        get => Mathf.RoundToInt((UnityEngine.Random.value * (max - min)) + min); }
+
+    public override string itemId {
+        get => itemIds[Mathf.FloorToInt(UnityEngine.Random.value * itemIds.Count)];
+    }
 
     public EffectInventoryVariable(string ownerId, List<string> itemIds, int min, int max)
     {
@@ -36,8 +44,6 @@ public class EffectInventoryVariable : EffectInventory
 
 public class EffectInventoryStatic : EffectInventory
 {
-    public string itemId;
-    public int delta;
 
     public EffectInventoryStatic(string ownerId, string itemId, int delta)
     {

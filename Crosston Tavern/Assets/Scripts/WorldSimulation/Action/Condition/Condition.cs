@@ -31,7 +31,7 @@ public class Condition_NotYou : Condition
 
     public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings)
     { 
-        return actor.feature.Id != bindings.BindString(featureId);
+        return actor.id != bindings.BindString(featureId);
     }
 }
 

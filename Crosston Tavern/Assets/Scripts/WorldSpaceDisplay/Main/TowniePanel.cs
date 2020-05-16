@@ -15,7 +15,7 @@ public class TowniePanel : MonoBehaviour
     public void Set(Person person, PeopleDetailTab PeopleDetailTab)
     {
         this.person = person;
-        this.townie = person.Id;
+        this.townie = person.id;
         this.PeopleDetailTab = PeopleDetailTab;
 
         display.text = this.townie;
