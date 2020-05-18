@@ -83,9 +83,9 @@ public class Goal
         combinedActions.AddRange(enablingActions);
         combinedActions.AddRange(other.enablingActions);
 
-        if (state is StateInventory) {
-            StateInventory invState = (StateInventory)state;
-            StateInventory invOther = (StateInventory)other.state;
+        if (state is StateInventoryStatic) {
+            StateInventoryStatic invState = (StateInventoryStatic)state;
+            StateInventoryStatic invOther = (StateInventoryStatic)other.state;
 
             int min = Mathf.Max(invState.min, invOther.min);
             int max = Mathf.Min(invState.max, invOther.max);
@@ -98,7 +98,7 @@ public class Goal
                 }
             }
 
-            return new Goal(new StateInventory(invState.ownerId, invState.itemId, min, max),
+            return new Goal(new StateInventoryStatic(invState.ownerId, invState.itemId, min, max),
                                 combinedPriority, combinedActions);
         }
 

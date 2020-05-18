@@ -9,7 +9,8 @@ public class FeatureInitializer
     enum FeatureType
     {
         river,
-        door
+        door,
+        shop
     }
 
     static Dictionary<FeatureType, Feature> MakeFeatures()
@@ -27,6 +28,11 @@ public class FeatureInitializer
             {FeatureType.door, new Feature("door", UNSET, 100,
                                     new List<GenericAction>(){ ActionInitializer.actions["move"] },
                                     new Dictionary<string, List<string>>())
+            },
+            {FeatureType.shop, new Feature("shop", UNSET, 2,
+                                    new List<GenericAction>(){ ActionInitializer.actions["buy_#item#"] },
+                                    new Dictionary<string, List<string>>(),
+                                    new Dictionary<string, int>(){})
             }
         };
     }
@@ -37,7 +43,12 @@ public class FeatureInitializer
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {
-        new KeyValuePair<string, string>("farm", "feild")
+        new KeyValuePair<string, string>("farm", "feild"),
+        new KeyValuePair<string, string>("feild", "hill"),
+        new KeyValuePair<string, string>("feild", "forest"),
+        new KeyValuePair<string, string>("feild", "town"),
+        new KeyValuePair<string, string>("town", "inn"),
+        new KeyValuePair<string, string>("town", "blacksmith")
     };
 
 
@@ -55,7 +66,23 @@ public class FeatureInitializer
             }
         }
 
-        foreach(KeyValuePair<string, string> connection in roomConnections) {
+
+        Feature shop = MakeFeatures()[FeatureType.shop];
+        shop.id = "tackle_shop_town";
+        shop.location = "farm";
+        shop.stockTable = new StringIntDictionary() {
+            {"fishing_rod", 5 },
+            {"bass", 2},
+            {"trout", 2},
+            {"salmon", 4}
+        };
+        shop.inventory.ChangeInventoryContents(10, "fishing_rod");
+        shop.inventory.ChangeInventoryContents(20, "bass");
+
+        allFeatures.Add("tackle_shop_town", shop);
+
+
+        foreach (KeyValuePair<string, string> connection in roomConnections) {
             Feature door = MakeFeatures()[FeatureType.door];
             door.location = connection.Key;
             door.relevantResources.Add(Map.R_CONNECTEDLOCATION, new List<string>() { connection.Value });

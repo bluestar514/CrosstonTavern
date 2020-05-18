@@ -59,3 +59,30 @@ public class EffectInventoryStatic : EffectInventory
         return base.ToString() + "," + delta + "," + itemId + ")>";
     }
 }
+
+
+public class EffectInventoryBound: EffectInventory
+{
+    string s_delta;
+    public override int delta {
+        get => 0;
+    }
+
+
+    public EffectInventoryBound(string ownerId, string itemId, string delta)
+    {
+        this.ownerId = ownerId;
+        this.itemId = itemId;
+        this.s_delta = delta;
+    }
+
+    public override string ToString()
+    {
+        return base.ToString() + "," + delta + "," + itemId + ")>";
+    }
+
+    public EffectInventoryStatic Bind(BoundBindingCollection bindings)
+    {
+        return new EffectInventoryStatic(ownerId, itemId, int.Parse(bindings.BindString(s_delta)));
+    }
+}

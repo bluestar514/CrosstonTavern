@@ -10,7 +10,7 @@ public class ActionInitializer
     public static Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>() {
         {"fish", new GenericAction("fish", 1,
             new Precondition( new List<Condition>() {
-                new Condition_IsState(new StateInventory("#a#", "fishing_rod", 1, INF))
+                new Condition_IsState(new StateInventoryStatic("#a#", "fishing_rod", 1, INF))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -95,6 +95,27 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "a")
+            }
+        ) },
+        {"buy_#item#", new GenericAction("buy_#item#", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(new StateInventoryBound("#a#", "#item#", "#item.cost#", INF.ToString()))
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifier(),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#b#", "#item#", -1),
+                        new EffectInventoryStatic("#a#", "#item#", 1),
+                        new EffectInventoryBound("#a#", "currency", "-#item.cost#")
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient),
+                new BindingPortStockItem("item", "b")
             }
         ) }
 

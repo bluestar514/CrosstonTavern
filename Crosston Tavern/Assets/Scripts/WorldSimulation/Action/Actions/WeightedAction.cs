@@ -22,7 +22,7 @@ public class WeightedAction : BoundAction
     }
         
     public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals) :
-        this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialEffects, 
+        this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialOutcomes, 
             boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.Bindings, weight, weightRationals)
     {}
 
@@ -38,7 +38,7 @@ public class WeightedAction : BoundAction
     public string VerboseString()
     {
         string str = ToString() +
-            "\nOutcomes:\n\t" + string.Join("\n\t", potentialEffects) +
+            "\nOutcomes:\n\t" + string.Join("\n\t", potentialOutcomes) +
             "\nBindings:\n\t" + string.Join("\n\t", Bindings.bindings) +
             "\nRational:\n\t" + string.Join("\n\t", weightRationals);
 

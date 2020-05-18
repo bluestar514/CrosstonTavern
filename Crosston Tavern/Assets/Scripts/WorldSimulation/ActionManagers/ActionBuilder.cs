@@ -25,7 +25,7 @@ public class ActionBuilder
 
 
         List<ActionData> genericActions = GatherProvidedActionsForActorAt(locationId);
-
+        Debug.Log(string.Join(",", genericActions));
 
 
         List<BoundAction> allActions = new List<BoundAction>();
@@ -33,6 +33,7 @@ public class ActionBuilder
             allActions.AddRange(FillOutBindings(data));
         }
 
+        Debug.Log(string.Join(",", allActions));
 
         return allActions;
     }
@@ -108,7 +109,7 @@ public class ActionBuilder
                 } else if (port is BindingPortStockItem) {
                     BindingPortStockItem shopPort = (BindingPortStockItem)port;
 
-                    string shopId = shopPort.shopId;
+                    string shopId = ((BoundPortEntity)GetPortWithTag(shopPort.shopId, bindings)).participantId;
 
                     StringIntDictionary stockTable = ws.map.GetFeature(shopId).stockTable;
                     Inventory inv = ws.map.GetFeature(shopId).inventory;

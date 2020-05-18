@@ -53,7 +53,7 @@ public class WorldHub : MonoBehaviour
             ChosenAction action = chosenActions[person];
 
             WeightedAction weightedAction = action.Action;
-            List<Outcome> potentialEffects = weightedAction.potentialEffects;
+            List<Outcome> potentialEffects = weightedAction.potentialOutcomes;
 
             ActionExecutionManager aem = new ActionExecutionManager(person, ws);
 

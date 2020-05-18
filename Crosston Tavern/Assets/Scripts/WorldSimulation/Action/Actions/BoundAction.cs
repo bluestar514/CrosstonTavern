@@ -25,7 +25,7 @@ public class BoundAction : WorldAction
     }
 
     public BoundAction(GenericAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings): 
-        this(action.Id, action.executionTime, action.preconditions, action.potentialEffects, actorId, featureId, locationId, bindings)
+        this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings)
     { }
 
     public override string ToString()

@@ -139,8 +139,6 @@ public class GoalManager
         foreach (Goal goal in currentGoals) {
             List<WeightedAction> relevantActions = new List<WeightedAction>( GetActionsThatAdvanceState(goal.state, invalidActions));
 
-            Debug.Log(string.Join(",", relevantActions));
-
             List<Goal> fromThisGoal = GenerateGoalsFromPreconditions(relevantActions, goal.priority);
             //fromThisGoal.ForEach(g => g.parentGoals.Add(goal));
 

@@ -98,7 +98,7 @@ public class ActionHeuristicManager : ActionManager
 
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         float weight = 0;
-        foreach(Outcome outcome in boundAction.potentialEffects) {
+        foreach(Outcome outcome in boundAction.potentialOutcomes) {
             KeyValuePair < float, List<WeightedAction.WeightRational> > result = 
                 GetWeightOfOutcome(outcome, boundAction.Bindings, ws.map.GetFeature(boundAction.FeatureId).relevantResources);
 
@@ -142,7 +142,7 @@ public class ActionHeuristicManager : ActionManager
     float GetWeightOfInventoryEffect(EffectInventory effect, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
         if (!(goal.state is StateInventory)) return 0;
-        StateInventory state = (StateInventory)goal.state;
+        StateInventoryStatic state = (StateInventoryStatic)((StateInventory)goal.state).Bind(bindings, resources);
 
         string goalInvOwner = state.ownerId;
         string goalItem = state.itemId;
@@ -152,11 +152,16 @@ public class ActionHeuristicManager : ActionManager
         if (goalInvOwner != owner.Replace("person_", "")) return 0;
         Inventory inv = ws.GetInventory(owner);
 
-        if (effect is EffectInventoryStatic) {
-            EffectInventoryStatic invEffect = (EffectInventoryStatic)effect;
+
+        if (effect is EffectInventoryStatic || effect is EffectInventoryBound) {
+            EffectInventory invEffect = effect;
 
             string item = bindings.BindString(invEffect.itemId);
             if (item != goalItem) return 0;
+
+            if (invEffect is EffectInventoryBound) {
+                invEffect = ((EffectInventoryBound)invEffect).Bind(bindings);
+            }
             int count = inv.GetInventoryCount(item);
 
             return CountInRange(count, invEffect.delta, state.min, state.max);

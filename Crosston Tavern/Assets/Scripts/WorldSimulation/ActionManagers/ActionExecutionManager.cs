@@ -39,10 +39,10 @@ public class ActionExecutionManager : ActionManager
         BoundBindingCollection bindings = action.Bindings;
         FeatureResources featureResources = ws.map.GetFeature(action.FeatureId).relevantResources;
 
-        float totalChance = action.potentialEffects.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(ws));
+        float totalChance = action.potentialOutcomes.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(ws));
         float rand = UnityEngine.Random.value * totalChance;
 
-        foreach(Outcome outcome in action.potentialEffects) {
+        foreach(Outcome outcome in action.potentialOutcomes) {
             float num = outcome.chanceModifier.MakeBound( bindings,featureResources).Chance(ws);
             if (num >= rand) return outcome;
             rand -= num;
@@ -56,6 +56,8 @@ public class ActionExecutionManager : ActionManager
         List<Effect> realizedEffects = new List<Effect>();
 
         foreach(Effect effect in chosenOutcome.effects) {
+
+
             if(effect is EffectInventory) {
                 EffectInventory effectInv = (EffectInventory)effect;
 
@@ -65,6 +67,9 @@ public class ActionExecutionManager : ActionManager
                 List<string> items = resources.BindString(itemid);
                 itemid = items[Mathf.FloorToInt(UnityEngine.Random.value * items.Count)];
 
+                if (effectInv is EffectInventoryBound) {
+                    effectInv = ((EffectInventoryBound)effectInv).Bind(bindings);
+                }
                 int delta = effectInv.delta;
 
                 realizedEffects.Add(new EffectInventoryStatic(owner, itemid, delta));

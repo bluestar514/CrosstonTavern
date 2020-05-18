@@ -23,9 +23,10 @@ public class PeopleInitializer
         };
 
         SetRelations(allPeople);
+        SetInventory(allPeople);
+        
 
-
-        //allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+        allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
 
         return allPeople;
     }
@@ -97,6 +98,14 @@ public class PeopleInitializer
                     person.relationships.Increase(other.id, Relationship.RelationType.romantic, romance);
                 }
             }
+        }
+    }
+
+
+    static void SetInventory(Dictionary<string, Person> allPeople)
+    {
+        foreach(Person person in allPeople.Values) {
+            person.inventory.ChangeInventoryContents(Random.Range(1, 25), "currency");
         }
     }
 }
