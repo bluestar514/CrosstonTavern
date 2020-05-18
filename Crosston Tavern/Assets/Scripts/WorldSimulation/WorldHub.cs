@@ -17,14 +17,13 @@ public class WorldHub : MonoBehaviour
     private void Start()
     {
         ws = WorldStateInitializer.GetWorldState();
+        ws.id = "main";
 
-        allPeople = WorldStateInitializer.GetTownies(); 
+        allPeople = WorldStateInitializer.GetTownies(ws); 
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
-
 
         foreach (Townie person in allPeople) {
             chosenActions.Add(person, null);
-
 
             person.townieInformation.knownGoals = person.gm.GetGoalsList();
 
@@ -56,13 +55,14 @@ public class WorldHub : MonoBehaviour
             WeightedAction weightedAction = action.Action;
             List<Outcome> potentialEffects = weightedAction.potentialEffects;
 
-            ActionExecutionManager aem = new ActionExecutionManager(ws.registry.GetPerson(weightedAction.ActorId), ws);
+            ActionExecutionManager aem = new ActionExecutionManager(person, ws);
 
             ExecutedAction executedAction = aem.ExecuteAction(action);
             if(executedAction != null) {
                 executedActions.Add(executedAction);
 
                 chosenActions[person] = null;
+                person.history.Add(executedAction);
 
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
 

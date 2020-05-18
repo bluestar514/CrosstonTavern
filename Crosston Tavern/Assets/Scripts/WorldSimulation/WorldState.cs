@@ -6,6 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public class WorldState 
 {
+    public string id = "default";
     public Map map;
     public Registry registry;
     public WorldTime time;

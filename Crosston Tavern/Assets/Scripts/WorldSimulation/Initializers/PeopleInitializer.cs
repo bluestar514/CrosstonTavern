@@ -25,6 +25,8 @@ public class PeopleInitializer
         SetRelations(allPeople);
 
 
+        //allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+
         return allPeople;
     }
 

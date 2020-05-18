@@ -9,6 +9,11 @@ public class ChanceModifier
     {
         return 1;
     }
+
+    public virtual ChanceModifier MakeBound(BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+        return new ChanceModifier();
+    }
 }
 
 public class ChanceModifierSimple: ChanceModifier
@@ -24,41 +29,52 @@ public class ChanceModifierSimple: ChanceModifier
     {
         return chance;
     }
+
+    public override ChanceModifier MakeBound(BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+        return new ChanceModifierSimple(chance);
+    }
 }
 
-//public class ChanceModifierRelation : ChanceModifier
-//{
-//    public EffectSocialChange socialState;
-//    public int boundry;
-//    public bool positive; 
+public class ChanceModifierRelation : ChanceModifier
+{
+    public StateSocial socialState;
+    public bool positive;
 
-//    public ChanceModifierRelation(EffectSocialChange socialState, int boundry, bool positive)
-//    {
-//        this.socialState = socialState;
-//        this.boundry = boundry;
-//        this.positive = positive;
-//    }
-    
-//    public override float Chance(WorldState ws)
-//    {
-//        Person source = ws.registry.GetPerson(socialState.SourceId);
-//        string target = socialState.TargetId;
-//        Relationship.RelationType type = socialState.RelationType;
+    public ChanceModifierRelation(StateSocial socialState, bool positive)
+    {
+        this.socialState = socialState;
+        this.positive = positive;
+    }
 
-//        float currentRelValue = source.relationships.Get(target, type);
+    public override float Chance(WorldState ws)
+    {
+        Person source = ws.registry.GetPerson(socialState.sourceId);
+        string target = socialState.targetId;
+        Relationship.RelationType type = socialState.axis;
 
-//        //currentRelValue should be between 0 and 1, never negative
-//        //at the boundry value it should return .5
-//        //at deltaMax -> 1
-//        //at deltaMin -> 0
+        float currentRelValue = source.relationships.Get(target, type);
 
-//        currentRelValue -= socialState.DeltaMin;
-//        float max = socialState.DeltaMax - socialState.DeltaMin;
+        //currentRelValue should be between 0 and 1, never negative
+        //at deltaMax -> 1
+        //at deltaMin -> 0
 
-//        currentRelValue = currentRelValue / max;
+        currentRelValue = Mathf.Max(0, currentRelValue - socialState.min);
+        float max = socialState.max - socialState.min;
 
-//        if (!positive) return 1 - currentRelValue;
-//        else return currentRelValue;
+        currentRelValue = currentRelValue / max;
 
-//    }
-//}
+        if (!positive) return 1 - currentRelValue;
+        else return currentRelValue;
+
+    }
+
+    public override ChanceModifier MakeBound(BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+        string source = bindings.BindString(socialState.sourceId);
+        string target = bindings.BindString(socialState.targetId);
+
+
+        return new ChanceModifierRelation(new StateSocial(source, target, socialState.axis, socialState.min, socialState.max), positive);
+    }
+}

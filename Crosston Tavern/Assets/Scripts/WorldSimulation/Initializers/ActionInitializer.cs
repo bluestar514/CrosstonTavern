@@ -42,11 +42,19 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifier(),
+                    new ChanceModifierRelation(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, -10, 10), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -2, 2)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 2),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 2)
                     }
-                )
+                ),
+                new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, -10, 10), false),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -2, 0),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -2, 0)
+                    }
+                ),
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),

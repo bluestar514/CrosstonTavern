@@ -10,10 +10,10 @@ using System.Linq;
 
 public class ActionExecutionManager : ActionManager
 {
-    Person actor;
+    Townie actor;
     WorldState ws;
 
-    public ActionExecutionManager(Person actor, WorldState ws)
+    public ActionExecutionManager(Townie actor, WorldState ws)
     {
         this.actor = actor;
         this.ws = ws;
@@ -36,11 +36,14 @@ public class ActionExecutionManager : ActionManager
 
     Outcome ChooseOutcome(WeightedAction action)
     {
-        float totalChance = action.potentialEffects.Sum(outcome => outcome.chanceModifier.Chance(ws));
+        BoundBindingCollection bindings = action.Bindings;
+        FeatureResources featureResources = ws.map.GetFeature(action.FeatureId).relevantResources;
+
+        float totalChance = action.potentialEffects.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(ws));
         float rand = UnityEngine.Random.value * totalChance;
 
         foreach(Outcome outcome in action.potentialEffects) {
-            float num = outcome.chanceModifier.Chance(ws);
+            float num = outcome.chanceModifier.MakeBound( bindings,featureResources).Chance(ws);
             if (num >= rand) return outcome;
             rand -= num;
         }
@@ -95,7 +98,8 @@ public class ActionExecutionManager : ActionManager
 
                 realizedEffects.Add(new EffectMovement(moverId, newLocationId));
 
-                ws.map.MovePerson(moverId, newLocationId);
+                actor.Move(moverId, newLocationId);
+                ws.map.MovePerson(moverId, newLocationId, false);
             } else {
                 realizedEffects.Add(effect);
 

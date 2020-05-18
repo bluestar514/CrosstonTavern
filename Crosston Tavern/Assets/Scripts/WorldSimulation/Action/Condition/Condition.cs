@@ -7,7 +7,7 @@ public class Condition
 {
     [SerializeField]
     protected string name = "GenericCondition";
-    public virtual bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings)
+    public virtual bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
         return true;
     }
@@ -29,7 +29,7 @@ public class Condition_NotYou : Condition
         name = "Condition:Don'tTargetSelf("+featureId+")";
     }
 
-    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings)
+    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     { 
         return actor.id != bindings.BindString(featureId);
     }
@@ -45,7 +45,7 @@ public class Condition_SpaceAtFeature: Condition
 
         name = "Condition:Can'tTargetFullFeature("+featureId+")";
     }
-    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings)
+    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
         Feature feature = ws.map.GetFeature(bindings.BindString(featureId));
 
@@ -63,8 +63,8 @@ public class Condition_IsState: Condition
         name = "Condition:" + state.ToString();
     }
 
-    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings)
+    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        return false;//state.GoalComplete(ws, actor);
+        return state.InEffect(ws, bindings, featureResources);
     }
 }

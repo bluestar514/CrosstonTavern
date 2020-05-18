@@ -12,8 +12,8 @@ public class Precondition
     }
 
 
-    public bool Valid(WorldState ws, Person actor, BoundBindingCollection bindings)
+    public bool Valid(WorldState ws, Person actor, BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        return conditions.TrueForAll(x => x.InEffect(actor, ws, bindings));
+        return conditions.TrueForAll(x => x.InEffect(actor, ws, bindings, featureResources));
     }
 }

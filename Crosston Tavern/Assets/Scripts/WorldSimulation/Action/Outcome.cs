@@ -23,9 +23,9 @@ public class Outcome
                                      //select effect.BindEffect(resources));        
     }
 
-    public float EvaluateChance(WorldState ws)
+    public float EvaluateChance(WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        evaluatedChance = chanceModifier.Chance(ws);
+        evaluatedChance = chanceModifier.MakeBound(bindings, featureResources).Chance(ws);
         return evaluatedChance;
     }
 

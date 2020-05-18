@@ -83,7 +83,12 @@ public class FeatureInitializer
     {
         Dictionary<string, Location> allLocations = new Dictionary<string, Location>() {
             {"farm", new Location("farm", new Dictionary<string, List<string>>(){}) },
-            {"feild", new Location("feild", new Dictionary<string, List<string>>(){ }) }
+            {"feild", new Location("feild", new Dictionary<string, List<string>>(){ }) },
+            {"hill", new Location("hill", new Dictionary<string, List<string>>(){ }) },
+            {"inn", new Location("inn", new Dictionary<string, List<string>>(){ }) },
+            {"forest", new Location("forest", new Dictionary<string, List<string>>(){ }) },
+            {"town", new Location("town", new Dictionary<string, List<string>>(){ }) },
+            {"blacksmith", new Location("blacksmith", new Dictionary<string, List<string>>(){ }) }
         };
 
         foreach (KeyValuePair<string, string> connection in roomConnections) {

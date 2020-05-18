@@ -21,16 +21,19 @@ public class ActionHeuristicManager : ActionManager
         this.actor = actor;
     }
 
-    public List<WeightedAction> WeighActions(List<BoundAction> boundActions = null)
+    public List<WeightedAction> WeighActions(List<BoundAction> boundActions = null, bool onlyValid = true)
     {
         if(boundActions == null) {
             ActionBuilder ab = new ActionBuilder(ws, actor);
             boundActions = ab.GetAllActions();
         }
 
-        Dictionary<bool, List<BoundAction>> validActions = GetPossibleActions(boundActions);
+        List<BoundAction> possibleActions = boundActions;
 
-        List<BoundAction> possibleActions = validActions[true];
+        if (onlyValid) {
+            Dictionary<bool, List<BoundAction>> validActions = GetPossibleActions(boundActions);
+            possibleActions = validActions[true];
+        }
 
         List<WeightedAction> weightedActions = new List<WeightedAction>();
         foreach(BoundAction action in possibleActions) {
@@ -77,7 +80,9 @@ public class ActionHeuristicManager : ActionManager
         List<BoundAction> rejectedActions = new List<BoundAction>();
 
         foreach (BoundAction action in boundActions) {
-            if (action.preconditions.Valid(ws, actor, action.Bindings)) possibleActions.Add(action);
+            FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+
+            if (action.preconditions.Valid(ws, actor, action.Bindings,resources)) possibleActions.Add(action);
             else rejectedActions.Add(action);
         }
 
@@ -107,7 +112,7 @@ public class ActionHeuristicManager : ActionManager
     KeyValuePair<float, List<WeightedAction.WeightRational>> 
         GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources)
     {
-        float chance = outcome.EvaluateChance(ws);
+        float chance = outcome.EvaluateChance(ws, bindings, resources);
         float weight = 0;
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         foreach (Goal goal in actor.knownGoals) {

@@ -11,7 +11,7 @@ public class GoalManager
     [SerializeField]
     List<GoalModule> modules = new List<GoalModule>();
 
-    int lookAhead = 5;
+    int lookAhead = 1;
 
     public GoalManager(WorldState ws, Person actor)
     {
@@ -34,14 +34,8 @@ public class GoalManager
             }
         }
 
-        List<Goal> newGoals = new List<Goal>();
-        foreach(Goal goal in currentGoals) {
-            newGoals.AddRange(MakeActionableGoals(goal));
-        }
-
-        currentGoals = newGoals;
-
-        for(int i =0; i< lookAhead; i++) {
+        List<Goal> newGoals = currentGoals;
+        for (int i =0; i< lookAhead; i++) {
             newGoals = UnravelCausality(newGoals);
 
             if (newGoals.Count <= 0) break;
@@ -68,59 +62,52 @@ public class GoalManager
     {
         List<BoundAction> allActions = GetAllActions();
 
-        return new List<BoundAction>();//from action in allActions
-                                           //where (!action.SatisfiedPreconditions(ws) || action.LocationId != actor.location) &&
-                                           //         action.Id != "move"
-                                           //select action);
+        return new List<BoundAction>( from action in allActions
+                                       where (!action.preconditions.Valid(ws, actor, action.Bindings, ws.map.GetFeature(action.FeatureId).relevantResources) || 
+                                                action.LocationId != actor.location) &&
+                                                action.Id != "move"
+                                       select action);
     }
 
-    List<BoundAction> GetActionsThatAdvanceState(State state, List<BoundAction> actionPool)
+    IEnumerable<WeightedAction> GetActionsThatAdvanceState(State state, List<BoundAction> actionPool)
     {
         ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
 
-        List<BoundAction> goodActions = new List<BoundAction>();
+        List<WeightedAction> weightedActions = ahm.WeighActions(actionPool, false);
 
-        //foreach (BoundAction action in actionPool) {
-        //    List<Outcome> potentialEffects = action.GenerateExpectedEffects(ws);
-
-        //    float weight = 0;
-        //    foreach(Outcome outcome in potentialEffects) {
-        //        float chance = outcome.chanceModifier.Chance(ws);
-
-        //        foreach (Effect effect in outcome.effects) {
-        //            weight += chance * ahm.EvaluateEffectTowardGoal(effect, state, 0);
-        //        }
-        //    }
-
-        //    if (weight > 0) goodActions.Add(action);
-        //}
-
-        return goodActions;
+        return from action in weightedActions
+               where action.weight > 0
+               select action;
     }
 
-    List<Goal> GenerateGoalsFromPreconditions(List<BoundAction> invalidActions, float parentPriority)
+    List<Goal> GenerateGoalsFromPreconditions(List<WeightedAction> invalidActions, float parentPriority)
     {
         List<Goal> newGoals = new List<Goal>();
 
-        //foreach(BoundAction action in invalidActions) {
-        //    foreach(Condition condition in action.GetBoundConditions(ws)) {
-        //        if (condition.InEffect(actor, ws.map.GetFeature(action.FeatureId), ws.map.GetLocation(action.LocationId), ws)) continue;
+        foreach (WeightedAction action in invalidActions) {
+            BoundBindingCollection bindings = action.Bindings;
+            FeatureResources featureResources = ws.map.GetFeature(action.FeatureId).relevantResources;
+            foreach (Condition condition in action.preconditions.conditions) {
+                if (condition.InEffect(actor, ws, bindings, featureResources)) continue;
 
-        //        if(condition is Condition_IsState) {
-        //            Condition_IsState stateCondition = (Condition_IsState)condition;
+                if (condition is Condition_IsState) {
+                    Condition_IsState stateCondition = (Condition_IsState)condition;
 
-        //            Goal g = new Goal(stateCondition.state, parentPriority, 1);
-        //            g.enablingActions.Add(action);
+                    Goal g = new Goal(stateCondition.state.Bind(bindings, featureResources), parentPriority);
+                    g.enablingActions.Add(action);
 
-        //            newGoals.Add(g);
-        //        }
+                    newGoals.Add(g);
+                }
 
-        //    }
-        //    Goal goal = new Goal(new EffectMove(action.LocationId), parentPriority, 1);
-        //    goal.enablingActions.Add(action);
+            }
 
-        //    newGoals.Add(goal);
-        //}
+
+
+            Goal goal = new Goal(new StatePosition( bindings.BindString(actor.id), bindings.BindString( action.LocationId)), parentPriority);
+            goal.enablingActions.Add(action);
+
+            newGoals.Add(goal);
+        }
 
         return newGoals;
     }
@@ -150,7 +137,9 @@ public class GoalManager
 
         List<Goal> newGoals = new List<Goal>();
         foreach (Goal goal in currentGoals) {
-            List<BoundAction> relevantActions = GetActionsThatAdvanceState(goal.state, invalidActions);
+            List<WeightedAction> relevantActions = new List<WeightedAction>( GetActionsThatAdvanceState(goal.state, invalidActions));
+
+            Debug.Log(string.Join(",", relevantActions));
 
             List<Goal> fromThisGoal = GenerateGoalsFromPreconditions(relevantActions, goal.priority);
             //fromThisGoal.ForEach(g => g.parentGoals.Add(goal));
@@ -159,18 +148,5 @@ public class GoalManager
         }
 
         return CondenseGoals(newGoals);
-    }
-
-
-    List<Goal> MakeActionableGoals(Goal goal)
-    {
-        //Effect effect = goal.state;
-        //if (effect is State) {
-        //    State state = (State)effect;
-
-        //    return new List<Goal>(from s in state.MakeActionable(ws, actor)
-        //                          select new Goal(s, goal.priority, 1));
-        //} else 
-        return new List<Goal>() { goal };
     }
 }
