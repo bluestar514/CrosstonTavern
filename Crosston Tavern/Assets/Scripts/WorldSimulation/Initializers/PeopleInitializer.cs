@@ -11,19 +11,20 @@ public class PeopleInitializer
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
-            {"alicia",  new Person("alicia",    "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"bob",     new Person("bob",       "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"clara",   new Person("clara",     "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"dirk",    new Person("dirk",      "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"henri",   new Person("henri",     "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())},
-            {"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>(), new StringStringListDictionary())}
+            {"alicia",  new Person("alicia",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"bob",     new Person("bob",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"clara",   new Person("clara",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"dirk",    new Person("dirk",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"henri",   new Person("henri",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
         };
 
         SetRelations(allPeople);
         SetInventory(allPeople);
+        SetPreferences(allPeople);
         
 
         allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
@@ -102,10 +103,53 @@ public class PeopleInitializer
     }
 
 
+    static List<string> randomItems = new List<string>() {
+            "apple", "banana", "trout", "ice_cream", "firewood", "coal", "morning_glory", "rose", "dandilion",
+            "mushroom", "saphire", "gold_ore", "cabbage", "pancakes", "pizza", "french_fries"
+        };
+
     static void SetInventory(Dictionary<string, Person> allPeople)
     {
         foreach(Person person in allPeople.Values) {
-            person.inventory.ChangeInventoryContents(Random.Range(1, 25), "currency");
+            person.inventory.ChangeInventoryContents(Random.Range(10, 25), "currency");
+            List<string> items = chooseSeveralFrom(randomItems, Random.Range(randomItems.Count / 5, randomItems.Count / 2))[true];
+            foreach(string item in items) {
+                person.inventory.ChangeInventoryContents(Random.Range(1, 10), item);
+            }
         }
+    }
+
+    static void SetPreferences(Dictionary<string, Person> allPeople)
+    {
+        foreach(Person person in allPeople.Values) {
+            List<string> possibleItems = new List<string>(randomItems);
+
+            person.preferences[PreferenceLevel.hated].Add("currency");
+
+            foreach (PreferenceLevel level in System.Enum.GetValues(typeof(PreferenceLevel))) {
+                Dictionary<bool, List<string>> randomSet = chooseSeveralFrom(possibleItems, Random.Range(1, randomItems.Count / 5));
+
+                person.preferences[level].AddRange(randomSet[true]);
+                possibleItems = randomSet[false];
+            }
+
+        }
+    }
+
+    static Dictionary<bool, List<string>> chooseSeveralFrom(List<string> list, int count)
+    {
+        List<string> options = new List<string>(list);
+        List<string> chosen = new List<string>();
+        for(; count > 0; count--) {
+            int rand = Random.Range(0, list.Count);
+
+            chosen.Add(list[rand]);
+            list.RemoveAt(rand);
+        }
+
+        return new Dictionary<bool, List<string>>() {
+            {true, chosen },
+            {false, options }
+        };
     }
 }

@@ -23,14 +23,20 @@ public class ChanceModifierItemOpinion : ChanceModifier
 
         Person p = ws.registry.GetPerson(person);
 
-        if (p.preferences["liked"].Contains(item)) {
+        if (p.preferences[PreferenceLevel.liked].Contains(item)) {
+            value += .5f;
+        }
+        if (p.preferences[PreferenceLevel.disliked].Contains(item)) {
+            value -= .5f;
+        }
+        if (p.preferences[PreferenceLevel.loved].Contains(item)) {
             value += 1;
         }
-        if (p.preferences["disliked"].Contains(item)) {
+        if (p.preferences[PreferenceLevel.hated].Contains(item)) {
             value -= 1;
         }
         if (p.NeedItem(item)) {
-            value += 1;
+            value += .5f;
         }
 
         if (minValue <= value && value <= maxValue) return 1;

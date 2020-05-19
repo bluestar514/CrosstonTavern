@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,19 +7,21 @@ using UnityEngine;
 public class Person: Feature
 {
     public Relationship relationships;
-    public StringStringListDictionary preferences;
+    public PreferencesDictionary preferences;
 
     public List<Goal> knownGoals;
 
     public Person(string id, string location, int maxUsers,
             List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
-            StringStringListDictionary preferences,
             Dictionary<string, int> stockTable = null) :
     base(id, location, maxUsers, providedActions, relevantResources, stockTable)
     {
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
-        this.preferences = preferences;
+        this.preferences = new PreferencesDictionary() { };
+        foreach(PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
+            preferences.Add(level, new List<string>());
+        }
     }
 
 
@@ -41,3 +44,12 @@ public class Person: Feature
     }
 }
 
+[Serializable]
+public enum PreferenceLevel
+{
+    hated,
+    disliked,
+    neutral, 
+    liked, 
+    loved
+}

@@ -117,7 +117,67 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortStockItem("item", "b")
             }
+        ) },
+        {"ask_out_to_#location#", new GenericAction("ask_out_to_#location#", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 4, 15), true),
+                    new List<Effect>() {
+                        new EffectGoal("#a#", new GoalModule(
+                                                            new List<GM_Precondition>(){
+                                                            },
+                                                            new List<Goal>() {
+                                                                new Goal(new StatePosition("#a#", "#location#"), 10),
+                                                                new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 10, 20), 5),
+                                                                new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 5, 20), 3)
+                                                            }
+                                              )
+                        ),
+                        new EffectGoal("#b#", new GoalModule(
+                                                            new List<GM_Precondition>(),
+                                                            new List<Goal>() {
+                                                                new Goal(new StatePosition("#b#", "#location#"), 10),
+                                                                new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 10, 20), 5),
+                                                                new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 20), 3)
+                                                            }
+                                              )
+                        ),
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 1),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 1)
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient),
+                new BindingPortEntity("location", ActionRole.location_any)
+            }
+        ) },
+        {"insult", new GenericAction("insult", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 3, 20), false),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1)
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 3, 20), true),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -1, 4)
+                    }
+                ),
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
         ) }
-
     };
 }

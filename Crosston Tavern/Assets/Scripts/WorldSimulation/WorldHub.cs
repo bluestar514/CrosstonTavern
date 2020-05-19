@@ -68,6 +68,11 @@ public class WorldHub : MonoBehaviour
 
             }
         }
+
+        foreach(Townie person in allPeople) {
+            ProximityRelationChange(person.townieInformation);
+        }
+
         timeStep.Add(executedActions);
 
         foreach (ExecutedAction action in executedActions) {
@@ -77,6 +82,15 @@ public class WorldHub : MonoBehaviour
 
     }
 
+
+    void ProximityRelationChange(Person person)
+    {
+        foreach(string other in from p in ws.registry.GetPeople()
+                                where p.location == person.location
+                                select p.id) {
+            person.relationships.Increase(other, Relationship.RelationType.friendly, UnityEngine.Random.Range(0, .3f));
+        }
+    }
 
 }
 

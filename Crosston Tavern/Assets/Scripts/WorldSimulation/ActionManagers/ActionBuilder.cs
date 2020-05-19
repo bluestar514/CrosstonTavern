@@ -79,6 +79,13 @@ public class ActionBuilder
                         potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.registry.GetPeople()
                                                                                      select new BoundPortEntity(entity.tag, person.id)));
                         break;
+                    case ActionRole.location_any:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from location in ws.map.GetNameOfLocations()
+                                                                                     select new BoundPortEntity(entity.tag, location)));
+                        break;
+                    case ActionRole.location_current:
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, actor.location) });
+                        break;
                 }
             }
         }

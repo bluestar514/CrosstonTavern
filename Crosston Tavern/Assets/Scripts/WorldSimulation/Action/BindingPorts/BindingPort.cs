@@ -45,5 +45,7 @@ public enum ActionRole
     initiator,
     recipient, 
     bystander, 
-    any
+    any,
+    location_current,
+    location_any
 }
