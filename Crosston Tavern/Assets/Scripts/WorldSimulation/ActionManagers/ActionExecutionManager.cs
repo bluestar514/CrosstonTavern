@@ -44,7 +44,8 @@ public class ActionExecutionManager : ActionManager
 
         foreach(Outcome outcome in action.potentialOutcomes) {
             float num = outcome.chanceModifier.MakeBound( bindings,featureResources).Chance(ws);
-            if (num >= rand) return outcome;
+
+            if (num > rand) return outcome;
             rand -= num;
         }
 
@@ -56,60 +57,7 @@ public class ActionExecutionManager : ActionManager
         List<Effect> realizedEffects = new List<Effect>();
 
         foreach(Effect effect in chosenOutcome.effects) {
-
-
-            if(effect is EffectInventory) {
-                EffectInventory effectInv = (EffectInventory)effect;
-
-                string owner = bindings.BindString(effectInv.ownerId);
-                string itemid = bindings.BindString(effectInv.itemId);
-
-                List<string> items = resources.BindString(itemid);
-                itemid = items[Mathf.FloorToInt(UnityEngine.Random.value * items.Count)];
-
-                if (effectInv is EffectInventoryBound) {
-                    effectInv = ((EffectInventoryBound)effectInv).Bind(bindings);
-                }
-                int delta = effectInv.delta;
-
-                realizedEffects.Add(new EffectInventoryStatic(owner, itemid, delta));
-
-
-                Inventory inv = ws.GetInventory(owner);
-                inv.ChangeInventoryContents(delta, itemid);
-            } else
-            if(effect is EffectSocial) {
-                EffectSocial effectSoc = (EffectSocial)effect;
-
-                string sourceId = bindings.BindString(effectSoc.sourceId);
-                string targetId = bindings.BindString(effectSoc.targetId);
-                Relationship.RelationType axis = effectSoc.axis;
-                int delta = effectSoc.delta;
-
-                realizedEffects.Add(new EffectSocialStatic(sourceId, targetId, axis, delta));
-
-
-                Relationship rel = ws.GetRelationshipsFor(sourceId);
-                rel.Increase(targetId, axis, delta);
-            } else
-            if(effect is EffectMovement) {
-                EffectMovement effectMove = (EffectMovement)effect;
-
-                string moverId = bindings.BindString(effectMove.moverId);
-                string newLocationId = bindings.BindString(effectMove.newLocationId);
-
-                List<string> potentialIds = resources.BindString(newLocationId);
-                newLocationId = potentialIds[Mathf.FloorToInt(UnityEngine.Random.value * potentialIds.Count)];
-
-                realizedEffects.Add(new EffectMovement(moverId, newLocationId));
-
-                actor.Move(moverId, newLocationId);
-                ws.map.MovePerson(moverId, newLocationId, false);
-            } else {
-                realizedEffects.Add(effect);
-
-                Debug.LogWarning("Effect ("+effect+") of unaccounted for Effect Type failed to be executed!");
-            }
+            realizedEffects.Add(effect.ExecuteEffect(ws, actor, bindings, resources));
         }
 
         return realizedEffects;

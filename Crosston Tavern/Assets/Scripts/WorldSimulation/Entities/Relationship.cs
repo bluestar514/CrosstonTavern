@@ -8,6 +8,9 @@ public class Relationship
     [SerializeField]
     StringFloatArrayDictionary relationships;
 
+    [SerializeField]
+    StringRelationTagsDictionary relationTags;
+
     public enum RelationType
     {
         friendly=0,
@@ -22,6 +25,13 @@ public class Relationship
         lovers,
         crushes,
         enemies
+    }
+
+    public enum RelationshipTag
+    {
+        dating,
+        rivals,
+        family
     }
 
     static public Dictionary<CodifiedRelationships, Dictionary<RelationType, float[]>> codifiedRelationRanges =
@@ -52,6 +62,7 @@ public class Relationship
     public Relationship()
     {
         relationships = new StringFloatArrayDictionary();
+        relationTags = new StringRelationTagsDictionary();
     }
 
     public void Increase(string target, RelationType axis, float value)
@@ -74,6 +85,27 @@ public class Relationship
         if (relationships.ContainsKey(target))
             return (int)relationships[target][(int)axis];
         else return 0;
+    }
+
+    public void AddRelationTag(string target, RelationshipTag tag)
+    {
+        if (!relationTags.ContainsKey(target)) relationTags.Add(target, new List<RelationshipTag>());
+
+        if(!RelationTagged(target, tag)) relationTags[target].Add(tag);
+    }
+
+    public void RemoveRelationTag(string target, RelationshipTag tag)
+    {
+        if (relationTags.ContainsKey(target)) {
+            relationTags[target].Remove(tag);
+        }
+    }
+
+    public bool RelationTagged(string target, RelationshipTag tag)
+    {
+        if (!relationTags.ContainsKey(target)) return false;
+
+        return relationTags[target].Contains(tag);
     }
 
     public List<string> GetKnownPeople()

@@ -6,40 +6,59 @@ public class ChanceModifierItemOpinion : ChanceModifier
 {
     public string item;
     public string person;
-    public float minValue;
-    public float maxValue;
+    public OpinionLevel minLevel;
+    public OpinionLevel maxLevel;
 
-    public ChanceModifierItemOpinion(string item, string person, float minValue, float maxValue)
+    public enum OpinionLevel
+    {
+        liked = 1,
+        disliked = -1,
+        loved = 2,
+        hated = -2,
+        needed = 1,
+        max=10,
+        min=-10,
+        neutral = 0
+    }
+
+    /// <summary>
+    /// A deterministic chance modifier based on how much a person likes an item
+    /// </summary>
+    /// <param name="item">Id of the item in question</param>
+    /// <param name="person">Person whose opinion we care about</param>
+    /// <param name="minLevel">Lowest level of opinion we want to return 1 for</param>
+    /// <param name="maxLevel">Highest level of opinion we want to return 1 for</param>
+    public ChanceModifierItemOpinion(string item, string person, OpinionLevel minLevel, OpinionLevel maxLevel)
     {
         this.item = item;
         this.person = person;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
+        this.minLevel = minLevel;
+        this.maxLevel = maxLevel;
     }
 
     public override float Chance(WorldState ws)
     {
-        float value = 0;
+        int value = 0;
 
         Person p = ws.registry.GetPerson(person);
 
         if (p.preferences[PreferenceLevel.liked].Contains(item)) {
-            value += .5f;
+            value += (int)OpinionLevel.liked;
         }
         if (p.preferences[PreferenceLevel.disliked].Contains(item)) {
-            value -= .5f;
+            value -= (int)OpinionLevel.disliked;
         }
         if (p.preferences[PreferenceLevel.loved].Contains(item)) {
-            value += 1;
+            value += (int)OpinionLevel.loved;
         }
         if (p.preferences[PreferenceLevel.hated].Contains(item)) {
-            value -= 1;
+            value -= (int)OpinionLevel.hated;
         }
         if (p.NeedItem(item)) {
-            value += .5f;
+            value += (int)OpinionLevel.needed;
         }
 
-        if (minValue <= value && value <= maxValue) return 1;
+        if ((int)minLevel <= value && value <= (int)maxLevel) return 1;
         else return 0;
     }
 }

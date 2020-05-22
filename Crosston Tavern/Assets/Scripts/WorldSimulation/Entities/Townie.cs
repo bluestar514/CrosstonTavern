@@ -27,7 +27,11 @@ public class Townie
     }
 
 
-
+    /// <summary>
+    /// Updates the location of a person as far as a particular Townie is aware of their location
+    /// </summary>
+    /// <param name="moverId"> The one actually moving</param>
+    /// <param name="newLocationId"> Where they are ending up</param>
     public void Move(string moverId, string newLocationId)
     {
         if(moverId == id) {

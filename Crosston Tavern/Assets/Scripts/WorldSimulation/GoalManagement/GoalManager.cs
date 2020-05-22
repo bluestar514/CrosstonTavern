@@ -103,7 +103,7 @@ public class GoalManager
 
 
 
-            Goal goal = new Goal(new StatePosition( bindings.BindString(actor.id), bindings.BindString( action.LocationId)), parentPriority);
+            Goal goal = new Goal(new StatePosition( bindings.BindString(actor.id), bindings.BindString( action.LocationId)), parentPriority* action.weight);
             goal.enablingActions.Add(action);
 
             newGoals.Add(goal);

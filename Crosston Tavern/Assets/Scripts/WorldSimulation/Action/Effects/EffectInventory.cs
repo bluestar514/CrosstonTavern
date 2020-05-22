@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EffectInventory : Effect
@@ -10,6 +11,43 @@ public class EffectInventory : Effect
     public override string ToString()
     {
         return "<EffectInventory("+ownerId;
+    }
+
+
+    public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        if (!(goal.state is StateInventory)) return 0;
+        StateInventoryStatic state = (StateInventoryStatic)((StateInventory)goal.state).Bind(bindings, resources);
+
+        string goalInvOwner = state.ownerId;
+        string goalItem = state.itemId;
+
+        string owner = bindings.BindString(ownerId);
+
+        if (goalInvOwner != owner.Replace("person_", "")) return 0;
+        Inventory inv = ws.GetInventory(owner);
+
+
+        return FinishWeighing(goalItem, inv, bindings, resources, state.min, state.max);
+    }
+
+    protected virtual float FinishWeighing(string goalItem, Inventory inv, BoundBindingCollection bindings, FeatureResources resources, int min, int max)
+    {
+        return 0;
+    }
+
+    public override Effect ExecuteEffect(WorldState ws, Townie actor, BoundBindingCollection bindings, FeatureResources resources)
+    {
+        string owner = bindings.BindString(ownerId);
+        string itemid = bindings.BindString(itemId);
+
+        List<string> items = resources.BindString(itemid);
+        itemid = items[Mathf.FloorToInt(UnityEngine.Random.value * items.Count)];
+
+        Inventory inv = ws.GetInventory(owner);
+        inv.ChangeInventoryContents(delta, itemid);
+
+        return new EffectInventoryStatic(owner, itemid, delta);
     }
 }
 
@@ -40,6 +78,22 @@ public class EffectInventoryVariable : EffectInventory
     {
         return base.ToString()+ ",{"+min+"~"+max+"}," + "{"+ string.Join(",", itemIds)+"})>";
     }
+
+    protected override float FinishWeighing(string goalItem, Inventory inv, BoundBindingCollection bindings, FeatureResources resources, int min, int max)
+    {
+        List<string> items = new List<string>();
+        foreach (string item in from item in itemIds
+                                select bindings.BindString(item)) {
+            items.AddRange(resources.BindString(item));
+        }
+
+        if (!items.Contains(goalItem)) return 0;
+        int count = inv.GetInventoryCount(goalItem);
+
+        return (CountInRange(count, this.min, min, max) +
+                CountInRange(count, this.max, min, max))
+                / 2;
+    }
 }
 
 public class EffectInventoryStatic : EffectInventory
@@ -57,6 +111,17 @@ public class EffectInventoryStatic : EffectInventory
     public override string ToString()
     {
         return base.ToString() + "," + delta + "," + itemId + ")>";
+    }
+
+    protected override float FinishWeighing(string goalItem, Inventory inv, BoundBindingCollection bindings, FeatureResources resources, int min, int max)
+    {
+        string item = bindings.BindString(itemId);
+        if (item != goalItem) return 0;
+
+        
+        int count = inv.GetInventoryCount(item);
+
+        return CountInRange(count, delta, min, max);
     }
 }
 
@@ -84,5 +149,15 @@ public class EffectInventoryBound: EffectInventory
     public EffectInventoryStatic Bind(BoundBindingCollection bindings)
     {
         return new EffectInventoryStatic(ownerId, itemId, int.Parse(bindings.BindString(s_delta)));
+    }
+
+    public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        return Bind(bindings).WeighAgainstGoal(ws, bindings, resources, goal);
+    }
+
+    public override Effect ExecuteEffect(WorldState ws, Townie actor, BoundBindingCollection bindings, FeatureResources resources)
+    {
+        return Bind(bindings).ExecuteEffect(ws, actor, bindings, resources);
     }
 }

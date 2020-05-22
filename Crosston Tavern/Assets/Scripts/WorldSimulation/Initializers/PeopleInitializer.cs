@@ -12,14 +12,14 @@ public class PeopleInitializer
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
             {"alicia",  new Person("alicia",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"bob",     new Person("bob",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"clara",   new Person("clara",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"dirk",    new Person("dirk",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"henri",   new Person("henri",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
+            {"bob",     new Person("bob",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
+            //{"clara",   new Person("clara",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"dirk",    new Person("dirk",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"henri",   new Person("henri",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
         };
 
         SetRelations(allPeople);
@@ -141,12 +141,12 @@ public class PeopleInitializer
         List<string> options = new List<string>(list);
         List<string> chosen = new List<string>();
         for(; count > 0; count--) {
-            int rand = Random.Range(0, list.Count);
+            int rand = Random.Range(0, options.Count);
 
-            chosen.Add(list[rand]);
-            list.RemoveAt(rand);
+            chosen.Add(options[rand]);
+            options.RemoveAt(rand);
         }
-
+        
         return new Dictionary<bool, List<string>>() {
             {true, chosen },
             {false, options }

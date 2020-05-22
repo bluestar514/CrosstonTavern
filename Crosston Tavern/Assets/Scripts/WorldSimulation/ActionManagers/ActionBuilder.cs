@@ -25,7 +25,7 @@ public class ActionBuilder
 
 
         List<ActionData> genericActions = GatherProvidedActionsForActorAt(locationId);
-        Debug.Log(string.Join(",", genericActions));
+        //Debug.Log(string.Join(",", genericActions));
 
 
         List<BoundAction> allActions = new List<BoundAction>();
@@ -33,7 +33,7 @@ public class ActionBuilder
             allActions.AddRange(FillOutBindings(data));
         }
 
-        Debug.Log(string.Join(",", allActions));
+        //Debug.Log(string.Join(",", allActions));
 
         return allActions;
     }
