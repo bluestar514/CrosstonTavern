@@ -31,4 +31,11 @@ public class StateRelation : State
 
         return source.relationships.RelationTagged(state.target, tag);
     }
+
+    public override string ToString()
+    {
+        return "<StateRelation(" +
+            source + "," + target
+            + "," + tag + ")>"; 
+    }
 }

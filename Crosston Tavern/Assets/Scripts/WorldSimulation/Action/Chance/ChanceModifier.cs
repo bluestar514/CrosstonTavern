@@ -14,6 +14,11 @@ public class ChanceModifier
     {
         return new ChanceModifier();
     }
+
+    public virtual Goal MakeGoal(WorldState ws, float priority)
+    {
+        return null;
+    }
 }
 
 public class ChanceModifierSimple: ChanceModifier
@@ -34,6 +39,8 @@ public class ChanceModifierSimple: ChanceModifier
     {
         return new ChanceModifierSimple(chance);
     }
+
+     
 }
 
 public class ChanceModifierRelation : ChanceModifier
@@ -76,5 +83,19 @@ public class ChanceModifierRelation : ChanceModifier
 
 
         return new ChanceModifierRelation(new StateSocial(source, target, socialState.axis, socialState.min, socialState.max), positive);
+    }
+
+    public override Goal MakeGoal(WorldState ws, float priority)
+    {
+        string source = socialState.sourceId;
+        string target = socialState.targetId;
+        Relationship.RelationType axis = socialState.axis;
+        int min = socialState.min;
+        int max = socialState.max;
+
+        if (positive)
+            return new Goal(new StateSocial(source, target, axis, max, 1000000), priority);
+        else
+            return new Goal(new StateSocial(source, target, axis, -1000000, min), priority);
     }
 }

@@ -67,4 +67,11 @@ public class EffectRelationship : Effect
 
         return new EffectRelationship(sourceId, targetId, tag, bidirectional, add);
     }
+
+    public override string ToString()
+    {
+        return "<EffectRelation(" +
+            source + "," + target
+            + "," + tag + ", bidirectional:" +bidirectional+", add:"+add+ ")>";
+    }
 }

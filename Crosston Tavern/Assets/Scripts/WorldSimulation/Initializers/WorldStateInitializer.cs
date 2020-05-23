@@ -13,13 +13,11 @@ public class WorldStateInitializer
                             WorldTime.DayZeroEightAM);
     }
 
-    static public List<Townie> GetTownies( WorldState ws = null)
+    static public List<Townie> GetTownies( WorldState ws)
     {
         List<Townie> townies = new List<Townie>();
 
-        foreach(Person person in PeopleInitializer.GetAllPeople().Values) {
-            if(ws == null) ws = GetWorldState();
-
+        foreach (Person person in ws.registry.GetPeople()) {
 
             townies.Add(new Townie(person, ws, new GoalManager(ws, person)));
         }
@@ -34,9 +32,10 @@ public class WorldStateInitializer
         townies[1].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateSocial(townies[1].townieInformation.id, "alicia", Relationship.RelationType.friendly, 5, 10), 1)
+                                        //new Goal(new StateSocial(townies[1].townieInformation.id, "alicia", Relationship.RelationType.friendly, 5, 10), 1)
+                                        new Goal(new StateRelation("bob", "alicia", Relationship.RelationshipTag.dating), 1)
                                     }
-                                ));
+                                )) ;
 
         return townies;
     }

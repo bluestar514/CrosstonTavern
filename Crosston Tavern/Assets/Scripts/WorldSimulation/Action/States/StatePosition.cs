@@ -46,4 +46,17 @@ public class StatePosition : State
 
         return new StatePosition(mover, string.Join(",", potentialIds));
     }
+
+    public override List<State> Combine(State state)
+    {
+        if (!(state is StatePosition)) return new List<State>() { this, state };
+        StatePosition stateSoc = (StatePosition)state;
+
+        if (stateSoc.moverId != moverId ||
+            stateSoc.locationId != locationId) return new List<State>() { this, state };
+
+        return new List<State>() {
+            new StatePosition(moverId, locationId)
+        };
+    }
 }

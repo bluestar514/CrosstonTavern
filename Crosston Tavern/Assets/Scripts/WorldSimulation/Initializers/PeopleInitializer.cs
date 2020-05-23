@@ -6,7 +6,10 @@ public class PeopleInitializer
 {
     public static List<GenericAction> peopleActions = new List<GenericAction>() {
         ActionInitializer.actions["talk"],
-        ActionInitializer.actions["give_#item#"]
+        ActionInitializer.actions["give_#item#"],
+        ActionInitializer.actions["insult"],
+        ActionInitializer.actions["compliment"],
+        ActionInitializer.actions["start_dating"]
     };
 
     public static Dictionary<string, Person> GetAllPeople() {

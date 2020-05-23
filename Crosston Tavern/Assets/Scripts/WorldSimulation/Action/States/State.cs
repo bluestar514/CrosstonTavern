@@ -15,4 +15,10 @@ public class State
 
 
     public virtual State Bind(BoundBindingCollection bindings, FeatureResources resources) { return this; }
+
+
+    public virtual List<State> Combine(State state)
+    {
+        return new List<State>() { this, state };
+    }
 }

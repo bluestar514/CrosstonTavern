@@ -66,7 +66,6 @@ public class ActionHeuristicManager : ActionManager
         float rand = UnityEngine.Random.Range(0, totalWeight);
         WeightedAction action = weightedActions[0];
         for(int i=0; i< maxConsideration; i++) {
-            Debug.Log(weightedActions[i] + ": " + totalWeight + ", " + weightedActions[i].weight + ">" + rand);
             if (rand < weightedActions[i].weight) {
 
                 action = weightedActions[i];

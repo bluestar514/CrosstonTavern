@@ -45,4 +45,23 @@ public class StateSocial : State
 
         return new StateSocial(source, target, axis, min, max);
     }
+
+    public override List<State> Combine(State state)
+    {
+        if (!(state is StateSocial)) return new List<State>() { this, state };
+        StateSocial stateSoc = (StateSocial)state;
+
+        if (stateSoc.sourceId != sourceId ||
+            stateSoc.targetId != targetId ||
+            stateSoc.axis != axis) return new List<State>() { this, state };
+
+        int min = Mathf.Max(this.min, stateSoc.min);
+        int max = Mathf.Min(this.max, stateSoc.max);
+
+        if (min > max) return new List<State>() { this, state };
+
+        return new List<State>() {
+            new StateSocial(sourceId, targetId, axis, min, max)
+        };
+    }
 }

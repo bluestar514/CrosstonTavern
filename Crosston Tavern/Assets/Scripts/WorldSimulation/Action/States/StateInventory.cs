@@ -57,6 +57,24 @@ public class StateInventoryStatic : StateInventory
 
         return new StateInventoryStatic(owner, string.Join(",", items), min, max);
     }
+
+    public override List<State> Combine(State state)
+    {
+        if (!(state is StateInventoryStatic)) return new List<State>() { this, state };
+        StateInventoryStatic stateInv = (StateInventoryStatic) state;
+
+        if(stateInv.itemId != itemId ||
+            stateInv.ownerId != ownerId) return new List<State>() { this, state };
+
+        int min = Mathf.Max(this.min, stateInv.min);
+        int max = Mathf.Min(this.max, stateInv.max);
+
+        if(min > max) return new List<State>() { this, state };
+
+        return new List<State>() {
+            new StateInventoryStatic(ownerId, itemId, min, max)
+        };
+    }
 }
 
 
