@@ -6,6 +6,8 @@ using UnityEngine;
 [System.Serializable]
 public class Registry 
 {
+    [SerializeField] string id;
+
     [SerializeField] List<Person> People;
 
     Dictionary<string, Person> people;
@@ -20,6 +22,23 @@ public class Registry
         }
     }
 
+    public Registry(List<Feature> mapFeatures, string idTag = "copy")
+    {
+        List<Person> people = new List<Person>();
+        foreach(Feature f in mapFeatures) {
+            if(f is Person) {
+                people.Add((Person)f);
+            }
+        }
+
+        People = people;
+        this.people = new Dictionary<string, Person>();
+        foreach (Person person in People) {
+            this.people.Add(person.id, person);
+        }
+
+        id = idTag; 
+    }
 
     public Person GetPerson(string id)
     {

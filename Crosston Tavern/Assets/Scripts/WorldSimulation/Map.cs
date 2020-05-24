@@ -8,6 +8,9 @@ using UnityEngine;
 public class Map 
 {
     [SerializeField]
+    protected string id;
+
+    [SerializeField]
     List<Feature> Features;
     [SerializeField]
     List<Location> Locations;
@@ -20,7 +23,7 @@ public class Map
 
     public static string R_CONNECTEDLOCATION = ResourceCatagories.r_connectedLocation;
 
-    public Map(List<Feature> features, List<Location> locations)
+    public Map(List<Feature> features, List<Location> locations, string idTag = "default")
     {
         Features = features;
         Locations = locations;
@@ -34,6 +37,18 @@ public class Map
         foreach(Location location in Locations) {
             this.locations.Add(location.Id, location);
         }
+
+        id = idTag;
+    }
+
+    public Map Copy(string name="copy")
+    {
+        List<Feature> copiedFeatures = new List<Feature>();
+        foreach(Feature f in features.Values) {
+            copiedFeatures.Add(f.Copy(false));
+        }
+
+        return new Map(copiedFeatures, new List<Location>(locations.Values), name);
     }
 
     public Feature GetFeature(string id)
@@ -114,5 +129,10 @@ public class Map
     {
         return new List<string>(from location in Locations
                             select location.Id);
+    }
+
+    public List<Feature> GetAllFeatures()
+    {
+        return new List<Feature>(Features);
     }
 }

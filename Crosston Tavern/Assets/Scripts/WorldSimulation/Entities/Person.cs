@@ -24,6 +24,35 @@ public class Person: Feature
         }
     }
 
+    public Person(Feature f): base(f.id, f.location, f.maxUsers, f.providedActions, f.relevantResources.resources, f.stockTable)
+    {
+        knownGoals = new List<Goal>();
+        this.relationships = new Relationship();
+        this.preferences = new PreferencesDictionary() { };
+        foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
+            preferences.Add(level, new List<string>());
+        }
+    }
+
+    public override Feature Copy(bool perfect)
+    {
+        Person p = new Person(base.Copy(perfect));
+
+
+        p.preferences = new PreferencesDictionary();
+        if (perfect) {
+            p.knownGoals = new List<Goal>(knownGoals);
+            p.preferences.CopyFrom(preferences);
+        } else {
+            p.knownGoals = new List<Goal>();
+        }
+
+        p.relationships = relationships.Copy(perfect);
+
+
+        return p;
+    }
+
 
     public bool NeedItem(string item)
     {

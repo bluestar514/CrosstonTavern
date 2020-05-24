@@ -83,9 +83,17 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.liked, ChanceModifierItemOpinion.OpinionLevel.max),
+                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.loved, ChanceModifierItemOpinion.OpinionLevel.max),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 1, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 2, 5),
+                        new EffectInventoryStatic("#b#", "#item#", 1),
+                        new EffectInventoryStatic("#a#", "#item#", -1)
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.liked, ChanceModifierItemOpinion.OpinionLevel.liked),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 1, 3),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1)
                     }
@@ -93,7 +101,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -3, -1),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1)
                     }
@@ -193,15 +201,15 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 20), true),
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 10), true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 3)
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2)
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 1)
                     }
                 ),
                 new Outcome(

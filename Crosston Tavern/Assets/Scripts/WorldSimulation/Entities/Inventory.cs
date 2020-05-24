@@ -15,6 +15,19 @@ public class Inventory
         this.owner = owner;
     }
 
+    protected Inventory(string owner, StringIntDictionary inv)
+    {
+        this.owner = owner;
+        inventory = new StringIntDictionary();
+        inventory.CopyFrom(inv);
+    }
+
+    public Inventory Copy(bool perfect)
+    {
+        if (perfect) return new Inventory(owner, inventory);
+        else return new Inventory(owner);
+    }
+
     public int GetInventoryCount(string itemId)
     {
         if (inventory.ContainsKey(itemId)) {

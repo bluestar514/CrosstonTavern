@@ -25,17 +25,30 @@ public class PeopleInitializer
             //{"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
         };
 
-        SetRelations(allPeople);
-        SetInventory(allPeople);
-        SetPreferences(allPeople);
-        
+        // Fill all values at random for everyone initially
+        SetRelationsRandom(allPeople);
+        SetInventoryRandom(allPeople);
+        SetPreferencesRandom(allPeople);
 
+        // Override with specific things for the senario and or testing
+
+        allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
+        allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
+
+        allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
+        allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
+
+
+        allPeople["bob"].inventory.ChangeInventoryContents(3, "trout");
+        allPeople["bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
         allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
 
+
+        allPeople["alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
         return allPeople;
     }
 
-    static void SetRelations(Dictionary<string, Person> allPeople)
+    static void SetRelationsRandom(Dictionary<string, Person> allPeople)
     {
 
         Dictionary<string, List<List<int>>> relationValues = new Dictionary<string, List<List<int>>>() {
@@ -105,13 +118,12 @@ public class PeopleInitializer
         }
     }
 
-
     static List<string> randomItems = new List<string>() {
             "apple", "banana", "trout", "ice_cream", "firewood", "coal", "morning_glory", "rose", "dandilion",
             "mushroom", "saphire", "gold_ore", "cabbage", "pancakes", "pizza", "french_fries"
         };
 
-    static void SetInventory(Dictionary<string, Person> allPeople)
+    static void SetInventoryRandom(Dictionary<string, Person> allPeople)
     {
         foreach(Person person in allPeople.Values) {
             person.inventory.ChangeInventoryContents(Random.Range(10, 25), "currency");
@@ -122,7 +134,7 @@ public class PeopleInitializer
         }
     }
 
-    static void SetPreferences(Dictionary<string, Person> allPeople)
+    static void SetPreferencesRandom(Dictionary<string, Person> allPeople)
     {
         foreach(Person person in allPeople.Values) {
             List<string> possibleItems = new List<string>(randomItems);

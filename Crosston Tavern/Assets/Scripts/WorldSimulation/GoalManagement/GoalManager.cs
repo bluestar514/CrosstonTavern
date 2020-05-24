@@ -50,7 +50,6 @@ public class GoalManager
 
             // Foreach goal, grab relevant set of outcomes and their restraints
             foreach (Goal goal in previousIterationGoals) {
-                Debug.Log(goal);
                 List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
                 newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
             }
@@ -148,8 +147,6 @@ public class GoalManager
         foreach (OutcomeRestraints outcome in relevantOutcomes) {
             if (goal.enablingActions.Contains(outcome.parentAction)) continue;
 
-            Debug.Log(outcome.parentAction);
-
             float effectStrength = outcome.effects.Sum(effect => effect.WeighAgainstGoal(ws,
                                                                                         outcome.bindings,
                                                                                         outcome.resources,
@@ -195,12 +192,13 @@ public class GoalManager
 
         if (chance.Chance(ws) >= 1) return newGoals;
 
-        Goal goal = chance.MakeGoal(ws, parentPriority);
+        List<Goal> goals = chance.MakeGoal(ws, parentPriority);
 
-
-        if (goal != null) {
-            newGoals.Add(goal);
-            goal.enablingActions.Add(outcome.parentAction);
+        if (goals != null) {
+            foreach (Goal goal in goals) {
+                newGoals.Add(goal);
+                goal.enablingActions.Add(outcome.parentAction);
+            }
         }
 
         return newGoals;

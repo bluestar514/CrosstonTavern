@@ -65,6 +65,47 @@ public class Relationship
         relationTags = new StringRelationTagsDictionary();
     }
 
+    protected Relationship(StringFloatArrayDictionary relationships, StringRelationTagsDictionary relationTags)
+    {
+        this.relationships = new StringFloatArrayDictionary();
+        this.relationships.CopyFrom(relationships);
+
+        this.relationTags = new StringRelationTagsDictionary();
+        this.relationTags.CopyFrom(relationTags);
+
+    }
+
+    public Relationship Copy(bool perfect)
+    {
+        if (perfect) return new Relationship(relationships, relationTags);
+        else return new Relationship();
+    }
+
+    /// <summary>
+    /// Used for initializing characters! Not updating them during the simulation!
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="axis"></param>
+    /// <param name="value"></param>
+    public void Set(string target, RelationType axis, float value)
+    {
+        if (!relationships.ContainsKey(target)) {
+            relationships.Add(target, new float[NUM_AXIS]);
+
+            for (int i = 0; i < NUM_AXIS; i++) {
+                relationships[target][i] = 0;
+            }
+        }
+
+        relationships[target][(int)axis] = value;
+    }
+
+    /// <summary>
+    /// Main method of altering the relationship state between characters. Use this, not Set during simulation
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="axis"></param>
+    /// <param name="value"></param>
     public void Increase(string target, RelationType axis, float value)
     {
         if (!relationships.ContainsKey(target)) {
@@ -78,6 +119,13 @@ public class Relationship
         relationships[target][(int)axis] += value;
     }
 
+    /// <summary>
+    /// Main method for getting the value of a given relation
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="axis"></param>
+    /// <returns>Returns an int for some reason, despite this value being 
+    /// stored internally as a float... Not sure whats up with that.</returns>
     public int Get(string target, RelationType axis)
     {
         if (target.StartsWith("person_")) target = target.Replace("person_", "");

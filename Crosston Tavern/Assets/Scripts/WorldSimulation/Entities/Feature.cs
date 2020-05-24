@@ -35,6 +35,20 @@ public class Feature
         inventory = new Inventory(id);
     }
 
+    public virtual Feature Copy(bool perfect = true)
+    {
+        Feature f;
+        if (perfect) {
+            f = new Feature(id, location, maxUsers, providedActions, new Dictionary<string, List<string>>(relevantResources.resources), new Dictionary<string, int>(stockTable));
+        } else {
+            f = new Feature(id, location, maxUsers, providedActions, new Dictionary<string, List<string>>(), new Dictionary<string, int>(stockTable));
+        }
+
+        f.inventory = inventory.Copy(perfect);
+
+        return f;
+    }
+
     public void Use()
     {
         currentUsers++;

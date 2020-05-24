@@ -36,6 +36,11 @@ public class ChanceModifierItemOpinion : ChanceModifier
         this.maxLevel = maxLevel;
     }
 
+    public override string ToString()
+    {
+        return "ChanceModifierItemOpion(" + person + "," + item + ",{" + minLevel.ToString() + "~" + maxLevel.ToString() + "})>";
+    }
+
     public override float Chance(WorldState ws)
     {
         int value = 0;
@@ -46,13 +51,13 @@ public class ChanceModifierItemOpinion : ChanceModifier
             value += (int)OpinionLevel.liked;
         }
         if (p.preferences[PreferenceLevel.disliked].Contains(item)) {
-            value -= (int)OpinionLevel.disliked;
+            value += (int)OpinionLevel.disliked;
         }
         if (p.preferences[PreferenceLevel.loved].Contains(item)) {
             value += (int)OpinionLevel.loved;
         }
         if (p.preferences[PreferenceLevel.hated].Contains(item)) {
-            value -= (int)OpinionLevel.hated;
+            value += (int)OpinionLevel.hated;
         }
         if (p.NeedItem(item)) {
             value += (int)OpinionLevel.needed;
@@ -60,5 +65,18 @@ public class ChanceModifierItemOpinion : ChanceModifier
 
         if ((int)minLevel <= value && value <= (int)maxLevel) return 1;
         else return 0;
+    }
+
+    public override ChanceModifier MakeBound(BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+        string item = string.Join(",", featureResources.BindString(bindings.BindString(this.item)));
+        string person = bindings.BindString(this.person);
+
+        return new ChanceModifierItemOpinion(item, person, minLevel, maxLevel);
+    }
+
+    public override List<Goal> MakeGoal(WorldState ws, float priority)
+    {
+        return base.MakeGoal(ws, priority);
     }
 }

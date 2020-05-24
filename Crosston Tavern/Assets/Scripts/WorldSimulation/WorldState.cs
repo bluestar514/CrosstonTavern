@@ -18,6 +18,16 @@ public class WorldState
         this.time = time;
     }
 
+    public WorldState Copy(string name = "copy")
+    {
+        Map c_map = map.Copy(name);
+        Registry c_reg = new Registry(c_map.GetAllFeatures(), name);
+
+        WorldState copy = new WorldState(c_map, c_reg, time);
+        copy.id = name;
+        return copy;
+    }
+
 
     public void Tick(int t=1)
     {
