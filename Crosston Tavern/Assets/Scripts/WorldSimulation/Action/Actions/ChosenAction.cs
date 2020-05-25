@@ -28,7 +28,7 @@ public class ChosenAction
 
     public override string ToString()
     {
-        return "<"+chosenAction.ToString()+"("+inProgress+"/"+chosenAction.executionTime+")>";
+        return "<" + chosenAction.ToString();//"("+inProgress+"/"+chosenAction.executionTime+")>";
     }
 
     public string VerboseString()

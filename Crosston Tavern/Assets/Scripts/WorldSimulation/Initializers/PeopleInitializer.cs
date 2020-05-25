@@ -14,10 +14,10 @@ public class PeopleInitializer
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
-            {"alicia",  new Person("alicia",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"bob",     new Person("bob",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
-            //{"clara",   new Person("clara",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            //{"dirk",    new Person("dirk",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"vendor_clara",        new Person("vendor_clara",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"judge_dirk",          new Person("judge_dirk",        "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
             //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
@@ -31,20 +31,25 @@ public class PeopleInitializer
         SetPreferencesRandom(allPeople);
 
         // Override with specific things for the senario and or testing
+            //Lover scenario Details:
+            allPeople["lover_bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
+            allPeople["lover_bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
 
-        allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
-        allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
-
-        allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
-        allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
-
-
-        allPeople["bob"].inventory.ChangeInventoryContents(3, "trout");
-        allPeople["bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
-        allPeople["alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+            allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.friendly, 3);
+            allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.romantic, 0);
 
 
-        allPeople["alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
+            allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
+            allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
+            allPeople["organizer_alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
+
+            //Organizer scenario details:
+
+
+
+
         return allPeople;
     }
 

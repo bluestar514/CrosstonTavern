@@ -56,15 +56,19 @@ public class Condition_SpaceAtFeature: Condition
 public class Condition_IsState: Condition
 {
     public State state;
-
-    public Condition_IsState(State state) {
+    public bool isTrue;
+    public Condition_IsState(State state, bool isTrue = true) {
         this.state = state;
+        this.isTrue = isTrue;
 
-        name = "Condition:" + state.ToString();
+
+        name = "Condition:" + state.ToString()+ "-" + isTrue;
     }
 
     public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        return state.InEffect(ws, bindings, featureResources);
+        bool inEffect = state.InEffect(ws, bindings, featureResources);
+        
+        return inEffect == isTrue;
     }
 }

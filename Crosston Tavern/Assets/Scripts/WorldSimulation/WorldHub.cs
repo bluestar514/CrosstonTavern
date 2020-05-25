@@ -55,14 +55,14 @@ public class WorldHub : MonoBehaviour
             WeightedAction weightedAction = action.Action;
             List<Outcome> potentialEffects = weightedAction.potentialOutcomes;
 
-            ActionExecutionManager aem = new ActionExecutionManager(person, ws);
+            ActionExecutionManager aem = new ActionExecutionManager(person, ws, allPeople);
 
             ExecutedAction executedAction = aem.ExecuteAction(action);
             if(executedAction != null) {
                 executedActions.Add(executedAction);
 
                 chosenActions[person] = null;
-                person.history.Add(executedAction);
+                
 
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
 

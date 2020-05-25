@@ -55,7 +55,7 @@ public class ActionHeuristicManager : ActionManager
 
         weightedActions = new List<WeightedAction>( weightedActions.OrderByDescending(a => a.weight));
 
-        Debug.Log(string.Join(",", weightedActions));
+        //Debug.Log(string.Join(",", weightedActions));
 
         int maxConsideration = Mathf.Min(5, weightedActions.Count);
 

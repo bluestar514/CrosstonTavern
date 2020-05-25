@@ -226,7 +226,8 @@ public class ActionInitializer
         ) },
         {"start_dating", new GenericAction("start_dating", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false)
             }),
             new List<Outcome>() {
                 new Outcome( //success:

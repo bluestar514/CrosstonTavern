@@ -32,8 +32,7 @@ public class WorldStateInitializer
         townies[1].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        //new Goal(new StateSocial(townies[1].townieInformation.id, "alicia", Relationship.RelationType.friendly, 5, 10), 1)
-                                        new Goal(new StateRelation("bob", "alicia", Relationship.RelationshipTag.dating), 1)
+                                        new Goal(new StateRelation("lover_bob", "organizer_alicia", Relationship.RelationshipTag.dating), 1)
                                     }
                                 )) ;
 

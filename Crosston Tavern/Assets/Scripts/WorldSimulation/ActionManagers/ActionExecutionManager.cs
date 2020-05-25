@@ -12,25 +12,36 @@ public class ActionExecutionManager : ActionManager
 {
     Townie actor;
     WorldState ws;
+    List<Townie> townies;
 
-    public ActionExecutionManager(Townie actor, WorldState ws)
+    public ActionExecutionManager(Townie actor, WorldState ws, List<Townie> townies)
     {
         this.actor = actor;
         this.ws = ws;
+        this.townies = townies;
     }
 
 
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
+        string location = actor.townieInformation.location;
 
         Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
+
+        Debug.Log("Realizing Effects for " + chosenAction + " for global world state");
 
         List<Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, chosenAction.Action.Bindings, 
                                                 ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources);
 
         Outcome realizedOutcome = new Outcome(new ChanceModifierSimple(1), realizedEffects);
 
-        return new ExecutedAction(chosenAction, realizedOutcome);
+        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedOutcome);
+
+        RealizeActionForTownies(location, executedAction);
+        if (location != actor.townieInformation.location)
+            RealizeActionForTownies(actor.townieInformation.location, executedAction);
+
+        return executedAction;
 
     }
 
@@ -56,10 +67,34 @@ public class ActionExecutionManager : ActionManager
     {
         List<Effect> realizedEffects = new List<Effect>();
 
-        foreach(Effect effect in chosenOutcome.effects) {
+        
+
+        foreach (Effect effect in chosenOutcome.effects) {
             realizedEffects.Add(effect.ExecuteEffect(ws, actor, bindings, resources));
         }
 
         return realizedEffects;
+    }
+
+
+    void RealizeActionForTownies(string location, ExecutedAction executedAction)
+    {
+        WeightedAction action = executedAction.Action;
+
+        List <Effect> realizedEffects = action.potentialOutcomes[0].effects;
+        BoundBindingCollection bindings = action.Bindings;
+        FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+
+        foreach (Townie townie in townies) {
+            if(townie.townieInformation.location == location) {
+                Debug.Log("Realizing Effects for " + action + " for " + townie.townieInformation.id);
+
+                foreach (Effect effect in realizedEffects) {
+                    effect.ExecuteEffect(townie.ws, actor, bindings, resources);
+                }
+
+                townie.history.Add(executedAction);
+            }
+        }
     }
 }

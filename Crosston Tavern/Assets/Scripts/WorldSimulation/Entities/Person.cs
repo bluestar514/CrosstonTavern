@@ -45,6 +45,9 @@ public class Person: Feature
             p.preferences.CopyFrom(preferences);
         } else {
             p.knownGoals = new List<Goal>();
+            foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
+                p.preferences.Add(level, new List<string>());
+            }
         }
 
         p.relationships = relationships.Copy(perfect);

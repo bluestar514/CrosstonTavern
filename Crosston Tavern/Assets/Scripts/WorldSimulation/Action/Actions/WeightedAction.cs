@@ -32,7 +32,7 @@ public class WeightedAction : BoundAction
         string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";
         if (Bindings == null) return n;
 
-        return Bindings.BindString(n);
+        return Bindings.BindString(n)+":"+weight;
     }
 
     public string VerboseString()
