@@ -49,4 +49,9 @@ public class Goal
         } else return new List<Goal>() { this, goal }; 
     }
 
+
+    public Goal MakeSpecific(BoundBindingCollection bindings, FeatureResources resources)
+    {
+        return new Goal(state.Bind(bindings, resources), priority);
+    }
 }

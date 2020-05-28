@@ -10,6 +10,7 @@ public class Person: Feature
     public PreferencesDictionary preferences;
 
     public List<Goal> knownGoals;
+    public List<TimeObligation> timeObligations;
 
     public Person(string id, string location, int maxUsers,
             List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
@@ -60,12 +61,12 @@ public class Person: Feature
     public bool NeedItem(string item)
     {
 
-        //foreach(Goal g in knownGoals) {
-        //    if(g.state is EffectInvChange) {
-        //        EffectInvChange state = (EffectInvChange)g.state;
-        //        if (state.ItemId.Contains(item)) return true;
-        //    }
-        //}
+        foreach (Goal g in knownGoals) {
+            if (g.state is StateInventory) {
+                StateInventory state = (StateInventory)g.state;
+                if (state.itemId.Contains(item)) return true;
+            }
+        }
 
         return false;
     }

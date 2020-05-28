@@ -141,4 +141,47 @@ public class WorldTime : IComparable
     public static bool operator !=(WorldTime a, WorldTime b) => a.CompareTo(b) != 0;
     public static bool operator <=(WorldTime a, WorldTime b) => a.CompareTo(b) <= 0;
     public static bool operator >=(WorldTime a, WorldTime b) => a.CompareTo(b) >= 0;
+
+    public static WorldTime operator +(WorldTime a, WorldTime b)
+    {
+        WorldTime c = new WorldTime(a.year, a.month, a.day, a.hour, a.minute);
+
+        if(b.year > 0) c.AdvanceYear(b.year);
+        if (b.month > 0) c.AdvanceMonth(b.month);
+        if (b.day > 0) c.AdvanceDay(b.day);
+        if (b.hour > 0) c.AdvanceHour(b.hour);
+        if (b.minute > 0) c.Tick(b.minute);
+
+        return c;
+    }
+}
+
+
+public class TimeObligation
+{
+    public WorldTime start;
+    public WorldTime end;
+
+    public TimeObligation(WorldTime start, WorldTime end)
+    {
+        this.start = start;
+        this.end = end;
+    }
+
+
+    public bool Overlapping(TimeObligation other)
+    {
+        if ((this.start <= other.start && other.start <= this.end) ||
+            (other.start <= this.start && this.start <= other.end)) {
+            return true;
+        } else return false;
+    }
+
+    public bool HappensBefore(TimeObligation other)
+    {
+        if (this.end <= other.start) return true;
+        else return false;
+    }
+
+
 }

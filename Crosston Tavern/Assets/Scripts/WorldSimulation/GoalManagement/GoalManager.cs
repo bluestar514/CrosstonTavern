@@ -76,6 +76,10 @@ public class GoalManager
 
         public BoundAction parentAction;
 
+        public override string ToString()
+        {
+            return "<"+parentAction+"{"+string.Join(",", effects)+"} {" +bindings+ ", "+ resources+"} "+chanceModifier+" {"+string.Join(",", preconditions)+"}>";
+        }
         public OutcomeRestraints(List<Effect> effects, ChanceModifier chanceModifier, List<Condition> preconditions, BoundBindingCollection bindings, FeatureResources resources, BoundAction parentAction)
         {
             this.effects = effects;
@@ -132,7 +136,6 @@ public class GoalManager
     bool OutcomeProgressesGoal(OutcomeRestraints outcome, Goal goal)
     {
         foreach (Effect effect in outcome.effects) {
-
             if (effect.WeighAgainstGoal(ws, outcome.bindings, outcome.resources, goal) > 0) {
                 return true;
             }

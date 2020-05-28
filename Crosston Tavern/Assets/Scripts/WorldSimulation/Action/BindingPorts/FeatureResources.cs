@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FeatureResources 
@@ -25,5 +26,11 @@ public class FeatureResources
         }
 
         return new List<string>() { str };
+    }
+
+    public override string ToString()
+    {
+        return string.Join(",", from resource in resources
+                                select resource.Key + ":"+ resource.Value);
     }
 }

@@ -116,7 +116,7 @@ public class ActionInitializer
         {"buy_#item#", new GenericAction("buy_#item#", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateInventoryBound("#a#", "#item#", "#item.cost#", INF.ToString()))
+                new Condition_IsState(new StateInventoryBound("#a#", "currency", "#item.cost#", INF.ToString()))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -144,6 +144,7 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectGoal("#a#", new GoalModule(
                                                             new List<GM_Precondition>(){
+                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Time(1, 30))
                                                             },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#a#", "#location#"), 10),
@@ -153,7 +154,9 @@ public class ActionInitializer
                                               )
                         ),
                         new EffectGoal("#b#", new GoalModule(
-                                                            new List<GM_Precondition>(),
+                                                            new List<GM_Precondition>(){
+                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Time(1, 30))
+                                                            },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#b#", "#location#"), 10),
                                                                 new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 10, 20), 5),

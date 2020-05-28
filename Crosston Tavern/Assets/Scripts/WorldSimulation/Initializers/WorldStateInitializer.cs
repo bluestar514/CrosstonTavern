@@ -19,7 +19,8 @@ public class WorldStateInitializer
 
         foreach (Person person in ws.registry.GetPeople()) {
             WorldState personalWorldState = ws.Copy(person.id + "_world_state");
-            townies.Add(new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
+            townies.Add(//new Townie(person, ws, new GoalManager(ws, person)));
+                        new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
         }
 
 

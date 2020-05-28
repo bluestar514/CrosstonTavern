@@ -28,8 +28,6 @@ public class ActionExecutionManager : ActionManager
 
         Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
 
-        Debug.Log("Realizing Effects for " + chosenAction + " for global world state");
-
         List<Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, chosenAction.Action.Bindings, 
                                                 ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources);
 
@@ -87,7 +85,7 @@ public class ActionExecutionManager : ActionManager
 
         foreach (Townie townie in townies) {
             if(townie.townieInformation.location == location) {
-                Debug.Log("Realizing Effects for " + action + " for " + townie.townieInformation.id);
+
 
                 foreach (Effect effect in realizedEffects) {
                     effect.ExecuteEffect(townie.ws, actor, bindings, resources);

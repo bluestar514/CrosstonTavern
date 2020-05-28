@@ -31,4 +31,9 @@ public class BoundBindingCollection
 
         return str;
     }
+
+    public override string ToString()
+    {
+        return string.Join(",", bindings);
+    }
 }

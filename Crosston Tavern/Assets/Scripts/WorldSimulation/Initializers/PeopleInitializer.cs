@@ -9,15 +9,16 @@ public class PeopleInitializer
         ActionInitializer.actions["give_#item#"],
         ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
-        ActionInitializer.actions["start_dating"]
+        ActionInitializer.actions["start_dating"],
+        ActionInitializer.actions["ask_out_to_#location#"]
     };
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
             {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"vendor_clara",        new Person("vendor_clara",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"judge_dirk",          new Person("judge_dirk",        "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
+            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
+            //{"vendor_clara",        new Person("vendor_clara",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            //{"judge_dirk",          new Person("judge_dirk",        "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
             //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
@@ -41,7 +42,7 @@ public class PeopleInitializer
 
             allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
             allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
-            allPeople["organizer_alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+            //allPeople["organizer_alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
 
             allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
 
