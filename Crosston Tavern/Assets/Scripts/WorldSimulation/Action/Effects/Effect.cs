@@ -69,11 +69,11 @@ public class Effect
     /// Used Primarily inside the ActionExecutionManager. Exists inside the Effect Class so each kind of effect can decide how it wants to be handled individually
     /// </summary>
     /// <param name="ws"> World State to be altered and acted against</param>
-    /// <param name="actor"> Person who made the action</param>
+    /// <param name="townie"> Person who made the action</param>
     /// <param name="bindings"> Action's bindings</param>
     /// <param name="resources"> Resources on the feature being acted against</param>
     /// <returns> A Static Effect with all values determined</returns>
-    public virtual Effect ExecuteEffect(WorldState ws, Townie actor, BoundBindingCollection bindings, FeatureResources resources)
+    public virtual Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
         Debug.LogWarning("Effect (" + this + ") of unaccounted for Effect Type failed to be executed!");
 
@@ -134,7 +134,7 @@ public class EffectMovement: Effect
         //4 is max score, this should normalize the number to always be between 0 and 1;
     }
 
-    public override Effect ExecuteEffect(WorldState ws, Townie actor, BoundBindingCollection bindings, FeatureResources resources)
+    public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
 
         string moverId = bindings.BindString(this.moverId);
@@ -143,7 +143,7 @@ public class EffectMovement: Effect
         List<string> potentialIds = resources.BindString(newLocationId);
         newLocationId = potentialIds[Mathf.FloorToInt(UnityEngine.Random.value * potentialIds.Count)];
 
-        actor.Move(moverId, newLocationId);
+        if (townie != null)  townie.Move(moverId, newLocationId);
         ws.map.MovePerson(moverId, newLocationId, false);
 
         return new EffectMovement(moverId, newLocationId);

@@ -65,10 +65,8 @@ public class ActionExecutionManager : ActionManager
     {
         List<Effect> realizedEffects = new List<Effect>();
 
-        
-
         foreach (Effect effect in chosenOutcome.effects) {
-            realizedEffects.Add(effect.ExecuteEffect(ws, actor, bindings, resources));
+            realizedEffects.Add(effect.ExecuteEffect(ws, null, bindings, resources));
         }
 
         return realizedEffects;
@@ -88,7 +86,7 @@ public class ActionExecutionManager : ActionManager
 
 
                 foreach (Effect effect in realizedEffects) {
-                    effect.ExecuteEffect(townie.ws, actor, bindings, resources);
+                    effect.ExecuteEffect(townie.ws, townie, bindings, resources);
                 }
 
                 townie.history.Add(executedAction);

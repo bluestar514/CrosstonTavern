@@ -6,8 +6,8 @@ public class PeopleInitializer
 {
     public static List<GenericAction> peopleActions = new List<GenericAction>() {
         ActionInitializer.actions["talk"],
-        ActionInitializer.actions["give_#item#"],
-        ActionInitializer.actions["insult"],
+        //ActionInitializer.actions["give_#item#"],
+        //ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
         ActionInitializer.actions["start_dating"],
         ActionInitializer.actions["ask_out_to_#location#"]

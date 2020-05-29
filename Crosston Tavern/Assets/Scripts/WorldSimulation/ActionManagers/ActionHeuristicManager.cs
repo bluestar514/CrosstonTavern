@@ -123,10 +123,11 @@ public class ActionHeuristicManager : ActionManager
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         foreach (Goal goal in actor.knownGoals) {
             foreach (Effect effect in outcome.effects) {
-                float value = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal) * chance;
+                float desirability = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal) ;
+                float value = desirability * chance;
                 weight += value;
                 if (value != 0)
-                    rationals.Add(new WeightedAction.WeightRational(effect, goal.state, value));
+                    rationals.Add(new WeightedAction.WeightRational(effect, goal.state, value, desirability, chance));
             }
         }
         return new KeyValuePair<float, List<WeightedAction.WeightRational>>(weight, rationals) ;

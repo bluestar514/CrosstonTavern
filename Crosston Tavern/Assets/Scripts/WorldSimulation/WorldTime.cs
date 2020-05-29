@@ -145,7 +145,7 @@ public class WorldTime : IComparable
     public static WorldTime operator +(WorldTime a, WorldTime b)
     {
         WorldTime c = new WorldTime(a.year, a.month, a.day, a.hour, a.minute);
-
+        
         if(b.year > 0) c.AdvanceYear(b.year);
         if (b.month > 0) c.AdvanceMonth(b.month);
         if (b.day > 0) c.AdvanceDay(b.day);

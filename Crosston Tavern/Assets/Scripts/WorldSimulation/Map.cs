@@ -135,4 +135,16 @@ public class Map
     {
         return new List<Feature>(Features);
     }
+
+    public void RemoveFeature(string featureName)
+    {
+        Feature f = features[featureName];
+        features.Remove(featureName);
+        Features.Remove(f);
+    }
+    public void AddFeature(string key, Feature f)
+    {
+        features.Add(key, f);
+        Features.Add(f);
+    }
 }

@@ -10,7 +10,7 @@ public class Person: Feature
     public PreferencesDictionary preferences;
 
     public List<Goal> knownGoals;
-    public List<TimeObligation> timeObligations;
+    public Schedule schedule;
 
     public Person(string id, string location, int maxUsers,
             List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
@@ -23,6 +23,8 @@ public class Person: Feature
         foreach(PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
             preferences.Add(level, new List<string>());
         }
+
+        schedule = new Schedule();
     }
 
     public Person(Feature f): base(f.id, f.location, f.maxUsers, f.providedActions, f.relevantResources.resources, f.stockTable)
@@ -33,6 +35,8 @@ public class Person: Feature
         foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
             preferences.Add(level, new List<string>());
         }
+
+        schedule = new Schedule();
     }
 
     public override Feature Copy(bool perfect)
@@ -44,6 +48,7 @@ public class Person: Feature
         if (perfect) {
             p.knownGoals = new List<Goal>(knownGoals);
             p.preferences.CopyFrom(preferences);
+            p.schedule = schedule.Copy();
         } else {
             p.knownGoals = new List<Goal>();
             foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {

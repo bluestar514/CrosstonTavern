@@ -12,12 +12,11 @@ public class GoalModule
     public List<GM_Precondition> preconditions;
     public List<Goal> goals;
 
-    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals)
+    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals, string name = "GENERIC GOAL")
     {
         this.preconditions = preconditions;
         this.goals = goals;
-
-        name = "GENERIC GOAL";
+        this.name = name;
     }
 
     public virtual bool Precondtion(WorldState ws) {

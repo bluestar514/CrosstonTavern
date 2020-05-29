@@ -50,10 +50,11 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
     public WorldTime bufferTime;
     public WorldTime length;
 
-    public GM_Precondition_NextFreeTime(List<string> participants, WorldTime bufferTime)
+    public GM_Precondition_NextFreeTime(List<string> participants, WorldTime bufferTime, WorldTime length)
     {
         this.participants = participants;
         this.bufferTime = bufferTime;
+        this.length = length;
     }
 
     public override bool Satisfied(WorldState ws)
@@ -130,4 +131,10 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
 
         return condensed;
     }
+}
+
+public class GM_Precondition_Now: GM_Precondition
+{
+    public WorldTime bufferTime;
+    public WorldTime length;
 }

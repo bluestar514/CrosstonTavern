@@ -136,36 +136,39 @@ public class ActionInitializer
         ) },
         {"ask_out_to_#location#", new GenericAction("ask_out_to_#location#", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(new StateAvailableNow("#a#", WorldTime.Time(1,30)))
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 4, 15), true),
+                    new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 0, 5), true),
                     new List<Effect>() {
                         new EffectGoal("#a#", new GoalModule(
                                                             new List<GM_Precondition>(){
-                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Time(1, 30))
+                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Date(-1, -1, 1), WorldTime.Time(1, 30))
                                                             },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#a#", "#location#"), 10),
                                                                 new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 10, 20), 5),
                                                                 new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 5, 20), 3)
-                                                            }
+                                                            },
+                                                            "Date_At_#location#_With_#b#"
                                               )
                         ),
                         new EffectGoal("#b#", new GoalModule(
                                                             new List<GM_Precondition>(){
-                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Time(1, 30))
+                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"},  WorldTime.Date(-1, -1, 1),  WorldTime.Time(1, 30))
                                                             },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#b#", "#location#"), 10),
                                                                 new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 10, 20), 5),
                                                                 new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 20), 3)
-                                                            }
+                                                            },
+                                                            "Date_At_#location#_With_#a#"
                                               )
                         ),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 1),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 1)
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 3),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 3)
                     }
                 )
             },
