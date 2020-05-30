@@ -11,7 +11,7 @@ public class GoalManager
     [SerializeField]
     List<GoalModule> modules = new List<GoalModule>();
 
-    int lookAhead = 5;
+    int lookAhead = 3;
 
     public GoalManager(WorldState ws, Person actor)
     {
@@ -36,7 +36,15 @@ public class GoalManager
 
         // Get High level goals:
         List<Goal> initialGoals = new List<Goal>();
-        foreach (GoalModule module in modules) {
+
+        List<GoalModule> allModules = new List<GoalModule>(modules);
+        foreach(Obligation ob in actor.schedule.obligations) {
+            Debug.Log(ob);
+            allModules.Add(ob.gMod);
+        }
+
+        foreach (GoalModule module in allModules) {
+            Debug.Log(module + ":" + module.Precondtion(ws));
             if (module.Precondtion(ws)) {
                 initialGoals.AddRange(module.goals);
             }
@@ -117,7 +125,8 @@ public class GoalManager
             BoundBindingCollection bindings = action.Bindings;
             FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
 
-            outcomeRestraints.Add(new OutcomeRestraints(effects, chanceModifier, preconditions, bindings, resources, action));
+            OutcomeRestraints restraints = new OutcomeRestraints(effects, chanceModifier, preconditions, bindings, resources, action);
+            outcomeRestraints.Add(restraints);
         }
 
         return outcomeRestraints;
@@ -136,6 +145,7 @@ public class GoalManager
     bool OutcomeProgressesGoal(OutcomeRestraints outcome, Goal goal)
     {
         foreach (Effect effect in outcome.effects) {
+            Debug.Log(outcome);
             if (effect.WeighAgainstGoal(ws, outcome.bindings, outcome.resources, goal) > 0) {
                 return true;
             }

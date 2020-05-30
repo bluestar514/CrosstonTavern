@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[System.Serializable]
 public class Schedule 
 {
     public List<Obligation> obligations;
@@ -16,7 +18,8 @@ public class Schedule
     public bool TimeFree(WorldTime start, WorldTime end, bool onlyBlocking = false)
     {
         foreach(Obligation ob in obligations) {
-            if (ob.Start <= start && ob.End >= end) {
+            if ((ob.Start <= start && start <= ob.End)||
+                (start <= ob.Start && ob.Start <= end)){
                 if(ob.Blocking || !onlyBlocking) return false;
             }
         }
@@ -28,6 +31,7 @@ public class Schedule
     {
         if (considerConflicts && TimeFree(ob.Start, ob.End, ob.Blocking)) {
             obligations.Add(ob);
+
         }
     }
 
@@ -39,22 +43,34 @@ public class Schedule
 
 }
 
-
+[System.Serializable]
 public class Obligation
 {
+    [SerializeField] private string name;
+
     public GoalModule gMod;
 
-    public WorldTime Start { get; private set; }
-    public WorldTime End { get; private set; }
-    public bool Blocking { get; private set; }
-    public string Name { get; private set; }
+    
+    [SerializeField] private bool blocking;
+    [SerializeField] private WorldTime end;
+    [SerializeField] private WorldTime start;
 
-    public Obligation(string name, WorldTime start, WorldTime end, bool blocking, GoalModule gMod=null)
+    public WorldTime Start { get => start; private set => start = value; }
+    public WorldTime End { get => end; private set => end = value; }
+    public bool Blocking { get => blocking; private set => blocking = value; }
+    public string Name { get => name; private set => name = value; }
+
+    public Obligation(string name, WorldTime start, WorldTime end, bool blocking, GoalModule gMod = null)
     {
         this.Name = name;
         this.Start = start;
         this.End = end;
         this.Blocking = blocking;
         this.gMod = gMod;
+    }
+
+    public override string ToString()
+    {
+        return "(Obligation:"+name+")";
     }
 }

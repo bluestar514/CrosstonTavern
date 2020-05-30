@@ -24,6 +24,9 @@ public class GoalModule
         else return true;
     }
 
-    
+    public override string ToString()
+    {
+        return name;
+    }
 
 }

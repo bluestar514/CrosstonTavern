@@ -30,6 +30,8 @@ public class WorldTime : IComparable
         this.minute = minute;
     }
 
+    public WorldTime(WorldTime time):this(time.year, time.month, time.day, time.hour, time.minute){}
+
     public static WorldTime Date(int year, int month, int day)
     {
         return new WorldTime(year, month, day, 0, 0);
@@ -144,7 +146,7 @@ public class WorldTime : IComparable
 
     public static WorldTime operator +(WorldTime a, WorldTime b)
     {
-        WorldTime c = new WorldTime(a.year, a.month, a.day, a.hour, a.minute);
+        WorldTime c = new WorldTime(a);
         
         if(b.year > 0) c.AdvanceYear(b.year);
         if (b.month > 0) c.AdvanceMonth(b.month);

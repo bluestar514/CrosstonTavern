@@ -14,6 +14,7 @@ public class EffectObligation : Effect
         this.obligation = obligation;
     }
 
+
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
         string owner = bindings.BindString(this.owner);
@@ -37,5 +38,46 @@ public class EffectObligation : Effect
         ws.registry.GetPerson(owner).schedule.Add(ob);
 
         return new EffectObligation(owner, ob);
+    }
+
+    public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        //Debug.Log("TO DO: Decide how the weighing of Obligation Effects should be done!");
+
+        return base.WeighAgainstGoal(ws, bindings, resources, goal);
+    }
+}
+
+
+public class EffectObligationNow: Effect
+{
+    public string owner;
+    public string obligationName;
+    public WorldTime length;
+    public bool blocking;
+    public GoalModule goalModule;
+
+    public EffectObligationNow(string owner, string obligationName, WorldTime length, bool blocking, GoalModule goalModule)
+    {
+        this.owner = owner;
+        this.length = length;
+        this.blocking = blocking;
+        this.goalModule = goalModule;
+        this.obligationName = obligationName;
+    }
+
+    public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
+    {
+        WorldTime start = new WorldTime(ws.time);
+        WorldTime end = start + length;
+
+        return new EffectObligation(owner, new Obligation(obligationName, start, end, blocking, goalModule)).ExecuteEffect(ws, townie, bindings, resources);
+    }
+
+    public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        //Debug.Log("TO DO: Decide how the weighing of Obligation Effects should be done!");
+
+        return base.WeighAgainstGoal(ws, bindings, resources, goal);
     }
 }

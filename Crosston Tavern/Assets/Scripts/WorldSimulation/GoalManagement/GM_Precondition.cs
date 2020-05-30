@@ -59,7 +59,7 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
 
     public override bool Satisfied(WorldState ws)
     {
-        return false;
+        return MakeSpecific(ws).Satisfied(ws);
     }
 
     public override GM_Precondition MakeSpecific(WorldState ws)
@@ -135,6 +135,24 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
 
 public class GM_Precondition_Now: GM_Precondition
 {
-    public WorldTime bufferTime;
     public WorldTime length;
+
+    public GM_Precondition_Now(WorldTime length)
+    {
+        this.length = length;
+    }
+
+    public override bool Satisfied(WorldState ws)
+    {
+        return MakeSpecific(ws).Satisfied(ws);
+    }
+
+    public override GM_Precondition MakeSpecific(WorldState ws)
+    {
+        WorldTime start = new WorldTime(ws.time);
+
+        WorldTime end = start + length;
+
+        return new GM_Precondition_Time(start, end);
+    }
 }

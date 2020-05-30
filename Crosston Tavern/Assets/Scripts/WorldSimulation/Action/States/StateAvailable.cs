@@ -67,7 +67,7 @@ public class StateAvailableNow: State
 
     public override bool InEffect(WorldState ws, BoundBindingCollection bindings, FeatureResources resources)
     {
-        StateAvailable state = new StateAvailable(actor, ws.time, ws.time + length);
+        StateAvailable state = new StateAvailable(actor, new WorldTime(ws.time), ws.time + length);
 
         return state.InEffect(ws, bindings, resources);
     }
@@ -81,5 +81,10 @@ public class StateAvailableNow: State
             this.length != stateAv.length) return base.Combine(state);
 
         return new List<State>() { this };
+    }
+
+    public override string ToString()
+    {
+        return "<StateAvailableNow(" + actor + ", " + length + ")>";
     }
 }

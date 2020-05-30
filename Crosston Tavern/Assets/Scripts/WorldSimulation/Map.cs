@@ -45,7 +45,7 @@ public class Map
     {
         List<Feature> copiedFeatures = new List<Feature>();
         foreach(Feature f in features.Values) {
-            copiedFeatures.Add(f.Copy(false));
+            copiedFeatures.Add(f.Copy(f.id.Contains("door")));
         }
 
         return new Map(copiedFeatures, new List<Location>(locations.Values), name);

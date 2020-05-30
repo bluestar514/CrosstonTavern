@@ -143,9 +143,10 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 0, 5), true),
                     new List<Effect>() {
-                        new EffectGoal("#a#", new GoalModule(
+                        new EffectObligationNow("#a#","Date_At_#location#_With_#b#", WorldTime.Time(1, 30), true, 
+                                                    new GoalModule(
                                                             new List<GM_Precondition>(){
-                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"}, WorldTime.Date(-1, -1, 1), WorldTime.Time(1, 30))
+                                                                new GM_Precondition_Now(WorldTime.Time(1, 30))
                                                             },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#a#", "#location#"), 10),
@@ -155,9 +156,10 @@ public class ActionInitializer
                                                             "Date_At_#location#_With_#b#"
                                               )
                         ),
-                        new EffectGoal("#b#", new GoalModule(
+                        new EffectObligationNow("#b#","Date_At_#location#_With_#a#", WorldTime.Time(1, 30), true, 
+                                                    new GoalModule(
                                                             new List<GM_Precondition>(){
-                                                                new GM_Precondition_NextFreeTime(new List<string>(){"#a#", "#b#"},  WorldTime.Date(-1, -1, 1),  WorldTime.Time(1, 30))
+                                                                new GM_Precondition_Now(WorldTime.Time(1, 30))
                                                             },
                                                             new List<Goal>() {
                                                                 new Goal(new StatePosition("#b#", "#location#"), 10),
