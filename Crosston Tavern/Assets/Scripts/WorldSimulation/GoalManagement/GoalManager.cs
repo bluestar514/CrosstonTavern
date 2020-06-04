@@ -39,12 +39,11 @@ public class GoalManager
 
         List<GoalModule> allModules = new List<GoalModule>(modules);
         foreach(Obligation ob in actor.schedule.obligations) {
-            Debug.Log(ob);
+
             allModules.Add(ob.gMod);
         }
 
         foreach (GoalModule module in allModules) {
-            Debug.Log(module + ":" + module.Precondtion(ws));
             if (module.Precondtion(ws)) {
                 initialGoals.AddRange(module.goals);
             }
@@ -145,7 +144,7 @@ public class GoalManager
     bool OutcomeProgressesGoal(OutcomeRestraints outcome, Goal goal)
     {
         foreach (Effect effect in outcome.effects) {
-            Debug.Log(outcome);
+
             if (effect.WeighAgainstGoal(ws, outcome.bindings, outcome.resources, goal) > 0) {
                 return true;
             }

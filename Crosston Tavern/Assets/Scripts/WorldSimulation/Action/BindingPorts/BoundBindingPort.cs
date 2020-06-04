@@ -11,6 +11,17 @@ public class BoundBindingPort
     {
         this.tag = tag;
     }
+
+    public BoundBindingPort(string tag, string value)
+    {
+        this.tag = tag;
+        Value = value;
+    }
+
+    public virtual void BindResource(FeatureResources resources)
+    {
+        Value = resources.PickBoundString(Value);
+    } 
 }
 
 public class BoundPortInventoryItem: BoundBindingPort
@@ -29,6 +40,11 @@ public class BoundPortInventoryItem: BoundBindingPort
     public override string ToString()
     {
         return "<" + tag + ":" + itemId + "(" + itemCount + ")>";
+    }
+
+    public override void BindResource(FeatureResources resources)
+    {
+        itemId = resources.PickBoundString(itemId);
     }
 }
 

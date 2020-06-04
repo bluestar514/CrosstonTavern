@@ -20,7 +20,7 @@ public class EffectObligation : Effect
         string owner = bindings.BindString(this.owner);
 
 
-        string obName = bindings.BindString(string.Join(",", resources.BindString(obligation.Name)));
+        string obName = string.Join(",", resources.BindString(bindings.BindString(obligation.Name)));
 
         GoalModule newGoal = obligation.gMod;
 
@@ -68,7 +68,7 @@ public class EffectObligationNow: Effect
 
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
-        WorldTime start = new WorldTime(ws.time);
+        WorldTime start = new WorldTime(ws.Time);
         WorldTime end = start + length;
 
         return new EffectObligation(owner, new Obligation(obligationName, start, end, blocking, goalModule)).ExecuteEffect(ws, townie, bindings, resources);

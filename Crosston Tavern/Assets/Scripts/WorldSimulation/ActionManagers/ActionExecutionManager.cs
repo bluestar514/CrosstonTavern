@@ -28,12 +28,15 @@ public class ActionExecutionManager : ActionManager
 
         Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
 
-        List<Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, chosenAction.Action.Bindings, 
-                                                ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources);
+        FeatureResources resources = ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources;
+        BoundBindingCollection bindings = chosenAction.Action.Bindings;
+        bindings.BindResources(resources);
+
+        List <Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, bindings, resources);
 
         Outcome realizedOutcome = new Outcome(new ChanceModifierSimple(1), realizedEffects);
 
-        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedOutcome);
+        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedOutcome, ws.Time);
 
         RealizeActionForTownies(location, executedAction);
         if (location != actor.townieInformation.location)
@@ -90,6 +93,7 @@ public class ActionExecutionManager : ActionManager
                 }
 
                 townie.history.Add(executedAction);
+                townie.ws.AddHistory(executedAction);
             }
         }
     }

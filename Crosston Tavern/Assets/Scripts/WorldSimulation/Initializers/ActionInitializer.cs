@@ -16,13 +16,15 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierSimple(.5f),
                     new List<Effect>() {
-                        new EffectInventoryVariable("#a#", new List<string>(){"#common_fish#"}, 1, 1)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
+                        new EffectKnowledge(new WorldFact("#feature#", "#common_fish#", "#c_fish#"))
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSimple(.35f),
                     new List<Effect>() {
-                        new EffectInventoryVariable("#a#", new List<string>(){"#rare_fish#"}, 1, 1)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#r_fish#"}, 1, 1),
+                        new EffectKnowledge(new WorldFact("#feature#", "#rare_fish#", "#r_fish#"))
                     }
                 ),
                 new Outcome(
@@ -33,7 +35,10 @@ public class ActionInitializer
                 )
             },
             new List<BindingPort>() {
-                new BindingPortEntity("a", ActionRole.initiator)
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("feature", ActionRole.recipient),
+                new BindingPortString("c_fish", "#common_fish#"),
+                new BindingPortString("r_fish", "#rare_fish#")
             }
         ) },
         {"talk", new GenericAction("talk", 1,

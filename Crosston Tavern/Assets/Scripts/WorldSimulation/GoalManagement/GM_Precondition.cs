@@ -28,8 +28,8 @@ public class GM_Precondition_Time : GM_Precondition
 
     public override bool Satisfied(WorldState ws)
     {
-        if (startTime < endTime) return ws.time <= endTime && ws.time >= startTime;
-        else return ws.time >= startTime || ws.time <= endTime;
+        if (startTime < endTime) return ws.Time <= endTime && ws.Time >= startTime;
+        else return ws.Time >= startTime || ws.Time <= endTime;
     }
 
     public override GM_Precondition MakeSpecific(WorldState ws)
@@ -78,7 +78,7 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
         //    if (obligation.end > minTime) return new GM_Precondition_Time(obligation.end, obligation.end + length);
         //}
 
-        WorldTime start = ws.time + bufferTime;
+        WorldTime start = ws.Time + bufferTime;
         WorldTime end = start + length;
 
         return new GM_Precondition_Time(start, end);
@@ -149,7 +149,7 @@ public class GM_Precondition_Now: GM_Precondition
 
     public override GM_Precondition MakeSpecific(WorldState ws)
     {
-        WorldTime start = new WorldTime(ws.time);
+        WorldTime start = new WorldTime(ws.Time);
 
         WorldTime end = start + length;
 

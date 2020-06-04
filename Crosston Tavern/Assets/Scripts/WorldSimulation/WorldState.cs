@@ -9,16 +9,20 @@ public class WorldState
     public string id = "default";
     public Map map;
     public Registry registry;
-    public WorldTime time;
+    private WorldTime time;
+    public KnownFacts knownFacts;
 
-    public WorldState(Map map, Registry registry, WorldTime time)
+    public WorldTime Time { get => new WorldTime(time); set => time = value; }
+
+    public WorldState(Map map, Registry registry, WorldTime time, string owner)
     {
         this.map = map;
         this.registry = registry;
-        this.time = time;
+        this.Time = time;
+        knownFacts = new KnownFacts(owner);
     }
 
-    public WorldState Copy(Person owner, string name = "copy")
+    public WorldState Copy(Person owner, string name)
     {
         Map c_map = map.Copy(name);
         c_map.RemoveFeature(owner.id);
@@ -26,7 +30,7 @@ public class WorldState
 
         Registry c_reg = new Registry(c_map.GetAllFeatures(), name);
 
-        WorldState copy = new WorldState(c_map, c_reg, time);
+        WorldState copy = new WorldState(c_map, c_reg, Time, name);
         copy.id = name;
         return copy;
     }
@@ -34,7 +38,7 @@ public class WorldState
 
     public void Tick(int t=1)
     {
-        time.Tick(t);
+        Time.Tick(t);
     }
 
     public Inventory GetInventory(string id)
@@ -69,5 +73,11 @@ public class WorldState
         return new List<string>(from person in map.GatherFeaturesAt(locationId)
                                 where person.id.StartsWith("person_")
                                 select person.id.Replace("person_", ""));
+    }
+
+
+    public void AddHistory(ExecutedAction action)
+    {
+        knownFacts.AddHistory(action, this);
     }
 }

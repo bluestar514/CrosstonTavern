@@ -13,6 +13,13 @@ public class BoundBindingCollection
         this.bindings = bindings;
     }
 
+    public void BindResources(FeatureResources resources)
+    {
+        foreach(BoundBindingPort port in bindings) {
+            port.BindResource(resources);
+        }
+    }
+
     public string BindString(string str)
     {
         if (bindings == null) return str;

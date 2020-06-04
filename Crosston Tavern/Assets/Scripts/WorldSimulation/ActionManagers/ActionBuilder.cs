@@ -84,6 +84,11 @@ public class ActionBuilder
                         break;
                 }
             }
+            if (port is BindingPortString) {
+                BindingPortString str = (BindingPortString)port;
+
+                potentialBindings.Add(str.tag, new List<BoundBindingPort>() { new BoundBindingPort(str.tag, str.value)  });
+            }
         }
 
         //combine entity variations

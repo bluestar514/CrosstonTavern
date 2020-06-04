@@ -40,6 +40,18 @@ public class BindingPortEntity : BindingPort
     }
 }
 
+public class BindingPortString : BindingPort
+{
+    public string value;
+
+    public BindingPortString(string tag, string value)
+    {
+        this.tag = tag;
+        this.value = value;
+    }
+}
+
+
 public enum ActionRole
 {
     initiator,

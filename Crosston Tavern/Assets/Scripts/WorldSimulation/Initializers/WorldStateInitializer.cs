@@ -10,7 +10,7 @@ public class WorldStateInitializer
                           new List<Location>(FeatureInitializer.GetAllLocations().Values));
         Registry registry = new Registry(map.GetAllFeatures());
 
-        return new WorldState(map, registry, WorldTime.DayZeroEightAM);
+        return new WorldState(map, registry, WorldTime.DayZeroEightAM, "global");
     }
 
     static public List<Townie> GetTownies( WorldState ws)
@@ -18,7 +18,7 @@ public class WorldStateInitializer
         List<Townie> townies = new List<Townie>();
 
         foreach (Person person in ws.registry.GetPeople()) {
-            WorldState personalWorldState = ws.Copy(person, person.id + "_world_state");
+            WorldState personalWorldState = ws.Copy(person, person.id);
             townies.Add(//new Townie(person, ws, new GoalManager(ws, person)));
                         new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
         }
