@@ -17,14 +17,14 @@ public class ActionInitializer
                     new ChanceModifierSimple(.5f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
-                        new EffectKnowledge(new WorldFact("#feature#", "#common_fish#", "#c_fish#"))
+                        new EffectKnowledge(new WorldFactResource("#feature#", "#common_fish#", "#c_fish#"))
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSimple(.35f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_fish#"}, 1, 1),
-                        new EffectKnowledge(new WorldFact("#feature#", "#rare_fish#", "#r_fish#"))
+                        new EffectKnowledge(new WorldFactResource("#feature#", "#rare_fish#", "#r_fish#"))
                     }
                 ),
                 new Outcome(
@@ -92,7 +92,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 2, 5),
                         new EffectInventoryStatic("#b#", "#item#", 1),
-                        new EffectInventoryStatic("#a#", "#item#", -1)
+                        new EffectInventoryStatic("#a#", "#item#", -1),
+                        new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.loved, "#item#"))
                     }
                 ),
                 new Outcome(
@@ -100,7 +101,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 1, 3),
                         new EffectInventoryStatic("#b#", "#item#", 1),
-                        new EffectInventoryStatic("#a#", "#item#", -1)
+                        new EffectInventoryStatic("#a#", "#item#", -1),
+                        new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.liked, "#item#"))
                     }
                 ),
                 new Outcome(
@@ -108,7 +110,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -3, -1),
                         new EffectInventoryStatic("#b#", "#item#", 1),
-                        new EffectInventoryStatic("#a#", "#item#", -1)
+                        new EffectInventoryStatic("#a#", "#item#", -1),
+                        new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#"))
                     }
                 )
             },

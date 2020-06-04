@@ -36,17 +36,8 @@ public class KnownFacts
     {
         if (!KnowFact(fact)) {
             knownFacts.Add(fact);
-            UpdateResourcesOnMap(fact, ws);
+            fact.UpdateWorldState(ws);
         }
-    }
-
-
-    void UpdateResourcesOnMap(WorldFact fact, WorldState ws)
-    {
-        string featureId = fact.featureId;
-        Feature feature = ws.map.GetFeature(featureId);
-
-        feature.relevantResources.Add(fact.resourceId, fact.potentialBinding);
     }
 
 

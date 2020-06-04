@@ -23,14 +23,7 @@ public class EffectKnowledge : Effect
     /// <returns></returns>
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
-        string featureId = bindings.BindString(fact.featureId);
-        string potentialBinding = bindings.BindString(fact.potentialBinding);
-
-
-        Debug.Log(bindings);
-        Debug.Log(new EffectKnowledge(new WorldFact(featureId, fact.resourceId, potentialBinding)));
-
-        return new EffectKnowledge( new WorldFact(featureId, fact.resourceId, potentialBinding));
+        return new EffectKnowledge(fact.Bind(bindings, resources));
     }
 
     public override string ToString()
