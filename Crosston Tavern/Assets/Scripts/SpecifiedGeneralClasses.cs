@@ -19,3 +19,5 @@ public class StringStringDictionary : SerializableDictionary<string, string> { }
 
 [Serializable]
 public class GoalDictionary : SerializableDictionary<Effect, float> { }
+[Serializable]
+public class StatusEffectSummary : SerializableDictionary<EntityStatusEffectType, int> { }

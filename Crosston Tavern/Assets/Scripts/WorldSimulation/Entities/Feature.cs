@@ -15,6 +15,8 @@ public class Feature
     public Inventory inventory;
     public StringIntDictionary stockTable;
 
+    public 
+
     public int maxUsers;
     public int currentUsers= 0;
 
