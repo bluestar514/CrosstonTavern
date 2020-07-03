@@ -71,6 +71,7 @@ public class WorldHub : MonoBehaviour
 
         foreach(Townie person in allPeople) {
             ProximityRelationChange(person.townieInformation);
+            person.townieInformation.statusEffectTable.Update();
         }
 
         timeStep.Add(executedActions);

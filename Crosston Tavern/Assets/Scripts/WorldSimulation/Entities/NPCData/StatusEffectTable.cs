@@ -24,6 +24,17 @@ public class StatusEffectTable
     public void Add(EntityStatusEffect status)
     {
         activeEffects.Add(status);
+
+        summary = CalculateStatus();
+    }
+
+    public void Reduce(EntityStatusEffectType type, int amount)
+    {
+        foreach(EntityStatusEffect effect in activeEffects) {
+            if (effect.type == type) effect.duration -= amount;
+        }
+
+        summary = CalculateStatus();
     }
 
     public IEnumerable ListAllStatuses()
@@ -63,6 +74,22 @@ public class StatusEffectTable
         foreach(EntityStatusEffect effect in timedOutEffects) {
             activeEffects.Remove(effect);
         }
+
+
+        summary = CalculateStatus();
+    }
+
+    public StatusEffectTable Copy()
+    {
+        StatusEffectTable table = new StatusEffectTable();
+        foreach(EntityStatusEffect effect in activeEffects) {
+            table.Add(new EntityStatusEffect( effect));
+        }
+
+        table.summary = table.CalculateStatus();
+
+        return table;
+
     }
 }
 
@@ -89,6 +116,8 @@ public class EntityStatusEffect
 
         displayName = ToString();
     }
+
+    public EntityStatusEffect(EntityStatusEffect effect) : this(effect.id, effect.type, effect.duration, effect.strength, effect.target) { }
 
     public void Update()
     {

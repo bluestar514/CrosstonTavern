@@ -31,6 +31,11 @@ public class PeopleInitializer
         SetInventoryRandom(allPeople);
         SetPreferencesRandom(allPeople);
 
+        foreach(Person person in allPeople.Values) {
+            person.statusEffectTable.Add(new EntityStatusEffect("test", EntityStatusEffectType.happy, 24, 3, new List<string>()));
+        }
+
+
         // Override with specific things for the senario and or testing
             //Lover scenario Details:
             allPeople["lover_bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);

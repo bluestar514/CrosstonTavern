@@ -15,7 +15,7 @@ public class Feature
     public Inventory inventory;
     public StringIntDictionary stockTable;
 
-    public 
+    public StatusEffectTable statusEffectTable;
 
     public int maxUsers;
     public int currentUsers= 0;
@@ -35,6 +35,7 @@ public class Feature
         if(stockTable != null) this.stockTable.CopyFrom(stockTable);
 
         inventory = new Inventory(id);
+        statusEffectTable = new StatusEffectTable();
     }
 
     public virtual Feature Copy(bool perfect = true)
@@ -47,6 +48,7 @@ public class Feature
         }
 
         f.inventory = inventory.Copy(perfect);
+        f.statusEffectTable = statusEffectTable.Copy();
 
         return f;
     }
