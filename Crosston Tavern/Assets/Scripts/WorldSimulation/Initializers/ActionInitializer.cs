@@ -151,7 +151,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 0, 5), true),
                     new List<Effect>() {
-                        new EffectObligationNow("#a#","Date_At_#location#_With_#b#", WorldTime.Time(1, 30), true, 
+                        new EffectObligationNow("#a#","Date_At_#location#_With_#b#", WorldTime.Time(1, 30), true,
                                                     new GoalModule(
                                                             new List<GM_Precondition>(){
                                                                 new GM_Precondition_Now(WorldTime.Time(1, 30))
@@ -164,7 +164,7 @@ public class ActionInitializer
                                                             "Date_At_#location#_With_#b#"
                                               )
                         ),
-                        new EffectObligationNow("#b#","Date_At_#location#_With_#a#", WorldTime.Time(1, 30), true, 
+                        new EffectObligationNow("#b#","Date_At_#location#_With_#a#", WorldTime.Time(1, 30), true,
                                                     new GoalModule(
                                                             new List<GM_Precondition>(){
                                                                 new GM_Precondition_Now(WorldTime.Time(1, 30))
@@ -273,6 +273,51 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             }
-        ) }
+        ) },
+        {"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(//success:
+                    new ChanceModifierCombination(new List<ChanceModifier>() {
+                        new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
+                        new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), true)
+                    }),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#b#", "#item#", -1),
+                        new EffectInventoryStatic("#a#", "#item#", 1),
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
+                    }
+                ),
+                new Outcome( //doesn't have item:
+                    new ChanceModifierCombination(new List<ChanceModifier>() {
+                        new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
+                        new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), false)
+                    }),
+                    new List<Effect>() {
+                        new EffectGoal("#b#", new GoalModule(
+                            new List<GM_Precondition>() {},
+                            new List<Goal>() {
+                                new Goal(new StateInventoryStatic("#a#", "#item#", 1, INF), 3),
+                            }
+                        )),
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
+                    }
+                ),
+                new Outcome( //doesn't want to give item
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), false),
+                    new List<Effect>() {
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -1),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient),
+                new BindingPortInventoryItem("item", "_any_")
+            }
+         ) }
     };
 }

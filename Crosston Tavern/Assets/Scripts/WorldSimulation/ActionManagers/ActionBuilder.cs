@@ -107,13 +107,22 @@ public class ActionBuilder
                     BindingPortInventoryItem invPort = (BindingPortInventoryItem)port;
 
                     string ownerId = ((BoundPortEntity)GetPortWithTag(invPort.owner, bindings)).participantId;
+                    if (ownerId == "_any_") {
+                        List<string> itemsList = new List<string>() {
+                            "apple", "banana", "trout", "ice_cream", "firewood", "coal", "morning_glory", "rose", "dandilion",
+                            "mushroom", "saphire", "gold_ore", "cabbage", "pancakes", "pizza", "french_fries",
+                            "dragon_egg"
+                        };
 
-                    Inventory inv = ws.registry.GetPerson(ownerId).inventory;
+                        itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in itemsList
+                                                                                  select new BoundPortInventoryItem(port.tag, item, 0)));
+                    } 
+                    else {
+                        Inventory inv = ws.registry.GetPerson(ownerId).inventory;
 
-                    itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in inv.GetItemList()
-                                                                              select new BoundPortInventoryItem(port.tag, item, inv.GetInventoryCount(item))));
-
-
+                        itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in inv.GetItemList()
+                                                                                  select new BoundPortInventoryItem(port.tag, item, inv.GetInventoryCount(item))));
+                    }
                 } else if (port is BindingPortStockItem) {
                     BindingPortStockItem shopPort = (BindingPortStockItem)port;
 
