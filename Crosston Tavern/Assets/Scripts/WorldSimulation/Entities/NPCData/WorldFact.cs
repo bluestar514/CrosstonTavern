@@ -60,9 +60,6 @@ public class WorldFactResource: WorldFact {
 
     public override void UpdateWorldState(WorldState ws)
     {
-
-        Debug.Log("check");
-
         Feature feature = ws.map.GetFeature(featureId);
 
         feature.relevantResources.Add(resourceId, potentialBinding);

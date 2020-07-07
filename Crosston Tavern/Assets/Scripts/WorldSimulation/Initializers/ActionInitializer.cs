@@ -246,7 +246,8 @@ public class ActionInitializer
         {"start_dating", new GenericAction("start_dating", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false)
+                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false),
+                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 1000), true)
             }),
             new List<Outcome>() {
                 new Outcome( //success:
@@ -273,51 +274,51 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             }
-        ) },
-        {"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
-            new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
-            }),
-            new List<Outcome>() {
-                new Outcome(//success:
-                    new ChanceModifierCombination(new List<ChanceModifier>() {
-                        new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
-                        new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), true)
-                    }),
-                    new List<Effect>() {
-                        new EffectInventoryStatic("#b#", "#item#", -1),
-                        new EffectInventoryStatic("#a#", "#item#", 1),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
-                    }
-                ),
-                new Outcome( //doesn't have item:
-                    new ChanceModifierCombination(new List<ChanceModifier>() {
-                        new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
-                        new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), false)
-                    }),
-                    new List<Effect>() {
-                        new EffectGoal("#b#", new GoalModule(
-                            new List<GM_Precondition>() {},
-                            new List<Goal>() {
-                                new Goal(new StateInventoryStatic("#a#", "#item#", 1, INF), 3),
-                            }
-                        )),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
-                    }
-                ),
-                new Outcome( //doesn't want to give item
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), false),
-                    new List<Effect>() {
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -1),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
-                    }
-                )
-            },
-            new List<BindingPort>() {
-                new BindingPortEntity("a", ActionRole.initiator),
-                new BindingPortEntity("b", ActionRole.recipient),
-                new BindingPortInventoryItem("item", "_any_")
-            }
-         ) }
+        ) }//,
+        //{"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
+        //    new Precondition(new List<Condition>() {
+        //        new Condition_NotYou("#b#")
+        //    }),
+        //    new List<Outcome>() {
+        //        new Outcome(//success:
+        //            new ChanceModifierCombination(new List<ChanceModifier>() {
+        //                new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
+        //                new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), true)
+        //            }),
+        //            new List<Effect>() {
+        //                new EffectInventoryStatic("#b#", "#item#", -1),
+        //                new EffectInventoryStatic("#a#", "#item#", 1),
+        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
+        //            }
+        //        ),
+        //        new Outcome( //doesn't have item:
+        //            new ChanceModifierCombination(new List<ChanceModifier>() {
+        //                new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
+        //                new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), false)
+        //            }),
+        //            new List<Effect>() {
+        //                new EffectGoal("#b#", new GoalModule(
+        //                    new List<GM_Precondition>() {},
+        //                    new List<Goal>() {
+        //                        new Goal(new StateInventoryStatic("#a#", "#item#", 1, INF), 3),
+        //                    }
+        //                )),
+        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
+        //            }
+        //        ),
+        //        new Outcome( //doesn't want to give item
+        //            new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), false),
+        //            new List<Effect>() {
+        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -1),
+        //                new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
+        //            }
+        //        )
+        //    },
+        //    new List<BindingPort>() {
+        //        new BindingPortEntity("a", ActionRole.initiator),
+        //        new BindingPortEntity("b", ActionRole.recipient),
+        //        new BindingPortInventoryItem("item", "_any_")
+        //    }
+        // ) }
     };
 }

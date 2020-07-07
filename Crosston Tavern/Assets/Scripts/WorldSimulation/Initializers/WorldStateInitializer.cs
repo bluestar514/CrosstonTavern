@@ -38,6 +38,13 @@ public class WorldStateInitializer
                                     }
                                 )) ;
 
+        townies[2].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new Goal(new StateSocial("clara", "organizer_alicia", Relationship.RelationType.friendly, -100, -5), 1)
+                                    }
+                                ));
+
         return townies;
     }
 }

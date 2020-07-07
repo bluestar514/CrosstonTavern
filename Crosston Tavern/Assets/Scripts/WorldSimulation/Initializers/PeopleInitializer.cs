@@ -6,18 +6,18 @@ public class PeopleInitializer
 {
     public static List<GenericAction> peopleActions = new List<GenericAction>() {
         ActionInitializer.actions["talk"],
-        //ActionInitializer.actions["give_#item#"],
-        //ActionInitializer.actions["insult"],
+        ActionInitializer.actions["give_#item#"],
+        ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
         ActionInitializer.actions["start_dating"],
-        ActionInitializer.actions["ask_out_to_#location#"]
+        ActionInitializer.actions["ask_out_to_#location#"]    
     };
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
             {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
-            //{"vendor_clara",        new Person("vendor_clara",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"clara",               new Person("clara",             "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
             //{"judge_dirk",          new Person("judge_dirk",        "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
             //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
@@ -31,15 +31,10 @@ public class PeopleInitializer
         SetInventoryRandom(allPeople);
         SetPreferencesRandom(allPeople);
 
-        foreach(Person person in allPeople.Values) {
-            person.statusEffectTable.Add(new EntityStatusEffect("test", EntityStatusEffectType.happy, 24, 3, new List<string>()));
-        }
-
-
         // Override with specific things for the senario and or testing
             //Lover scenario Details:
-            allPeople["lover_bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
-            allPeople["lover_bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
+            allPeople["lover_bob"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 2);
+            allPeople["lover_bob"].relationships.Set("organizer_alicia", Relationship.RelationType.romantic, 5);
 
             allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.friendly, 3);
             allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.romantic, 0);
@@ -51,9 +46,12 @@ public class PeopleInitializer
 
             allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
 
-            //Organizer scenario details:
+        //Organizer scenario details:
 
 
+        //Clara Testing Rivals
+        allPeople["clara"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 3);
+        allPeople["organizer_alicia"].relationships.Set("clara", Relationship.RelationType.friendly, 3);
 
 
         return allPeople;

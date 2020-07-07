@@ -21,6 +21,19 @@ public class ChanceModifierRelation : ChanceModifier
 
         float currentRelValue = source.relationships.Get(target, type);
 
+        //Account for Emotion:
+        StatusEffectSummary emotionState = source.statusEffectTable.CalculateStatus(target);
+        switch (type) {
+            case Relationship.RelationType.friendly:
+                currentRelValue += emotionState[EntityStatusEffectType.happy];
+                currentRelValue -= emotionState[EntityStatusEffectType.angry];
+                currentRelValue -= emotionState[EntityStatusEffectType.sad];
+                break;
+            case Relationship.RelationType.romantic:
+                currentRelValue -= emotionState[EntityStatusEffectType.angry];
+                break;
+        }
+
         //currentRelValue should be between 0 and 1, never negative
         //at deltaMax -> 1
         //at deltaMin -> 0

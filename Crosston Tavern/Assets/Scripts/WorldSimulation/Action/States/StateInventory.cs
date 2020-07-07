@@ -32,6 +32,7 @@ public class StateInventoryStatic : StateInventory
 
     public override bool InEffect(WorldState ws, BoundBindingCollection bindings, FeatureResources resources)
     {
+
         string owner = bindings.BindString(ownerId);
         string boundItem = bindings.BindString(itemId);
 

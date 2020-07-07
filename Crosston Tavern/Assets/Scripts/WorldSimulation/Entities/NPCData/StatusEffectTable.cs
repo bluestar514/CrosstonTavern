@@ -46,11 +46,14 @@ public class StatusEffectTable
     {
         StatusEffectSummary s = new StatusEffectSummary();
 
+        foreach(EntityStatusEffectType status in System.Enum.GetValues(typeof(EntityStatusEffectType))) {
+            s.Add(status, 0);
+        }
+
         foreach(EntityStatusEffect effect in activeEffects) {
 
             EntityStatusEffectType type = effect.type;
 
-            if (!s.ContainsKey(type)) s.Add(type, 0);
             s[type] += effect.strength;
 
             if (effect.target.Contains(target)) {
