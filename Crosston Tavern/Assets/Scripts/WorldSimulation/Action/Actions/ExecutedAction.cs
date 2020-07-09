@@ -18,4 +18,9 @@ public class ExecutedAction : ChosenAction
         inProgress = chosenAction.inProgress;
     }
 
+    public override string ToString()
+    {
+        return "{" + Action + "-" + executionTime + "}";
+    }
+
 }

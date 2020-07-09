@@ -49,4 +49,9 @@ public class KnownFacts
 
         return false;
     }
+
+    public List<ExecutedAction> GetHistory()
+    {
+        return new List<ExecutedAction>(history);
+    }
 }

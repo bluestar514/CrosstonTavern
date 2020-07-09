@@ -17,8 +17,8 @@ public class PeopleInitializer
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
             {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"clara",               new Person("clara",             "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
-            //{"judge_dirk",          new Person("judge_dirk",        "farm", 2, peopleActions, new Dictionary<string, List<string>>())}//,
+            {"clara",               new Person("clara",             "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"faroff_dirk",         new Person("faroff_dirk",       "blacksmith", 2, peopleActions, new Dictionary<string, List<string>>())}//,
             //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},

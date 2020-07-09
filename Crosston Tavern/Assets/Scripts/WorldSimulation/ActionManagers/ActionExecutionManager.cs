@@ -42,6 +42,8 @@ public class ActionExecutionManager : ActionManager
         if (location != actor.townieInformation.location)
             RealizeActionForTownies(actor.townieInformation.location, executedAction);
 
+        ws.AddHistory(executedAction);
+
         return executedAction;
 
     }
