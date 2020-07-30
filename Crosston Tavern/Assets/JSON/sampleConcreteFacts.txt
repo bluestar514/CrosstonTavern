@@ -1,0 +1,61 @@
+Events:
+{
+	name: "{<fish(alicia, river_farm)>:0.5}"
+	actorId: "alicia"
+	featureId: "river_farm"
+	locationId: "farm"
+	weight: 0.5
+	executedEffect:[
+		<EffectInventory("alicia", 1, "bass")>
+	]
+	executionTime: <WorldTime(Day1-9am)>
+}
+{
+	name: "{<small_talk(alicia, bob)>:4}"
+	actorId: "alicia"
+	featureId: "bob"
+	locationId: "town"
+	weight: 4
+	executedEffect:[
+		<EffectSocial("alicia", "bob", Relationship.RelationType.friendly, 2)>
+		<EffectSocial("bob", "alicia", Relationship.RelationType.friendly, 1)>
+	]
+	executionTime: <WorldTime(Day3-4pm)>
+}
+{
+	name: "{<insult(clara, alicia)>:17}"
+	actorId: "clara"
+	featureId: "alicia"
+	locationId: "dock"
+	weight: 17
+	executedEffect: [
+		<EffectSocialVariable("alicia", "clara", Relationship.RelationType.friendly, -3)>,
+        <EffectStatusEffect("alicia", <EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, "clara")>)>
+	]
+	executionTime: <WorldTime(Day2-1pm)>
+}
+
+This is the basic structure at this point for recording events:
+{
+	name: (a string summarizing the action)
+	actorId: (NPC who preformed the action)
+	featureId: (Either object or other NPC interacted with)
+	locationId: (where the action took place)
+	weight: (the value calculated by the hueristic to choose this action)
+	executedEffect: (a list of Effect objects)
+	executionTime: (a datastructure that defines when the action occured)
+}
+
+Aspects of the World:
+Available Resources:
+{
+	entityID: "river_farm"
+	resourceId: "#common_fish#",
+	potentialItem: "bass"
+}
+NPC gift preferences:
+{
+	entityID: "alicia"
+	preferenceLevel: PreferenceLevel.love,
+	potentialItem: "strawberry"
+}
