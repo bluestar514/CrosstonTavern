@@ -49,15 +49,15 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 2),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 2)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -1, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -1, 3)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -2, 0),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -2, 0)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, 1),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, 1)
                     }
                 ),
             },
@@ -90,7 +90,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.loved, ChanceModifierItemOpinion.OpinionLevel.max),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 2, 5),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 10, 15),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.loved, "#item#"))
@@ -99,7 +99,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.liked, ChanceModifierItemOpinion.OpinionLevel.liked),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 1, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 0, 5),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.liked, "#item#"))
@@ -108,7 +108,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -3, -1),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -10),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#"))
@@ -142,52 +142,52 @@ public class ActionInitializer
                 new BindingPortStockItem("item", "b")
             }
         ) },
-        {"ask_out_to_#location#", new GenericAction("ask_out_to_#location#", 1,
-            new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateAvailableNow("#a#", WorldTime.Time(1,30)))
-            }),
-            new List<Outcome>() {
-                new Outcome(
-                    new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 0, 5), true),
-                    new List<Effect>() {
-                        new EffectObligationNow("#a#","Date_At_#location#_With_#b#", WorldTime.Time(1, 30), true,
-                                                    new GoalModule(
-                                                            new List<GM_Precondition>(){
-                                                                new GM_Precondition_Now(WorldTime.Time(1, 30))
-                                                            },
-                                                            new List<Goal>() {
-                                                                new Goal(new StatePosition("#a#", "#location#"), 10),
-                                                                new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 10, 20), 5),
-                                                                new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 5, 20), 3)
-                                                            },
-                                                            "Date_At_#location#_With_#b#"
-                                              )
-                        ),
-                        new EffectObligationNow("#b#","Date_At_#location#_With_#a#", WorldTime.Time(1, 30), true,
-                                                    new GoalModule(
-                                                            new List<GM_Precondition>(){
-                                                                new GM_Precondition_Now(WorldTime.Time(1, 30))
-                                                            },
-                                                            new List<Goal>() {
-                                                                new Goal(new StatePosition("#b#", "#location#"), 10),
-                                                                new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 10, 20), 5),
-                                                                new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 20), 3)
-                                                            },
-                                                            "Date_At_#location#_With_#a#"
-                                              )
-                        ),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 3),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 3)
-                    }
-                )
-            },
-            new List<BindingPort>() {
-                new BindingPortEntity("a", ActionRole.initiator),
-                new BindingPortEntity("b", ActionRole.recipient),
-                new BindingPortEntity("location", ActionRole.location_any)
-            }
-        ) },
+        //{"ask_out_to_#location#", new GenericAction("ask_out_to_#location#", 1,
+        //    new Precondition(new List<Condition>() {
+        //        new Condition_NotYou("#b#"),
+        //        new Condition_IsState(new StateAvailableNow("#a#", WorldTime.Time(1,30)))
+        //    }),
+        //    new List<Outcome>() {
+        //        new Outcome(
+        //            new ChanceModifierRelation(new StateSocial("#b#","#a#", Relationship.RelationType.friendly, 0, 5), true),
+        //            new List<Effect>() {
+        //                new EffectObligationNow("#a#","Date_At_#location#_With_#b#", WorldTime.Time(1, 30), true,
+        //                                            new GoalModule(
+        //                                                    new List<GM_Precondition>(){
+        //                                                        new GM_Precondition_Now(WorldTime.Time(1, 30))
+        //                                                    },
+        //                                                    new List<Goal>() {
+        //                                                        new Goal(new StatePosition("#a#", "#location#"), 10),
+        //                                                        new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 10, 20), 5),
+        //                                                        new Goal(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 5, 20), 3)
+        //                                                    },
+        //                                                    "Date_At_#location#_With_#b#"
+        //                                      )
+        //                ),
+        //                new EffectObligationNow("#b#","Date_At_#location#_With_#a#", WorldTime.Time(1, 30), true,
+        //                                            new GoalModule(
+        //                                                    new List<GM_Precondition>(){
+        //                                                        new GM_Precondition_Now(WorldTime.Time(1, 30))
+        //                                                    },
+        //                                                    new List<Goal>() {
+        //                                                        new Goal(new StatePosition("#b#", "#location#"), 10),
+        //                                                        new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.friendly, 10, 20), 5),
+        //                                                        new Goal(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 20), 3)
+        //                                                    },
+        //                                                    "Date_At_#location#_With_#a#"
+        //                                      )
+        //                ),
+        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 3),
+        //                new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 3)
+        //            }
+        //        )
+        //    },
+        //    new List<BindingPort>() {
+        //        new BindingPortEntity("a", ActionRole.initiator),
+        //        new BindingPortEntity("b", ActionRole.recipient),
+        //        new BindingPortEntity("location", ActionRole.location_any)
+        //    }
+        //) },
         {"insult", new GenericAction("insult", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#")
@@ -247,11 +247,11 @@ public class ActionInitializer
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
                 new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false),
-                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 5, 1000), true)
+                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 20, 1000), true)
             }),
             new List<Outcome>() {
                 new Outcome( //success:
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 20), true),
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 20, 100), true),
                     new List<Effect>() {
                         new EffectRelationship("#a#", "#b#", Relationship.RelationshipTag.dating, true, true),
                         new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2),
@@ -261,12 +261,12 @@ public class ActionInitializer
                     }
                 ),
                 new Outcome( //failure:
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 20), false),
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 20, 100), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -4, -1),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -4, -2),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.romantic, -2, 0),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -2, 0)
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -15, -5),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -5),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.romantic, -5, 0),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -5, 0)
                     }
                 ),
             },
@@ -274,7 +274,34 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             }
-        ) }//,
+        ) },
+        { "outing_shopping_at_#loc#_with_#b#", new GenericAction( "outing_shopping_at_#loc#_with_#b#", 1, 
+        
+            new Precondition(new List<Condition>() {
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), true),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 10),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 10)
+                    }
+                ),
+                 new Outcome(
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), false),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -10, -2),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -10, -2)
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.bystander),
+                new BindingPortEntity("loc", ActionRole.recipient)
+            }
+        )}//,
         //{"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
         //    new Precondition(new List<Condition>() {
         //        new Condition_NotYou("#b#")

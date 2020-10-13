@@ -10,7 +10,8 @@ public class PeopleInitializer
         ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
         ActionInitializer.actions["start_dating"],
-        ActionInitializer.actions["ask_out_to_#location#"]    
+        //ActionInitializer.actions["ask_out_to_#location#"],
+        //ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
     };
 
     public static Dictionary<string, Person> GetAllPeople() {

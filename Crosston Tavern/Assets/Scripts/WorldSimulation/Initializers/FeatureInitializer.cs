@@ -6,17 +6,12 @@ public class FeatureInitializer
 {
     static string UNSET = "UNSET";
 
-    enum FeatureType
-    {
-        river,
-        door,
-        shop
-    }
 
-    static Dictionary<FeatureType, Feature> MakeFeatures()
+
+    static Dictionary<Feature.FeatureType, Feature> MakeFeatures()
     {
-        return new Dictionary<FeatureType, Feature>() {
-            {FeatureType.river, new Feature("river", UNSET, 2,
+        return new Dictionary<Feature.FeatureType, Feature>() {
+            {Feature.FeatureType.river, new Feature("river", Feature.FeatureType.river, UNSET, 2,
                                     new List<GenericAction>(){
                                         ActionInitializer.actions["fish"]
                                     },
@@ -25,21 +20,23 @@ public class FeatureInitializer
                                         {"rare_fish", new List<string>(){"salmon"} }
                                     })
             },
-            {FeatureType.door, new Feature("door", UNSET, 100,
+            {Feature.FeatureType.door, new Feature("door", Feature.FeatureType.door, UNSET, 100,
                                     new List<GenericAction>(){ ActionInitializer.actions["move"] },
                                     new Dictionary<string, List<string>>())
             },
-            {FeatureType.shop, new Feature("shop", UNSET, 2,
-                                    new List<GenericAction>(){ ActionInitializer.actions["buy_#item#"] },
+            {Feature.FeatureType.shop, new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
+                                    new List<GenericAction>(){ ActionInitializer.actions["buy_#item#"],
+                                                                ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
+                                    },
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})
             }
         };
     }
 
-    static Dictionary<string, List<FeatureType>> featuresInRoom = new Dictionary<string, List<FeatureType>>() {
-        {"farm", new List<FeatureType>(){FeatureType.river} },
-        {"feild", new List<FeatureType>(){FeatureType.river} }
+    static Dictionary<string, List<Feature.FeatureType>> featuresInRoom = new Dictionary<string, List<Feature.FeatureType>>() {
+        {"farm", new List<Feature.FeatureType>(){ Feature.FeatureType.river} },
+        {"feild", new List<Feature.FeatureType>(){ Feature.FeatureType.river} }
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {
@@ -57,7 +54,7 @@ public class FeatureInitializer
         Dictionary<string, Feature> allFeatures = new Dictionary<string, Feature>();
 
         foreach(string room in featuresInRoom.Keys) {
-            foreach(FeatureType ft in featuresInRoom[room]) {
+            foreach(Feature.FeatureType ft in featuresInRoom[room]) {
                 Feature newFeature = MakeFeatures()[ft];
                 newFeature.location = room;
                 newFeature.id += "_" + newFeature.location;
@@ -67,7 +64,7 @@ public class FeatureInitializer
         }
 
 
-        Feature shop = MakeFeatures()[FeatureType.shop];
+        Feature shop = MakeFeatures()[Feature.FeatureType.shop];
         shop.id = "tackle_shop_town";
         shop.location = "farm";
         shop.stockTable = new StringIntDictionary() {
@@ -83,14 +80,14 @@ public class FeatureInitializer
 
 
         foreach (KeyValuePair<string, string> connection in roomConnections) {
-            Feature door = MakeFeatures()[FeatureType.door];
+            Feature door = MakeFeatures()[Feature.FeatureType.door];
             door.location = connection.Key;
             door.relevantResources.Add(Map.R_CONNECTEDLOCATION, new List<string>() { connection.Value });
             door.id += "_" + door.location + "->" + connection.Value;
 
             allFeatures.Add(door.id, door);
 
-            door = MakeFeatures()[FeatureType.door];
+            door = MakeFeatures()[Feature.FeatureType.door];
             door.location = connection.Value;
             door.relevantResources.Add(Map.R_CONNECTEDLOCATION, new List<string>() { connection.Key });
             door.id += "_" + door.location + "->" + connection.Key;

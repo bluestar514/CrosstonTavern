@@ -71,8 +71,8 @@ public class WorldState
     public List<string> GetBystanders(string locationId)
     {
         return new List<string>(from person in map.GatherFeaturesAt(locationId)
-                                where person.id.StartsWith("person_")
-                                select person.id.Replace("person_", ""));
+                                where person.type == Feature.FeatureType.person
+                                select person.id);
     }
 
 

@@ -20,10 +20,20 @@ public class Feature
     public int maxUsers;
     public int currentUsers= 0;
 
-    public Feature(string id, string location, int maxUsers, List<GenericAction> providedActions, 
+    public readonly FeatureType type;
+    public enum FeatureType
+    {
+        river,
+        door,
+        shop,
+        person
+    }
+
+    public Feature(string id, FeatureType type, string location, int maxUsers, List<GenericAction> providedActions, 
         Dictionary<string, List<string>> relevantResources, Dictionary<string, int> stockTable=null)
     {
         this.id = id;
+        this.type = type;
         this.location = location;
         this.providedActions = providedActions;
         StringStringListDictionary resources = new StringStringListDictionary();
@@ -42,9 +52,9 @@ public class Feature
     {
         Feature f;
         if (perfect) {
-            f = new Feature(id, location, maxUsers, providedActions, new Dictionary<string, List<string>>(relevantResources.resources), new Dictionary<string, int>(stockTable));
+            f = new Feature(id, type, location, maxUsers, providedActions, new Dictionary<string, List<string>>(relevantResources.resources), new Dictionary<string, int>(stockTable));
         } else {
-            f = new Feature(id, location, maxUsers, providedActions, new Dictionary<string, List<string>>(), new Dictionary<string, int>(stockTable));
+            f = new Feature(id, type, location, maxUsers, providedActions, new Dictionary<string, List<string>>(), new Dictionary<string, int>(stockTable));
         }
 
         f.inventory = inventory.Copy(perfect);

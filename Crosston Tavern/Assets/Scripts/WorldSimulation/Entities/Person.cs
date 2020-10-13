@@ -15,7 +15,7 @@ public class Person: Feature
     public Person(string id, string location, int maxUsers,
             List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
             Dictionary<string, int> stockTable = null) :
-    base(id, location, maxUsers, providedActions, relevantResources, stockTable)
+    base(id, FeatureType.person, location, maxUsers, providedActions, relevantResources, stockTable)
     {
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
@@ -27,7 +27,7 @@ public class Person: Feature
         schedule = new Schedule();
     }
 
-    public Person(Feature f): base(f.id, f.location, f.maxUsers, f.providedActions, f.relevantResources.resources, f.stockTable)
+    public Person(Feature f): base(f.id, FeatureType.person, f.location, f.maxUsers, f.providedActions, f.relevantResources.resources, f.stockTable)
     {
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
