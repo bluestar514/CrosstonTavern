@@ -9,14 +9,18 @@ public class Goal
     public string name;
 
     public State state;
-
     public float priority;
 
     public int priTimer;
     int priTimerCurrent;
 
+    public int timeOut = PERMINATE;
+
+    public static int PERMINATE = -1;
+
     //public List<Goal> parentGoals = new List<Goal>();
-    public List<BoundAction> enablingActions = new List<BoundAction>();
+    public List<BoundAction> enablingActions = new List<BoundAction>(); // THese are the actions completing this goal unlocks
+    //Not the actions which complete this goal
 
     public Goal(State state, float priority)
     {
@@ -32,6 +36,11 @@ public class Goal
         enablingActions.AddRange(enabledActions);
     }
 
+    public Goal(State state, float priority, int timeOut): this(state, priority)
+    {
+        this.timeOut = timeOut; 
+    }
+
     public override string ToString()
     {
         return state.ToString() + ":" + priority; 
@@ -42,7 +51,7 @@ public class Goal
     {
         List<State> states = this.state.Combine(goal.state);
         if (states.Count == 1) {
-            Goal newGoal = new Goal(states[0], this.priority + goal.priority);
+            Goal newGoal = new Goal(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
             newGoal.enablingActions.AddRange(enablingActions);
             newGoal.enablingActions.AddRange(goal.enablingActions);
             return new List<Goal>() { newGoal };

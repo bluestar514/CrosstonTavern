@@ -7,7 +7,8 @@ using System;
 public class WorldHub : MonoBehaviour
 {
     public WorldState ws;
-    public List<Townie> allPeople;
+
+    List<Townie> allPeople;
 
     public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
 
@@ -19,7 +20,7 @@ public class WorldHub : MonoBehaviour
         ws = WorldStateInitializer.GetWorldState();
         ws.id = "main";
 
-        allPeople = WorldStateInitializer.GetTownies(ws); 
+        allPeople = WorldStateInitializer.GetTownies(ws, transform); 
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
         foreach (Townie person in allPeople) {
@@ -38,13 +39,14 @@ public class WorldHub : MonoBehaviour
     public void TimeStep()
     {
         int i = timeStep.Count;
-        
 
+        
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
         foreach (Townie person in allPeople) {
             
 
             if(chosenActions[person] == null) {
+                person.townieInformation.knownGoals = person.gm.GetGoalsList();
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, ws);
 
                 chosenActions[person]= ahm.ChooseBestAction();
@@ -62,9 +64,6 @@ public class WorldHub : MonoBehaviour
                 executedActions.Add(executedAction);
 
                 chosenActions[person] = null;
-                
-
-                person.townieInformation.knownGoals = person.gm.GetGoalsList();
 
             }
         }
@@ -93,5 +92,10 @@ public class WorldHub : MonoBehaviour
         }
     }
 
+
+    public List<Townie> GetTownies()
+    {
+        return allPeople;
+    }
 }
 

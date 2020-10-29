@@ -8,6 +8,7 @@ public class Person: Feature
 {
     public Relationship relationships;
     public PreferencesDictionary preferences;
+    public Skill skill;
 
     public List<Goal> knownGoals;
     public Schedule schedule;
@@ -24,6 +25,8 @@ public class Person: Feature
             preferences.Add(level, new List<string>());
         }
 
+        skill = new Skill();
+
         schedule = new Schedule();
     }
 
@@ -36,13 +39,14 @@ public class Person: Feature
             preferences.Add(level, new List<string>());
         }
 
+        skill = new Skill();
+
         schedule = new Schedule();
     }
 
     public override Feature Copy(bool perfect)
     {
         Person p = new Person(base.Copy(perfect));
-
 
         p.preferences = new PreferencesDictionary();
         if (perfect) {
@@ -56,6 +60,7 @@ public class Person: Feature
             }
         }
 
+        p.skill = skill.Copy(perfect);
         p.relationships = relationships.Copy(perfect);
 
 

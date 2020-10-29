@@ -37,7 +37,7 @@ public class EventDetailPanel : DetailTab
         FillPanel(InvalidActionsPanel, InvalidActionsPrefab, action.invalidChoices);
         FillPanel(RejectedActionsPanel, WeightedActionPrefab, action.rejectedChoices);
         FillPanel(RationalsPanel, RationalsPrefab, action.Action.weightRationals);
-        FillPanel(EffectsPanel, EffectsPrefab, action.executedEffect.effects);
+        FillPanel(EffectsPanel, EffectsPrefab, action.executedEffect);
 
     }
 

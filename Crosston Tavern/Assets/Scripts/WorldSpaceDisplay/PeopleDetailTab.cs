@@ -23,7 +23,7 @@ public class PeopleDetailTab : DetailTab
         location.text = person.location;
 
 
-        Townie townie = new List<Townie>(from t in worldHub.allPeople
+        Townie townie = new List<Townie>(from t in worldHub.GetTownies()
                                          where t.townieInformation == person
                                          select t)[0];
 

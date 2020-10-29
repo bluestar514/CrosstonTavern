@@ -68,8 +68,6 @@ public class ActionBuilder
                         potentialBindings.Add(entity.tag, new List<BoundBindingPort>() { new BoundPortEntity(entity.tag, data.featureId) });
                         break;
                     case ActionRole.bystander:
-                        Debug.Log("Finding Bystanders?:" + ws.GetBystanders(data.locationId).Count);
-
                         potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.GetBystanders(data.locationId)
                                                                                      select new BoundPortEntity(entity.tag, person)));
                         break;

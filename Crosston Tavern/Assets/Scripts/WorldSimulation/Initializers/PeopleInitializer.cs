@@ -10,6 +10,7 @@ public class PeopleInitializer
         ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
         ActionInitializer.actions["start_dating"],
+        ActionInitializer.actions["ask_#item#"],
         //ActionInitializer.actions["ask_out_to_#location#"],
         //ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
     };
@@ -29,7 +30,7 @@ public class PeopleInitializer
 
         // Fill all values at random for everyone initially
         SetRelationsRandom(allPeople);
-        SetInventoryRandom(allPeople);
+        //SetInventoryRandom(allPeople);
         SetPreferencesRandom(allPeople);
 
         // Override with specific things for the senario and or testing
@@ -41,11 +42,28 @@ public class PeopleInitializer
             allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.romantic, 0);
 
 
-            allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
-            allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
-            //allPeople["organizer_alicia"].inventory.ChangeInventoryContents(1, "fishing_rod");
+            //allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
+            //allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
 
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("dragon_egg");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("strawberry_cake");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("salmon_fried");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("morning_rose");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("strawberry");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("salmon");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("rose");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("dandilion");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("blackberry");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("trout");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("tulip");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("blackberry_tart");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("trout_stew");
+            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("evening_tulip");
+
+            allPeople["faroff_dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
+
+
+
+
 
         //Organizer scenario details:
 

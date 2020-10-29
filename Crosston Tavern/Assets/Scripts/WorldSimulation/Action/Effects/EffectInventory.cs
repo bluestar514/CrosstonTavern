@@ -44,10 +44,14 @@ public class EffectInventory : Effect
         List<string> items = resources.BindString(itemid);
         itemid = items[Mathf.FloorToInt(UnityEngine.Random.value * items.Count)];
 
-        Inventory inv = ws.GetInventory(owner);
-        inv.ChangeInventoryContents(delta, itemid);
+        int num = delta;
 
-        return new EffectInventoryStatic(owner, itemid, delta);
+        Inventory inv = ws.GetInventory(owner);
+        inv.ChangeInventoryContents(num, itemid);
+
+        Effect realizedEffect = new EffectInventoryStatic(owner, itemid, num);
+
+        return realizedEffect;
     }
 }
 

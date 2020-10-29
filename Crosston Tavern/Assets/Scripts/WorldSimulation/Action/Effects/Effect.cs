@@ -37,11 +37,11 @@ public class Effect
     /// <param name="min">Minumum Goal Value</param>
     /// <param name="max">Maximum Goal Value</param>
     /// <returns>Weight based on how much we have moved into the target zone</returns>
-    protected float CountInRange(int count, int delta, int min, int max)
+    protected float CountInRange(float count, float delta, float min, float max)
     {
         float weight = 0;
 
-        int newCount = count + delta;
+        float newCount = count + delta;
 
         //get there in one step:
         // in range -> +1
@@ -102,7 +102,13 @@ public class EffectMovement: Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (!(goal.state is StatePosition)) return 0;
+        if (!(goal.state is StatePosition)) return WeighToDoAction(ws, bindings, resources, goal);
+        else return WeighForLocation(ws, bindings, resources, goal);
+        
+    }
+
+    private float WeighForLocation(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
         StatePosition state = (StatePosition)goal.state;
 
         string mover = bindings.BindString(moverId);
@@ -122,7 +128,7 @@ public class EffectMovement: Effect
         foreach (string location in locations) {
             //get there in one step
             if (location == goalLocation) weight += 2;
-            else weight -= 1;
+            //else weight -= 1;
             //Move in right direction
             if (map.GetDistance(currentLocation, goalLocation) > map.GetDistance(location, goalLocation))
                 weight += 2 * (map.LocationCount - map.GetDistance(location, goalLocation)) / map.LocationCount;
@@ -130,8 +136,13 @@ public class EffectMovement: Effect
             if (currentLocation == goalLocation) weight -= 1;
         }
 
-        return weight / locations.Count /4; 
+        return weight / locations.Count / 4;
         //4 is max score, this should normalize the number to always be between 0 and 1;
+    }
+
+    private float WeighToDoAction(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        return 0;
     }
 
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)

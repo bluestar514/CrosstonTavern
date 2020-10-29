@@ -24,7 +24,7 @@ public class KnownFacts
     {
         history.Add(action);
 
-        foreach(Effect effect in action.executedEffect.effects) {
+        foreach(Effect effect in action.executedEffect) {
             if(effect is EffectKnowledge) {
                 EffectKnowledge effectKnow = (EffectKnowledge)effect;
                 AddFact(effectKnow.fact, ws);

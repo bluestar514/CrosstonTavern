@@ -11,7 +11,7 @@ using System.Linq;
 public class ActionExecutionManager : ActionManager
 {
     Townie actor;
-    WorldState ws;
+    WorldState ws; //global world state
     List<Townie> townies;
 
     public ActionExecutionManager(Townie actor, WorldState ws, List<Townie> townies)
@@ -34,11 +34,11 @@ public class ActionExecutionManager : ActionManager
 
         List <Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, bindings, resources);
 
-        Outcome realizedOutcome = new Outcome(new ChanceModifierSimple(1), realizedEffects);
-
-        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedOutcome, ws.Time);
+        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedEffects, ws.Time);
 
         RealizeActionForTownies(location, executedAction);
+
+        //exectute action in minds of townies at both destination and source
         if (location != actor.townieInformation.location)
             RealizeActionForTownies(actor.townieInformation.location, executedAction);
 
@@ -70,6 +70,8 @@ public class ActionExecutionManager : ActionManager
     {
         List<Effect> realizedEffects = new List<Effect>();
 
+        // updates the global WS
+        // which is why the Townies feild here is null because we arent' updating anyone's internal state
         foreach (Effect effect in chosenOutcome.effects) {
             realizedEffects.Add(effect.ExecuteEffect(ws, null, bindings, resources));
         }
@@ -82,13 +84,12 @@ public class ActionExecutionManager : ActionManager
     {
         WeightedAction action = executedAction.Action;
 
-        List <Effect> realizedEffects = action.potentialOutcomes[0].effects;
+        List <Effect> realizedEffects = executedAction.executedEffect;
         BoundBindingCollection bindings = action.Bindings;
         FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
 
         foreach (Townie townie in townies) {
             if(townie.townieInformation.location == location) {
-
 
                 foreach (Effect effect in realizedEffects) {
                     effect.ExecuteEffect(townie.ws, townie, bindings, resources);

@@ -26,7 +26,10 @@ public class Feature
         river,
         door,
         shop,
-        person
+        kitchen,
+        brush,
+        person,
+        meadow
     }
 
     public Feature(string id, FeatureType type, string location, int maxUsers, List<GenericAction> providedActions, 

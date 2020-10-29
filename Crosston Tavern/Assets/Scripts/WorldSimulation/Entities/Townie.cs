@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Townie
+public class Townie: MonoBehaviour
 {
     [SerializeField]
     private string id;
@@ -17,7 +17,7 @@ public class Townie
 
     public List<ExecutedAction> history;
 
-    public Townie(Person townieInformation, WorldState ws, GoalManager gm)
+    public void TownieInit(Person townieInformation, WorldState ws, GoalManager gm)
     {
         id = townieInformation.id;
         this.townieInformation = townieInformation;

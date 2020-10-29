@@ -17,20 +17,23 @@ public class ActionInitializer
                     new ChanceModifierSimple(.5f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
-                        new EffectKnowledge(new WorldFactResource("#feature#", "#common_fish#", "#c_fish#"))
+                        new EffectKnowledge(new WorldFactResource("#feature#", "common_fish", "#c_fish#")),
+                        new EffectSkill("#a#", "fishing", 2)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSimple(.35f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_fish#"}, 1, 1),
-                        new EffectKnowledge(new WorldFactResource("#feature#", "#rare_fish#", "#r_fish#"))
+                        new EffectKnowledge(new WorldFactResource("#feature#", "rare_fish", "#r_fish#")),
+                        new EffectSkill("#a#", "fishing", 3)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSimple(.15f),
                     new List<Effect>() {
-                        new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5)
+                        new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5),
+                        new EffectSkill("#a#", "fishing", 1)
                     }
                 )
             },
@@ -41,6 +44,39 @@ public class ActionInitializer
                 new BindingPortString("r_fish", "#rare_fish#")
             }
         ) },
+        {"forage", new GenericAction("forage", 1,
+            new Precondition( new List<Condition>() {
+                
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(.5f),
+                    new List<Effect>() {
+                        new EffectInventoryVariable("#a#", new List<string>(){"#c_forage#"}, 1, 1),
+                        new EffectKnowledge(new WorldFactResource("#feature#", "common_forage", "#c_forage#"))
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierSimple(.35f),
+                    new List<Effect>() {
+                        new EffectInventoryVariable("#a#", new List<string>(){"#r_forage#"}, 1, 1),
+                        new EffectKnowledge(new WorldFactResource("#feature#", "rare_forage", "#r_forage#"))
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierSimple(.15f),
+                    new List<Effect>() {
+                        new EffectInventoryVariable("#a#", new List<string>(){"dandelion" }, 1, 5)
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("feature", ActionRole.recipient),
+                new BindingPortString("c_forage", "#common_forage#"),
+                new BindingPortString("r_forage", "#rare_forage#")
+            }
+        ) },
         {"talk", new GenericAction("talk", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#")
@@ -49,15 +85,15 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -1, 3),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -1, 3)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 3)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, 1),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, 1)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, 0),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, 0)
                     }
                 ),
             },
@@ -121,27 +157,64 @@ public class ActionInitializer
                 new BindingPortInventoryItem("item", "a")
             }
         ) },
-        {"buy_#item#", new GenericAction("buy_#item#", 1,
+        {"ask_#item#", new GenericAction("ask_#item#", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateInventoryBound("#a#", "currency", "#item.cost#", INF.ToString()))
+                new Condition_IsState(new StateInventoryStatic("#b#", "#item#", 1, INF))
             }),
             new List<Outcome>() {
                 new Outcome(
                     new ChanceModifier(),
                     new List<Effect>() {
                         new EffectInventoryStatic("#b#", "#item#", -1),
-                        new EffectInventoryStatic("#a#", "#item#", 1),
-                        new EffectInventoryBound("#a#", "currency", "-#item.cost#")
+                        new EffectInventoryStatic("#a#", "#item#", 1)
                     }
                 )
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient),
-                new BindingPortStockItem("item", "b")
+                new BindingPortInventoryItem("item", "b")
             }
         ) },
+        { "buy_fishing_rod", new GenericAction("buy_fishing_rod", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "fishing_rod", 0, 0))
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifier(),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "fishing_rod", 1)
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
+        )},
+        //{"buy_#item#", new GenericAction("buy_#item#", 1,
+        //    new Precondition(new List<Condition>() {
+        //        new Condition_NotYou("#b#"),
+        //        new Condition_IsState(new StateInventoryBound("#a#", "currency", "#item.cost#", INF.ToString()))
+        //    }),
+        //    new List<Outcome>() {
+        //        new Outcome(
+        //            new ChanceModifier(),
+        //            new List<Effect>() {
+        //                new EffectInventoryStatic("#b#", "#item#", -1),
+        //                new EffectInventoryStatic("#a#", "#item#", 1),
+        //                new EffectInventoryBound("#a#", "currency", "-#item.cost#")
+        //            }
+        //        )
+        //    },
+        //    new List<BindingPort>() {
+        //        new BindingPortEntity("a", ActionRole.initiator),
+        //        new BindingPortEntity("b", ActionRole.recipient),
+        //        new BindingPortStockItem("item", "b")
+        //    }
+        //) },
         //{"ask_out_to_#location#", new GenericAction("ask_out_to_#location#", 1,
         //    new Precondition(new List<Condition>() {
         //        new Condition_NotYou("#b#"),
@@ -301,7 +374,85 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.bystander),
                 new BindingPortEntity("loc", ActionRole.recipient)
             }
-        )}//,
+        )},
+        { "bake_strawberry_cake", new GenericAction("bake_stawrberry_cake", 1, 
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "strawberry", 1, INF)),
+                new Condition_IsState(new StateInventoryStatic("#a#", "strawberry_cake_recipe", 1, INF)),
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "strawberry_cake", 1),
+                        new EffectInventoryStatic("#a#", "strawberry", -1)
+                    })
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
+        )},
+        { "fry_salmon", new GenericAction("fry_salmon", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "salmon", 1, INF)),
+                new Condition_IsState(new StateInventoryStatic("#a#", "fried_salmon_recipe", 1, INF)),
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "fried_salmon", 1),
+                        new EffectInventoryStatic("#a#", "salmon", -1)
+                    })
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
+        )},
+        { "bake_blackberry_tart", new GenericAction("bake_blackberry_tart", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "blackberry", 1, INF)),
+                new Condition_IsState(new StateInventoryStatic("#a#", "blackberry_tart_recipe", 1, INF)),
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "blackberry_tart", 1),
+                        new EffectInventoryStatic("#a#", "blackberry", -1)
+                    })
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
+        )},
+        { "stew_trout", new GenericAction("stew_trout", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "trout", 1, INF)),
+                new Condition_IsState(new StateInventoryStatic("#a#", "trout_stew_recipe", 1, INF)),
+                new Condition_NotYou("#b#")
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "trout_stew", 1),
+                        new EffectInventoryStatic("#a#", "trout", -1)
+                    })
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            }
+        )}
+        
+        //,
         //{"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
         //    new Precondition(new List<Condition>() {
         //        new Condition_NotYou("#b#")

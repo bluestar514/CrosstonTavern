@@ -25,18 +25,48 @@ public class FeatureInitializer
                                     new Dictionary<string, List<string>>())
             },
             {Feature.FeatureType.shop, new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
-                                    new List<GenericAction>(){ ActionInitializer.actions["buy_#item#"],
+                                    new List<GenericAction>(){ //ActionInitializer.actions["buy_#item#"],
                                                                 ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
                                     },
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})
+            },
+            {Feature.FeatureType.kitchen, new Feature("kitchen", Feature.FeatureType.kitchen, UNSET, 2,
+                                    new List<GenericAction>(){ ActionInitializer.actions["bake_strawberry_cake"],
+                                                                ActionInitializer.actions["fry_salmon"],
+                                                                ActionInitializer.actions["bake_blackberry_tart"],
+                                                                ActionInitializer.actions["stew_trout"]
+
+                                    },
+                                    new Dictionary<string, List<string>>(),
+                                    new Dictionary<string, int>(){})
+            },
+            {Feature.FeatureType.brush, new Feature("brush", Feature.FeatureType.brush, UNSET, 2,
+                                    new List<GenericAction>(){
+                                        ActionInitializer.actions["forage"]
+                                    },
+                                    new Dictionary<string, List<string>>() {
+                                        {"common_forage", new List<string>(){"blackberry"} },
+                                        {"rare_forage", new List<string>(){"strawberry"} }
+                                    })
+            },
+            {Feature.FeatureType.meadow, new Feature("meadow", Feature.FeatureType.meadow, UNSET, 2,
+                                    new List<GenericAction>(){
+                                        ActionInitializer.actions["forage"]
+                                    },
+                                    new Dictionary<string, List<string>>() {
+                                        {"common_forage", new List<string>(){"tulip", "rose"} },
+                                        {"rare_forage", new List<string>(){"morning_rose", "evening_tulip"} }
+                                    })
             }
         };
     }
 
     static Dictionary<string, List<Feature.FeatureType>> featuresInRoom = new Dictionary<string, List<Feature.FeatureType>>() {
         {"farm", new List<Feature.FeatureType>(){ Feature.FeatureType.river} },
-        {"feild", new List<Feature.FeatureType>(){ Feature.FeatureType.river} }
+        {"feild", new List<Feature.FeatureType>(){ Feature.FeatureType.river, Feature.FeatureType.meadow} },
+        {"forest", new List<Feature.FeatureType>(){Feature.FeatureType.brush } },
+        {"inn", new List<Feature.FeatureType>(){Feature.FeatureType.kitchen} }
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {
@@ -66,7 +96,9 @@ public class FeatureInitializer
 
         Feature shop = MakeFeatures()[Feature.FeatureType.shop];
         shop.id = "tackle_shop_town";
-        shop.location = "farm";
+        shop.location = "town";
+
+        shop.providedActions.Add(ActionInitializer.actions["buy_fishing_rod"]);
         shop.stockTable = new StringIntDictionary() {
             {"fishing_rod", 5 },
             {"bass", 2},

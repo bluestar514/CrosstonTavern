@@ -68,8 +68,11 @@ public class GoalManager
             newGoals = new List<Goal>();
         }
 
+        allGoals = CondenseGoals(allGoals);
 
-        return CondenseGoals(allGoals);
+        allGoals = FindLocations(allGoals);
+
+        return allGoals;
     }
 
     class OutcomeRestraints
@@ -239,5 +242,40 @@ public class GoalManager
         }
 
         return condensedGoals;
+    }
+
+
+    List<Goal> FindLocations(List<Goal> goals)
+    {
+        Dictionary<string, float> locationPriority = new Dictionary<string, float>();
+
+        List<BoundAction> allActions = GetAllActions();
+        ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
+        
+        foreach (BoundAction action in allActions) {
+            if (action.preconditions.Valid(ws, actor, action.Bindings, ws.map.GetFeature(action.FeatureId).relevantResources)) {
+                float desire = ahm.WeighActions(new List<BoundAction>() { action })[0].weight;
+                desire = Mathf.Max(0, desire);
+
+                List<OutcomeRestraints> outcomes = DecomposeActionToOutcomes(action);
+                foreach (OutcomeRestraints outcome in outcomes) {
+                    foreach (Goal goal in goals) {
+                        if (OutcomeProgressesGoal(outcome, goal)) {
+                            string location = action.LocationId;
+                            if (locationPriority.ContainsKey(location)) locationPriority[location]+=desire;
+                            else locationPriority.Add(location, desire);
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+        foreach(string location in locationPriority.Keys) {
+            goals.Add(new Goal(new StatePosition(actor.id, location), locationPriority[location]));
+        }
+
+        return goals;
     }
 }
