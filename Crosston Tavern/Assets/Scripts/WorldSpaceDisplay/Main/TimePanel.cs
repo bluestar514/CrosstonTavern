@@ -7,12 +7,15 @@ public class TimePanel : MonoBehaviour
 {
     public int timeStep;
 
+    public WorldTime timeStamp;
+
     public Text display;
 
-    public void Set(int time)
+    public void Set(int time, WorldTime timeStamp)
     {
         timeStep = time;
+        this.timeStamp = timeStamp;
 
-        display.text = timeStep.ToString();
+        display.text = timeStep.ToString() +":"+timeStamp.ToString() ;
     }
 }

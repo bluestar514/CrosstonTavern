@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Patron 
@@ -7,55 +8,48 @@ public class Patron
     string name;
     public string Name { get => name; set => name = value; }
 
+    public Townie townie;
+    public List<SocialMove> socialMoves;
 
-    List<SocialMove> socialMoves;
+    ConversationController cc;
 
-    public Patron(string name)
+    public Patron(Townie townie, List<SocialMove> socialMoves)
     {
-        this.Name = name;
+        this.townie = townie;
+        this.Name = townie.townieInformation.id;
 
-        socialMoves = new List<SocialMove>()
-        {
-            new SocialMove("talk"),
-            new SocialMove("argue"),
-            new SocialMove("insult"),
-            new SocialMove("compliment"),
-            new SocialMove("complain"),
-            new SocialMove("brag"),
-            new SocialMove("askAbout"),
-            new SocialMove("smallTalk"),
-            new SocialMove("agree"),
-            new SocialMove("disagree"),
-            new SocialMove("gossip")
-        };
+        this.socialMoves = socialMoves; 
+        cc = new ConversationController(this);
     }
 
-    public SocialMove PickSocialMove()
+    public SocialMove PickSocialMove(SocialMove prompt)
     {
-        return PickBestSocialMoves(1)[0];
+        return cc.GiveResponse(prompt); //PickBestSocialMoves(1)[0];
     }
 
-    public List<SocialMove> PickBestSocialMoves(int num=1)
+    public List<SocialMove> GetSocialMoves(Townie partner)
     {
-        if (num >= socialMoves.Count) return socialMoves;
-
-        List<SocialMove> bestSocialMoves = new List<SocialMove>();
-
-        while(bestSocialMoves.Count < num)
-        {
-            SocialMove socialMove = socialMoves[Mathf.FloorToInt(Random.value * socialMoves.Count)];
-            if (!bestSocialMoves.Contains(socialMove))
-            {
-                bestSocialMoves.Add(socialMove);
-            }
-        }
-
-        return bestSocialMoves;
+        List<SocialMove> moves = new List<SocialMove>(socialMoves);
+        moves.AddRange(GenAskWhyGoal(partner.gm.lastSetOfGoals));
+        moves.AddRange(GenAskWhyAction(partner.ws.knownFacts.GetHistory()));
+        return moves;
     }
 
     public DialogueUnit ExpressSocialMove(SocialMove socialMove)
     {
         return new DialogueUnit(socialMove.ToString(), name, socialMove);
     }
-    
+
+
+    List<SocialMove> GenAskWhyGoal(List<Goal> goals)
+    {
+        return new List<SocialMove>(from goal in goals
+                                    select new SocialMove("askWhyGoal#", new List<string>() { goal.name }));
+    }
+
+    List<SocialMove> GenAskWhyAction(List<ExecutedAction> actions)
+    {
+        return new List<SocialMove>(from action in actions
+                                    select new SocialMove("askWhyAction#", new List<string>() { action.ToString() }));
+    }
 }

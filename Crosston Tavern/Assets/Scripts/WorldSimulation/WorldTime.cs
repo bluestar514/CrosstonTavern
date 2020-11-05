@@ -121,6 +121,14 @@ public class WorldTime : IComparable
         }
     }
 
+    public bool SameDay(WorldTime date)
+    {
+        if (this.year == date.year &&
+            this.month == date.month &&
+            this.day == date.day) return true;
+        else return false;
+    }
+
     public override bool Equals(object obj)
     {
         return this.CompareTo(obj) == 0;

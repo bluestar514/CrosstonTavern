@@ -54,4 +54,13 @@ public class KnownFacts
     {
         return new List<ExecutedAction>(history);
     }
+
+    public ExecutedAction GetActionFromName(string name)
+    {
+        foreach(ExecutedAction action in history) {
+            if (action.ToString() == name) return action;
+        }
+
+        return null;
+    }
 }

@@ -10,6 +10,7 @@ public class GoalManager
     Person actor;
     [SerializeField]
     List<GoalModule> modules = new List<GoalModule>();
+    public List<Goal> lastSetOfGoals = new List<Goal>();
 
     int lookAhead = 3;
 
@@ -22,6 +23,15 @@ public class GoalManager
     public void AddModule(GoalModule goalModule)
     {
         modules.Add(goalModule);
+    }
+
+    public Goal GetGoalFromName(string name)
+    {
+        foreach(Goal goal in lastSetOfGoals) {
+            if (goal.name == name) return goal;
+        }
+
+        return null;
     }
 
     public List<Goal> GetGoalsList()
@@ -72,6 +82,8 @@ public class GoalManager
 
         allGoals = FindLocations(allGoals);
 
+
+        lastSetOfGoals = allGoals;
         return allGoals;
     }
 
@@ -85,6 +97,7 @@ public class GoalManager
         public FeatureResources resources;
 
         public BoundAction parentAction;
+        public List<Goal> fullfillsGoal;
 
         public override string ToString()
         {
@@ -99,6 +112,7 @@ public class GoalManager
             this.bindings = bindings;
             this.resources = resources;
             this.parentAction = parentAction;
+            fullfillsGoal = new List<Goal>();
         }
     }
 
@@ -138,7 +152,10 @@ public class GoalManager
     {
         List<OutcomeRestraints> relevantOutcomes = new List<OutcomeRestraints>();
         foreach(OutcomeRestraints outcome in outcomes) {
-            if (OutcomeProgressesGoal(outcome, goal)) relevantOutcomes.Add(outcome);
+            if (OutcomeProgressesGoal(outcome, goal)) {
+                outcome.fullfillsGoal.Add(goal);
+                relevantOutcomes.Add(outcome);
+            }
         }
 
         return relevantOutcomes;
@@ -190,7 +207,8 @@ public class GoalManager
 
                 Goal g = new Goal(stateCondition.state.Bind(outcome.bindings, outcome.resources), parentPriority);
                 g.enablingActions.Add(outcome.parentAction);
-
+                g.parentGoals.AddRange(from goal in outcome.fullfillsGoal
+                                       select goal.name);
                 newGoals.Add(g);
             }
         }
@@ -213,6 +231,8 @@ public class GoalManager
             foreach (Goal goal in goals) {
                 newGoals.Add(goal);
                 goal.enablingActions.Add(outcome.parentAction);
+                goal.parentGoals.AddRange(from g in outcome.fullfillsGoal
+                                            select g.name);
             }
         }
 
@@ -248,6 +268,7 @@ public class GoalManager
     List<Goal> FindLocations(List<Goal> goals)
     {
         Dictionary<string, float> locationPriority = new Dictionary<string, float>();
+        Dictionary<string, List<string>> locationReason = new Dictionary<string, List<string>>();
 
         List<BoundAction> allActions = GetAllActions();
         ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
@@ -262,8 +283,13 @@ public class GoalManager
                     foreach (Goal goal in goals) {
                         if (OutcomeProgressesGoal(outcome, goal)) {
                             string location = action.LocationId;
-                            if (locationPriority.ContainsKey(location)) locationPriority[location]+=desire;
-                            else locationPriority.Add(location, desire);
+                            if (locationPriority.ContainsKey(location)) {
+                                locationPriority[location] += desire;
+                                locationReason[location].Add(goal.name);
+                            } else {
+                                locationPriority.Add(location, desire);
+                                locationReason.Add(location, new List<string>() { goal.name });
+                            }
                         }
 
                     }
@@ -273,7 +299,9 @@ public class GoalManager
 
 
         foreach(string location in locationPriority.Keys) {
-            goals.Add(new Goal(new StatePosition(actor.id, location), locationPriority[location]));
+            Goal goal = new Goal(new StatePosition(actor.id, location), locationPriority[location]);
+            goal.parentGoals.AddRange(locationReason[location]);
+            goals.Add(goal);
         }
 
         return goals;

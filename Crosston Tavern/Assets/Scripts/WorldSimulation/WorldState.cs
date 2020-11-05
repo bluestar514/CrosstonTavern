@@ -9,7 +9,7 @@ public class WorldState
     public string id = "default";
     public Map map;
     public Registry registry;
-    private WorldTime time;
+    [SerializeField] private WorldTime time;
     public KnownFacts knownFacts;
 
     public WorldTime Time { get => new WorldTime(time); set => time = value; }
@@ -30,7 +30,7 @@ public class WorldState
 
         Registry c_reg = new Registry(c_map.GetAllFeatures(), name);
 
-        WorldState copy = new WorldState(c_map, c_reg, Time, name);
+        WorldState copy = new WorldState(c_map, c_reg, time, name);
         copy.id = name;
         return copy;
     }
@@ -38,7 +38,12 @@ public class WorldState
 
     public void Tick(int t=1)
     {
-        Time.Tick(t);
+        time.Tick(t);
+    }
+
+    public void NewDay()
+    {
+        time.AdvanceToStartOfDay();
     }
 
     public Inventory GetInventory(string id)

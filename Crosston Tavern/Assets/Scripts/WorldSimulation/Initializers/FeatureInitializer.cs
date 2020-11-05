@@ -58,6 +58,14 @@ public class FeatureInitializer
                                         {"common_forage", new List<string>(){"tulip", "rose"} },
                                         {"rare_forage", new List<string>(){"morning_rose", "evening_tulip"} }
                                     })
+            },
+            {Feature.FeatureType.SYSTEM, new Feature("SYSTEM", Feature.FeatureType.SYSTEM, UNSET, 100,
+                                    new List<GenericAction>(){
+                                        
+                                    },
+                                    new Dictionary<string, List<string>>() {
+                                        
+                                    })
             }
         };
     }
@@ -66,7 +74,8 @@ public class FeatureInitializer
         {"farm", new List<Feature.FeatureType>(){ Feature.FeatureType.river} },
         {"feild", new List<Feature.FeatureType>(){ Feature.FeatureType.river, Feature.FeatureType.meadow} },
         {"forest", new List<Feature.FeatureType>(){Feature.FeatureType.brush } },
-        {"inn", new List<Feature.FeatureType>(){Feature.FeatureType.kitchen} }
+        {"inn", new List<Feature.FeatureType>(){Feature.FeatureType.kitchen} },
+        {"SYSTEM", new List<Feature.FeatureType>{Feature.FeatureType.SYSTEM } }
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {

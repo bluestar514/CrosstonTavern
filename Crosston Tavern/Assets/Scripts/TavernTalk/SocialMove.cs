@@ -12,14 +12,27 @@ using UnityEngine;
 public class SocialMove
 {
     public string verb;
+    public List<string> arguements;
+    public string content;
 
-    public SocialMove(string verb)
+    public SocialMove(string verb, List<string> arguements = null, string content = "")
     {
         this.verb = verb;
+        this.content = content;
+        if (arguements == null) arguements = new List<string>();
+        this.arguements = arguements;
     }
 
     public override string ToString()
     {
-        return "<"+verb+">";
+        string name = verb;
+        foreach(string arg in arguements) {
+            name = name.Replace("#", arg);
+        }
+
+        if (content == "")
+            return "<" + name + ">";
+        else
+            return "<" + name + ":" + content + ">";
     }
 }

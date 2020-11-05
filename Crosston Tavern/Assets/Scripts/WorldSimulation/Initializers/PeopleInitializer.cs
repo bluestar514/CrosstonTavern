@@ -17,6 +17,7 @@ public class PeopleInitializer
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
+            {"barkeep",             new Person("barkeep",           "inn", 2, peopleActions, new Dictionary<string, List<string>>())}, 
             {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             {"clara",               new Person("clara",             "farm", 2, peopleActions, new Dictionary<string, List<string>>())},

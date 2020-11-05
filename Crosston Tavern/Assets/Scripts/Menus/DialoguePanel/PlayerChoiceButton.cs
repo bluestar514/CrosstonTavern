@@ -9,7 +9,7 @@ public class PlayerChoiceButton : MonoBehaviour
 
     BarSpaceController supervisor;
 
-    DialogueUnit dialogueUnit;
+    public DialogueUnit dialogueUnit;
 
     public void LabelButton(DialogueUnit content, BarSpaceController bsc)
     {

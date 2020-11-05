@@ -100,4 +100,45 @@ public class ActionExecutionManager : ActionManager
             }
         }
     }
+
+
+    void AddOpinion(ExecutedAction executedAction, Townie townie)
+    {
+        List<Outcome> expected = executedAction.Action.expectedEffects;
+        List<Goal> goals = townie.gm.lastSetOfGoals;
+
+        List<WeightedAction.WeightRational> weightRationals = executedAction.Action.weightRationals;
+
+        List<Effect> realizedEffects = executedAction.executedEffect;
+
+
+
+    }
+
+
+/*    List<Outcome> FilterOutcomesThatFullfillGoal(Goal goal, List<Outcome> outcomes, WeightedAction action)
+    {
+        List<Outcome> relevantOutcomes = new List<Outcome>();
+        foreach (Outcome outcome in outcomes) {
+            if (OutcomeProgressesGoal(outcome, goal, action)) relevantOutcomes.Add(outcome);
+        }
+
+        return relevantOutcomes;
+    }
+
+    bool OutcomeProgressesGoal(Outcome outcome, Goal goal, WeightedAction action)
+    {
+        BoundBindingCollection bindings = action.Bindings;
+        FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+
+
+        foreach (Effect effect in outcome.effects) {
+
+            if (effect.WeighAgainstGoal(ws,bindings,resources, goal) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }*/
 }

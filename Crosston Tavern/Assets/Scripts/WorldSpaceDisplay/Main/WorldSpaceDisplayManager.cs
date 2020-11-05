@@ -49,7 +49,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
 
     public void AddEvent(ExecutedAction action, int timeStep)
     {
-        if (history.Count <= timeStep) AddTimeStep(timeStep);
+        if (history.Count <= timeStep) AddTimeStep(timeStep, action.executionTime);
 
         string townie = action.Action.ActorId;
 
@@ -58,12 +58,12 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         history[timeStep].Add(townie, obj.GetComponent<EventPanel>());
     }
 
-    GameObject AddTimeStep(int step)
+    GameObject AddTimeStep(int step, WorldTime time)
     {
         GameObject timePanel = null;
         while (history.Count <= step) {
             timePanel = Instantiate(TimePanelPrefab, TimeLineContent.transform);
-            timePanel.GetComponent<TimePanel>().Set(history.Count);
+            timePanel.GetComponent<TimePanel>().Set(history.Count, time);
 
             PositionTimeColumn(timePanel.GetComponent<TimePanel>());
 

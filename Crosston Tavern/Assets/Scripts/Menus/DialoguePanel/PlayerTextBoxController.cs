@@ -4,9 +4,26 @@ using UnityEngine;
 
 public class PlayerTextBoxController : MenuElement
 {
-    public List<PlayerChoiceButton> playerChoiceButtons;
+    public GameObject window;
+    public Transform buttonHolder;
+    public GameObject playerChoiceButtonPrefab;
 
     BarSpaceController mainMenu;
+
+    public override void Open()
+    {
+        base.Open();
+        window.SetActive(true);
+    }
+    public override void Close()
+    {
+        base.Close();
+        window.SetActive(false);
+
+        foreach (Transform child in buttonHolder) {
+            Destroy(child.gameObject);
+        }
+    }
 
     public void Initialize(BarSpaceController mm)
     {
@@ -15,11 +32,9 @@ public class PlayerTextBoxController : MenuElement
 
     public void Fill(List<DialogueUnit> playerChoices)
     {
-        int minNum = Mathf.Min(playerChoiceButtons.Count, playerChoices.Count);
-
-        for(int i=0; i<minNum; i++)
-        {
-            playerChoiceButtons[i].LabelButton(playerChoices[i], mainMenu);
+        foreach(DialogueUnit playerChoice in playerChoices) {
+            GameObject button = Instantiate(playerChoiceButtonPrefab, buttonHolder);
+            button.GetComponent<PlayerChoiceButton>().LabelButton(playerChoice, mainMenu);
         }
 
     }

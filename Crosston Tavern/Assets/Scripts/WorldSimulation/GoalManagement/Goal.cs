@@ -18,7 +18,7 @@ public class Goal
 
     public static int PERMINATE = -1;
 
-    //public List<Goal> parentGoals = new List<Goal>();
+    public List<string> parentGoals = new List<string>();
     public List<BoundAction> enablingActions = new List<BoundAction>(); // THese are the actions completing this goal unlocks
     //Not the actions which complete this goal
 
@@ -28,12 +28,6 @@ public class Goal
         this.priority = priority;
 
         name = ToString();
-    }
-
-    public Goal(State state, float priority, List<BoundAction> enabledActions):this(state, priority)
-    {
-        //parentGoals.AddRange(parent);
-        enablingActions.AddRange(enabledActions);
     }
 
     public Goal(State state, float priority, int timeOut): this(state, priority)
@@ -54,6 +48,8 @@ public class Goal
             Goal newGoal = new Goal(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
             newGoal.enablingActions.AddRange(enablingActions);
             newGoal.enablingActions.AddRange(goal.enablingActions);
+            newGoal.parentGoals.AddRange(parentGoals);
+            newGoal.parentGoals.AddRange(goal.parentGoals);
             return new List<Goal>() { newGoal };
         } else return new List<Goal>() { this, goal }; 
     }

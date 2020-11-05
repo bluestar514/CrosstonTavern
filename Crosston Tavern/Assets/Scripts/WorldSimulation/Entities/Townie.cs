@@ -17,6 +17,8 @@ public class Townie: MonoBehaviour
 
     public List<ExecutedAction> history;
 
+    public string homeLocation;
+
     public void TownieInit(Person townieInformation, WorldState ws, GoalManager gm)
     {
         id = townieInformation.id;

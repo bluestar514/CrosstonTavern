@@ -66,6 +66,8 @@ public class WorldHub : MonoBehaviour
                 chosenActions[person] = null;
 
             }
+
+            //person.ws.Tick(30);
         }
 
         foreach(Townie person in allPeople) {
@@ -78,7 +80,7 @@ public class WorldHub : MonoBehaviour
         foreach (ExecutedAction action in executedActions) {
             wsdm.AddEvent(action, i);
         }
-        ws.Tick(10);
+        ws.Tick(30);
 
     }
 
@@ -96,6 +98,37 @@ public class WorldHub : MonoBehaviour
     public List<Townie> GetTownies()
     {
         return allPeople;
+    }
+
+    public void NewDay()
+    {
+        ws.NewDay();
+        ws.Tick(60 * 8);
+
+        foreach (Townie person in allPeople) {
+            ActionExecutionManager aem = new ActionExecutionManager(person, ws, allPeople);
+
+            ExecutedAction executedAction = aem.ExecuteAction(new ChosenAction(
+                new WeightedAction( new BoundAction( 
+                                        new GenericAction( 
+                                            "teleportToStart", 
+                                            0, 
+                                            new Precondition(new List<Condition>()), 
+                                            new List<Outcome>() {
+                                                new Outcome(new ChanceModifier(), new List<Effect>(){ new EffectMovement(person.ws.id, person.homeLocation) })
+                                            }, 
+                                            new List<BindingPort>()), 
+                                        person.ws.id,
+                                        "SYSTEM_SYSTEM",
+                                        person.homeLocation,
+                                        new BoundBindingCollection(new List<BoundBindingPort>())),
+                                    -1, 
+                                    new List<WeightedAction.WeightRational>()),
+                new List<BoundAction>(),
+                new List<WeightedAction>())
+            );
+
+        }
     }
 }
 

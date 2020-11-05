@@ -27,31 +27,38 @@ public class WorldStateInitializer
             townieObj.transform.parent = townieHolder; 
 
             townies.Add(townieObj.GetComponent<Townie>());
-                //new Townie(person, ws, new GoalManager(ws, person)));
-                //new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
-        }
+            //new Townie(person, ws, new GoalManager(ws, person)));
+            //new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
 
+            townieObj.GetComponent<Townie>().homeLocation = "farm";
+        }
 
         townies[0].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[0].townieInformation.id, "trout", 20, 100), 1)
+                                        new Goal(new StatePosition("barkeep", "inn"), 100)
                                     }
                                 ));
         townies[1].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new Goal(new StateInventoryStatic(townies[1].townieInformation.id, "trout", 20, 100), 1)
+                                    }
+                                ));
+        townies[2].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
                                         new Goal(new StateRelation("lover_bob", "organizer_alicia", Relationship.RelationshipTag.dating), 1)
                                     }
                                 )) ;
-        townies[1].gm.AddModule(new GoalModule(
+        townies[2].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[1].townieInformation.id, "strawberry_cake", 1, 100), 4)
+                                        new Goal(new StateInventoryStatic(townies[2].townieInformation.id, "strawberry_cake", 1, 100), 4)
                                     }
                                 ));
 
-        townies[2].gm.AddModule(new GoalModule(
+        townies[3].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
                                         new Goal(new StateSocial("clara", "organizer_alicia", Relationship.RelationType.friendly, -100, -5), 1)
@@ -60,9 +67,9 @@ public class WorldStateInitializer
 
 
 
-        townies[0].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[0].ws);
-        townies[0].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[0].ws);
-        townies[1].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[1].ws);
+        townies[1].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[1].ws);
+        townies[1].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[1].ws);
+        townies[2].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[2].ws);
 
 
         return townies;

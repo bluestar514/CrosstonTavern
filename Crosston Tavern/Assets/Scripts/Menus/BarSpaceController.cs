@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BarSpaceController : MonoBehaviour
@@ -7,22 +8,61 @@ public class BarSpaceController : MonoBehaviour
     public DialogueBoxController dbc;
     public NotebookController nc;
     public LogController lc;
+    public PatronPicker pp;
+    public WorldHub worldHub;
 
-    Patron patron = new Patron("Marco");
-    Patron barkeep = new Patron("Barkeep");
+    static List<SocialMove> genericSocialMoves = new List<SocialMove>()
+        {
+            new SocialMove("talk"),
+            new SocialMove("argue"),
+            new SocialMove("insult"),
+            new SocialMove("compliment"),
+            new SocialMove("complain"),
+            new SocialMove("brag"),
+            new SocialMove("askAbout"),
+            new SocialMove("smallTalk"),
+            new SocialMove("agree"),
+            new SocialMove("disagree"),
+            new SocialMove("gossip")
+        };
+
+    static List<SocialMove> barkeeperMoves = new List<SocialMove>() {
+            new SocialMove("askAboutGoals"),
+            new SocialMove("askAboutGoalFrustration"),
+            new SocialMove("askAboutDay"),
+            new SocialMove("askAboutObservation")
+    };
+
+
+    public Patron patron;
+    public Patron barkeep;
 
     public void Start()
     {
+        
+        gameObject.SetActive(false);
+
         dbc.Initialize(this);
         nc.Initialize(new List<Fact>());
         lc.Initialize(new List<string>());
-
-        NPCPhase();
     }
 
-    public void NPCPhase()
+    public void SetPatron(Townie townie)
     {
-        DialogueUnit npcDialogue = patron.ExpressSocialMove(patron.PickSocialMove());
+
+        Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
+        barkeep = new Patron(barkeepTownie, barkeeperMoves);
+        patron = new Patron(townie, genericSocialMoves);
+        pp.gameObject.SetActive(false);
+
+        PlayerPhase();
+    }
+
+
+    public void NPCPhase(SocialMove prompt)
+
+    {
+        DialogueUnit npcDialogue = patron.ExpressSocialMove(patron.PickSocialMove(prompt));
 
         dbc.DisplayNPCAction(npcDialogue);
         lc.AddElement(npcDialogue.speakerName + ": " + npcDialogue.verbalization);
@@ -31,7 +71,7 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerPhase()
     {
-        List<SocialMove> bestSocialMoves = barkeep.PickBestSocialMoves(4);
+        List<SocialMove> bestSocialMoves = barkeep.GetSocialMoves(patron.townie);
         List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
         foreach (SocialMove socialMove in bestSocialMoves)
         {
@@ -44,7 +84,7 @@ public class BarSpaceController : MonoBehaviour
     {
         lc.AddElement(dialogueUnit.speakerName + ": " + dialogueUnit.verbalization);
 
-        NPCPhase();
+        NPCPhase(dialogueUnit.underpinningSocialMove);
     }
 
     public void AdvanceNPCDialogue()

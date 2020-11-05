@@ -29,7 +29,8 @@ public class Feature
         kitchen,
         brush,
         person,
-        meadow
+        meadow,
+        SYSTEM
     }
 
     public Feature(string id, FeatureType type, string location, int maxUsers, List<GenericAction> providedActions, 

@@ -12,7 +12,7 @@ public class DialogueUnit
     public List<Fact> facts;
     // also probably would hold:
     //  - speaker's emotion being displayed
-
+    
     List<Fact> potentialFacts = new List<Fact>()
     {
         new Fact("Alicia",  "is", "busy"),
@@ -23,7 +23,7 @@ public class DialogueUnit
 
     public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove)
     {
-        this.verbalization = verbalization;
+        this.verbalization = underpinningSocialMove.ToString();
         this.speakerName = speakerName;
         this.underpinningSocialMove = underpinningSocialMove;
         this.facts = pickRandomFacts(Mathf.FloorToInt(Random.value * potentialFacts.Count));

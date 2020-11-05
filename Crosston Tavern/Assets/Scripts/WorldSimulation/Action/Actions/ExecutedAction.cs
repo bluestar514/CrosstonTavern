@@ -8,6 +8,7 @@ public class ExecutedAction : ChosenAction
     public List<Effect> executedEffect;
     public WorldTime executionTime;
 
+
     public ExecutedAction(WeightedAction chosenAction, List<BoundAction> invalidChoices, List<WeightedAction> rejectedChoices, List<Effect> executedEffect, WorldTime executionTime) : base(chosenAction, invalidChoices, rejectedChoices)
     {
         this.executedEffect = executedEffect;
