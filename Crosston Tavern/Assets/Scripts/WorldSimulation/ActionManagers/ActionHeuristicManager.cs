@@ -98,7 +98,7 @@ public class ActionHeuristicManager : ActionManager
         };
     }
 
-    WeightedAction GetWeightOfBoundAction(BoundAction boundAction)
+    public WeightedAction GetWeightOfBoundAction(BoundAction boundAction)
     {
         //Weight = sum of(chance of occuring * desirablity of outcome)
 
@@ -115,7 +115,7 @@ public class ActionHeuristicManager : ActionManager
         return new WeightedAction(boundAction, weight, rationals);
     }
 
-    KeyValuePair<float, List<WeightedAction.WeightRational>> 
+    public KeyValuePair<float, List<WeightedAction.WeightRational>> 
         GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources)
     {
         float chance = outcome.EvaluateChance(ws, bindings, resources);

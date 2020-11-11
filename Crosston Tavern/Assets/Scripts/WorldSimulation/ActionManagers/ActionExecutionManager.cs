@@ -90,13 +90,16 @@ public class ActionExecutionManager : ActionManager
 
         foreach (Townie townie in townies) {
             if(townie.townieInformation.location == location) {
+                ExecutedAction personalAction = executedAction.ShallowCopy();
+                AddOpinion(personalAction, townie);
+
 
                 foreach (Effect effect in realizedEffects) {
                     effect.ExecuteEffect(townie.ws, townie, bindings, resources);
                 }
 
-                townie.history.Add(executedAction);
-                townie.ws.AddHistory(executedAction);
+                townie.history.Add(personalAction);
+                townie.ws.AddHistory(personalAction);
             }
         }
     }
@@ -104,15 +107,9 @@ public class ActionExecutionManager : ActionManager
 
     void AddOpinion(ExecutedAction executedAction, Townie townie)
     {
-        List<Outcome> expected = executedAction.Action.expectedEffects;
-        List<Goal> goals = townie.gm.lastSetOfGoals;
+        Opinion opinion = new Opinion(executedAction, townie);
 
-        List<WeightedAction.WeightRational> weightRationals = executedAction.Action.weightRationals;
-
-        List<Effect> realizedEffects = executedAction.executedEffect;
-
-
-
+        executedAction.opinion = opinion;
     }
 
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ConversationController 
@@ -18,26 +19,41 @@ public class ConversationController
     {
         switch (prompt.verb) {
             case "askAboutGoals":
-                return new SocialMove("tellAboutGoals", content:System.String.Join(",", GetGoals()));
+                return new SocialMove("tellAboutGoals", mentionedGoals: GetGoals());
             case "askAboutDay":
                 List<ExecutedAction> history = FilterMyActions(GetDayEvents());
-                return new SocialMove("tellAboutDayEvents", content: System.String.Join(",", history));
+                return new SocialMove("tellAboutDayEvents", mentionedActions: history);
             case "askAboutObservation":
                 List<ExecutedAction> observedHistory = FilterOtherActions(GetDayEvents());
-                return new SocialMove("tellAboutDayObservedEvents", content: System.String.Join(",", observedHistory));
+                return new SocialMove("tellAboutDayObservedEvents", mentionedActions: observedHistory);
             case "askWhyGoal#":
                 string goalName = prompt.arguements[0];
                 Goal goal = townie.gm.GetGoalFromName(goalName);
-                return new SocialMove("tellWhyGoal#", new List<string>() { goalName }, System.String.Join(",", goal.parentGoals));
+
+                List<Goal> parentGoals = new List<Goal>(from g in goal.parentGoals
+                                                        select townie.gm.GetGoalFromName(g));
+
+                return new SocialMove("tellWhyGoal#", new List<string>() { goalName }, mentionedGoals: parentGoals);
             case "askWhyAction#":
                 string actionName = prompt.arguements[0];
                 ExecutedAction action = townie.ws.knownFacts.GetActionFromName(actionName);
                 return new SocialMove("tellWhyAction#", new List<string>() { actionName }, System.String.Join(",", action.Action.weightRationals));
+            case "askAboutExcitement":
+                List<ExecutedAction> fullHistory = FilterMyActions(GetDayEvents());
+                return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory
+                                                                                                           where e.opinion.tags.Contains(Opinion.Tag.excited)
+                                                                                                           select e));
+            case "askAboutDisapointment":
+                List<ExecutedAction> fullHistory2 = FilterMyActions(GetDayEvents());
+                return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory2
+                                                                                                           where e.opinion.tags.Contains(Opinion.Tag.disapointed)
+                                                                                                           select e));
+
             /*case "askAboutGoalFrustration":
-                List<Goal> goals = GetGoals();
-                foreach (Goal goal in goals) {
-                    goal.state
-                }*/
+            List<Goal> goals = GetGoals();
+            foreach (Goal goal in goals) {
+                goal.state
+            }*/
 
 
             default:
@@ -48,8 +64,6 @@ public class ConversationController
 
     List<Goal> GetGoals()
     {
-        Debug.Log(System.String.Join(",", townie.gm.GetGoalsList()));
-
         return townie.gm.GetGoalsList();
     }
 
