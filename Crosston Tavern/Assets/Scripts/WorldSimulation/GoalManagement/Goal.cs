@@ -27,7 +27,7 @@ public class Goal
         this.state = state;
         this.priority = priority;
 
-        name = ToString();
+        name = state.ToString();
     }
 
     public Goal(State state, float priority, int timeOut): this(state, priority)

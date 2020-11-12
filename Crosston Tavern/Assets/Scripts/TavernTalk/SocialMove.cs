@@ -15,23 +15,32 @@ public class SocialMove
     public List<string> arguements;
     public string content;
 
-    public List<ExecutedAction> mentionedActions;
-    public List<Goal> mentionedGoals;
+    public List<WorldFact> mentionedFacts;
 
-    public SocialMove(string verb, List<string> arguements = null, string content = "", 
-        List<ExecutedAction> mentionedActions = null, List<Goal> mentionedGoals = null)
+    public SocialMove(string verb, List<string> arguements = null, string content = "",
+        List<ExecutedAction> mentionedActions = null, List<Goal> mentionedGoals = null, List<WorldFact> mentionedFacts = null)
     {
         this.verb = verb;
-        
+
         if (arguements == null) arguements = new List<string>();
         this.arguements = arguements;
-        if (mentionedActions == null) mentionedActions = new List<ExecutedAction>();
-        this.mentionedActions = mentionedActions;
-        if (mentionedGoals == null) mentionedGoals = new List<Goal>();
-        this.mentionedGoals = mentionedGoals;
+
+        if (mentionedFacts == null) mentionedFacts = new List<WorldFact>();
+        this.mentionedFacts = mentionedFacts;
+        if (mentionedActions != null) {
+            foreach (ExecutedAction action in mentionedActions) {
+                this.mentionedFacts.Add(new WorldFactEvent(action));
+            }
+        }
+        if (mentionedGoals != null) {
+            foreach (Goal goal in mentionedGoals) {
+                this.mentionedFacts.Add(new WorldFactGoal(goal));
+            }
+        }
 
 
-        this.content = content + string.Join(",", mentionedGoals)+string.Join(",", mentionedActions);
+        this.content = content + string.Join(",", mentionedFacts);
+        
     }
 
     public override string ToString()

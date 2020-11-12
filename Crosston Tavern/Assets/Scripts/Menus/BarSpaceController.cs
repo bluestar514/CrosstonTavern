@@ -29,15 +29,19 @@ public class BarSpaceController : MonoBehaviour
     static List<SocialMove> barkeeperMoves = new List<SocialMove>() {
             new SocialMove("askAboutGoals"),
             new SocialMove("askAboutGoalFrustration"),
-            new SocialMove("askAboutDay"),
+            new SocialMove("askAboutDayFull"),
+            new SocialMove("askAboutDayHighlights"),
             new SocialMove("askAboutObservation"),
             new SocialMove("askAboutExcitement"),
             new SocialMove("askAboutDisapointment")
     };
 
 
-    public Patron patron;
-    public Patron barkeep;
+    //public Patron patron;
+    //public Patron barkeep;
+
+    public ConversationController patron;
+    public ConversationController barkeep;
 
     public void Start()
     {
@@ -45,7 +49,7 @@ public class BarSpaceController : MonoBehaviour
         gameObject.SetActive(false);
 
         dbc.Initialize(this);
-        nc.Initialize(new List<Fact>());
+        nc.Initialize(new List<WorldFact>());
         lc.Initialize(new List<string>());
     }
 
@@ -53,8 +57,8 @@ public class BarSpaceController : MonoBehaviour
     {
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
-        barkeep = new Patron(barkeepTownie, barkeeperMoves);
-        patron = new Patron(townie, genericSocialMoves);
+        barkeep = new ConversationController(barkeepTownie, barkeeperMoves); //new Patron(barkeepTownie, barkeeperMoves);
+        patron = new ConversationController(townie, genericSocialMoves); //new Patron(townie, genericSocialMoves);
         pp.gameObject.SetActive(false);
 
         PlayerPhase();
@@ -64,16 +68,18 @@ public class BarSpaceController : MonoBehaviour
     public void NPCPhase(SocialMove prompt)
 
     {
-        DialogueUnit npcDialogue = patron.ExpressSocialMove(patron.PickSocialMove(prompt));
+        DialogueUnit npcDialogue = patron.ExpressSocialMove(patron.GiveResponse(prompt));
+        patron.LearnFromInput(prompt);
 
         dbc.DisplayNPCAction(npcDialogue);
         lc.AddElement(npcDialogue.speakerName + ": " + npcDialogue.verbalization);
         AddAllFacts(npcDialogue.facts);
+        barkeep.LearnFromInput(npcDialogue.underpinningSocialMove);
     }
 
     public void PlayerPhase()
     {
-        List<SocialMove> bestSocialMoves = barkeep.GetSocialMoves(patron.townie);
+        List<SocialMove> bestSocialMoves = barkeep.GetSocialMoves();
         List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
         foreach (SocialMove socialMove in bestSocialMoves)
         {
@@ -95,9 +101,9 @@ public class BarSpaceController : MonoBehaviour
     }
 
 
-    void AddAllFacts(List<Fact> facts)
+    void AddAllFacts(List<WorldFact> facts)
     {
-        foreach(Fact fact in facts) {
+        foreach(WorldFact fact in facts) {
             nc.AddElement(fact);
         }
     }

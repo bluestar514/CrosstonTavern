@@ -3,6 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FactDisplay : DisplayPanel<Fact>
+public class FactDisplay : DisplayPanel<WorldFact>
 {
 }

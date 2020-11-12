@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NotebookController : SideMenuController<Fact>
+public class NotebookController : SideMenuController<WorldFact>
 {
 
 }

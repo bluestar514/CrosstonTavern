@@ -115,3 +115,54 @@ public class WorldFactPreference: WorldFact
         if (!pref[level].Contains(item)) pref[level].Add(item);
     }
 }
+
+public class WorldFactEvent: WorldFact
+{
+    public ExecutedAction action;
+
+    public WorldFactEvent(ExecutedAction action)
+    {
+        this.action = action;
+
+        id = ToString();
+    }
+
+    public override string ToString()
+    {
+        return "{Event:" + action.ToString() + "}";
+    }
+
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is WorldFactEvent)) return false;
+
+        WorldFactEvent fact = (WorldFactEvent)obj;
+        if (this.action.ToString() == fact.ToString()) return true;
+
+        return false;
+    }
+
+    public override void UpdateWorldState(WorldState ws)
+    {
+        ws.AddHistory(action);
+    }
+}
+
+
+public class WorldFactGoal: WorldFact
+{
+    public Goal goal;
+
+    public WorldFactGoal(Goal goal)
+    {
+        this.goal = goal;
+
+        id = ToString();
+    }
+
+    public override string ToString()
+    {
+        return "{Goal:"+goal.ToString()+"}";
+    }
+}

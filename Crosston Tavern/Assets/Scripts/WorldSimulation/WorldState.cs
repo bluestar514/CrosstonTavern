@@ -98,4 +98,9 @@ public class WorldState
     {
         knownFacts.AddHistory(action, this);
     }
+
+    public void LearnFact(WorldFact fact)
+    {
+        knownFacts.AddFact(fact, this);
+    }
 }

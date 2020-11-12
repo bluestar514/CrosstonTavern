@@ -55,6 +55,11 @@ public class KnownFacts
         return new List<ExecutedAction>(history);
     }
 
+    public List<WorldFact> GetFacts()
+    {
+        return new List<WorldFact>(knownFacts);
+    }
+
     public ExecutedAction GetActionFromName(string name)
     {
         foreach(ExecutedAction action in history) {

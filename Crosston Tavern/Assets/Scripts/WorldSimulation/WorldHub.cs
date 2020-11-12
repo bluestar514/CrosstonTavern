@@ -24,6 +24,7 @@ public class WorldHub : MonoBehaviour
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
         foreach (Townie person in allPeople) {
+            if (person.name == "barkeep") continue;
             chosenActions.Add(person, null);
 
             person.townieInformation.knownGoals = person.gm.GetGoalsList();
@@ -43,9 +44,9 @@ public class WorldHub : MonoBehaviour
         
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
         foreach (Townie person in allPeople) {
-            
+            if (person.name == "barkeep") continue;
 
-            if(chosenActions[person] == null) {
+            if (chosenActions[person] == null) {
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, ws);
 
