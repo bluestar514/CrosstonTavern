@@ -5,19 +5,39 @@ using UnityEngine;
 public class ChanceModifierCombination : ChanceModifier
 {
     List<ChanceModifier> chanceModifiers;
+    Mode mode;
 
-    public ChanceModifierCombination(List<ChanceModifier> chanceModifiers)
+    public enum Mode
+    {
+        additive,
+        multiplicitive
+    }
+
+    public ChanceModifierCombination(List<ChanceModifier> chanceModifiers, Mode mode)
     {
         this.chanceModifiers = chanceModifiers;
+        this.mode = mode;
     }
 
     public override float Chance(WorldState ws)
     {
-        float chance = 1;
-        foreach(ChanceModifier chanceModifier in chanceModifiers) {
-            chance *= chanceModifier.Chance(ws);
-        }
+        float chance = 0;
 
+        switch (mode) {
+            case Mode.multiplicitive:
+                chance += 1;
+                foreach (ChanceModifier chanceModifier in chanceModifiers) {
+                    chance *= chanceModifier.Chance(ws);
+                }
+                break;
+            case Mode.additive:
+                foreach (ChanceModifier chanceModifier in chanceModifiers) {
+                    chance += chanceModifier.Chance(ws);
+                }
+                chance /= chanceModifiers.Count;
+
+                break;
+        }
         return chance;
     }
 
@@ -28,7 +48,7 @@ public class ChanceModifierCombination : ChanceModifier
             list.Add(chance.MakeBound(bindings, featureResources));
         }
 
-        return new ChanceModifierCombination(list);
+        return new ChanceModifierCombination(list, mode);
     }
 
     public override List<Goal> MakeGoal(WorldState ws, float priority)

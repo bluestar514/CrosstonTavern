@@ -33,43 +33,61 @@ public class WorldStateInitializer
             townieObj.GetComponent<Townie>().homeLocation = "farm";
         }
 
-        townies[0].gm.AddModule(new GoalModule(
+        int barkeep = 0;
+        int alicia = 1;
+        int bob = 2;
+        int clara = 3;
+        int dirk = 4;
+
+        townies[barkeep].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
                                         new Goal(new StatePosition("barkeep", "inn"), 100)
                                     }
                                 ));
-        townies[1].gm.AddModule(new GoalModule(
+        townies[alicia].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[1].townieInformation.id, "trout", 20, 100), 1)
+                                        new Goal(new StateInventoryStatic(townies[alicia].townieInformation.id, "trout", 20, 100), 1)
                                     }
                                 ));
-        townies[2].gm.AddModule(new GoalModule(
+
+        townies[bob].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateRelation("lover_bob", "organizer_alicia", Relationship.RelationshipTag.dating), 1)
+                                        new Goal(new StateRelation("bob", "alicia", Relationship.RelationshipTag.dating), 1)
                                     }
                                 )) ;
-        townies[2].gm.AddModule(new GoalModule(
+        townies[bob].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[2].townieInformation.id, "strawberry_cake", 1, 100), 4)
+                                        new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "strawberry_cake", 1, 100), 4)
                                     }
                                 ));
 
-        townies[3].gm.AddModule(new GoalModule(
+        /*townies[clara].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateSocial("clara", "organizer_alicia", Relationship.RelationType.friendly, -100, -5), 1)
+                                        new Goal(new StateSocial("clara", "alicia", Relationship.RelationType.friendly, -100, -5), 1)
+                                    }
+                                ));*/
+        townies[clara].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new Goal(new StateInventoryStatic(townies[clara].townieInformation.id, "strawberry", 20, 100), 1)
+                                    }
+                                ));
+        townies[dirk].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new Goal(new StateInventoryStatic(townies[dirk].townieInformation.id, "tulip", 20, 100), 1)
                                     }
                                 ));
 
-
-
-        townies[1].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[1].ws);
-        townies[1].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[1].ws);
-        townies[2].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[2].ws);
+        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[alicia].ws);
+        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[alicia].ws);
+        townies[clara].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[clara].ws);
+        townies[dirk].ws.knownFacts.AddFact(new WorldFactResource("meadow_feild", "common_forage", "tulip"), townies[dirk].ws);
 
 
         return townies;

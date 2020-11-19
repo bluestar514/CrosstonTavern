@@ -60,6 +60,8 @@ public class ConversationController
                 return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory2
                                                                                                            where e.opinion.tags.Contains(Opinion.Tag.disapointed)
                                                                                                            select e));
+            case "tellAction#":
+                return new SocialMove("acknowledge");
             default:
                 return new SocialMove("DEFAULT");
         }
@@ -70,6 +72,7 @@ public class ConversationController
         List<SocialMove> moves = new List<SocialMove>(socialMoves);
         moves.AddRange(GenAskWhyGoal());
         moves.AddRange(GenAskWhyAction());
+        moves.AddRange(GenTellAction());
         return moves;
     }
 
@@ -99,7 +102,16 @@ public class ConversationController
     {
         return new List<SocialMove>(from fact in townie.ws.knownFacts.GetFacts()
                                     where fact is WorldFactEvent
-                                    select new SocialMove("askWhyAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, mentionedFacts: new List<WorldFact>() { fact }));
+                                    select new SocialMove("askWhyAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
+                                                                           mentionedFacts: new List<WorldFact>() { fact }));
+    }
+
+    List<SocialMove> GenTellAction()
+    {
+        return new List<SocialMove>(from fact in townie.ws.knownFacts.GetFacts()
+                                    where fact is WorldFactEvent
+                                    select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
+                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
     List<Goal> GetGoals()

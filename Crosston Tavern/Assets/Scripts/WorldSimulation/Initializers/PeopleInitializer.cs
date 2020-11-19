@@ -10,18 +10,16 @@ public class PeopleInitializer
         ActionInitializer.actions["insult"],
         ActionInitializer.actions["compliment"],
         ActionInitializer.actions["start_dating"],
-        ActionInitializer.actions["ask_#item#"],
-        //ActionInitializer.actions["ask_out_to_#location#"],
-        //ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
+        ActionInitializer.actions["ask_#item#"]
     };
 
     public static Dictionary<string, Person> GetAllPeople() {
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
-            {"barkeep",             new Person("barkeep",           "SYSTEM", 2, peopleActions, new Dictionary<string, List<string>>())}, 
-            {"organizer_alicia",    new Person("organizer_alicia",  "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"lover_bob",           new Person("lover_bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"clara",               new Person("clara",             "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"faroff_dirk",         new Person("faroff_dirk",       "blacksmith", 2, peopleActions, new Dictionary<string, List<string>>())}//,
+            {"barkeep",   new Person("barkeep",     "SYSTEM", 2, peopleActions, new Dictionary<string, List<string>>())}, 
+            {"alicia",    new Person("alicia",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"bob",       new Person("bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"clara",     new Person("clara",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
+            {"dirk",      new Person("dirk",        "blacksmith", 2, peopleActions, new Dictionary<string, List<string>>())}//,
             //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
             //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
@@ -36,31 +34,31 @@ public class PeopleInitializer
 
         // Override with specific things for the senario and or testing
             //Lover scenario Details:
-            allPeople["lover_bob"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 2);
-            allPeople["lover_bob"].relationships.Set("organizer_alicia", Relationship.RelationType.romantic, 5);
+            allPeople["bob"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 2);
+            allPeople["bob"].relationships.Set("organizer_alicia", Relationship.RelationType.romantic, 5);
 
-            allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.friendly, 3);
-            allPeople["organizer_alicia"].relationships.Set("lover_bob", Relationship.RelationType.romantic, 0);
+            allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
+            allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
 
 
             //allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
             //allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
 
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("strawberry_cake");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("salmon_fried");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.loved].Add("morning_rose");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("strawberry");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("salmon");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("rose");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.liked].Add("dandilion");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("blackberry");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("trout");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.disliked].Add("tulip");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("blackberry_tart");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("trout_stew");
-            allPeople["organizer_alicia"].preferences[PreferenceLevel.hated].Add("evening_tulip");
+            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("strawberry_cake");
+            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("salmon_fried");
+            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("morning_rose");
+            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("strawberry");
+            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("salmon");
+            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("rose");
+            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("dandilion");
+            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("blackberry");
+            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("trout");
+            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("tulip");
+            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("blackberry_tart");
+            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("trout_stew");
+            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("evening_tulip");
 
-            allPeople["faroff_dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
+            allPeople["dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
 
 
 
@@ -70,8 +68,8 @@ public class PeopleInitializer
 
 
         //Clara Testing Rivals
-        allPeople["clara"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 3);
-        allPeople["organizer_alicia"].relationships.Set("clara", Relationship.RelationType.friendly, 3);
+        allPeople["clara"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
+        allPeople["bob"].relationships.Set("clara", Relationship.RelationType.friendly, 3);
 
 
         return allPeople;

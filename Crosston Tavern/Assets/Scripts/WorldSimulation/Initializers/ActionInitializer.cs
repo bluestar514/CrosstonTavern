@@ -46,7 +46,7 @@ public class ActionInitializer
         ) },
         {"forage", new GenericAction("forage", 1,
             new Precondition( new List<Condition>() {
-                
+
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -164,10 +164,22 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifier(),
+                    new ChanceModifierCombination( new List<ChanceModifier>(){
+                        new ChanceModifierItemOpinion("#item#", "#b#",
+                                                        ChanceModifierItemOpinion.OpinionLevel.min,
+                                                        ChanceModifierItemOpinion.OpinionLevel.neutral),
+                        new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 100), true)
+                    }, ChanceModifierCombination.Mode.additive),
                     new List<Effect>() {
                         new EffectInventoryStatic("#b#", "#item#", -1),
                         new EffectInventoryStatic("#a#", "#item#", 1)
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifier(),
+                    new List<Effect>() {
+                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -2),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -2)
                     }
                 )
             },
