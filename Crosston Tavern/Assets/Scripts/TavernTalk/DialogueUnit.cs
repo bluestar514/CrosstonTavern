@@ -15,7 +15,7 @@ public class DialogueUnit
     
     public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove)
     {
-        this.verbalization = underpinningSocialMove.ToString();
+        this.verbalization = verbalization;
         this.speakerName = speakerName;
         this.underpinningSocialMove = underpinningSocialMove;
         SocialMoveContentToFacts(underpinningSocialMove);
@@ -33,5 +33,8 @@ public class DialogueUnit
     {
         return "{"+speakerName+"("+underpinningSocialMove+"): \""+verbalization+"\"}";
     }
+
+
+
 }
 

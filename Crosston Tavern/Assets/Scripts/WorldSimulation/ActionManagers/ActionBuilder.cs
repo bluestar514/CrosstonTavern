@@ -143,7 +143,8 @@ public class ActionBuilder
         List<BoundAction> actions = new List<BoundAction>();
         foreach(List<BoundBindingPort> bindings in itemBoundCombinations) {
 
-            actions.Add(new BoundAction(data.action, actor.id, data.featureId, data.locationId, new BoundBindingCollection( bindings)));
+            actions.Add(new BoundAction(data.action, actor.id, data.featureId, data.locationId, new BoundBindingCollection( bindings),
+                                            new VerbilizationInfo("PLACEHOLDER?")));
         }
 
         return actions;

@@ -12,8 +12,8 @@ public class BoundAction : WorldAction
     public BoundBindingCollection Bindings { get; private set; }
 
     public BoundAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, 
-        string actorId, string featureId, string locationId, BoundBindingCollection Bindings) :
-        base(id, executionTime, preconditions, potentialEffects)
+        string actorId, string featureId, string locationId, BoundBindingCollection Bindings, VerbilizationInfo verbilizationInfo) :
+        base(id, executionTime, preconditions, potentialEffects, verbilizationInfo)
     {
         this.ActorId = actorId;
         this.FeatureId = featureId;
@@ -24,8 +24,8 @@ public class BoundAction : WorldAction
         name = ToString();
     }
 
-    public BoundAction(GenericAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings): 
-        this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings)
+    public BoundAction(GenericAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings, VerbilizationInfo verbilizationInfo) : 
+        this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings, verbilizationInfo)
     { }
 
     public override string ToString()

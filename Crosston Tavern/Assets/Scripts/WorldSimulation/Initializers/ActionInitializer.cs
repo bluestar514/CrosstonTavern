@@ -42,7 +42,8 @@ public class ActionInitializer
                 new BindingPortEntity("feature", ActionRole.recipient),
                 new BindingPortString("c_fish", "#common_fish#"),
                 new BindingPortString("r_fish", "#rare_fish#")
-            }
+            },
+            new VerbalizePatternFishing("fishing", "at")
         ) },
         {"forage", new GenericAction("forage", 1,
             new Precondition( new List<Condition>() {
@@ -75,7 +76,8 @@ public class ActionInitializer
                 new BindingPortEntity("feature", ActionRole.recipient),
                 new BindingPortString("c_forage", "#common_forage#"),
                 new BindingPortString("r_forage", "#rare_forage#")
-            }
+            },
+            new VerbalizePatternFishing("foraging", "at")
         ) },
         {"talk", new GenericAction("talk", 1,
             new Precondition(new List<Condition>() {
@@ -100,7 +102,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternFishing("talk", "to")
         ) },
         {"move", new GenericAction("move", 0,
             new Precondition(new List<Condition>() {
@@ -115,7 +118,11 @@ public class ActionInitializer
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
-            }
+            },
+            //bob went to the inn
+            //I went to the forest
+            //why did you go to the forest
+            new VerbalizePatternMove()
 
         ) },
         {"give_#item#", new GenericAction("give_#item#", 1,
@@ -155,7 +162,8 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "a")
-            }
+            }, 
+            new VerbalizationPatternItem("gave", "") 
         ) },
         {"ask_#item#", new GenericAction("ask_#item#", 1,
             new Precondition(new List<Condition>() {
@@ -187,7 +195,8 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "b")
-            }
+            },
+            new VerbalizationPatternItem("ask", "for")
         ) },
         { "buy_fishing_rod", new GenericAction("buy_fishing_rod", 1,
             new Precondition(new List<Condition>() {
@@ -204,7 +213,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternFishing("buy a fishing rod", "from")
         )},
         //{"buy_#item#", new GenericAction("buy_#item#", 1,
         //    new Precondition(new List<Condition>() {
@@ -295,7 +305,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternCompliment("insult")
         ) },
         {"compliment", new GenericAction("compliment", 1,
             new Precondition(new List<Condition>() {
@@ -326,7 +337,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternCompliment("compliment")
         ) },
         {"start_dating", new GenericAction("start_dating", 1,
             new Precondition(new List<Condition>() {
@@ -358,35 +370,39 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            }, 
+            
+            // I started dating alicia. 
+            // why did you start dating alicia?
+            new VerbalizePatternCompliment("start dating")
         ) },
-        { "outing_shopping_at_#loc#_with_#b#", new GenericAction( "outing_shopping_at_#loc#_with_#b#", 1, 
+        //{ "outing_shopping_at_#loc#_with_#b#", new GenericAction( "outing_shopping_at_#loc#_with_#b#", 1, 
         
-            new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
-            }),
-            new List<Outcome>() {
-                new Outcome(
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), true),
-                    new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 10),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 10)
-                    }
-                ),
-                 new Outcome(
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), false),
-                    new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -10, -2),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -10, -2)
-                    }
-                )
-            },
-            new List<BindingPort>() {
-                new BindingPortEntity("a", ActionRole.initiator),
-                new BindingPortEntity("b", ActionRole.bystander),
-                new BindingPortEntity("loc", ActionRole.recipient)
-            }
-        )},
+        //    new Precondition(new List<Condition>() {
+        //        new Condition_NotYou("#b#")
+        //    }),
+        //    new List<Outcome>() {
+        //        new Outcome(
+        //            new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), true),
+        //            new List<Effect>() {
+        //                new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 10),
+        //                new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 10)
+        //            }
+        //        ),
+        //         new Outcome(
+        //            new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -100, 0), false),
+        //            new List<Effect>() {
+        //                new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -10, -2),
+        //                new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -10, -2)
+        //            }
+        //        )
+        //    },
+        //    new List<BindingPort>() {
+        //        new BindingPortEntity("a", ActionRole.initiator),
+        //        new BindingPortEntity("b", ActionRole.bystander),
+        //        new BindingPortEntity("loc", ActionRole.recipient)
+        //    }
+        //)},
         { "bake_strawberry_cake", new GenericAction("bake_stawrberry_cake", 1, 
             new Precondition(new List<Condition>() {
                 new Condition_IsState(new StateInventoryStatic("#a#", "strawberry", 1, INF)),
@@ -404,7 +420,9 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            }, // bob baked a strawberry cake
+
+            new VerbalizePatternCompliment("baked a strawberry cake") 
         )},
         { "fry_salmon", new GenericAction("fry_salmon", 1,
             new Precondition(new List<Condition>() {
@@ -423,7 +441,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternCompliment("made fried salmon")
         )},
         { "bake_blackberry_tart", new GenericAction("bake_blackberry_tart", 1,
             new Precondition(new List<Condition>() {
@@ -442,7 +461,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternCompliment("baked a blackberry tart")
         )},
         { "stew_trout", new GenericAction("stew_trout", 1,
             new Precondition(new List<Condition>() {
@@ -461,7 +481,8 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
-            }
+            },
+            new VerbalizePatternCompliment("made stewed trout")
         )}
         
         //,

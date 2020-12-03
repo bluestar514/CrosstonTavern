@@ -7,8 +7,11 @@ using UnityEngine;
 public class GenericAction: WorldAction {
 
     public List<BindingPort> bindingPorts;
+    
 
-    public GenericAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, List<BindingPort> bindings):base(id, executionTime, preconditions,  potentialEffects)
+    public GenericAction(string id, int executionTime, Precondition preconditions, 
+        List<Outcome> potentialEffects, List<BindingPort> bindings, VerbilizationInfo verbilizationInfo) : 
+        base(id, executionTime, preconditions, potentialEffects, verbilizationInfo)
     {
         if (bindings == null) this.bindingPorts = null;
         else this.bindingPorts = new List<BindingPort>(bindings);
@@ -22,4 +25,5 @@ public class GenericAction: WorldAction {
     }
 
 }
+
 

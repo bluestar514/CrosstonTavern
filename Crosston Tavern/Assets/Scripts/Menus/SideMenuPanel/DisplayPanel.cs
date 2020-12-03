@@ -7,7 +7,7 @@ public class DisplayPanel<T> : MonoBehaviour
 {
     public Text factText;
 
-    T fact;
+    protected T fact;
 
     public virtual void Fill(T fact)
     {

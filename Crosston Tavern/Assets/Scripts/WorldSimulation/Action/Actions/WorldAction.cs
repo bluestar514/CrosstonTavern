@@ -16,8 +16,9 @@ public class WorldAction
     public int executionTime;
     public Precondition preconditions;
     public List<Outcome> potentialOutcomes;
+    public VerbilizationInfo verbilizationInfo;
 
-    public WorldAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects)
+    public WorldAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, VerbilizationInfo verbilizationInfo)
     {
         Id = id;
         name = Id;
@@ -25,5 +26,6 @@ public class WorldAction
         this.executionTime = executionTime;
         this.preconditions = preconditions;
         this.potentialOutcomes = new List<Outcome>(potentialEffects);
+        this.verbilizationInfo = verbilizationInfo;
     }
 }

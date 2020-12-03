@@ -39,6 +39,11 @@ public class WorldHub : MonoBehaviour
 
     public void TimeStep()
     {
+        if (ws.Time > WorldTime.Night) {
+            NewDay();
+            
+        }
+
         int i = timeStep.Count;
 
         
@@ -101,6 +106,23 @@ public class WorldHub : MonoBehaviour
         return allPeople;
     }
 
+    public void DayStep()
+    {
+        if (ws.Time >= WorldTime.Night) {
+            TimeStep();
+        }
+
+        int x = 0;
+        while(ws.Time <= WorldTime.Night) {
+            TimeStep();
+
+            x++;
+            if (x > 1000) throw new Exception("Time is not advancing correctly during TimeStep, so we never leave this loop.");
+        }
+
+        
+    }
+
     public void NewDay()
     {
         ws.NewDay();
@@ -118,11 +140,13 @@ public class WorldHub : MonoBehaviour
                                             new List<Outcome>() {
                                                 new Outcome(new ChanceModifier(), new List<Effect>(){ new EffectMovement(person.ws.id, person.homeLocation) })
                                             }, 
-                                            new List<BindingPort>()), 
+                                            new List<BindingPort>(),
+                                            new VerbilizationInfo("SYSTEM_TELEPORT")), 
                                         person.ws.id,
                                         "SYSTEM_SYSTEM",
                                         person.homeLocation,
-                                        new BoundBindingCollection(new List<BoundBindingPort>())),
+                                        new BoundBindingCollection(new List<BoundBindingPort>()),
+                                        new VerbilizationInfo("SYSTEM_TELEPORT")),
                                     -1, 
                                     new List<WeightedAction.WeightRational>()),
                 new List<BoundAction>(),

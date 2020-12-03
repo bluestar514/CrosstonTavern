@@ -26,7 +26,7 @@ public class FeatureInitializer
             },
             {Feature.FeatureType.shop, new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
                                     new List<GenericAction>(){ //ActionInitializer.actions["buy_#item#"],
-                                                                ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
+                                                                //ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
                                     },
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})

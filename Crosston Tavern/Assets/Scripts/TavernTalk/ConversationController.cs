@@ -6,12 +6,14 @@ using UnityEngine;
 public class ConversationController 
 {
     Townie townie;
-    List<SocialMove> socialMoves; 
+    List<SocialMove> socialMoves;
+    string partner;
 
-    public ConversationController(Townie patron, List<SocialMove> socialMoves)
+    public ConversationController(Townie patron, List<SocialMove> socialMoves, string partner)
     {
         townie = patron;
         this.socialMoves = socialMoves;
+        this.partner = partner;
     }
 
 
@@ -86,7 +88,60 @@ public class ConversationController
 
     public DialogueUnit ExpressSocialMove(SocialMove socialMove)
     {
-        return new DialogueUnit(socialMove.ToString(), townie.name, socialMove);
+
+        string verbilization = socialMove.ToString();
+        string actionName = "";
+        ExecutedAction actionObj = null;
+        string actionActor = partner;
+        string were = "was";
+        string actionVerb = "";
+        string actionLocation = "";
+
+        switch (socialMove.verb) {
+            case "askAboutDayHighlights":
+                verbilization = "What did you do today?";
+                break;
+            case "askAboutObservation":
+                verbilization = "Did you see anything interesting today?";
+                break;
+            case "askAboutExcitement":
+                verbilization = "Did anything good happen today?";
+                break;
+            case "askAboutDisapointment":
+                verbilization = "Did anything disapointing happen today?";
+                break;
+            case "askAboutGoals":
+                verbilization = "What have you been trying to do lately?";
+                break;
+            case "askWhyAction#":
+                actionName = socialMove.arguements[0];
+                actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
+                actionActor = actionObj.Action.ActorId;
+                were = "was";
+                if (actionActor == partner) {
+                    actionActor = "you";
+                    were = "were";
+                }
+                actionVerb = actionObj.Action.Id;
+                actionLocation = actionObj.Action.FeatureId;
+                
+                verbilization = "Why "+were+" " + actionActor + " trying to " + actionVerb + " at " +actionLocation+"?";
+                break;
+            case "tellAction#":
+                actionName = socialMove.arguements[0];
+                actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
+                actionActor = actionObj.Action.ActorId;
+                if (actionActor == partner) {
+                    actionActor = "you";
+                }
+                actionVerb = actionObj.Action.Id;
+                actionLocation = actionObj.Action.FeatureId;
+
+                verbilization = "Did you hear that " + actionActor + " " + actionVerb + " at " + actionLocation +"?";
+                break;
+        }
+
+        return new DialogueUnit(verbilization, townie.name, socialMove);
     }
 
 
@@ -102,6 +157,7 @@ public class ConversationController
     {
         return new List<SocialMove>(from fact in townie.ws.knownFacts.GetFacts()
                                     where fact is WorldFactEvent
+                                    where ((WorldFactEvent)fact).action.Action.ActorId == partner //I may take out this condition in the long run
                                     select new SocialMove("askWhyAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
                                                                            mentionedFacts: new List<WorldFact>() { fact }));
     }
@@ -110,6 +166,7 @@ public class ConversationController
     {
         return new List<SocialMove>(from fact in townie.ws.knownFacts.GetFacts()
                                     where fact is WorldFactEvent
+                                    where ((WorldFactEvent)fact).action.Action.ActorId != partner
                                     select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }

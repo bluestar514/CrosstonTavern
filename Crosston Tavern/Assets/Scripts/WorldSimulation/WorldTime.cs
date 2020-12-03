@@ -19,6 +19,8 @@ public class WorldTime : IComparable
 
 
     public static WorldTime DayZeroEightAM = new WorldTime(1, 1, 1, 8, 0);
+    public static WorldTime Morning = new WorldTime(-1, -1, -1, 8, 0);
+    public static WorldTime Night = new WorldTime(-1, -1, -1, 22, 0);
 
 
     public WorldTime(int year, int month, int day, int hour, int minute)
@@ -152,6 +154,12 @@ public class WorldTime : IComparable
     public static bool operator <=(WorldTime a, WorldTime b) => a.CompareTo(b) <= 0;
     public static bool operator >=(WorldTime a, WorldTime b) => a.CompareTo(b) >= 0;
 
+    /// <summary>
+    /// NOT SYMETRIC!!! 
+    /// </summary>
+    /// <param name="a">Full Date, no value in a can be -1 unless the same value in b is -1, or else strange things will happen!</param>
+    /// <param name="b">can be a partial date</param>
+    /// <returns></returns>
     public static WorldTime operator +(WorldTime a, WorldTime b)
     {
         WorldTime c = new WorldTime(a);

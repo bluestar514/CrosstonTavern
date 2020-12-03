@@ -12,8 +12,8 @@ public class WeightedAction : BoundAction
 
     public WeightedAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, 
         string actorId, string featureId, string locationId, BoundBindingCollection bindings,
-        float weight, List<WeightRational> weightRationals) : 
-        base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings)
+        float weight, List<WeightRational> weightRationals, VerbilizationInfo verbilizationInfo) : 
+        base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings,  verbilizationInfo)
     {
         this.weight = weight;
         this.weightRationals = weightRationals;
@@ -23,7 +23,7 @@ public class WeightedAction : BoundAction
         
     public WeightedAction(BoundAction boundAction, float weight, List<WeightRational> weightRationals) :
         this(boundAction.Id, boundAction.executionTime, boundAction.preconditions, boundAction.potentialOutcomes, 
-            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.Bindings, weight, weightRationals)
+            boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.Bindings, weight, weightRationals, boundAction.verbilizationInfo)
     {}
 
 

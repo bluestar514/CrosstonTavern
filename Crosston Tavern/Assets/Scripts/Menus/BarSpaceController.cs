@@ -28,8 +28,8 @@ public class BarSpaceController : MonoBehaviour
 
     static List<SocialMove> barkeeperMoves = new List<SocialMove>() {
             new SocialMove("askAboutGoals"),
-            new SocialMove("askAboutGoalFrustration"),
-            new SocialMove("askAboutDayFull"),
+            //new SocialMove("askAboutGoalFrustration"),
+            //new SocialMove("askAboutDayFull"),
             new SocialMove("askAboutDayHighlights"),
             new SocialMove("askAboutObservation"),
             new SocialMove("askAboutExcitement"),
@@ -50,15 +50,15 @@ public class BarSpaceController : MonoBehaviour
 
         dbc.Initialize(this);
         nc.Initialize(new List<WorldFact>());
-        lc.Initialize(new List<string>());
+        lc.Initialize(new List<DialogueUnit>());
     }
 
     public void SetPatron(Townie townie)
     {
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
-        barkeep = new ConversationController(barkeepTownie, barkeeperMoves); //new Patron(barkeepTownie, barkeeperMoves);
-        patron = new ConversationController(townie, genericSocialMoves); //new Patron(townie, genericSocialMoves);
+        barkeep = new ConversationController(barkeepTownie, barkeeperMoves, townie.townieInformation.id); //new Patron(barkeepTownie, barkeeperMoves);
+        patron = new ConversationController(townie, genericSocialMoves, "barkeep"); //new Patron(townie, genericSocialMoves);
         pp.gameObject.SetActive(false);
 
         PlayerPhase();
@@ -72,7 +72,7 @@ public class BarSpaceController : MonoBehaviour
         patron.LearnFromInput(prompt);
 
         dbc.DisplayNPCAction(npcDialogue);
-        lc.AddElement(npcDialogue.speakerName + ": " + npcDialogue.verbalization);
+        lc.AddElement(npcDialogue);
         AddAllFacts(npcDialogue.facts);
         barkeep.LearnFromInput(npcDialogue.underpinningSocialMove);
     }
@@ -90,7 +90,7 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
-        lc.AddElement(dialogueUnit.speakerName + ": " + dialogueUnit.verbalization);
+        lc.AddElement(dialogueUnit);
 
         NPCPhase(dialogueUnit.underpinningSocialMove);
     }
