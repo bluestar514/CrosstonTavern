@@ -12,7 +12,7 @@ public class BoundAction : WorldAction
     public BoundBindingCollection Bindings { get; private set; }
 
     public BoundAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, 
-        string actorId, string featureId, string locationId, BoundBindingCollection Bindings, VerbilizationInfo verbilizationInfo) :
+        string actorId, string featureId, string locationId, BoundBindingCollection Bindings, VerbilizationAction verbilizationInfo) :
         base(id, executionTime, preconditions, potentialEffects, verbilizationInfo)
     {
         this.ActorId = actorId;
@@ -24,7 +24,7 @@ public class BoundAction : WorldAction
         name = ToString();
     }
 
-    public BoundAction(GenericAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings, VerbilizationInfo verbilizationInfo) : 
+    public BoundAction(GenericAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings, VerbilizationAction verbilizationInfo) : 
         this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings, verbilizationInfo)
     { }
 

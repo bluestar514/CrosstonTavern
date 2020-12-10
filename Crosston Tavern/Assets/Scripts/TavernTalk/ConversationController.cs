@@ -36,22 +36,19 @@ public class ConversationController
                 return new SocialMove("tellAboutDayObservedEvents", mentionedActions: observedHistory);
             case "askWhyGoal#":
                 string goalName = prompt.arguements[0];
-                Goal goal = townie.gm.GetGoalFromName(goalName);
+                WorldFactGoal goalFact = (WorldFactGoal)prompt.mentionedFacts[0];
+                Goal goal = goalFact.goal;
 
-                /*Debug.Log(goal);
-                Debug.Log(goal.parentGoals.Count);*/
-
-                List<Goal> parentGoals = new List<Goal>(from g in goal.parentGoals
-                                                        select townie.gm.GetGoalFromName(g));
+                List<Goal> parentGoals = goal.GetParentGoals();
 
                 return new SocialMove("tellWhyGoal#", new List<string>() { goalName }, mentionedGoals: parentGoals);
             case "askWhyAction#":
                 string actionName = prompt.arguements[0];
                 ExecutedAction action = townie.ws.knownFacts.GetActionFromName(actionName);
                 if (action == null) return new SocialMove("dontKnow#", prompt.arguements);
-                return new SocialMove("tellWhyAction#", new List<string>() { actionName }, string.Join(",", action.Action.weightRationals));/*,
+                return new SocialMove("tellWhyAction#", new List<string>() { actionName },
                                                 mentionedGoals: new List<Goal>(from rational in action.Action.weightRationals
-                                                                               select new Goal(rational.goal, 1)));*/
+                                                                               select new Goal(rational.goal, 1)));
             case "askAboutExcitement":
                 List<ExecutedAction> fullHistory = FilterMyActions(GetDayEvents());
                 return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory
@@ -59,7 +56,7 @@ public class ConversationController
                                                                                                            select e));
             case "askAboutDisapointment":
                 List<ExecutedAction> fullHistory2 = FilterMyActions(GetDayEvents());
-                return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory2
+                return new SocialMove("tellAboutDisapointingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory2
                                                                                                            where e.opinion.tags.Contains(Opinion.Tag.disapointed)
                                                                                                            select e));
             case "tellAction#":
@@ -90,13 +87,11 @@ public class ConversationController
     {
 
         string verbilization = socialMove.ToString();
-        string actionName = "";
-        ExecutedAction actionObj = null;
-        string actionActor = partner;
-        string were = "was";
-        string actionVerb = "";
-        string actionLocation = "";
-
+        string actionName;
+        ExecutedAction actionObj;
+        List<WorldFact> facts = socialMove.mentionedFacts;
+        List<string> goals = new List<string>();
+        WorldFactGoal goalFact;
         switch (socialMove.verb) {
             case "askAboutDayHighlights":
                 verbilization = "What did you do today?";
@@ -116,34 +111,170 @@ public class ConversationController
             case "askWhyAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
-                actionActor = actionObj.Action.ActorId;
-                were = "was";
-                if (actionActor == partner) {
-                    actionActor = "you";
-                    were = "were";
-                }
-                actionVerb = actionObj.Action.Id;
-                actionLocation = actionObj.Action.FeatureId;
-                
-                verbilization = "Why "+were+" " + actionActor + " trying to " + actionVerb + " at " +actionLocation+"?";
+
+                verbilization = VerbalizeAction(actionObj, true);
+                verbilization = "Why did " + verbilization + "?";
                 break;
             case "tellAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
-                actionActor = actionObj.Action.ActorId;
-                if (actionActor == partner) {
-                    actionActor = "you";
-                }
-                actionVerb = actionObj.Action.Id;
-                actionLocation = actionObj.Action.FeatureId;
 
-                verbilization = "Did you hear that " + actionActor + " " + actionVerb + " at " + actionLocation +"?";
+                verbilization = VerbalizeAction(actionObj, false);
+                verbilization = "Did you hear that " + verbilization +"?";
+                break;
+            case "tellAboutDayEvents":
+            case "tellAboutExcitingEvent":
+            case "tellAboutDisapointingEvent":
+            case "tellAboutDayObservedEvents":
+                List<WorldFact> events = socialMove.mentionedFacts;
+                verbilization = "Today, ";
+
+                List<string> collectedEvents = new List<string>();
+                foreach(WorldFact fact in events) {
+                    if (fact is WorldFactEvent) {
+
+                        WorldFactEvent e = (WorldFactEvent)fact;
+                        ExecutedAction a = e.action;
+                        collectedEvents.Add(VerbalizeAction(a, false));
+                    }
+                }
+
+                string lastevent = collectedEvents.Last();
+                collectedEvents.RemoveAt(collectedEvents.Count-1);
+
+                verbilization += string.Join(", ", collectedEvents) + ", and " + lastevent+".";
+                break;
+            case "tellAboutGoals":
+                
+                //I want to have 3 to 1000 trout
+                //I want to be friendlier with Alicia
+                //I want to be dating Alicia
+                //I want Alicia to have 4 to 5 strawberry
+                foreach (WorldFact fact in facts) {
+                    
+                    if (fact is WorldFactGoal) {
+                        goalFact = (WorldFactGoal)fact;
+                        goals.Add(VerbalizaeState(goalFact.goal.state));
+                    }
+                }
+
+                verbilization = string.Join(". I want ", goals);
+                verbilization = "I want " + verbilization;
+                break;
+            case "tellWhyAction#":
+                foreach(WorldFact fact in facts) {
+                    if(fact is WorldFactGoal) {
+                        goalFact = (WorldFactGoal)fact;
+                        goals.AddRange( UnrollGoalChain(goalFact.goal));
+                    }
+                }
+
+                verbilization = string.Join(", and so I wanted ", goals);
+                verbilization = "I wanted " + verbilization;
                 break;
         }
 
         return new DialogueUnit(verbilization, townie.name, socialMove);
     }
 
+    List<string> UnrollGoalChain(Goal initGoal)
+    {
+        List<Goal> goalChain =new List<Goal>() { initGoal } ;
+
+        int x = 0;
+        List<Goal> backlog = new List<Goal>() { initGoal };
+         
+        while (backlog.Count > 0) {
+            Goal goal = backlog[0];
+            backlog.RemoveAt(0);
+
+            goalChain.AddRange(goal.GetParentGoals());
+            backlog.AddRange(goal.GetParentGoals());
+            Debug.Log("goal: " + goal + " parents: " + goal.GetParentGoals().Count);
+            x++;
+            if (x > 1000) throw new System.Exception("Infinite Loop detected!");
+        }
+
+        goalChain.Reverse();
+
+        List<Goal> noDups = new List<Goal>();
+        HashSet<Goal> seen = new HashSet<Goal>();
+        foreach (Goal g in goalChain) {
+            if (!seen.Contains(g)) {
+                noDups.Add(g);
+                seen.Add(g);
+            }
+            
+        }
+
+        List<string> subVerbilizations = new List<string>();
+        foreach(Goal goal in noDups) {
+            subVerbilizations.Add(VerbalizaeState(goal.state));
+        }
+
+        return subVerbilizations;
+        
+    }
+
+    string VerbalizaeState(State goalState)
+    {
+        string owner = "";
+        string target;
+
+        if (goalState is StateInventoryStatic) {
+            StateInventoryStatic stateInv = (StateInventoryStatic)goalState;
+
+            if (stateInv.ownerId != townie.townieInformation.id) {
+                owner = stateInv.ownerId + " to ";
+            }
+            return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + stateInv.itemId);
+        } else if (goalState is StateSocial) {
+            StateSocial stateSocial = (StateSocial)goalState;
+
+            string axisDirection;
+            if (stateSocial.max > townie.townieInformation.relationships.Get(stateSocial.targetId, stateSocial.axis)) axisDirection = "more";
+            else axisDirection = "less";
+
+            if (stateSocial.sourceId != townie.townieInformation.id) {
+                owner = stateSocial.sourceId + " to ";
+            }
+            if (stateSocial.targetId == townie.townieInformation.id) target = "me";
+            else target = stateSocial.targetId;
+
+            return (owner + "to be " + axisDirection + " " + stateSocial.axis + " with " + target);
+        } else if (goalState is StatePosition) {
+            StatePosition statePos = (StatePosition)goalState;
+            return ("go to the " + statePos.locationId);
+        } else if (goalState is StateRelation) {
+            StateRelation stateRelation = (StateRelation)goalState;
+
+            if (stateRelation.source != townie.townieInformation.id) {
+                owner = stateRelation.source + " to ";
+            }
+            if (stateRelation.target == townie.townieInformation.id) target = "me";
+            else target = stateRelation.target;
+            return (owner + "to be " + stateRelation.tag + " " + target);
+        } else {
+            return (goalState.id);
+        }
+    }
+
+    string VerbalizeAction(ExecutedAction action, bool presentTense)
+    {
+        string actionActor = action.Action.ActorId;
+        if(actionActor == townie.townieInformation.id) {
+            actionActor = "I";
+        }
+        if (actionActor == partner) {
+            actionActor = "you";
+        }
+        string actionLocation = action.Action.FeatureId;
+
+        string verbilization = action.Action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
+        verbilization = action.Action.Bindings.BindString(verbilization);
+
+        return verbilization;
+    }
 
     List<SocialMove> GenAskWhyGoal()
     {

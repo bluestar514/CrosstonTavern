@@ -19,6 +19,7 @@ public class Goal
     public static int PERMINATE = -1;
 
     public List<string> parentGoals = new List<string>();
+    List<Goal> parentGoalObj = new List<Goal>();
     public List<BoundAction> enablingActions = new List<BoundAction>(); // THese are the actions completing this goal unlocks
     //Not the actions which complete this goal
 
@@ -48,8 +49,13 @@ public class Goal
             Goal newGoal = new Goal(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
             newGoal.enablingActions.AddRange(enablingActions);
             newGoal.enablingActions.AddRange(goal.enablingActions);
+
             newGoal.parentGoals.AddRange(parentGoals);
             newGoal.parentGoals.AddRange(goal.parentGoals);
+
+            newGoal.parentGoalObj.AddRange(GetParentGoals());
+            newGoal.parentGoalObj.AddRange(goal.GetParentGoals());
+
             return new List<Goal>() { newGoal };
         } else return new List<Goal>() { this, goal }; 
     }
@@ -58,5 +64,15 @@ public class Goal
     public Goal MakeSpecific(BoundBindingCollection bindings, FeatureResources resources)
     {
         return new Goal(state.Bind(bindings, resources), priority);
+    }
+
+    public List<Goal> GetParentGoals()
+    {
+        return parentGoalObj;
+    }
+    public void AddParentGoal(Goal goal)
+    {
+        parentGoalObj.Add(goal);
+        parentGoals.Add(goal.name);
     }
 }

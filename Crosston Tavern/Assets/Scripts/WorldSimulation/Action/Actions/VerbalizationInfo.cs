@@ -4,84 +4,166 @@ using UnityEngine;
 
 public class VerbilizationInfo
 {
-    //fishing at the lake in the forest
-    //complimented alicia at the inn
 
-    public string verb; //fishing, complimented, etc
+}
 
-    public VerbilizationInfo(string verb)
+public class VerbilizationAction: VerbilizationInfo
+{
+    protected string verbPresent;
+    protected string verbPast;
+
+    public VerbilizationAction(string verbPresent, string verbPast)
+    {
+        this.verbPresent = verbPresent;
+        this.verbPast = verbPast;
+    }
+
+    public virtual string Verbilize(string actor, string feature, bool presentTense)
+    {
+        return verbPresent;
+    }
+}
+
+public class VerbilizationActionResourceGathering : VerbilizationAction
+{
+    public VerbilizationActionResourceGathering(string verbPresent, string verbPast) : base(verbPresent, verbPast)
+    {
+    }
+
+
+    //I went fishing at the pond in the forest
+    //you went foraging at the feild bushes
+    //Bob went fishing at the farm river
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        return actor+ " " + verb + " at " + feature;
+    }
+}
+
+public class VerbilizationActionSocial: VerbilizationAction
+{
+    public VerbilizationActionSocial(string verbPresent, string verbPast) : base(verbPresent, verbPast)
+    {
+    }
+
+    //I complimented Alicia
+    //you insulted Alicia
+    //Bob started dating Alicia
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        return actor+ " " + verb + " " + feature;
+    }
+}
+
+/// <summary>
+/// Assumes singular items presently
+/// </summary>
+public class VerbilizationActionItem : VerbilizationAction
+{
+    protected string itemBinding;
+
+    public VerbilizationActionItem(string verbPresent, string verbPast, string itemBinding) : base(verbPresent, verbPast)
+    {
+        this.itemBinding = itemBinding;
+    }
+
+    //I gave Alicia a strawberry
+    //you asked Alicia for a rose
+    //Bob gave Alicia a cake
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        return base.Verbilize(actor, feature,  presentTense);
+    }
+}
+
+public class VerbilizationActionItemAskFor : VerbilizationActionItem
+{
+    public VerbilizationActionItemAskFor(string verbPresent, string verbPast, string itemBinding) : base(verbPresent, verbPast, itemBinding)
+    {
+    }
+
+    //I gave Alicia a strawberry
+    //you asked Alicia for a rose
+    //Bob gave Alicia a cake
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        return actor + " " + verb + " " + feature + " for a " + itemBinding;
+    }
+}
+
+public class VerbilizationActionItemGive : VerbilizationActionItem
+{
+    public VerbilizationActionItemGive(string verbPresent, string verbPast, string itemBinding) : base(verbPresent, verbPast, itemBinding)
+    {
+    }
+
+    //I gave Alicia a strawberry
+    //Bob gave Alicia a cake
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        return actor + " " + verb + " " + feature + " a " + itemBinding;
+    }
+}
+
+public class VerbilizationEffect: VerbilizationInfo
+{
+    protected string verb;
+
+    public VerbilizationEffect(string verb)
     {
         this.verb = verb;
     }
 
-    public virtual string Verbalize(ExecutedAction action)
+    virtual public string Verbilize(string actor, Effect effect)
     {
-        return action.ToString();
+        return verb;
     }
 }
 
-public class VerbalizePatternFishing : VerbilizationInfo
+public class VerbilizationEffectItemGather: VerbilizationEffect
 {
-    //Why did bob go fishing at the lake in the forest?
-    //I went foraging in the brush in the feild.
-
-    public string inAt;
-
-    public VerbalizePatternFishing(string verb, string inAt) : base(verb)
+    public VerbilizationEffectItemGather(string verb) : base(verb)
     {
-        this.inAt = inAt;
     }
 
-    public override string Verbalize(ExecutedAction action)
+    //and I caught 4 trout
+    //I found 2 strawberries
+    public override string Verbilize(string actor, Effect effect)
     {
-        return verb + " " + inAt + " the " + action.Action.FeatureId + " in the " + action.Action.LocationId;
+        if (effect is EffectInventoryBound) {
+            EffectInventoryBound invEffect = (EffectInventoryBound)effect;
+
+            return actor + " " + verb + " " + Mathf.Abs(invEffect.delta) + " " + invEffect.itemId; 
+        }
+
+        throw new System.Exception("I think we used the wrong kind of Verbalization on " + effect);
     }
+
 }
 
-public class VerbalizePatternCompliment : VerbilizationInfo
+public class VerblilizationFeature: VerbilizationInfo
 {
-    public VerbalizePatternCompliment(string verb) : base(verb)
+    string feature;
+
+    public VerblilizationFeature(string feature)
     {
+        this.feature = feature;
     }
 
-    //Why did bob compliment alicia in the inn?
-    //I complimented alicia in the farm. 
-
-    public override string Verbalize(ExecutedAction action)
+    public string Verbilize()
     {
-        return verb + action.Action.FeatureId + " in the " + action.Action.LocationId;
-    }
-}
-
-public class VerbalizePatternMove : VerbilizationInfo
-{
-    public VerbalizePatternMove() : base("went")
-    {
-    }
-
-    public override string Verbalize(ExecutedAction action)
-    { //why did you go
-        //I went 
-        return " to the " + action.Action.LocationId;
-    }
-}
-
-public class VerbalizationPatternItem: VerbilizationInfo
-{
-    //I gave alicia a cake
-    //Why did you give alicia a cake
-    //I did bob ask alicia for a strawberry?
-    string optionalFor;
-
-    public VerbalizationPatternItem(string verb, string optionalFor) : base(verb)
-    {
-        this.optionalFor = optionalFor;
-    }
-
-    public override string Verbalize(ExecutedAction action)
-    {
-        string item = action.Action.Bindings.BindString("#item#");
-
-        return verb + " " + action.Action.FeatureId+ " "+ optionalFor + " a " + item;
+        return feature;
     }
 }

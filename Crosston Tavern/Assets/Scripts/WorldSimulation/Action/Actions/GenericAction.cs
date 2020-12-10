@@ -10,7 +10,7 @@ public class GenericAction: WorldAction {
     
 
     public GenericAction(string id, int executionTime, Precondition preconditions, 
-        List<Outcome> potentialEffects, List<BindingPort> bindings, VerbilizationInfo verbilizationInfo) : 
+        List<Outcome> potentialEffects, List<BindingPort> bindings, VerbilizationAction verbilizationInfo) : 
         base(id, executionTime, preconditions, potentialEffects, verbilizationInfo)
     {
         if (bindings == null) this.bindingPorts = null;

@@ -12,7 +12,7 @@ public class WeightedAction : BoundAction
 
     public WeightedAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, 
         string actorId, string featureId, string locationId, BoundBindingCollection bindings,
-        float weight, List<WeightRational> weightRationals, VerbilizationInfo verbilizationInfo) : 
+        float weight, List<WeightRational> weightRationals, VerbilizationAction verbilizationInfo) : 
         base(id, executionTime, preconditions, potentialEffects, actorId, featureId, locationId, bindings,  verbilizationInfo)
     {
         this.weight = weight;

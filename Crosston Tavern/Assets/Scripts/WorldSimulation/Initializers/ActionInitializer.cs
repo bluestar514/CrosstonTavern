@@ -43,7 +43,7 @@ public class ActionInitializer
                 new BindingPortString("c_fish", "#common_fish#"),
                 new BindingPortString("r_fish", "#rare_fish#")
             },
-            new VerbalizePatternFishing("fishing", "at")
+            new VerbilizationActionResourceGathering("go fishing", "went fishing")
         ) },
         {"forage", new GenericAction("forage", 1,
             new Precondition( new List<Condition>() {
@@ -77,7 +77,7 @@ public class ActionInitializer
                 new BindingPortString("c_forage", "#common_forage#"),
                 new BindingPortString("r_forage", "#rare_forage#")
             },
-            new VerbalizePatternFishing("foraging", "at")
+            new VerbilizationActionResourceGathering("go foraging","went foraging")
         ) },
         {"talk", new GenericAction("talk", 1,
             new Precondition(new List<Condition>() {
@@ -103,7 +103,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternFishing("talk", "to")
+            new VerbilizationActionSocial("talk to", "talked to")
         ) },
         {"move", new GenericAction("move", 0,
             new Precondition(new List<Condition>() {
@@ -119,10 +119,7 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
             },
-            //bob went to the inn
-            //I went to the forest
-            //why did you go to the forest
-            new VerbalizePatternMove()
+            new VerbilizationActionResourceGathering("to", "to")
 
         ) },
         {"give_#item#", new GenericAction("give_#item#", 1,
@@ -163,7 +160,7 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "a")
             }, 
-            new VerbalizationPatternItem("gave", "") 
+            new VerbilizationActionItemGive("give", "gave", "#item#") 
         ) },
         {"ask_#item#", new GenericAction("ask_#item#", 1,
             new Precondition(new List<Condition>() {
@@ -196,7 +193,7 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "b")
             },
-            new VerbalizationPatternItem("ask", "for")
+            new VerbilizationActionItemAskFor("ask for", "asked for", "#item#")
         ) },
         { "buy_fishing_rod", new GenericAction("buy_fishing_rod", 1,
             new Precondition(new List<Condition>() {
@@ -214,7 +211,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternFishing("buy a fishing rod", "from")
+            new VerbilizationActionResourceGathering("buy a fishing rod", "bought a fishing rod")
         )},
         //{"buy_#item#", new GenericAction("buy_#item#", 1,
         //    new Precondition(new List<Condition>() {
@@ -306,7 +303,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternCompliment("insult")
+            new VerbilizationActionSocial("insult", "insulted")
         ) },
         {"compliment", new GenericAction("compliment", 1,
             new Precondition(new List<Condition>() {
@@ -338,7 +335,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternCompliment("compliment")
+            new VerbilizationActionSocial("compliment", "complimented")
         ) },
         {"start_dating", new GenericAction("start_dating", 1,
             new Precondition(new List<Condition>() {
@@ -374,7 +371,7 @@ public class ActionInitializer
             
             // I started dating alicia. 
             // why did you start dating alicia?
-            new VerbalizePatternCompliment("start dating")
+            new VerbilizationActionSocial("start dating", "started dating")
         ) },
         //{ "outing_shopping_at_#loc#_with_#b#", new GenericAction( "outing_shopping_at_#loc#_with_#b#", 1, 
         
@@ -422,7 +419,7 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient)
             }, // bob baked a strawberry cake
 
-            new VerbalizePatternCompliment("baked a strawberry cake") 
+            new VerbilizationActionResourceGathering("bake a strawberry cake", "baked a strawberry cake") 
         )},
         { "fry_salmon", new GenericAction("fry_salmon", 1,
             new Precondition(new List<Condition>() {
@@ -442,7 +439,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternCompliment("made fried salmon")
+            new VerbilizationActionResourceGathering("make fried salmon", "made fried salmon")
         )},
         { "bake_blackberry_tart", new GenericAction("bake_blackberry_tart", 1,
             new Precondition(new List<Condition>() {
@@ -462,7 +459,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternCompliment("baked a blackberry tart")
+            new VerbilizationActionResourceGathering("bake a blackberry tart", "baked a blackberry tart")
         )},
         { "stew_trout", new GenericAction("stew_trout", 1,
             new Precondition(new List<Condition>() {
@@ -482,7 +479,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbalizePatternCompliment("made stewed trout")
+            new VerbilizationActionResourceGathering("make stewed trout", "made stewed trout")
         )}
         
         //,

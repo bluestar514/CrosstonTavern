@@ -16,9 +16,9 @@ public class WorldAction
     public int executionTime;
     public Precondition preconditions;
     public List<Outcome> potentialOutcomes;
-    public VerbilizationInfo verbilizationInfo;
+    public VerbilizationAction verbilizationInfo;
 
-    public WorldAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, VerbilizationInfo verbilizationInfo)
+    public WorldAction(string id, int executionTime, Precondition preconditions, List<Outcome> potentialEffects, VerbilizationAction verbilizationInfo)
     {
         Id = id;
         name = Id;
