@@ -152,6 +152,8 @@ public class GoalManager
     {
         List<OutcomeRestraints> relevantOutcomes = new List<OutcomeRestraints>();
         foreach(OutcomeRestraints outcome in outcomes) {
+            if (!ContainsConditionNotYou(outcome.preconditions, outcome.bindings)) continue; 
+
             if (OutcomeProgressesGoal(outcome, goal)) {
                 outcome.fullfillsGoal.Add(goal);
                 relevantOutcomes.Add(outcome);
@@ -159,6 +161,20 @@ public class GoalManager
         }
 
         return relevantOutcomes;
+    }
+    bool ContainsConditionNotYou(List<Condition> preconditions, BoundBindingCollection bindings)
+    {
+        foreach (Condition condition in preconditions) {
+            if (condition is Condition_NotYou) {
+                Condition_NotYou condition_NotYou = (Condition_NotYou)condition;
+                
+                if (bindings.BindString(condition_NotYou.featureId) == actor.id) { //this can never change, so we should just discard this action
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     bool OutcomeProgressesGoal(OutcomeRestraints outcome, Goal goal)
@@ -173,23 +189,23 @@ public class GoalManager
         return false;
     }
 
-    List<Goal> MakeGoalsFromOutcome(Goal goal, List<OutcomeRestraints> relevantOutcomes)
+    List<Goal> MakeGoalsFromOutcome(Goal parentGoal, List<OutcomeRestraints> outcomesFillingParentGoal)
     {
         List<Goal> newGoals = new List<Goal>();
-        foreach (OutcomeRestraints outcome in relevantOutcomes) {
-            if (goal.enablingActions.Contains(outcome.parentAction)) continue;
+        foreach (OutcomeRestraints outcome in outcomesFillingParentGoal) {
+            if (parentGoal.unlockedActionsOnGoalCompletion.Contains(outcome.parentAction)) continue;
 
             float effectStrength = outcome.effects.Sum(effect => effect.WeighAgainstGoal(ws,
                                                                                         outcome.bindings,
                                                                                         outcome.resources,
-                                                                                        goal));
+                                                                                        parentGoal));
 
             newGoals.AddRange(MakePreconditionsGoal(outcome,
-                                                    goal.priority *
+                                                    parentGoal.priority *
                                                         outcome.chanceModifier.MakeBound(outcome.bindings, outcome.resources).Chance(ws) *
                                                         effectStrength
                                                     ));
-            newGoals.AddRange(MakeChanceModifierGoal(outcome, goal.priority * effectStrength));
+            newGoals.AddRange(MakeChanceModifierGoal(outcome, parentGoal.priority * effectStrength));
         }
 
         return newGoals;
@@ -206,10 +222,10 @@ public class GoalManager
                 Condition_IsState stateCondition = (Condition_IsState)condition;
 
                 Goal g = new Goal(stateCondition.state.Bind(outcome.bindings, outcome.resources), parentPriority);
-                g.enablingActions.Add(outcome.parentAction);
+                g.AddUnlockedAction(outcome.parentAction);
 
-                foreach(Goal goal in outcome.fullfillsGoal) {
-                    g.AddParentGoal(goal);
+                foreach(Goal parentGoal in outcome.fullfillsGoal) {
+                    g.AddParentGoal(parentGoal);
                 }
 
                 newGoals.Add(g);
@@ -233,7 +249,7 @@ public class GoalManager
         if (goals != null) {
             foreach (Goal goal in goals) {
                 newGoals.Add(goal);
-                goal.enablingActions.Add(outcome.parentAction);
+                goal.AddUnlockedAction(outcome.parentAction);
                 foreach (Goal g in outcome.fullfillsGoal) {
                     goal.AddParentGoal(g);
                 }
@@ -273,6 +289,7 @@ public class GoalManager
     {
         Dictionary<string, float> locationPriority = new Dictionary<string, float>();
         Dictionary<string, List<Goal>> locationReason = new Dictionary<string, List<Goal>>();
+        Dictionary<string, List<BoundAction>> locationActions = new Dictionary<string, List<BoundAction>>();
 
         List<BoundAction> allActions = GetAllActions();
         ActionHeuristicManager ahm = new ActionHeuristicManager(actor, ws);
@@ -290,9 +307,11 @@ public class GoalManager
                             if (locationPriority.ContainsKey(location)) {
                                 locationPriority[location] += desire;
                                 locationReason[location].Add(goal);
+                                locationActions[location].Add(action);
                             } else {
                                 locationPriority.Add(location, desire);
                                 locationReason.Add(location, new List<Goal>() { goal });
+                                locationActions.Add(location, new List<BoundAction>() { action });
                             }
                         }
 
@@ -307,6 +326,10 @@ public class GoalManager
             
             foreach(Goal g in locationReason[location]) {
                 goal.AddParentGoal(g);
+            }
+
+            foreach (BoundAction action in locationActions[location]) {
+                goal.AddUnlockedAction(action);
             }
 
             goals.Add(goal);

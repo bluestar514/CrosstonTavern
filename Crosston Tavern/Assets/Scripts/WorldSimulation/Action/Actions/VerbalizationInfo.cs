@@ -24,6 +24,21 @@ public class VerbilizationAction: VerbilizationInfo
     }
 }
 
+public class VerbilizationMovement : VerbilizationAction
+{
+    public VerbilizationMovement() : base(" go to ", " went to ")
+    {
+    }
+
+    // bob, door_farm->feild, true
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string went = verbPast;
+        if (presentTense) went = verbPresent;
+        return actor + went + feature.Split('>')[1];
+    }
+}
+
 public class VerbilizationActionResourceGathering : VerbilizationAction
 {
     public VerbilizationActionResourceGathering(string verbPresent, string verbPast) : base(verbPresent, verbPast)
@@ -142,13 +157,16 @@ public class VerbilizationEffectItemGather: VerbilizationEffect
     //I found 2 strawberries
     public override string Verbilize(string actor, Effect effect)
     {
-        if (effect is EffectInventoryBound) {
-            EffectInventoryBound invEffect = (EffectInventoryBound)effect;
+        Debug.Log(effect + ":" + (effect is EffectInventory));
+
+
+        if (effect is EffectInventory) {
+            EffectInventory invEffect = (EffectInventory)effect;
 
             return actor + " " + verb + " " + Mathf.Abs(invEffect.delta) + " " + invEffect.itemId; 
         }
 
-        throw new System.Exception("I think we used the wrong kind of Verbalization on " + effect);
+        return "";
     }
 
 }

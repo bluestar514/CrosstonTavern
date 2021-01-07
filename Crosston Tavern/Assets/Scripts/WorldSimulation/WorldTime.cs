@@ -49,6 +49,10 @@ public class WorldTime : IComparable
         return "<" + year + "-" + month + "-" + day + " " + hour + ":" + minute + ">";
     }
 
+    public string GetDate()
+    {
+        return month + "/" + day + "/" + year;
+    }
 
     public void Tick(int i = 1)
     {

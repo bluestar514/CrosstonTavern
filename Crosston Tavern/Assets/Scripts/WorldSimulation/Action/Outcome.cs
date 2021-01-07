@@ -8,19 +8,15 @@ public class Outcome
 {
     public ChanceModifier chanceModifier;
     public List<Effect> effects;
+    public List<VerbilizationEffect> effectVerbalizations;
 
     public float evaluatedChance;
 
-    public Outcome(ChanceModifier chanceModifier, List<Effect> effects)
+    public Outcome(ChanceModifier chanceModifier, List<Effect> effects, List<VerbilizationEffect> effectVerbalizations)
     {
         this.chanceModifier = chanceModifier;
         this.effects = effects;
-    }
-
-    public List<Effect> BindEffects(Dictionary<string, List<string>> resources)
-    {
-        return new List<Effect>();//from effect in effects
-                                     //select effect.BindEffect(resources));        
+        this.effectVerbalizations = effectVerbalizations;
     }
 
     public float EvaluateChance(WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)

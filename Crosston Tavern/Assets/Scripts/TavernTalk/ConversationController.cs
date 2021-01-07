@@ -8,12 +8,15 @@ public class ConversationController
     Townie townie;
     List<SocialMove> socialMoves;
     string partner;
+    Verbalizer v;
+
 
     public ConversationController(Townie patron, List<SocialMove> socialMoves, string partner)
     {
         townie = patron;
         this.socialMoves = socialMoves;
         this.partner = partner;
+        v = new Verbalizer(townie.townieInformation.id, partner, townie.ws);
     }
 
 
@@ -48,7 +51,7 @@ public class ConversationController
                 if (action == null) return new SocialMove("dontKnow#", prompt.arguements);
                 return new SocialMove("tellWhyAction#", new List<string>() { actionName },
                                                 mentionedGoals: new List<Goal>(from rational in action.Action.weightRationals
-                                                                               select new Goal(rational.goal, 1)));
+                                                                               select rational.goal));
             case "askAboutExcitement":
                 List<ExecutedAction> fullHistory = FilterMyActions(GetDayEvents());
                 return new SocialMove("tellAboutExcitingEvent", mentionedActions: new List<ExecutedAction>(from e in fullHistory
@@ -61,6 +64,8 @@ public class ConversationController
                                                                                                            select e));
             case "tellAction#":
                 return new SocialMove("acknowledge");
+            case "askAboutAction#":
+                return new SocialMove("tellDetailsOfAction#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
             default:
                 return new SocialMove("DEFAULT");
         }
@@ -72,6 +77,7 @@ public class ConversationController
         moves.AddRange(GenAskWhyGoal());
         moves.AddRange(GenAskWhyAction());
         moves.AddRange(GenTellAction());
+        moves.AddRange(GenAskAboutAction());
         return moves;
     }
 
@@ -112,39 +118,52 @@ public class ConversationController
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbilization = VerbalizeAction(actionObj, true);
+                verbilization = v.VerbalizeAction(actionObj, true);
                 verbilization = "Why did " + verbilization + "?";
                 break;
             case "tellAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbilization = VerbalizeAction(actionObj, false);
+                verbilization = v.VerbalizeAction(actionObj, false);
                 verbilization = "Did you hear that " + verbilization +"?";
                 break;
             case "tellAboutDayEvents":
             case "tellAboutExcitingEvent":
             case "tellAboutDisapointingEvent":
             case "tellAboutDayObservedEvents":
-                List<WorldFact> events = socialMove.mentionedFacts;
+                
                 verbilization = "Today, ";
 
                 List<string> collectedEvents = new List<string>();
-                foreach(WorldFact fact in events) {
+                foreach(WorldFact fact in facts) {
                     if (fact is WorldFactEvent) {
 
                         WorldFactEvent e = (WorldFactEvent)fact;
                         ExecutedAction a = e.action;
-                        collectedEvents.Add(VerbalizeAction(a, false));
+                        collectedEvents.Add(v.VerbalizeActionWithResults(a, false));
                     }
                 }
+                if (collectedEvents.Count >= 3) {
+                    string lastevent = collectedEvents.Last();
+                    collectedEvents.RemoveAt(collectedEvents.Count - 1);
 
-                string lastevent = collectedEvents.Last();
-                collectedEvents.RemoveAt(collectedEvents.Count-1);
-
-                verbilization += string.Join(", ", collectedEvents) + ", and " + lastevent+".";
+                    verbilization += string.Join(", ", collectedEvents) + ", and " + lastevent + ".";
+                } else if (collectedEvents.Count == 2) {
+                    verbilization += string.Join(" and ", collectedEvents) + ".";
+                } else if (collectedEvents.Count == 1) {
+                    verbilization += collectedEvents[0];
+                } else {
+                    verbilization = "Nothing interesting happened today.";
+                }
                 break;
             case "tellAboutGoals":
+            case "tellWhyGoal#":
+
+                if (facts.Count == 0) {
+                    verbilization = "I just do.";
+                    break;
+                }
                 
                 //I want to have 3 to 1000 trout
                 //I want to be friendlier with Alicia
@@ -154,7 +173,7 @@ public class ConversationController
                     
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(VerbalizaeState(goalFact.goal.state));
+                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
                     }
                 }
 
@@ -165,12 +184,45 @@ public class ConversationController
                 foreach(WorldFact fact in facts) {
                     if(fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.AddRange( UnrollGoalChain(goalFact.goal));
+                        goals.AddRange(UnrollGoalChain(goalFact.goal));
                     }
                 }
 
                 verbilization = string.Join(", and so I wanted ", goals);
                 verbilization = "I wanted " + verbilization;
+                break;
+            case "askWhyGoal#":
+                foreach (WorldFact fact in facts) {
+
+                    if (fact is WorldFactGoal) {
+                        goalFact = (WorldFactGoal)fact;
+                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
+                    }
+                }
+
+                verbilization = "Why do you want "+ goals[0]+"?";
+                break;
+            case "askAboutAction#":
+                actionName = socialMove.arguements[0];
+                actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
+
+                verbilization = v.VerbalizeAction(actionObj, false);
+                verbilization = "Could you tell me more about how " + verbilization + "?";
+                break;
+            case "tellDetailsOfAction#":
+                foreach (WorldFact fact in facts) {
+                    if (fact is WorldFactEvent) {
+
+                        WorldFactEvent e = (WorldFactEvent)fact;
+                        ExecutedAction a = e.action;
+
+                        foreach (Effect effect in a.executedEffect) {
+                            verbilization += effect.ToString();
+                        }
+                    }
+                }
+
+
                 break;
         }
 
@@ -209,72 +261,14 @@ public class ConversationController
 
         List<string> subVerbilizations = new List<string>();
         foreach(Goal goal in noDups) {
-            subVerbilizations.Add(VerbalizaeState(goal.state));
+            subVerbilizations.Add(v.VerbalizaeState(goal.state));
         }
 
         return subVerbilizations;
         
     }
 
-    string VerbalizaeState(State goalState)
-    {
-        string owner = "";
-        string target;
-
-        if (goalState is StateInventoryStatic) {
-            StateInventoryStatic stateInv = (StateInventoryStatic)goalState;
-
-            if (stateInv.ownerId != townie.townieInformation.id) {
-                owner = stateInv.ownerId + " to ";
-            }
-            return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + stateInv.itemId);
-        } else if (goalState is StateSocial) {
-            StateSocial stateSocial = (StateSocial)goalState;
-
-            string axisDirection;
-            if (stateSocial.max > townie.townieInformation.relationships.Get(stateSocial.targetId, stateSocial.axis)) axisDirection = "more";
-            else axisDirection = "less";
-
-            if (stateSocial.sourceId != townie.townieInformation.id) {
-                owner = stateSocial.sourceId + " to ";
-            }
-            if (stateSocial.targetId == townie.townieInformation.id) target = "me";
-            else target = stateSocial.targetId;
-
-            return (owner + "to be " + axisDirection + " " + stateSocial.axis + " with " + target);
-        } else if (goalState is StatePosition) {
-            StatePosition statePos = (StatePosition)goalState;
-            return ("go to the " + statePos.locationId);
-        } else if (goalState is StateRelation) {
-            StateRelation stateRelation = (StateRelation)goalState;
-
-            if (stateRelation.source != townie.townieInformation.id) {
-                owner = stateRelation.source + " to ";
-            }
-            if (stateRelation.target == townie.townieInformation.id) target = "me";
-            else target = stateRelation.target;
-            return (owner + "to be " + stateRelation.tag + " " + target);
-        } else {
-            return (goalState.id);
-        }
-    }
-
-    string VerbalizeAction(ExecutedAction action, bool presentTense)
-    {
-        string actionActor = action.Action.ActorId;
-        if(actionActor == townie.townieInformation.id) {
-            actionActor = "I";
-        }
-        if (actionActor == partner) {
-            actionActor = "you";
-        }
-        string actionLocation = action.Action.FeatureId;
-
-        string verbilization = action.Action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
-        verbilization = action.Action.Bindings.BindString(verbilization);
-
-        return verbilization;
-    }
+    
 
     List<SocialMove> GenAskWhyGoal()
     {
@@ -299,6 +293,15 @@ public class ConversationController
                                     where fact is WorldFactEvent
                                     where ((WorldFactEvent)fact).action.Action.ActorId != partner
                                     select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
+                                                                         mentionedFacts: new List<WorldFact>() { fact }));
+    }
+
+    List<SocialMove> GenAskAboutAction()
+    {
+        return new List<SocialMove>(from fact in townie.ws.knownFacts.GetFacts()
+                                    where fact is WorldFactEvent
+                                    where ((WorldFactEvent)fact).action.Action.ActorId == partner
+                                    select new SocialMove("askAboutAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() },
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
 

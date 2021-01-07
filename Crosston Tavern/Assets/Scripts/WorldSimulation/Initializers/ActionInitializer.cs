@@ -19,6 +19,9 @@ public class ActionInitializer
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "common_fish", "#c_fish#")),
                         new EffectSkill("#a#", "fishing", 2)
+                    }, 
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("caught")
                     }
                 ),
                 new Outcome(
@@ -27,6 +30,9 @@ public class ActionInitializer
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_fish#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "rare_fish", "#r_fish#")),
                         new EffectSkill("#a#", "fishing", 3)
+                    },
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("caught")
                     }
                 ),
                 new Outcome(
@@ -34,6 +40,9 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5),
                         new EffectSkill("#a#", "fishing", 1)
+                    },
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("caught")
                     }
                 )
             },
@@ -55,6 +64,9 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_forage#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "common_forage", "#c_forage#"))
+                    },
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("found")
                     }
                 ),
                 new Outcome(
@@ -62,12 +74,18 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_forage#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "rare_forage", "#r_forage#"))
+                    },
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("found")
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSimple(.15f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"dandelion" }, 1, 5)
+                    },
+                    new List<VerbilizationEffect>() {
+                        new VerbilizationEffectItemGather("found")
                     }
                 )
             },
@@ -89,6 +107,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 3),
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 3)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
@@ -96,6 +116,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, 0),
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, 0)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
             },
@@ -113,13 +135,15 @@ public class ActionInitializer
                     new ChanceModifier(),
                     new List<Effect>() {
                         new EffectMovement("#a#", "#"+Map.R_CONNECTEDLOCATION+"#")
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 )
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
             },
-            new VerbilizationActionResourceGathering("to", "to")
+            new VerbilizationMovement()
 
         ) },
         {"give_#item#", new GenericAction("give_#item#", 1,
@@ -134,6 +158,8 @@ public class ActionInitializer
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.loved, "#item#"))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
@@ -143,6 +169,8 @@ public class ActionInitializer
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.liked, "#item#"))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
@@ -152,6 +180,8 @@ public class ActionInitializer
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#"))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 )
             },
@@ -178,6 +208,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryStatic("#b#", "#item#", -1),
                         new EffectInventoryStatic("#a#", "#item#", 1)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
@@ -185,6 +217,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -2),
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -2)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 )
             },
@@ -204,6 +238,8 @@ public class ActionInitializer
                     new ChanceModifier(),
                     new List<Effect>() {
                         new EffectInventoryStatic("#a#", "fishing_rod", 1)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 )
             },
@@ -290,12 +326,16 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, 12, 3, new List<string>(){"#a#"}))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -1, 4)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
             },
@@ -315,6 +355,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
@@ -322,12 +364,16 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 1),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), false),
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
             },
@@ -352,6 +398,8 @@ public class ActionInitializer
                         new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.romantic, 2),
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 2),
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2),
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome( //failure:
@@ -361,6 +409,8 @@ public class ActionInitializer
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -5),
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.romantic, -5, 0),
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -5, 0)
+                    },
+                    new List<VerbilizationEffect>() {
                     }
                 ),
             },
@@ -412,6 +462,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryStatic("#a#", "strawberry_cake", 1),
                         new EffectInventoryStatic("#a#", "strawberry", -1)
+                    },
+                    new List<VerbilizationEffect>() {
                     })
             },
             new List<BindingPort>() {
@@ -433,6 +485,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryStatic("#a#", "fried_salmon", 1),
                         new EffectInventoryStatic("#a#", "salmon", -1)
+                    },
+                    new List<VerbilizationEffect>() {
                     })
             },
             new List<BindingPort>() {
@@ -453,6 +507,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryStatic("#a#", "blackberry_tart", 1),
                         new EffectInventoryStatic("#a#", "blackberry", -1)
+                    },
+                    new List<VerbilizationEffect>() {
                     })
             },
             new List<BindingPort>() {
@@ -473,6 +529,8 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryStatic("#a#", "trout_stew", 1),
                         new EffectInventoryStatic("#a#", "trout", -1)
+                    },
+                    new List<VerbilizationEffect>() {
                     })
             },
             new List<BindingPort>() {

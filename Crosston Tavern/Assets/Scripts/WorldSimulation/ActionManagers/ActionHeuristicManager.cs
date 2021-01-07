@@ -127,7 +127,7 @@ public class ActionHeuristicManager : ActionManager
                 float value = desirability * chance;
                 weight += value;
                 if (value != 0)
-                    rationals.Add(new WeightedAction.WeightRational(effect, goal.state, value, desirability, chance));
+                    rationals.Add(new WeightedAction.WeightRational(effect, goal, value, desirability, chance));
             }
         }
         return new KeyValuePair<float, List<WeightedAction.WeightRational>>(weight, rationals) ;

@@ -138,7 +138,9 @@ public class WorldHub : MonoBehaviour
                                             0, 
                                             new Precondition(new List<Condition>()), 
                                             new List<Outcome>() {
-                                                new Outcome(new ChanceModifier(), new List<Effect>(){ new EffectMovement(person.ws.id, person.homeLocation) })
+                                                new Outcome(new ChanceModifier(), new List<Effect>(){ new EffectMovement(person.ws.id, person.homeLocation) },
+                                                                new List<VerbilizationEffect>(){ new VerbilizationEffect("SYSTEM TELEPORT") }
+                                                )
                                             }, 
                                             new List<BindingPort>(),
                                             new VerbilizationAction("SYSTEM", "SYSTEM")), 

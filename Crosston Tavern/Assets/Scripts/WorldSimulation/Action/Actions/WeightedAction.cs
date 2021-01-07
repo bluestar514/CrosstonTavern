@@ -52,12 +52,12 @@ public class WeightedAction : BoundAction
         string name;
 
         public Effect effect;
-        public State goal;
+        public Goal goal;
         public float weight;
         public float desirability;
         public float chance;
 
-        public WeightRational(Effect effect, State goal, float weight, float desirability, float chance)
+        public WeightRational(Effect effect, Goal goal, float weight, float desirability, float chance)
         {
             this.effect = effect;
             this.goal = goal;
@@ -72,7 +72,7 @@ public class WeightedAction : BoundAction
 
         public override string ToString()
         {
-            return "{"+goal+", "+effect+": "+weight+"("+desirability+"*"+chance+")}";
+            return "{"+goal.state+", "+effect+": "+weight+"("+desirability+"*"+chance+")}";
         }
     }
 }

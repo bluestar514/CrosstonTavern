@@ -20,8 +20,12 @@ public class Goal
 
     public List<string> parentGoals = new List<string>();
     List<Goal> parentGoalObj = new List<Goal>();
-    public List<BoundAction> enablingActions = new List<BoundAction>(); // THese are the actions completing this goal unlocks
-    //Not the actions which complete this goal
+    /// <summary>
+    /// These are the actions completing this goal unlocks,
+    /// not the actions which complete this goal.
+    /// In other words, these are the actions that the character wanted to do which prompted the creation on this goal.
+    /// </summary>
+    public List<BoundAction> unlockedActionsOnGoalCompletion = new List<BoundAction>(); 
 
     public Goal(State state, float priority)
     {
@@ -47,8 +51,8 @@ public class Goal
         List<State> states = this.state.Combine(goal.state);
         if (states.Count == 1) {
             Goal newGoal = new Goal(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
-            newGoal.enablingActions.AddRange(enablingActions);
-            newGoal.enablingActions.AddRange(goal.enablingActions);
+            newGoal.unlockedActionsOnGoalCompletion.AddRange(unlockedActionsOnGoalCompletion);
+            newGoal.unlockedActionsOnGoalCompletion.AddRange(goal.unlockedActionsOnGoalCompletion);
 
             newGoal.parentGoals.AddRange(parentGoals);
             newGoal.parentGoals.AddRange(goal.parentGoals);
@@ -72,7 +76,17 @@ public class Goal
     }
     public void AddParentGoal(Goal goal)
     {
+        if (parentGoalObj.Contains(goal))
+            return;
+
         parentGoalObj.Add(goal);
         parentGoals.Add(goal.name);
+    }
+
+    public void AddUnlockedAction(BoundAction action)
+    {
+        if (unlockedActionsOnGoalCompletion.Contains(action)) return;
+
+        unlockedActionsOnGoalCompletion.Add(action);
     }
 }

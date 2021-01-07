@@ -18,6 +18,7 @@ public class WorldFact
 }
 
 
+[System.Serializable]
 public class WorldFactResource: WorldFact { 
 
     public string featureId;
@@ -64,9 +65,19 @@ public class WorldFactResource: WorldFact {
 
         feature.relevantResources.Add(resourceId, potentialBinding);
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 1424682090;
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(featureId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(resourceId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(potentialBinding);
+        return hashCode;
+    }
 }
 
 
+[System.Serializable]
 public class WorldFactPreference: WorldFact
 {
     public string person;
@@ -114,8 +125,18 @@ public class WorldFactPreference: WorldFact
         if (!pref.ContainsKey(level)) pref.Add(level, new List<string>());
         if (!pref[level].Contains(item)) pref[level].Add(item);
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 1523044811;
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(person);
+        hashCode = hashCode * -1521134295 + level.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(item);
+        return hashCode;
+    }
 }
 
+[System.Serializable]
 public class WorldFactEvent: WorldFact
 {
     public ExecutedAction action;
@@ -147,9 +168,14 @@ public class WorldFactEvent: WorldFact
     {
         ws.AddHistory(action);
     }
+
+    public override int GetHashCode()
+    {
+        return -1387187753 + EqualityComparer<ExecutedAction>.Default.GetHashCode(action);
+    }
 }
 
-
+[System.Serializable]
 public class WorldFactGoal: WorldFact
 {
     public Goal goal;

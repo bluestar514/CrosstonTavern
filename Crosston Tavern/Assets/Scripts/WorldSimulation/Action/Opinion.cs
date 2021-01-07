@@ -24,7 +24,7 @@ public class Opinion
         List<Effect> realizedEffects = executedAction.executedEffect;
         BoundAction boundAction = executedAction.Action;
 
-        Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects);
+        Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects, new List<VerbilizationEffect>() { new VerbilizationEffectItemGather("OPINION_SYSTEM")});
         WorldState ws = townie.ws;
         ActionHeuristicManager ahm = new ActionHeuristicManager(townie.townieInformation, ws);
 
