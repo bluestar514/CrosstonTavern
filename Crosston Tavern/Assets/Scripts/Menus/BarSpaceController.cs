@@ -10,6 +10,9 @@ public class BarSpaceController : MonoBehaviour
     public LogController lc;
     public PatronPicker pp;
     public WorldHub worldHub;
+    public BarPatronSelector bps;
+
+    public List<string> validPatronNames = new List<string>();
 
     static List<SocialMove> genericSocialMoves = new List<SocialMove>()
         {
@@ -45,14 +48,22 @@ public class BarSpaceController : MonoBehaviour
 
     public void Start()
     {
-        
-        gameObject.SetActive(false);
-
         dbc.Initialize(this);
         nc.Initialize(new List<WorldFact>());
         lc.Initialize(new List<DialogueUnit>());
+
+        bps = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
+        SetNextPatron();
     }
 
+
+    public void SetNextPatron()
+    {
+        string previousPatron = "";
+        if (patron != null) previousPatron = patron.townie.name;
+
+        SetPatron(bps.PickRandomPatron(previousPatron));
+    }
     public void SetPatron(Townie townie)
     {
 
@@ -64,6 +75,15 @@ public class BarSpaceController : MonoBehaviour
         PlayerPhase();
     }
 
+    public void AddDaySeperator()
+    {
+        lc.AddDaySeperator(worldHub.ws.Time);
+    }
+
+    public void AddConvSeperator()
+    {
+        lc.AddConversationSeperator();
+    }
 
     public void NPCPhase(SocialMove prompt)
 

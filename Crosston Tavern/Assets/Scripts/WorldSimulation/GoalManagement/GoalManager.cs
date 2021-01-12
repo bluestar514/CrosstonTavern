@@ -199,6 +199,7 @@ public class GoalManager
                                                                                         outcome.bindings,
                                                                                         outcome.resources,
                                                                                         parentGoal));
+            effectStrength /= outcome.effects.Count;
 
             newGoals.AddRange(MakePreconditionsGoal(outcome,
                                                     parentGoal.priority *
@@ -215,7 +216,9 @@ public class GoalManager
     {
         List<Goal> newGoals = new List<Goal>();
 
-        foreach(Condition condition in outcome.preconditions) {
+        if (parentPriority == 0) return newGoals;
+
+        foreach (Condition condition in outcome.preconditions) {
             if (condition.InEffect(actor, ws, outcome.bindings, outcome.resources)) continue;
 
             if (condition is Condition_IsState) {

@@ -24,7 +24,7 @@ public class Effect
     /// <param name="bindings"> Action's bindings</param>
     /// <param name="resources"> Resources on the feature being acted against</param>
     /// <param name="goal"> A goal for the effect to be weighed against</param>
-    /// <returns> An estimate of how much a character wants to do something.</returns>
+    /// <returns> An estimate of how much a character wants to do something. This value should be between -1 and 1 at all times</returns>
     public virtual float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal) {
         return 0;
     }
@@ -62,7 +62,7 @@ public class Effect
         if (Mathf.Abs(newCount - max) <= Mathf.Abs(count - max)) weight += 1;
         else weight -= 1;
 
-        return weight;
+        return weight/2;
     }
 
     /// <summary>

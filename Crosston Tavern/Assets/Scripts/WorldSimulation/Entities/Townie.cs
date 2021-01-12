@@ -14,9 +14,7 @@ public class Townie: MonoBehaviour
     public WorldState ws; //there understanding of the WorldState
 
     public GoalManager gm;
-
-    public List<ExecutedAction> history;
-
+    
     public string homeLocation;
 
     public void TownieInit(Person townieInformation, WorldState ws, GoalManager gm)
@@ -25,7 +23,6 @@ public class Townie: MonoBehaviour
         this.townieInformation = townieInformation;
         this.ws = ws;
         this.gm = gm;
-        history = new List<ExecutedAction>();
     }
 
 

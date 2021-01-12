@@ -33,7 +33,7 @@ public class Verbalizer
 
             string axisDirection = "";
             if (ws != null) {
-                if (stateSocial.max > ws.GetRelationshipsFor(stateSocial.sourceId).Get(stateSocial.sourceId, stateSocial.axis)) axisDirection = " nmore";
+                if (stateSocial.max > ws.GetRelationshipsFor(stateSocial.sourceId).Get(stateSocial.sourceId, stateSocial.axis)) axisDirection = " more";
                 else axisDirection = " less";
             }
             if (stateSocial.sourceId != speakerId) {
@@ -42,7 +42,7 @@ public class Verbalizer
             if (stateSocial.targetId == speakerId) target = "me";
             else target = stateSocial.targetId;
 
-            return (owner + "to be" + axisDirection + " " + stateSocial.axis + " with " + target);
+            return (owner + " to be" + axisDirection + " " + stateSocial.axis + " with " + target);
         } else if (goalState is StatePosition) {
             StatePosition statePos = (StatePosition)goalState;
             return ("go to the " + statePos.locationId);

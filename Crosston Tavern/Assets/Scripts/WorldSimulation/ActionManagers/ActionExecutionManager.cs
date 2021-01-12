@@ -98,7 +98,6 @@ public class ActionExecutionManager : ActionManager
                     effect.ExecuteEffect(townie.ws, townie, bindings, resources);
                 }
 
-                townie.history.Add(personalAction);
                 townie.ws.AddHistory(personalAction);
             }
         }

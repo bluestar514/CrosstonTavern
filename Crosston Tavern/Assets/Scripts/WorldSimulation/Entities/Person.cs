@@ -80,6 +80,17 @@ public class Person: Feature
 
         return false;
     }
+    public PreferenceLevel ItemPreference(string item)
+    {
+        foreach(KeyValuePair<PreferenceLevel, List<string>> p in preferences) {
+            PreferenceLevel level = p.Key;
+            List<string> items = p.Value;
+
+            if (items.Contains(item)) return level;
+        }
+
+        return PreferenceLevel.neutral;
+    }
 
     public override string ToString()
     {

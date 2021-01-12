@@ -26,7 +26,13 @@ public class WeightedAction : BoundAction
             boundAction.ActorId, boundAction.FeatureId, boundAction.LocationId, boundAction.Bindings, weight, weightRationals, boundAction.verbilizationInfo)
     {}
 
+    public string ToId()
+    {
+        string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";
+        if (Bindings == null) return n;
 
+        return Bindings.BindString(n);
+    }
     public override string ToString()
     {
         string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";

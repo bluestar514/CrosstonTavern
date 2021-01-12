@@ -6,6 +6,8 @@ using System;
 
 public class WorldHub : MonoBehaviour
 {
+    public int simulatedInitialDays = 0;
+
     public WorldState ws;
 
     List<Townie> allPeople;
@@ -15,12 +17,17 @@ public class WorldHub : MonoBehaviour
     public WorldSpaceDisplayManager wsdm;
 
     Dictionary<Townie, ChosenAction> chosenActions = new Dictionary<Townie, ChosenAction>();
-    private void Start()
+    private void Awake()
     {
         ws = WorldStateInitializer.GetWorldState();
         ws.id = "main";
 
         allPeople = WorldStateInitializer.GetTownies(ws, transform); 
+
+    }
+
+    private void Start()
+    {
         wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
 
         foreach (Townie person in allPeople) {
@@ -31,10 +38,9 @@ public class WorldHub : MonoBehaviour
 
         }
 
-        for (int i = 0; i < 1; i++) {
-            TimeStep();
+        for (int i = 0; i < simulatedInitialDays; i++) {
+            DayStep();
         }
-
     }
 
     public void TimeStep()
@@ -129,6 +135,8 @@ public class WorldHub : MonoBehaviour
         ws.Tick(60 * 8);
 
         foreach (Townie person in allPeople) {
+            if (person.townieInformation.id == "barkeep") continue;
+
             ActionExecutionManager aem = new ActionExecutionManager(person, ws, allPeople);
 
             ExecutedAction executedAction = aem.ExecuteAction(new ChosenAction(

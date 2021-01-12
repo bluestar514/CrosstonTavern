@@ -21,7 +21,12 @@ public class BoundBindingPort
     public virtual void BindResource(FeatureResources resources)
     {
         Value = resources.PickBoundString(Value);
-    } 
+    }
+
+    public override string ToString()
+    {
+        return "<" + tag + ":" + Value + ">";
+    }
 }
 
 public class BoundPortInventoryItem: BoundBindingPort

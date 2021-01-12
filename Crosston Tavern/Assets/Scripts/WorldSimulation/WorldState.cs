@@ -13,6 +13,7 @@ public class WorldState
     public KnownFacts knownFacts;
 
     public WorldTime Time { get => new WorldTime(time); set => time = value; }
+    public List<string> completeItemsList;
 
     public WorldState(Map map, Registry registry, WorldTime time, string owner)
     {
@@ -20,6 +21,8 @@ public class WorldState
         this.registry = registry;
         this.Time = time;
         knownFacts = new KnownFacts(owner);
+
+        completeItemsList = GenerateFullItemList();
     }
 
     public WorldState Copy(Person owner, string name)
@@ -102,5 +105,31 @@ public class WorldState
     public void LearnFact(WorldFact fact)
     {
         knownFacts.AddFact(fact, this);
+    }
+
+
+    private List<string> GenerateFullItemList()
+    {
+        HashSet<string> allItems = new HashSet<string>(ActionInitializer.GetAllActionGeneratedItems());
+
+        foreach(Feature f in map.GetAllFeatures()) {
+            foreach(KeyValuePair<string, List<string>> p in f.relevantResources.resources) {
+                if (p.Key == ResourceCatagories.r_connectedLocation) continue;
+
+                List<string> itemList = p.Value;
+                foreach(string item in itemList) {
+                    allItems.Add(item);
+                }
+            }
+        }
+
+
+        foreach(Person person in registry.GetPeople()) {
+            foreach(string item in person.inventory.GetItemList()) {
+                allItems.Add(item);
+            }
+        }
+
+        return new List<string>(allItems);
     }
 }

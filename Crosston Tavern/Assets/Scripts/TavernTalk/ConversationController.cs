@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ConversationController 
 {
-    Townie townie;
+    public Townie townie;
     List<SocialMove> socialMoves;
     string partner;
     Verbalizer v;
@@ -77,7 +77,7 @@ public class ConversationController
         moves.AddRange(GenAskWhyGoal());
         moves.AddRange(GenAskWhyAction());
         moves.AddRange(GenTellAction());
-        moves.AddRange(GenAskAboutAction());
+        //moves.AddRange(GenAskAboutAction());
         return moves;
     }
 
@@ -312,7 +312,7 @@ public class ConversationController
 
     List<ExecutedAction> GetDayEvents()
     {
-        List<ExecutedAction> completeHistory = townie.history;
+        List<ExecutedAction> completeHistory = townie.ws.knownFacts.GetHistory();
         List<ExecutedAction> todaysHistory = completeHistory.FindAll(x => x.executionTime.SameDay(townie.ws.Time));
 
         return todaysHistory;

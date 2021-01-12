@@ -43,6 +43,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
                                                 select person.id);
 
         foreach(Person person in people) {
+            if (person.id == "barkeep") continue;
             AddTownieRow(person);
         }
     }

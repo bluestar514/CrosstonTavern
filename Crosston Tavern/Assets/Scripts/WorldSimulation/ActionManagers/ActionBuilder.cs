@@ -19,19 +19,30 @@ public class ActionBuilder
         this.actor = actor;
     }
 
-    public List<BoundAction> GetAllActions(string locationId="")
+    public List<BoundAction> GetAllActions(string locationId="", bool respectLocation = true)
     {
-        if (locationId == "") locationId = actor.location;
+        if (respectLocation) {
+
+            if (locationId == "") locationId = actor.location;
 
 
-        List<ActionData> genericActions = GatherProvidedActionsForActorAt(locationId);
+            List<ActionData> genericActions = GatherProvidedActionsForActorAt(locationId);
 
-        List<BoundAction> allActions = new List<BoundAction>();
-        foreach(ActionData data in genericActions) {
-            allActions.AddRange(FillOutBindings(data));
+            List<BoundAction> allActions = new List<BoundAction>();
+            foreach (ActionData data in genericActions) {
+                allActions.AddRange(FillOutBindings(data));
+            }
+
+            return allActions;
+        } else {
+
+            List<BoundAction> allActions = new List<BoundAction>();
+            foreach(string location in ws.map.GetNameOfLocations()) {
+                allActions.AddRange(GetAllActions(location));
+            }
+
+            return allActions;
         }
-
-        return allActions;
     }
 
    
@@ -110,7 +121,7 @@ public class ActionBuilder
                     string ownerId = ((BoundPortEntity)GetPortWithTag(invPort.owner, bindings)).participantId;
                     Inventory inv = ws.registry.GetPerson(ownerId).inventory;
 
-                    itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in inv.GetItemList()
+                    itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in ws.completeItemsList
                                                                                 select new BoundPortInventoryItem(port.tag, item, inv.GetInventoryCount(item))));
                     
                 } else if (port is BindingPortStockItem) {

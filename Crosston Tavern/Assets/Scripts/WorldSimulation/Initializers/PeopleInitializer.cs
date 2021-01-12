@@ -61,9 +61,6 @@ public class PeopleInitializer
             allPeople["dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
 
 
-
-
-
         //Organizer scenario details:
 
 

@@ -18,6 +18,7 @@ public class PatronPicker : MonoBehaviour
             allPeople = world.GetTownies();
 
             foreach (Townie townie in allPeople) {
+                if (townie.townieInformation.id == "barkeep") continue;
                 GameObject button = Instantiate(PatronButtonPrefab, PatronButtonHolder);
                 button.GetComponent<PatronPickerButton>().Init(townie, bsc);
             }

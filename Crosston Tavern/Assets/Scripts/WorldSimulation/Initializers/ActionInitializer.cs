@@ -148,7 +148,8 @@ public class ActionInitializer
         ) },
         {"give_#item#", new GenericAction("give_#item#", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(new StateInventoryStatic("#a#", "#item#", 1, INF))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -176,7 +177,8 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -10),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -30, -15),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -20, -10),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#"))
@@ -587,4 +589,25 @@ public class ActionInitializer
         //    }
         // ) }
     };
+
+
+    public static HashSet<string> GetAllActionGeneratedItems()
+    {
+        HashSet<string> items = new HashSet<string>();
+
+        foreach(GenericAction action in actions.Values) {
+            foreach(Outcome outcome in action.potentialOutcomes) {
+                foreach(Effect effect in outcome.effects) {
+                    if(effect is EffectInventory) {
+                        EffectInventory effectInventory = (EffectInventory)effect;
+                        if (!effectInventory.itemId.Contains("#")) {
+                            items.Add(effectInventory.itemId);
+                        }
+                    }
+                }
+            }
+        }
+
+        return items;
+    }
 }

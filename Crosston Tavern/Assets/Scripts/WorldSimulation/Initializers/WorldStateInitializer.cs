@@ -58,12 +58,12 @@ public class WorldStateInitializer
                                         new Goal(new StateRelation("bob", "alicia", Relationship.RelationshipTag.dating), 1)
                                     }
                                 )) ;
-        townies[bob].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "strawberry_cake", 1, 100), 4)
-                                    }
-                                ));
+        //townies[bob].gm.AddModule(new GoalModule(
+        //                            new List<GM_Precondition>(),
+        //                            new List<Goal>() {
+        //                                new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "strawberry_cake", 1, 100), 4)
+        //                            }
+        //                        ));
 
         /*townies[clara].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
@@ -92,4 +92,14 @@ public class WorldStateInitializer
 
         return townies;
     }
+}
+
+
+public class ResourceCatagories
+{
+    public static string r_connectedLocation = "connectedLocation";
+
+    public static string r_initiator = "initiator";
+    public static string r_recipient = "recipient";
+
 }

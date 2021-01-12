@@ -43,7 +43,7 @@ public class MemoryAdder : MonoBehaviour
         addableFacts.AddOptions(new List<string>(from executedAction in unknownActions
                                                  select executedAction.ToString()));
 
-        foreach (ExecutedAction executedAction in individual.history) {
+        foreach (ExecutedAction executedAction in individual.ws.knownFacts.GetHistory()) {
             DisplayAddedEvent(executedAction);
         }
     }
@@ -60,7 +60,6 @@ public class MemoryAdder : MonoBehaviour
             effect.ExecuteEffect(individual.ws, individual, bindings, resources);
         }
 
-        individual.history.Add(executedAction);
         individual.ws.AddHistory(executedAction);
 
         DisplayAddedEvent(executedAction);
