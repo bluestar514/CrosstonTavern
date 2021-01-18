@@ -72,6 +72,12 @@ public class Verbalizer
             actionActor = "you";
         }
         string actionLocation = action.Action.FeatureId;
+        if(actionLocation == speakerId) {
+            actionLocation = "me";
+        }
+        if(actionLocation == listenerId) {
+            actionLocation = "you";
+        }
 
 
         string verbilization = action.Action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
@@ -101,13 +107,19 @@ public class Verbalizer
             }
         }
         string verbalization = MakeNiceList(verbEffects);
-        if (verbalization != "") return VerbalizeAction(action, presentTense) + " and " + verbalization;
-        else return VerbalizeAction(action, presentTense);
+        if (verbalization != "") verbalization = VerbalizeAction(action, presentTense) + " and " + verbalization;
+        else verbalization = VerbalizeAction(action, presentTense);
+
+        verbalization = action.Action.Bindings.BindString(verbalization);
+
+        return verbalization;
     }
 
 
     public string MakeNiceList(List<string> collectedEvents)
     {
+         collectedEvents = new List<string>(collectedEvents.Distinct());
+
         string verbalization = "";
 
         if (collectedEvents.Count >= 3) {
@@ -125,4 +137,7 @@ public class Verbalizer
 
         return verbalization;
     }
+
+
+
 }

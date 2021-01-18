@@ -13,7 +13,7 @@ public class SocialMove
     public List<WorldFact> mentionedFacts;
 
     public SocialMove(string verb, List<string> arguements = null, string content = "",
-        List<ExecutedAction> mentionedActions = null, List<Goal> mentionedGoals = null, List<WorldFact> mentionedFacts = null)
+                         List<WorldFact> mentionedFacts = null)
     {
         this.verb = verb;
 
@@ -22,17 +22,6 @@ public class SocialMove
 
         if (mentionedFacts == null) mentionedFacts = new List<WorldFact>();
         this.mentionedFacts = mentionedFacts;
-        if (mentionedActions != null) {
-            foreach (ExecutedAction action in mentionedActions) {
-                this.mentionedFacts.Add(new WorldFactEvent(action));
-            }
-        }
-        if (mentionedGoals != null) {
-            foreach (Goal goal in mentionedGoals) {
-                this.mentionedFacts.Add(new WorldFactGoal(goal));
-            }
-        }
-
 
         this.content = content + string.Join(",", mentionedFacts);
         

@@ -8,12 +8,15 @@ public class NotebookController : SideMenuController<WorldFact>
 
     public override void AddElement(WorldFact element)
     {
-        base.AddElement(element);
+        bool addToSideNotebook = true;
 
         if (element is WorldFactEvent) {
             WorldFactEvent e = (WorldFactEvent)element;
 
-            notebook.AddEvent(e);
+            addToSideNotebook = notebook.AddEvent(e);
         }
+
+
+        if(addToSideNotebook) base.AddElement(element);
     }
 }

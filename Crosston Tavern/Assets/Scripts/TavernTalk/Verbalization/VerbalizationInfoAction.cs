@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VerbilizationInfo
-{
-
-}
-
-public class VerbilizationAction: VerbilizationInfo
+public class VerbilizationAction : VerbilizationInfo
 {
     protected string verbPresent;
     protected string verbPast;
@@ -54,11 +49,11 @@ public class VerbilizationActionResourceGathering : VerbilizationAction
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
 
-        return actor+ " " + verb + " at " + feature;
+        return actor + " " + verb + " at " + feature;
     }
 }
 
-public class VerbilizationActionSocial: VerbilizationAction
+public class VerbilizationActionSocial : VerbilizationAction
 {
     public VerbilizationActionSocial(string verbPresent, string verbPast) : base(verbPresent, verbPast)
     {
@@ -72,7 +67,7 @@ public class VerbilizationActionSocial: VerbilizationAction
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
 
-        return actor+ " " + verb + " " + feature;
+        return actor + " " + verb + " " + feature;
     }
 }
 
@@ -93,7 +88,7 @@ public class VerbilizationActionItem : VerbilizationAction
     //Bob gave Alicia a cake
     public override string Verbilize(string actor, string feature, bool presentTense)
     {
-        return base.Verbilize(actor, feature,  presentTense);
+        return base.Verbilize(actor, feature, presentTense);
     }
 }
 
@@ -129,59 +124,5 @@ public class VerbilizationActionItemGive : VerbilizationActionItem
         if (!presentTense) verb = verbPast;
 
         return actor + " " + verb + " " + feature + " a " + itemBinding;
-    }
-}
-
-public class VerbilizationEffect: VerbilizationInfo
-{
-    protected string verb;
-
-    public VerbilizationEffect(string verb)
-    {
-        this.verb = verb;
-    }
-
-    virtual public string Verbilize(string actor, Effect effect)
-    {
-        return verb;
-    }
-}
-
-public class VerbilizationEffectItemGather: VerbilizationEffect
-{
-    public VerbilizationEffectItemGather(string verb) : base(verb)
-    {
-    }
-
-    //and I caught 4 trout
-    //I found 2 strawberries
-    public override string Verbilize(string actor, Effect effect)
-    {
-        Debug.Log(effect + ":" + (effect is EffectInventory));
-
-
-        if (effect is EffectInventory) {
-            EffectInventory invEffect = (EffectInventory)effect;
-
-            return actor + " " + verb + " " + Mathf.Abs(invEffect.delta) + " " + invEffect.itemId; 
-        }
-
-        return "";
-    }
-
-}
-
-public class VerblilizationFeature: VerbilizationInfo
-{
-    string feature;
-
-    public VerblilizationFeature(string feature)
-    {
-        this.feature = feature;
-    }
-
-    public string Verbilize()
-    {
-        return feature;
     }
 }

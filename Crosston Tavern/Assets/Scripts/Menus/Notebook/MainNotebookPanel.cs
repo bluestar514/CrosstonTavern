@@ -23,7 +23,7 @@ public class MainNotebookPanel : MonoBehaviour
     }
 
 
-    public void AddEvent(WorldFactEvent e)
+    public bool AddEvent(WorldFactEvent e)
     {
         WorldTime time = e.action.executionTime;
 
@@ -35,6 +35,8 @@ public class MainNotebookPanel : MonoBehaviour
         }
 
         KnownEventPanel panel = dayDict[time.GetDate()].AddEvent(e);
+        if (panel == null) return false;
+
 
         ExecutedAction action = e.action;
         string actor = action.Action.ActorId;
@@ -51,6 +53,7 @@ public class MainNotebookPanel : MonoBehaviour
         }
 
         eventByActorDict[actor].Add(panel);
+        return true;
     }
 
     public void Close(GameObject obj)

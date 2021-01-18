@@ -15,6 +15,12 @@ public class WorldFact
     }
 
     public virtual void UpdateWorldState(WorldState ws) { }
+
+
+    public virtual string Verbalize(string speaker, string listener, WorldState ws=null)
+    {
+        return id;
+    }
 }
 
 
@@ -73,6 +79,11 @@ public class WorldFactResource: WorldFact {
         hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(resourceId);
         hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(potentialBinding);
         return hashCode;
+    }
+
+    public override string Verbalize(string speaker, string listener, WorldState ws=null)
+    {
+        return "There is " + potentialBinding + " at " + featureId;
     }
 }
 
@@ -134,6 +145,11 @@ public class WorldFactPreference: WorldFact
         hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(item);
         return hashCode;
     }
+
+    public override string Verbalize(string speaker, string listener, WorldState ws = null)
+    {
+        return person + " " + level + " " + item;
+    }
 }
 
 [System.Serializable]
@@ -173,22 +189,50 @@ public class WorldFactEvent: WorldFact
     {
         return -1387187753 + EqualityComparer<ExecutedAction>.Default.GetHashCode(action);
     }
+
+    public override string Verbalize(string speaker, string listener, WorldState ws = null)
+    {
+        Verbalizer v = new Verbalizer(speaker, listener, ws);
+        return v.VerbalizeAction(action, false);
+    }
 }
 
 [System.Serializable]
 public class WorldFactGoal: WorldFact
 {
     public Goal goal;
+    public string owner;
 
-    public WorldFactGoal(Goal goal)
+    public WorldFactGoal(Goal goal, string owner)
     {
         this.goal = goal;
 
         id = ToString();
+        this.owner = owner;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is WorldFactGoal)) return false;
+        WorldFactGoal other = (WorldFactGoal)obj;
+
+        return goal == other.goal;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 
     public override string ToString()
     {
-        return "{Goal:"+goal.ToString()+"}";
+        return "{Goal:"+ owner+ " - " + goal.ToString()+"}";
+    }
+
+    public override string Verbalize(string speaker, string listener, WorldState ws = null)
+    {
+        Verbalizer v = new Verbalizer(speaker, listener, ws);
+        
+        return owner+ " wants " + v.VerbalizaeState(goal.state);
     }
 }

@@ -53,6 +53,20 @@ public class EffectInventory : Effect
 
         return realizedEffect;
     }
+
+    public override Effect Combine(Effect other)
+    {
+        if(other is EffectInventory) {
+            EffectInventory otherInv = (EffectInventory)other;
+
+            if(ownerId == otherInv.ownerId &&
+                itemId == otherInv.itemId) {
+                return new EffectInventoryStatic(ownerId, itemId, delta + otherInv.delta);
+            }
+        }
+
+        return null;
+    }
 }
 
 public class EffectInventoryVariable : EffectInventory

@@ -105,8 +105,11 @@ public class ActionHeuristicManager : ActionManager
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         float weight = 0;
         foreach(Outcome outcome in boundAction.potentialOutcomes) {
+            BoundBindingCollection bindings = boundAction.Bindings;
+            FeatureResources resources = ws.map.GetFeature(boundAction.FeatureId).relevantResources;
+
             KeyValuePair < float, List<WeightedAction.WeightRational> > result = 
-                GetWeightOfOutcome(outcome, boundAction.Bindings, ws.map.GetFeature(boundAction.FeatureId).relevantResources);
+                                                            GetWeightOfOutcome(outcome, bindings, resources);
 
             weight += result.Key;
             rationals.AddRange(result.Value);

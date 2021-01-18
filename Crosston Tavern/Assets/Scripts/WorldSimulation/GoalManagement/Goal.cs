@@ -50,7 +50,7 @@ public class Goal
     {
         List<State> states = this.state.Combine(goal.state);
         if (states.Count == 1) {
-            Goal newGoal = new Goal(states[0], (this.priority + goal.priority)/2, Mathf.Min(this.timeOut, goal.timeOut));
+            Goal newGoal = new Goal(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
             newGoal.unlockedActionsOnGoalCompletion.AddRange(unlockedActionsOnGoalCompletion);
             newGoal.unlockedActionsOnGoalCompletion.AddRange(goal.unlockedActionsOnGoalCompletion);
 

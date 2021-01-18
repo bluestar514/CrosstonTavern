@@ -20,6 +20,8 @@ public class WorldTime : IComparable
 
     public static WorldTime DayZeroEightAM = new WorldTime(1, 1, 1, 8, 0);
     public static WorldTime Morning = new WorldTime(-1, -1, -1, 8, 0);
+    public static WorldTime Noon = new WorldTime(-1, -1, -1, 12, 0);
+    public static WorldTime Evening = new WorldTime(-1, -1, -1, 16, 0);
     public static WorldTime Night = new WorldTime(-1, -1, -1, 22, 0);
 
 

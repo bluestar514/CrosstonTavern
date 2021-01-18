@@ -55,6 +55,21 @@ public class EffectSocial : Effect
 
         return new EffectSocialStatic(sourceId, targetId, axis, delta);
     }
+
+    public override Effect Combine(Effect other)
+    {
+        if (other is EffectSocial) {
+            EffectSocial otherSoc = (EffectSocial)other;
+
+            if (sourceId == otherSoc.sourceId &&
+                targetId == otherSoc.targetId &&
+                axis == otherSoc.axis) {
+                return new EffectSocialStatic(sourceId, targetId, axis, delta + otherSoc.delta);
+            }
+        }
+
+        return null;
+    }
 }
 
 public class EffectSocialVariable : EffectSocial

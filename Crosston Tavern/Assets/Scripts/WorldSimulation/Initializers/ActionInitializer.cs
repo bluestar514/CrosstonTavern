@@ -19,7 +19,7 @@ public class ActionInitializer
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "common_fish", "#c_fish#")),
                         new EffectSkill("#a#", "fishing", 2)
-                    }, 
+                    },
                     new List<VerbilizationEffect>() {
                         new VerbilizationEffectItemGather("caught")
                     }
@@ -105,19 +105,22 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 0, 3),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 0, 3)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 1, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 1, 3)
                     },
                     new List<VerbilizationEffect>() {
+                        //I talked to bob and we had a good time
+                        new VerbilizationEffectSocialThreshold("we had a good time", "it was frustrating", 0)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, 0),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, 0)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, -1),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1)
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("we had a good time", "it was frustrating", 0)
                     }
                 ),
             },
@@ -161,6 +164,7 @@ public class ActionInitializer
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.loved, "#item#"))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffect("#b# loved it")
                     }
                 ),
                 new Outcome(
@@ -172,6 +176,7 @@ public class ActionInitializer
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.liked, "#item#"))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffect("#b# liked it")
                     }
                 ),
                 new Outcome(
@@ -184,6 +189,7 @@ public class ActionInitializer
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#"))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffect("#b# didn't like it at all")
                     }
                 )
             },
@@ -212,6 +218,7 @@ public class ActionInitializer
                         new EffectInventoryStatic("#a#", "#item#", 1)
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffect("#b# gave it happily")
                     }
                 ),
                 new Outcome(
@@ -221,6 +228,7 @@ public class ActionInitializer
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -2)
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffect("#b# wouldn't give it to #a#")
                     }
                 )
             },
@@ -330,14 +338,16 @@ public class ActionInitializer
                         new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, 12, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("#b# ignored it", "#b# got real mad",  0)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -1, 4)
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -2, 1)
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("#b# ignored it", "#b# got real mad",  0)
                     }
                 ),
             },
@@ -359,6 +369,7 @@ public class ActionInitializer
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("#b# blushed bright red", "#b# didn't believe it",  0)
                     }
                 ),
                 new Outcome(
@@ -368,14 +379,16 @@ public class ActionInitializer
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("#b# seemed pleased", "#b# didn't believe it",  0)
                     }
                 ),
                 new Outcome(
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), false),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
+                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -3)
                     },
                     new List<VerbilizationEffect>() {
+                        new VerbilizationEffectSocialThreshold("#b# seemed pleased", "#b# didn't believe it",  0)
                     }
                 ),
             },
@@ -389,25 +402,21 @@ public class ActionInitializer
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
                 new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false),
-                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 20, 1000), true)
+                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 60, 1000), true)
             }),
             new List<Outcome>() {
                 new Outcome( //success:
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 20, 100), true),
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 60, 100), true),
                     new List<Effect>() {
-                        new EffectRelationship("#a#", "#b#", Relationship.RelationshipTag.dating, true, true),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2),
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.romantic, 2),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, 2),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2),
+                        new EffectRelationship("#a#", "#b#", Relationship.RelationshipTag.dating, true, true)
                     },
                     new List<VerbilizationEffect>() {
                     }
                 ),
                 new Outcome( //failure:
-                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 20, 100), false),
+                    new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 60, 100), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -15, -5),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -10, -5),
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -5),
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.romantic, -5, 0),
                         new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -5, 0)

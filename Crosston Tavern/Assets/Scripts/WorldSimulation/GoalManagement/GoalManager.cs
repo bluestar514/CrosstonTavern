@@ -78,10 +78,8 @@ public class GoalManager
             newGoals = new List<Goal>();
         }
 
-        allGoals = CondenseGoals(allGoals);
-
         allGoals = FindLocations(allGoals);
-
+        allGoals = CondenseGoals(allGoals);
 
         lastSetOfGoals = allGoals;
         return allGoals;
@@ -209,7 +207,22 @@ public class GoalManager
             newGoals.AddRange(MakeChanceModifierGoal(outcome, parentGoal.priority * effectStrength));
         }
 
-        return newGoals;
+        List<Goal> unloopingGoals = new List<Goal>();
+        foreach(Goal goal in newGoals) {
+            bool looping = false;
+            foreach(string parent in goal.parentGoals) {
+                if (goal.state.ToString() == parent.Split(':')[0]) {
+                    looping = true;
+                } 
+            }
+
+            if (!looping) {
+                unloopingGoals.Add(goal);
+            }
+            
+        }
+
+        return unloopingGoals;
     }
 
     List<Goal> MakePreconditionsGoal(OutcomeRestraints outcome, float parentPriority)

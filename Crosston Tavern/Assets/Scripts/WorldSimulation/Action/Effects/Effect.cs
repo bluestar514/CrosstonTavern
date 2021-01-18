@@ -79,6 +79,16 @@ public class Effect
 
         return new Effect();
     }
+
+    /// <summary>
+    /// Combines two Effects into 1 if possible. Returns Null if they cannot be combined.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual Effect Combine(Effect other)
+    {
+        return null;
+    }
 }
 
 

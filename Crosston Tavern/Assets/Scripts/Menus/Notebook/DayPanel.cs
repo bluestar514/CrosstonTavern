@@ -21,7 +21,9 @@ public class DayPanel : MonoBehaviour
 
     public KnownEventPanel AddEvent(WorldFactEvent e)
     {
-        if (events.ContainsKey(e.ToString())) return null;
+        if (events.ContainsKey(e.ToString())) {
+            return null;
+        }
         events.Add(e.ToString(), Instantiate(eventPrefab, eventHolder));
         KnownEventPanel panel = events[e.ToString()].GetComponent<KnownEventPanel>();
         panel.Initiate(e);

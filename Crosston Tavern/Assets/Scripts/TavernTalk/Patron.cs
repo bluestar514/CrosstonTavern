@@ -11,7 +11,7 @@ public class Patron
     public Townie townie;
     public List<SocialMove> socialMoves;
 
-    ConversationController cc;
+    ConversationEngine cc;
 
 
 }
