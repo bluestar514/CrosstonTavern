@@ -18,41 +18,39 @@ public class Relationship
     }
     static int NUM_AXIS = 2; 
 
-    public enum CodifiedRelationships
-    {
-        acquantences,
-        friends,
-        lovers,
-        crushes,
-        enemies
-    }
 
     public enum RelationshipTag
     {
         dating,
         rivals,
-        family
+        family,
+        acquantences,
+        friends,
+        lovers,
+        crushes,
+        enemies,
+        self
     }
 
-    static public Dictionary<CodifiedRelationships, Dictionary<RelationType, float[]>> codifiedRelationRanges =
-        new Dictionary<CodifiedRelationships, Dictionary<RelationType, float[]>>() {
-            {CodifiedRelationships.acquantences, new Dictionary<RelationType, float[]> {
+    static public Dictionary<RelationshipTag, Dictionary<RelationType, float[]>> codifiedRelationRanges =
+        new Dictionary<RelationshipTag, Dictionary<RelationType, float[]>>() {
+            {RelationshipTag.acquantences, new Dictionary<RelationType, float[]> {
                 {RelationType.friendly, new float[]{-2, 2} },
                 {RelationType.romantic, new float[]{-4, 4} }
             } },
-            { CodifiedRelationships.friends, new Dictionary<RelationType, float[]> {
+            { RelationshipTag.friends, new Dictionary<RelationType, float[]> {
                 {RelationType.friendly, new float[]{2, 100} },
                 {RelationType.romantic, new float[]{-100, 100} }
             } },
-            { CodifiedRelationships.lovers, new Dictionary<RelationType, float[]> {
+            { RelationshipTag.lovers, new Dictionary<RelationType, float[]> {
                 {RelationType.friendly, new float[]{0, 100} },
                 {RelationType.romantic, new float[]{4, 100} }
             } },
-            { CodifiedRelationships.enemies, new Dictionary<RelationType, float[]> {
+            { RelationshipTag.enemies, new Dictionary<RelationType, float[]> {
                 {RelationType.friendly, new float[]{-100, -2} },
                 {RelationType.romantic, new float[]{-100, 100} }
             } },
-            { CodifiedRelationships.crushes, new Dictionary<RelationType, float[]> {
+            { RelationshipTag.crushes, new Dictionary<RelationType, float[]> {
                 {RelationType.friendly, new float[]{-100, 100} },
                 {RelationType.romantic, new float[]{2, 100} }
             } }
@@ -148,6 +146,12 @@ public class Relationship
             relationTags[target].Remove(tag);
         }
     }
+    public List<RelationshipTag> GetTag(string target)
+    {
+        if (!relationTags.ContainsKey(target)) return new List<RelationshipTag>();
+
+        else return new List<RelationshipTag>(relationTags[target]);
+    }
 
     public bool RelationTagged(string target, RelationshipTag tag)
     {
@@ -161,16 +165,16 @@ public class Relationship
         return new List<string>(relationships.Keys);
     }
 
-    public bool HasRelation(string other, CodifiedRelationships rel)
+    public bool HasRelation(string other, RelationshipTag rel)
     {
         switch (rel) {
-            case CodifiedRelationships.friends:
+            case RelationshipTag.friends:
                 return IsFriend(other);
-            case CodifiedRelationships.enemies:
+            case RelationshipTag.enemies:
                 return IsEnemy(other);
-            case CodifiedRelationships.crushes:
+            case RelationshipTag.crushes:
                 return HasCrush(other);
-            case CodifiedRelationships.acquantences:
+            case RelationshipTag.acquantences:
                 return !IsEnemy(other) && !IsFriend(other);
         }
 

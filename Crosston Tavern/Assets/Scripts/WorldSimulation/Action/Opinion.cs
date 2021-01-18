@@ -10,6 +10,8 @@ public class Opinion
     public List<WeightedAction.WeightRational> reality;
     float realityWeight;
 
+    Person townie;
+
     public List<Tag> tags;
 
     public enum Tag
@@ -27,6 +29,7 @@ public class Opinion
         Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects, new List<VerbilizationEffect>() { new VerbilizationEffectItemGather("OPINION_SYSTEM")});
         WorldState ws = townie.ws;
         ActionHeuristicManager ahm = new ActionHeuristicManager(townie.townieInformation, ws);
+        this.townie = townie.townieInformation;
 
         SetExpectation(ahm, boundAction);
         SetReality(ahm, outcome);
@@ -47,7 +50,7 @@ public class Opinion
     {
         
         KeyValuePair<float, List<WeightedAction.WeightRational>> realizedRational = ahm.GetWeightOfOutcome(outcome,
-            new BoundBindingCollection(new List<BoundBindingPort>()), new FeatureResources(new StringStringListDictionary()));
+            new BoundBindingCollection(new List<BoundBindingPort>()), new FeatureResources(new StringStringListDictionary()), townie.knownGoals);
 
         reality = realizedRational.Value;
         realityWeight = realizedRational.Key;

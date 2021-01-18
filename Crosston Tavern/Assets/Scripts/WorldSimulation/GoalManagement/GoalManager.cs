@@ -10,7 +10,7 @@ public class GoalManager
     Person actor;
     [SerializeField]
     List<GoalModule> modules = new List<GoalModule>();
-    public List<Goal> lastSetOfGoals = new List<Goal>();
+    List<Goal> lastSetOfGoals = new List<Goal>(); //only for use in GM, for outside GM use the Townie Information's KnownGoals
 
     int lookAhead = 3;
 
@@ -78,6 +78,7 @@ public class GoalManager
             newGoals = new List<Goal>();
         }
 
+        allGoals = CondenseGoals(allGoals);
         allGoals = FindLocations(allGoals);
         allGoals = CondenseGoals(allGoals);
 
@@ -312,7 +313,7 @@ public class GoalManager
         
         foreach (BoundAction action in allActions) {
             if (action.preconditions.Valid(ws, actor, action.Bindings, ws.map.GetFeature(action.FeatureId).relevantResources)) {
-                float desire = ahm.WeighActions(new List<BoundAction>() { action })[0].weight;
+                float desire = ahm.GetWeightOfBoundAction(action, goals).weight;
                 desire = Mathf.Max(0, desire);
 
                 List<OutcomeRestraints> outcomes = DecomposeActionToOutcomes(action);

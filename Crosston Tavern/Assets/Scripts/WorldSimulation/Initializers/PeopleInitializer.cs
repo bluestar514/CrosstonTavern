@@ -34,8 +34,8 @@ public class PeopleInitializer
 
         // Override with specific things for the senario and or testing
             //Lover scenario Details:
-            allPeople["bob"].relationships.Set("organizer_alicia", Relationship.RelationType.friendly, 2);
-            allPeople["bob"].relationships.Set("organizer_alicia", Relationship.RelationType.romantic, 5);
+            allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
+            allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
 
             allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
             allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
@@ -75,28 +75,28 @@ public class PeopleInitializer
     static void SetRelationsRandom(Dictionary<string, Person> allPeople)
     {
 
-        Dictionary<string, List<List<int>>> relationValues = new Dictionary<string, List<List<int>>>() {
-            {"acquaintance", new List<List<int>>() {
+        Dictionary<Relationship.RelationshipTag, List<List<int>>> relationValues = new Dictionary<Relationship.RelationshipTag, List<List<int>>>() {
+            {Relationship.RelationshipTag.acquantences, new List<List<int>>() {
                 new List<int>(){-2, 2},
                 new List<int>(){-4, 4}
             } },
-            {"friend", new List<List<int>>(){
+            {Relationship.RelationshipTag.friends, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){-4, 6}
             } },
-            {"enemy", new List<List<int>>(){
+            {Relationship.RelationshipTag.enemies, new List<List<int>>(){
                 new List<int>(){-6, -2},
                 new List<int>(){-6, 4}
             } },
-            {"lover", new List<List<int>>(){
+            {Relationship.RelationshipTag.lovers, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){4, 10}
             } }
         };
 
-        List<string> relations = new List<string>(relationValues.Keys);
+        List<Relationship.RelationshipTag> relations = new List<Relationship.RelationshipTag>(relationValues.Keys);
 
-        Dictionary<string, Dictionary<string, string>> relationMatrix = new Dictionary<string, Dictionary<string, string>>();
+        Dictionary<string, Dictionary<string, Relationship.RelationshipTag>> relationMatrix = new Dictionary<string, Dictionary<string, Relationship.RelationshipTag>>();
 
         foreach (Person personA in allPeople.Values) {
             string a = personA.id;
@@ -104,8 +104,8 @@ public class PeopleInitializer
             foreach (Person personB in allPeople.Values) {
                 string b = personB.id;
                 
-                if (!relationMatrix.ContainsKey(a)) relationMatrix[a] = new Dictionary<string, string>();
-                if (!relationMatrix.ContainsKey(b)) relationMatrix[b] = new Dictionary<string, string>();
+                if (!relationMatrix.ContainsKey(a)) relationMatrix[a] = new Dictionary<string, Relationship.RelationshipTag>();
+                if (!relationMatrix.ContainsKey(b)) relationMatrix[b] = new Dictionary<string, Relationship.RelationshipTag>();
 
                 if (relationMatrix[b].ContainsKey(a)) {
                     relationMatrix[a][b] = relationMatrix[b][a];
@@ -113,7 +113,7 @@ public class PeopleInitializer
                 }
 
                 if (a == b) {
-                    relationMatrix[a].Add(b, "self");
+                    relationMatrix[a].Add(b, Relationship.RelationshipTag.self);
                     continue;
                 }
 
@@ -126,9 +126,9 @@ public class PeopleInitializer
 
         foreach (Person person in allPeople.Values) {
             foreach (Person other in allPeople.Values) {
-                string relation = relationMatrix[person.id][other.id];
+                Relationship.RelationshipTag relation = relationMatrix[person.id][other.id];
 
-                if (relation == "self") continue;
+                if (relation == Relationship.RelationshipTag.self) continue;
                 else {
                     List<List<int>> valueRange = relationValues[relation];
 
@@ -137,6 +137,8 @@ public class PeopleInitializer
 
                     person.relationships.Increase(other.id, Relationship.RelationType.friendly, friendly);
                     person.relationships.Increase(other.id, Relationship.RelationType.romantic, romance);
+
+                    person.relationships.AddRelationTag(other.id, relation);
                 }
             }
         }

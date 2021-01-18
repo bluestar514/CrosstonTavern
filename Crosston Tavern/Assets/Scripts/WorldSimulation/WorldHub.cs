@@ -59,7 +59,7 @@ public class WorldHub : MonoBehaviour
 
             if (chosenActions[person] == null) {
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
-                ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, ws);
+                ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, person.ws);
 
                 chosenActions[person]= ahm.ChooseBestAction();
             }

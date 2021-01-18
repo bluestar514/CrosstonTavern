@@ -133,6 +133,10 @@ public class ConversationVerbalizer
 
 
                 break;
+            case "acknowledge":
+                verbilization = "No, I hadn't";
+                Debug.LogWarning("No checking is done as to whether " + townie + " has actually heard " + string.Join(",",socialMove.mentionedFacts));
+                break;
         }
 
         return new DialogueUnit(verbilization, townie.name, socialMove);

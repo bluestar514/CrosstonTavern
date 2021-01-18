@@ -76,7 +76,7 @@ public class MemoryAdder : MonoBehaviour
 
         Dropdown.OptionData optionData = new Dropdown.OptionData();
         foreach(Dropdown.OptionData data in addableFacts.options) {
-            Debug.Log(executedAction.ToString() + " =?= "+ data.text);
+            //Debug.Log(executedAction.ToString() + " =?= "+ data.text);
             if (data.text == executedAction.ToString()) {
                 optionData = data;
                 break;

@@ -21,8 +21,31 @@ public class WorldStateInitializer
             WorldState personalWorldState = ws.Copy(person, person.id);
 
             GameObject townieObj = new GameObject(person.id);
-            townieObj.AddComponent<Townie>();
-            townieObj.GetComponent<Townie>().TownieInit(person, personalWorldState, new GoalManager(personalWorldState, person));
+            Townie townie = townieObj.AddComponent<Townie>();
+            townie.TownieInit(person, personalWorldState, new GoalManager(personalWorldState, person));
+
+            string self = townie.townieInformation.id;
+            foreach (Person other in townie.ws.registry.GetPeople()) {
+                List<Relationship.RelationshipTag> relationshipTag = person.relationships.GetTag(other.id);
+
+                foreach(Relationship.RelationshipTag tag in relationshipTag) {
+                    if(new List<Relationship.RelationshipTag>() {
+                        Relationship.RelationshipTag.acquantences,
+                        Relationship.RelationshipTag.enemies,
+                        Relationship.RelationshipTag.friends,
+                        Relationship.RelationshipTag.lovers
+                        }.Contains(tag)) {
+
+                        foreach (Relationship.RelationType relationType in new List<Relationship.RelationType>()
+                                            { Relationship.RelationType.friendly, Relationship.RelationType.romantic}) {
+                            float[] range = Relationship.codifiedRelationRanges[tag][relationType];
+                            float value = Random.Range(Mathf.Max(range[0], -6), Mathf.Min(range[1], 10));
+
+                            other.relationships.Increase(self, relationType, value);
+                        }
+                    }
+                }
+            }
 
             townieObj.transform.parent = townieHolder; 
 
@@ -88,7 +111,6 @@ public class WorldStateInitializer
         townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[alicia].ws);
         townies[clara].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[clara].ws);
         townies[dirk].ws.knownFacts.AddFact(new WorldFactResource("meadow_feild", "common_forage", "tulip"), townies[dirk].ws);
-
 
         return townies;
     }

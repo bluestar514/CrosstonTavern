@@ -73,7 +73,7 @@ public class ConversationEngine
 
                 return new SocialMove("tellAboutDisapointingEvent", mentionedFacts: MakeActionFacts(history));
             case "tellAction#":
-                return new SocialMove("acknowledge");
+                return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
             case "askAboutAction#":
                 return new SocialMove("tellDetailsOfAction#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
             default:

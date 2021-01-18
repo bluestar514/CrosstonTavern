@@ -31,7 +31,7 @@ public class ActionHeuristicManager : ActionManager
         List<BoundAction> possibleActions = boundActions;
 
         if (onlyValid) {
-            Dictionary<bool, List<BoundAction>> validActions = GetPossibleActions(boundActions);
+            Dictionary<bool, List<BoundAction>> validActions = GetPossibleActions(possibleActions);
             possibleActions = validActions[true];
         }
 
@@ -98,9 +98,10 @@ public class ActionHeuristicManager : ActionManager
         };
     }
 
-    public WeightedAction GetWeightOfBoundAction(BoundAction boundAction)
+    public WeightedAction GetWeightOfBoundAction(BoundAction boundAction, List<Goal> goals = null)
     {
         //Weight = sum of(chance of occuring * desirablity of outcome)
+
 
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         float weight = 0;
@@ -109,7 +110,7 @@ public class ActionHeuristicManager : ActionManager
             FeatureResources resources = ws.map.GetFeature(boundAction.FeatureId).relevantResources;
 
             KeyValuePair < float, List<WeightedAction.WeightRational> > result = 
-                                                            GetWeightOfOutcome(outcome, bindings, resources);
+                                                            GetWeightOfOutcome(outcome, bindings, resources, goals);
 
             weight += result.Key;
             rationals.AddRange(result.Value);
@@ -119,12 +120,17 @@ public class ActionHeuristicManager : ActionManager
     }
 
     public KeyValuePair<float, List<WeightedAction.WeightRational>> 
-        GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources)
+        GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, List<Goal> goals=null)
     {
+        if (goals == null) {
+            goals = actor.knownGoals;
+        }
+
         float chance = outcome.EvaluateChance(ws, bindings, resources);
         float weight = 0;
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
-        foreach (Goal goal in actor.knownGoals) {
+
+        foreach (Goal goal in goals) {
             foreach (Effect effect in outcome.effects) {
                 float desirability = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal) ;
                 float value = desirability * chance;

@@ -34,7 +34,7 @@ public class BarSpaceController : MonoBehaviour
             //new SocialMove("askAboutGoalFrustration"),
             //new SocialMove("askAboutDayFull"),
             new SocialMove("askAboutDayHighlights"),
-            new SocialMove("askAboutObservation"),
+            //new SocialMove("askAboutObservation"),
             new SocialMove("askAboutExcitement"),
             new SocialMove("askAboutDisapointment")
     };
