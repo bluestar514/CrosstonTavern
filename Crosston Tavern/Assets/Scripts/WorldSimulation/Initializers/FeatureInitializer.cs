@@ -72,17 +72,17 @@ public class FeatureInitializer
 
     static Dictionary<string, List<Feature.FeatureType>> featuresInRoom = new Dictionary<string, List<Feature.FeatureType>>() {
         {"farm", new List<Feature.FeatureType>(){ Feature.FeatureType.river} },
-        {"feild", new List<Feature.FeatureType>(){ Feature.FeatureType.river, Feature.FeatureType.meadow} },
+        {"field", new List<Feature.FeatureType>(){ Feature.FeatureType.river, Feature.FeatureType.meadow} },
         {"forest", new List<Feature.FeatureType>(){Feature.FeatureType.brush } },
         {"inn", new List<Feature.FeatureType>(){Feature.FeatureType.kitchen} },
         {"SYSTEM", new List<Feature.FeatureType>{Feature.FeatureType.SYSTEM } }
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {
-        new KeyValuePair<string, string>("farm", "feild"),
-        new KeyValuePair<string, string>("feild", "hill"),
-        new KeyValuePair<string, string>("feild", "forest"),
-        new KeyValuePair<string, string>("feild", "town"),
+        new KeyValuePair<string, string>("farm", "field"),
+        new KeyValuePair<string, string>("field", "hill"),
+        new KeyValuePair<string, string>("field", "forest"),
+        new KeyValuePair<string, string>("field", "town"),
         new KeyValuePair<string, string>("town", "inn"),
         new KeyValuePair<string, string>("town", "blacksmith")
     };
@@ -148,7 +148,7 @@ public class FeatureInitializer
     {
         Dictionary<string, Location> allLocations = new Dictionary<string, Location>() {
             {"farm", new Location("farm", new Dictionary<string, List<string>>(){}) },
-            {"feild", new Location("feild", new Dictionary<string, List<string>>(){ }) },
+            {"field", new Location("field", new Dictionary<string, List<string>>(){ }) },
             {"hill", new Location("hill", new Dictionary<string, List<string>>(){ }) },
             {"inn", new Location("inn", new Dictionary<string, List<string>>(){ }) },
             {"forest", new Location("forest", new Dictionary<string, List<string>>(){ }) },

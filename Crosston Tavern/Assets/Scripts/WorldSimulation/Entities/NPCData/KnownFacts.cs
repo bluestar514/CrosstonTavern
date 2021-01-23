@@ -44,7 +44,7 @@ public class KnownFacts
     public bool KnowFact(WorldFact fact)
     {
         foreach(WorldFact f in knownFacts) {
-            if (f == fact) return true;
+            if (f.Equals(fact)) return true;
         }
 
         return false;

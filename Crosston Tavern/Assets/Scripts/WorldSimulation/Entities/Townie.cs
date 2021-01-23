@@ -7,7 +7,7 @@ public class Townie: MonoBehaviour
 {
     [SerializeField]
     private string id;
-
+    public string Id { get => id; private set => id = value; }
 
     public Person townieInformation; //should be them as a person in the WS;
 

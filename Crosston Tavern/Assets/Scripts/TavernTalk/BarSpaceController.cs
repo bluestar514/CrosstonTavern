@@ -14,31 +14,6 @@ public class BarSpaceController : MonoBehaviour
 
     public List<string> validPatronNames = new List<string>();
 
-    static List<SocialMove> genericSocialMoves = new List<SocialMove>()
-        {
-            new SocialMove("talk"),
-            new SocialMove("argue"),
-            new SocialMove("insult"),
-            new SocialMove("compliment"),
-            new SocialMove("complain"),
-            new SocialMove("brag"),
-            new SocialMove("askAbout"),
-            new SocialMove("smallTalk"),
-            new SocialMove("agree"),
-            new SocialMove("disagree"),
-            new SocialMove("gossip")
-        };
-
-    static List<SocialMove> barkeeperMoves = new List<SocialMove>() {
-            new SocialMove("askAboutGoals"),
-            //new SocialMove("askAboutGoalFrustration"),
-            //new SocialMove("askAboutDayFull"),
-            new SocialMove("askAboutDayHighlights"),
-            //new SocialMove("askAboutObservation"),
-            new SocialMove("askAboutExcitement"),
-            new SocialMove("askAboutDisapointment")
-    };
-
 
     //public Patron patron;
     //public Patron barkeep;
@@ -47,6 +22,14 @@ public class BarSpaceController : MonoBehaviour
     ConversationEngine barkeepEngine;
     ConversationVerbalizer patronVerbalizer;
     ConversationVerbalizer barkeepVerbalizer;
+
+    SocialMove lastSocialMove = null;
+
+    List<FoodItem> barMenu = new List<FoodItem>() {
+        new FoodItem("strawberry_cake", new List<string>(){"strawberry"}),
+        new FoodItem("trout_stew", new List<string>(){"trout"}),
+        new FoodItem("fried_salmon", new List<string>(){"salmon" })
+    };
 
     public void Start()
     {
@@ -62,7 +45,7 @@ public class BarSpaceController : MonoBehaviour
     public void SetNextPatron()
     {
         string previousPatron = "";
-        if (patronEngine != null) previousPatron = patronEngine.townie.name;
+        if (patronEngine != null) previousPatron = patronEngine.speaker.name;
 
         SetPatron(bps.PickRandomPatron(previousPatron));
     }
@@ -71,14 +54,16 @@ public class BarSpaceController : MonoBehaviour
         string partner = townie.townieInformation.id;
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
-        barkeepEngine = new ConversationEngine(barkeepTownie, barkeeperMoves, partner); //new Patron(barkeepTownie, barkeeperMoves);
-        patronEngine = new ConversationEngine(townie, genericSocialMoves, "barkeep"); //new Patron(townie, genericSocialMoves);
+        barkeepEngine = new ConversationEngine(barkeepTownie, partner, barMenu); //new Patron(barkeepTownie, barkeeperMoves);
+        patronEngine = new ConversationEngine(townie, "barkeep", barMenu); //new Patron(townie, genericSocialMoves);
         barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner);
         patronVerbalizer = new ConversationVerbalizer(townie, "barkeep");
 
         pp.gameObject.SetActive(false);
 
-        PlayerPhase();
+        NPCPhase(new SocialMove("start"));
+
+        //PlayerPhase();
     }
 
     public void AddDaySeperator()
@@ -92,20 +77,25 @@ public class BarSpaceController : MonoBehaviour
     }
 
     public void NPCPhase(SocialMove prompt)
-
     {
-        DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(patronEngine.GiveResponse(prompt));
+        
         patronEngine.LearnFromInput(prompt);
 
+        lastSocialMove = patronEngine.GiveResponse(prompt);
+        DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(lastSocialMove);
+        
         dbc.DisplayNPCAction(npcDialogue);
         lc.AddElement(npcDialogue);
         AddAllFacts(npcDialogue.facts);
-        barkeepEngine.LearnFromInput(npcDialogue.underpinningSocialMove);
+
+        barkeepEngine.LearnFromInput(lastSocialMove);
     }
 
     public void PlayerPhase()
     {
-        List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves();
+        Debug.Log(lastSocialMove);
+
+        List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
         List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
         foreach (SocialMove socialMove in bestSocialMoves)
         {

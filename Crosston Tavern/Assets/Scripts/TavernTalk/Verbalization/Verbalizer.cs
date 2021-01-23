@@ -60,28 +60,35 @@ public class Verbalizer
         }
     }
 
-    //I went fishing at the lake
-    //Bob went foriging at the forest
-    public string VerbalizeAction(ExecutedAction action, bool presentTense)
+    public string VerbalizeAction(BoundAction action, bool presentTense)
     {
-        string actionActor = action.Action.ActorId;
+        string actionActor = action.ActorId;
         if (actionActor == speakerId) {
             actionActor = "I";
         }
         if (actionActor == listenerId) {
             actionActor = "you";
         }
-        string actionLocation = action.Action.FeatureId;
-        if(actionLocation == speakerId) {
+        string actionLocation = action.FeatureId;
+        if (actionLocation == speakerId) {
             actionLocation = "me";
         }
-        if(actionLocation == listenerId) {
+        if (actionLocation == listenerId) {
             actionLocation = "you";
         }
 
 
-        string verbilization = action.Action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
-        verbilization = action.Action.Bindings.BindString(verbilization);
+        string verbilization = action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
+        verbilization = action.Bindings.BindString(verbilization);
+
+        return verbilization;
+    }
+
+    //I went fishing at the lake
+    //Bob went foriging at the forest
+    public string VerbalizeAction(ExecutedAction action, bool presentTense)
+    {
+        string verbilization = VerbalizeAction(action.Action, presentTense);
 
         return verbilization;
     }

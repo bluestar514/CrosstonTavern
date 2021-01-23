@@ -47,18 +47,21 @@ public class ChanceModifierItemOpinion : ChanceModifier
 
         Person p = ws.registry.GetPerson(person);
 
-        if (p.preferences[PreferenceLevel.liked].Contains(item)) {
-            value += (int)OpinionLevel.liked;
+        switch (p.preference.GetLevel(item)) {
+            case PreferenceLevel.loved:
+                value += (int)OpinionLevel.loved;
+                break;
+            case PreferenceLevel.liked:
+                value += (int)OpinionLevel.liked;
+                break;
+            case PreferenceLevel.disliked:
+                value += (int)OpinionLevel.disliked;
+                break;
+            case PreferenceLevel.hated:
+                value += (int)OpinionLevel.hated;
+                break;
         }
-        if (p.preferences[PreferenceLevel.disliked].Contains(item)) {
-            value += (int)OpinionLevel.disliked;
-        }
-        if (p.preferences[PreferenceLevel.loved].Contains(item)) {
-            value += (int)OpinionLevel.loved;
-        }
-        if (p.preferences[PreferenceLevel.hated].Contains(item)) {
-            value += (int)OpinionLevel.hated;
-        }
+
         if (p.NeedItem(item)) {
             value += (int)OpinionLevel.needed;
         }

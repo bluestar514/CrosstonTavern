@@ -18,7 +18,8 @@ public class Opinion
     {
         excited,
         disapointed,
-        surprised
+        surprised,
+        noteworthy
     }
 
     public Opinion(ExecutedAction executedAction, Townie townie)

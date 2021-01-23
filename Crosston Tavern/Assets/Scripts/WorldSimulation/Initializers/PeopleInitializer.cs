@@ -30,7 +30,7 @@ public class PeopleInitializer
         // Fill all values at random for everyone initially
         SetRelationsRandom(allPeople);
         //SetInventoryRandom(allPeople);
-        SetPreferencesRandom(allPeople);
+        
 
         // Override with specific things for the senario and or testing
             //Lover scenario Details:
@@ -41,27 +41,28 @@ public class PeopleInitializer
             allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
 
 
-            //allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
-            //allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
+        //allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
+        //allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
 
-            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("strawberry_cake");
-            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("salmon_fried");
-            allPeople["alicia"].preferences[PreferenceLevel.loved].Add("morning_rose");
-            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("strawberry");
-            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("salmon");
-            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("rose");
-            allPeople["alicia"].preferences[PreferenceLevel.liked].Add("dandilion");
-            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("blackberry");
-            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("trout");
-            allPeople["alicia"].preferences[PreferenceLevel.disliked].Add("tulip");
-            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("blackberry_tart");
-            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("trout_stew");
-            allPeople["alicia"].preferences[PreferenceLevel.hated].Add("evening_tulip");
+            allPeople["alicia"].preference.Add("strawberry_cake",   PreferenceLevel.loved);
+            allPeople["alicia"].preference.Add("salmon_fried",      PreferenceLevel.loved);
+            allPeople["alicia"].preference.Add("morning_rose",      PreferenceLevel.loved);
+            allPeople["alicia"].preference.Add("strawberry",        PreferenceLevel.liked);
+            allPeople["alicia"].preference.Add("salmon",            PreferenceLevel.liked);
+            allPeople["alicia"].preference.Add("rose",              PreferenceLevel.liked);
+            allPeople["alicia"].preference.Add("dandilion",         PreferenceLevel.liked);
+            allPeople["alicia"].preference.Add("blackberry",        PreferenceLevel.disliked);
+            allPeople["alicia"].preference.Add("trout",             PreferenceLevel.disliked);
+            allPeople["alicia"].preference.Add("tulip",             PreferenceLevel.disliked);
+            allPeople["alicia"].preference.Add("blackberry_tart",   PreferenceLevel.hated);
+            allPeople["alicia"].preference.Add("trout_stew",        PreferenceLevel.hated);
+            allPeople["alicia"].preference.Add("evening_tulip",     PreferenceLevel.hated);
+
 
             allPeople["dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
 
 
-        //Organizer scenario details:
+        SetPreferencesRandom(allPeople);
 
 
         //Clara Testing Rivals
@@ -165,12 +166,17 @@ public class PeopleInitializer
         foreach(Person person in allPeople.Values) {
             List<string> possibleItems = new List<string>(randomItems);
 
-            person.preferences[PreferenceLevel.hated].Add("currency");
+            person.preference.Add("currency", PreferenceLevel.hated);
 
             foreach (PreferenceLevel level in System.Enum.GetValues(typeof(PreferenceLevel))) {
                 Dictionary<bool, List<string>> randomSet = chooseSeveralFrom(possibleItems, Random.Range(1, randomItems.Count / 5));
 
-                person.preferences[level].AddRange(randomSet[true]);
+                foreach(string item in randomSet[true]) {
+                    if (level == PreferenceLevel.neutral) continue;
+                    if(person.preference.GetLevel(item) == PreferenceLevel.neutral)
+                        person.preference.Add(item, level);
+                }
+                
                 possibleItems = randomSet[false];
             }
 

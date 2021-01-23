@@ -7,7 +7,7 @@ using UnityEngine;
 public class Person: Feature
 {
     public Relationship relationships;
-    public PreferencesDictionary preferences;
+    public ItemPreference preference;
     public Skill skill;
 
     public List<Goal> knownGoals;
@@ -20,11 +20,8 @@ public class Person: Feature
     {
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
-        this.preferences = new PreferencesDictionary() { };
-        foreach(PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
-            preferences.Add(level, new List<string>());
-        }
 
+        preference = new ItemPreference();
         skill = new Skill();
 
         schedule = new Schedule();
@@ -34,10 +31,7 @@ public class Person: Feature
     {
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
-        this.preferences = new PreferencesDictionary() { };
-        foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
-            preferences.Add(level, new List<string>());
-        }
+        preference = new ItemPreference();
 
         skill = new Skill();
 
@@ -47,19 +41,17 @@ public class Person: Feature
     public override Feature Copy(bool perfect)
     {
         Person p = new Person(base.Copy(perfect));
+        
 
-        p.preferences = new PreferencesDictionary();
         if (perfect) {
             p.knownGoals = new List<Goal>(knownGoals);
-            p.preferences.CopyFrom(preferences);
             p.schedule = schedule.Copy();
         } else {
             p.knownGoals = new List<Goal>();
-            foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
-                p.preferences.Add(level, new List<string>());
-            }
+            
         }
 
+        p.preference = preference.Copy(perfect);
         p.skill = skill.Copy(perfect);
         p.relationships = relationships.Copy(perfect);
 
@@ -82,14 +74,7 @@ public class Person: Feature
     }
     public PreferenceLevel ItemPreference(string item)
     {
-        foreach(KeyValuePair<PreferenceLevel, List<string>> p in preferences) {
-            PreferenceLevel level = p.Key;
-            List<string> items = p.Value;
-
-            if (items.Contains(item)) return level;
-        }
-
-        return PreferenceLevel.neutral;
+        return preference.GetLevel(item);
     }
 
     public override string ToString()

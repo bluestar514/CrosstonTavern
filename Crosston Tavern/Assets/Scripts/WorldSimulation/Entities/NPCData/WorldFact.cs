@@ -131,10 +131,9 @@ public class WorldFactPreference: WorldFact
 
     public override void UpdateWorldState(WorldState ws)
     {
-        PreferencesDictionary pref = ws.registry.GetPerson(person).preferences;
+        ItemPreference pref = ws.registry.GetPerson(person).preference;
 
-        if (!pref.ContainsKey(level)) pref.Add(level, new List<string>());
-        if (!pref[level].Contains(item)) pref[level].Add(item);
+        pref.Add(item, level);
     }
 
     public override int GetHashCode()
@@ -148,7 +147,23 @@ public class WorldFactPreference: WorldFact
 
     public override string Verbalize(string speaker, string listener, WorldState ws = null)
     {
-        return person + " " + level + " " + item;
+        string level;
+        string name = person;
+
+        if (this.level == PreferenceLevel.neutral) {
+            if (name == speaker || name == listener) level = "don't care one way or the other about";
+            else level = "doesn't care one way or the other about";
+        } else {
+            level = this.level.ToString();
+            level = level.Remove(level.Length - 1, 1);
+            if (name != speaker && name != listener) level += "s";
+        }
+
+        if (name == speaker) name = "I";
+        if (name == listener) name = "you";
+        
+
+        return name + " " + level + " " + item;
     }
 }
 
@@ -175,7 +190,7 @@ public class WorldFactEvent: WorldFact
         if (!(obj is WorldFactEvent)) return false;
 
         WorldFactEvent fact = (WorldFactEvent)obj;
-        if (this.action.ToString() == fact.ToString()) return true;
+        if (this.action.ToString() == fact.action.ToString()) return true;
 
         return false;
     }
@@ -234,5 +249,46 @@ public class WorldFactGoal: WorldFact
         Verbalizer v = new Verbalizer(speaker, listener, ws);
         
         return owner+ " wants " + v.VerbalizaeState(goal.state);
+    }
+}
+
+[System.Serializable]
+public class WorldFactPotentialAction : WorldFact
+{
+    public BoundAction action;
+
+    public WorldFactPotentialAction(BoundAction action)
+    {
+        this.action = action;
+
+        id = ToString();
+    }
+
+    public override string ToString()
+    {
+        return "{PotentialAction:" + action.ToString() + "}";
+    }
+
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is WorldFactPotentialAction)) return false;
+
+        WorldFactPotentialAction fact = (WorldFactPotentialAction)obj;
+        if (this.action.ToString() == fact.ToString()) return true;
+
+        return false;
+    }
+
+
+    public override int GetHashCode()
+    {
+        return -1387187753 + EqualityComparer<BoundAction>.Default.GetHashCode(action);
+    }
+
+    public override string Verbalize(string speaker, string listener, WorldState ws = null)
+    {
+        Verbalizer v = new Verbalizer(speaker, listener, ws);
+        return v.VerbalizeAction(action, true);
     }
 }

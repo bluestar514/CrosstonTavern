@@ -25,7 +25,11 @@ public class ConversationVerbalizer
         List<WorldFact> facts = socialMove.mentionedFacts;
         List<string> goals = new List<string>();
         WorldFactGoal goalFact;
+        WorldFactPotentialAction actionFact;
         switch (socialMove.verb) {
+            case "greet":
+                verbilization = "Good evening.";
+                break;
             case "askAboutDayHighlights":
                 verbilization = "What did you do today?";
                 break;
@@ -48,6 +52,12 @@ public class ConversationVerbalizer
                 verbilization = v.VerbalizeAction(actionObj, true);
                 verbilization = "Why did " + verbilization + "?";
                 break;
+            case "askAboutPreferencesLike":
+                verbilization = "What do you like?";
+                break;
+            case "askAboutPreferencesHate":
+                verbilization = "What do you dislike?";
+                break;
             case "tellAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
@@ -56,8 +66,7 @@ public class ConversationVerbalizer
                 verbilization = "Did you hear that " + verbilization + "?";
                 break;
             case "tellAboutDayEvents":
-            case "tellAboutExcitingEvent":
-            case "tellAboutDisapointingEvent":
+            case "tellAbout#Event":
             case "tellAboutDayObservedEvents":
                 float coin = Random.value;
                 if(coin > .5)
@@ -74,20 +83,25 @@ public class ConversationVerbalizer
                     break;
                 }
 
+                List<string> motivations = new List<string>();
+
                 //I want to have 3 to 1000 trout
                 //I want to be friendlier with Alicia
                 //I want to be dating Alicia
                 //I want Alicia to have 4 to 5 strawberry
                 foreach (WorldFact fact in facts) {
-
+                    if(fact is WorldFactPotentialAction) {
+                        actionFact = (WorldFactPotentialAction)fact;
+                        motivations.Add(v.VerbalizeAction(actionFact.action, true));
+                    }
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
                         goals.Add(v.VerbalizaeState(goalFact.goal.state));
                     }
                 }
-
-                verbilization = string.Join(". I want ", goals);
-                verbilization = "I want " + verbilization;
+                verbilization = "";
+                if(motivations.Count > 0) verbilization = "I want to "+ string.Join(". I want to ", motivations)+". ";
+                verbilization = verbilization+ "I want " + string.Join(". I want ", goals) + ". ";
                 break;
             case "tellWhyAction#":
                 foreach (WorldFact fact in facts) {
@@ -131,6 +145,18 @@ public class ConversationVerbalizer
                     }
                 }
 
+
+                break;
+
+            case "tellPreference":
+            case "tellPreference#":
+                if (socialMove.arguements.Count > 0) verbilization = "Did you know ";
+                else verbilization = "";
+                foreach (WorldFact fact in facts) {
+                    verbilization += fact.Verbalize(townie.Id, partner);
+                }
+                if (socialMove.arguements.Count > 0) verbilization += "?";
+                else verbilization += ".";
 
                 break;
             case "acknowledge":

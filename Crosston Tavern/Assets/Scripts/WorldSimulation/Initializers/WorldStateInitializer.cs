@@ -108,9 +108,9 @@ public class WorldStateInitializer
                                 ));
 
         townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[alicia].ws);
-        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_feild", "common_fish", "trout"), townies[alicia].ws);
+        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_field", "common_fish", "trout"), townies[alicia].ws);
         townies[clara].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[clara].ws);
-        townies[dirk].ws.knownFacts.AddFact(new WorldFactResource("meadow_feild", "common_forage", "tulip"), townies[dirk].ws);
+        townies[dirk].ws.knownFacts.AddFact(new WorldFactResource("meadow_field", "common_forage", "tulip"), townies[dirk].ws);
 
         return townies;
     }
