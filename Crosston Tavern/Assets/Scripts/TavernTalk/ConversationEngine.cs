@@ -25,34 +25,66 @@ public class ConversationEngine
             case "start":
                 return new SocialMove("greet");
             case "greet":
-                FoodItem food = GetFavoriteFoodFromMenu();
+            case "askForOrder":
+                float coin = Random.value;
+                if (coin > .5) {
+                    FoodItem food = GetFavoriteFoodFromMenu();
+                    return new SocialMove("order#", new List<string>() { food.name });
+                } else {
+                    return new SocialMove("askForRecomendation");
+                }
+            case "recomend#":
+                FoodItem recomendedFood = GetFromMenu(prompt.arguements[0]);
+                FoodItem favoriteFood = GetFavoriteFoodFromMenu();
 
-                return new SocialMove("order#", new List<string>() { food.name });
+                int scoreOfRecomended = ScoreFood(recomendedFood);
+                int scoreOfFavorite = ScoreFood(favoriteFood);
+
+                if( scoreOfRecomended >= Mathf.Abs(scoreOfFavorite / 2)) {
+                    return new SocialMove("order#OnRecomendation", new List<string>() { recomendedFood.name });
+                }else return new SocialMove("order#OffRecomendation", new List<string>() { favoriteFood.name });
+
+            case "serveOrder#":
+                FoodItem servedFood = GetFromMenu(prompt.arguements[0]);
+
+                Dictionary<PreferenceLevel, List<string>> ingredientOpinions = GetOpinionIngredients(servedFood);
+                PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
+
+                List<WorldFact> facts = new List<WorldFact>();
+                facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
+                foreach(PreferenceLevel level in ingredientOpinions.Keys) {
+                    foreach(string ingredient in ingredientOpinions[level]) {
+                        facts.Add(new WorldFactPreference(speaker.Id, level, ingredient));
+                    }
+                }
+
+                return new SocialMove("thank", mentionedFacts: facts);
+
             case "askAboutGoals":
-                return SocialMoveFactory.MakeTellAboutGoals(speaker);
+                return SocialMoveFactory.MakeMove("tellAboutGoals", speaker, prompt);
             case "askAboutDayFull":
-                return SocialMoveFactory.MakeTellAboutDayEvents(speaker);
+                return SocialMoveFactory.MakeMove("tellAboutDayEvents", speaker, prompt);
             case "askAboutDayHighlights":
-                return SocialMoveFactory.MakeTellAboutInterestingEvents(speaker, Opinion.Tag.noteworthy);
+                return SocialMoveFactory.MakeMove("tellAboutNOTEWORTHYEvent", speaker, prompt);
             case "askAboutObservation":
-                return SocialMoveFactory.MakeTellAboutObservedEvents(speaker);
+                return SocialMoveFactory.MakeMove("tellAboutDayObservedEvents", speaker, prompt);
             case "askWhyGoal#":
-                return SocialMoveFactory.MakeTellWhyGoal(speaker, prompt);
+                return SocialMoveFactory.MakeMove("tellWhyGoal#", speaker, prompt);
             case "askWhyAction#":
-                return SocialMoveFactory.MakeTellWhyAction(speaker, prompt);
+                return SocialMoveFactory.MakeMove("tellWhyAction#", speaker, prompt);
             case "askAboutExcitement":
-                return SocialMoveFactory.MakeTellAboutInterestingEvents(speaker, Opinion.Tag.excited);
+                return SocialMoveFactory.MakeMove("tellAboutEXCITEDEvent", speaker, prompt);
             case "askAboutDisapointment":
-                return SocialMoveFactory.MakeTellAboutInterestingEvents(speaker, Opinion.Tag.disapointed);
+                return SocialMoveFactory.MakeMove("tellAboutDISAPOINTEDEvent", speaker, prompt);
             case "askAboutAction#": //Currently not used, consider removing
                 return new SocialMove("tellDetailsOfAction#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
             case "askAboutPreferencesLike":
-                return  SocialMoveFactory.MakeTellPreference(speaker, true);
+                return SocialMoveFactory.MakeMove("tellPreferenceLike", speaker, prompt);
             case "askAboutPreferencesHate":
-                return  SocialMoveFactory.MakeTellPreference(speaker, true);
+                return SocialMoveFactory.MakeMove("tellPreferenceHate", speaker, prompt);
             case "tellAction#":
             case "tellPreference#":
-                return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
+                return SocialMoveFactory.MakeMove("acknowledge", speaker, prompt);
             default:
                 return new SocialMove("DEFAULT");
         }
@@ -60,25 +92,50 @@ public class ConversationEngine
 
     public List<SocialMove> GetSocialMoves(SocialMove prompt)
     {
-        List<SocialMove> barkeeperMoves = new List<SocialMove>() {
-            new SocialMove("askAboutGoals"),
-            //new SocialMove("askAboutGoalFrustration"),
-            //new SocialMove("askAboutDayFull"),
-            new SocialMove("askAboutDayHighlights"),
-            //new SocialMove("askAboutObservation"),
-            new SocialMove("askAboutExcitement"),
-            new SocialMove("askAboutDisapointment"),
-            new SocialMove("askAboutPreferencesLike"),
-            new SocialMove("askAboutPreferencesHate")
-        };
+        List<SocialMove> moves = new List<SocialMove>();
 
-        List<SocialMove> moves = new List<SocialMove>(barkeeperMoves);
-        moves.AddRange(GenAskWhyGoal());
-        moves.AddRange(GenAskWhyAction());
-        moves.AddRange(GenTellAction());
-        moves.AddRange(GenTellPreference());
-        //moves.AddRange(GenAskAboutAction());
-        return moves;
+        switch (prompt.verb) {
+            case "greet":
+                moves.Add(new SocialMove("askAboutState"));
+                moves.Add(new SocialMove("greet"));
+                moves.Add(new SocialMove("askForOrder"));
+                return moves;
+
+            case "askForRecomendation":
+                foreach(FoodItem item in barMenu) {
+                    moves.Add(new SocialMove("recomend#", new List<string>() { item.name }));
+                }
+                return moves;
+
+            case "order#":
+            case "order#OnRecomendation":
+            case "order#OffRecomendation":
+                moves.Add(new SocialMove("serveOrder#", prompt.arguements));
+                return moves;
+
+            default:
+                List<SocialMove> barkeeperMoves = new List<SocialMove>() {
+                    new SocialMove("askAboutGoals"),
+                    //new SocialMove("askAboutGoalFrustration"),
+                    //new SocialMove("askAboutDayFull"),
+                    new SocialMove("askAboutDayHighlights"),
+                    //new SocialMove("askAboutObservation"),
+                    new SocialMove("askAboutExcitement"),
+                    new SocialMove("askAboutDisapointment"),
+                    new SocialMove("askAboutPreferencesLike"),
+                    new SocialMove("askAboutPreferencesHate")
+                };
+
+                moves = new List<SocialMove>(barkeeperMoves);
+                moves.AddRange(GenAskWhyGoal());
+                moves.AddRange(GenAskWhyAction());
+                moves.AddRange(GenTellAction());
+                moves.AddRange(GenTellPreference());
+                //moves.AddRange(GenAskAboutAction());
+                return moves;
+        }
+
+        
     }
 
 
@@ -89,6 +146,7 @@ public class ConversationEngine
         }
     }
 
+
     List<SocialMove> GenAskWhyGoal()
     {
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
@@ -96,7 +154,6 @@ public class ConversationEngine
                                     select new SocialMove("askWhyGoal#", new List<string> { ((WorldFactGoal)fact).goal.name}, 
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
-
     List<SocialMove> GenAskWhyAction()
     {
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
@@ -105,7 +162,6 @@ public class ConversationEngine
                                     select new SocialMove("askWhyAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
                                                                            mentionedFacts: new List<WorldFact>() { fact }));
     }
-
     List<SocialMove> GenTellAction()
     {
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
@@ -114,7 +170,6 @@ public class ConversationEngine
                                     select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
-
     List<SocialMove> GenAskAboutAction()
     {
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
@@ -123,7 +178,6 @@ public class ConversationEngine
                                     select new SocialMove("askAboutAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() },
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
-
     List<SocialMove> GenTellPreference()
     {
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
@@ -133,45 +187,15 @@ public class ConversationEngine
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
 
+
     FoodItem GetFavoriteFoodFromMenu()
     {
         FoodItem favorite = null;
         int maxPoints = -100;
 
         foreach(FoodItem food in barMenu) {
-            int points = 0;
 
-            switch(speaker.townieInformation.ItemPreference(food.name)) {
-                case PreferenceLevel.loved:
-                    points += 5;
-                    break;
-                case PreferenceLevel.liked:
-                    points += 2;
-                    break;
-                case PreferenceLevel.disliked:
-                    points -= 2;
-                    break;
-                case PreferenceLevel.hated:
-                    points -= 5;
-                    break;
-            }
-
-            foreach (string ingredient in food.ingredients) {
-                switch (speaker.townieInformation.ItemPreference(ingredient)) {
-                    case PreferenceLevel.loved:
-                        points += 3;
-                        break;
-                    case PreferenceLevel.liked:
-                        points += 1;
-                        break;
-                    case PreferenceLevel.disliked:
-                        points -= 1;
-                        break;
-                    case PreferenceLevel.hated:
-                        points -= 3;
-                        break;
-                }
-            }
+            int points = ScoreFood(food);
 
             if (points >= maxPoints) {
                 favorite = food;
@@ -179,6 +203,63 @@ public class ConversationEngine
             }
         }
         return favorite;
+    }
+
+
+    int ScoreFood(FoodItem food)
+    {
+        int points = 0;
+        switch (speaker.townieInformation.ItemPreference(food.name)) {
+            case PreferenceLevel.loved:
+                points += 5;
+                break;
+            case PreferenceLevel.liked:
+                points += 2;
+                break;
+            case PreferenceLevel.disliked:
+                points -= 2;
+                break;
+            case PreferenceLevel.hated:
+                points -= 5;
+                break;
+        }
+
+        Dictionary<PreferenceLevel, List<string>> ingredientsOfInterest = GetOpinionIngredients(food);
+
+        points += ingredientsOfInterest[PreferenceLevel.loved].Count * 3;
+        points += ingredientsOfInterest[PreferenceLevel.liked].Count;
+        points -= ingredientsOfInterest[PreferenceLevel.disliked].Count;
+        points -= ingredientsOfInterest[PreferenceLevel.hated].Count * 3;
+
+        return points;
+    }
+
+    Dictionary<PreferenceLevel, List<string>> GetOpinionIngredients(FoodItem food)
+    {
+        Dictionary<PreferenceLevel, List<string>> dict = new Dictionary<PreferenceLevel, List<string>>() {
+            {PreferenceLevel.loved, new List<string>() },
+            {PreferenceLevel.liked, new List<string>() },
+            {PreferenceLevel.disliked, new List<string>() },
+            {PreferenceLevel.hated, new List<string>() }
+        };
+
+        foreach (string ingredient in food.ingredients) {
+            PreferenceLevel level = speaker.townieInformation.ItemPreference(ingredient);
+            if (level == PreferenceLevel.neutral) continue;
+
+            dict[level].Add(ingredient);
+        }
+
+        return dict;
+    }
+
+    FoodItem GetFromMenu(string name)
+    {
+        foreach(FoodItem food in barMenu) {
+            if (food.name == name) return food;
+        }
+
+        return null;
     }
 
 }

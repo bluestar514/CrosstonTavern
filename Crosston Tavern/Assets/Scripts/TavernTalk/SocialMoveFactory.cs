@@ -5,6 +5,62 @@ using UnityEngine;
 
 public class SocialMoveFactory
 {
+    static public SocialMove MakeMove(string verb, Townie speaker, SocialMove prompt)
+    {
+        switch (verb) {
+            case "greet":
+            case "askAboutGoals":
+            case "askAboutDayFull":
+            case "askAboutDayHighlights":
+            case "askAboutObservation":
+            case "askAboutExcitement":
+            case "askAboutDisapointment":
+            case "askAboutPreferencesLike":
+            case "askAboutPreferencesHate":
+                return new SocialMove(verb);
+
+
+
+            case "tellAction#":
+            case "tellAboutGoals":
+                return MakeTellAboutGoals(speaker);
+            case "tellAboutDayEvents":
+                return MakeTellAboutDayEvents(speaker);
+            case "tellAboutNOTEWORTHYEvent":
+                return MakeTellAboutInterestingEvents(speaker, Opinion.Tag.noteworthy);
+            case "tellAboutEXCITEDEvent":
+                return MakeTellAboutInterestingEvents(speaker, Opinion.Tag.excited);
+            case "tellAboutDISAPOINTEDEvent":
+                return MakeTellAboutInterestingEvents(speaker, Opinion.Tag.disapointed);
+            case "tellAboutDayObservedEvents":
+                return MakeTellAboutObservedEvents(speaker);
+            case "tellWhyGoal#":
+                return MakeTellWhyGoal(speaker, prompt);
+            case "tellWhyAction#":
+                return MakeTellWhyAction(speaker, prompt);
+            case "tellPreferenceLike":
+                return MakeTellPreference(speaker, true);
+            case "tellPreferenceHate":
+                return MakeTellPreference(speaker, false);
+
+
+
+            case "acknowledge":
+                return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
+
+
+
+            case "askWhyGoal#":
+            case "askWhyAction#":
+            case "askAboutAction#":
+                throw new System.Exception(verb + 
+                    " is currently only created enmass from the ConversationEngine, not from this Factory");
+            default:
+                return new SocialMove("DEFAULT");
+        }
+    }
+
+
     public static SocialMove MakeTellAboutGoals(Townie speaker)
     {
         List<WorldFact> facts = MakeGoalsFacts(speaker, speaker.gm.GetGoalsList());
@@ -54,6 +110,7 @@ public class SocialMoveFactory
         return new SocialMove("tellAboutDayObservedEvents", mentionedFacts: facts);
     }
 
+    //TODO: make this not reliant on a "prompt" but rather the goal in question
     public static SocialMove MakeTellWhyGoal(Townie speaker, SocialMove prompt)
     {
         string goalName = prompt.arguements[0];
@@ -78,6 +135,7 @@ public class SocialMoveFactory
         return new SocialMove("tellWhyGoal#", new List<string>() { goalName }, mentionedFacts: facts);
     }
 
+    //TODO: make this not reliant on a "prompt" but rather the action in question
     public static SocialMove MakeTellWhyAction(Townie speaker, SocialMove prompt)
     {
         string actionName = prompt.arguements[0];
