@@ -7,6 +7,8 @@ public class ActionInitializer
     static int INF = 100000000;
     static int NEG_INF = -100000000;
 
+    static int stepsInDay = 28; 
+
     public static Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>() {
         {"fish", new GenericAction("fish", 1,
             new Precondition( new List<Condition>() {
@@ -335,7 +337,7 @@ public class ActionInitializer
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), false),
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1),
-                        new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, 12, 3, new List<string>(){"#a#"}))
+                        new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, stepsInDay, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
                         new VerbilizationEffectSocialThreshold("#b# ignored it", "#b# got real mad",  0)
@@ -366,7 +368,7 @@ public class ActionInitializer
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 10), true),
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2),
-                        new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
+                        new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
                         new VerbilizationEffectSocialThreshold("#b# blushed bright red", "#b# didn't believe it",  0)
@@ -376,7 +378,7 @@ public class ActionInitializer
                     new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 1),
-                        new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, 12, 3, new List<string>(){"#a#"}))
+                        new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     },
                     new List<VerbilizationEffect>() {
                         new VerbilizationEffectSocialThreshold("#b# seemed pleased", "#b# didn't believe it",  0)

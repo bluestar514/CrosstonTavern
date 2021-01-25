@@ -42,8 +42,8 @@ public class SocialMoveFactory
                 return MakeTellPreference(speaker, true);
             case "tellPreferenceHate":
                 return MakeTellPreference(speaker, false);
-
-
+            case "tellState#":
+                return MakeTellState(speaker);
 
             case "acknowledge":
                 return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
@@ -179,6 +179,57 @@ public class SocialMoveFactory
 
         return new SocialMove("tellPreference", arguements: new List<string> { level.ToString() },
                                                 mentionedFacts: facts);
+    }
+
+    public static SocialMove MakeTellState(Townie speaker)
+    {
+        StatusEffectSummary emotionStrength = speaker.townieInformation.statusEffectTable.CalculateStatus();
+
+
+        int max = 0;
+        EntityStatusEffectType strongestState = EntityStatusEffectType.special;
+        foreach (EntityStatusEffectType emotion in emotionStrength.Keys) {
+            int strength = emotionStrength[emotion];
+
+            if (strength >= max) {
+                max = strength;
+                strongestState = emotion;
+            }
+        }
+
+        if (strongestState != EntityStatusEffectType.special) {
+            List<ExecutedAction> history = GetDayEvents(speaker);
+
+            List<ExecutedAction> causes = new List<ExecutedAction>();
+
+            foreach(ExecutedAction action in history) {
+                List<Effect> effects = action.executedEffect;
+                IEnumerable<EffectStatusEffect> effectStatusEffects = from effect in effects
+                                                                where effect is EffectStatusEffect
+                                                                select (EffectStatusEffect)effect;
+                List<EntityStatusEffect> statusEffects = new List<EntityStatusEffect>( 
+                                                                from effect in effectStatusEffects
+                                                                where effect.status.type == strongestState
+                                                                select effect.status);
+                if(statusEffects.Count > 0) {
+                    causes.Add(action);
+                } 
+
+            }
+
+            causes = CondenseEvents(causes);
+
+            return new SocialMove("tellState#", 
+                new List<string>() { strongestState.ToString() }, 
+                mentionedFacts: MakeActionFacts(causes));
+
+        }
+        //check and see if they are having difficulty with goals
+
+        //check and see if they got to do things they like (TODO, no support currently)
+
+
+        return new SocialMove("tellStateNONE");
     }
 
 

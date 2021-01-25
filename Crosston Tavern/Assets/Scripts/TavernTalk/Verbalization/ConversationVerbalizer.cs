@@ -68,11 +68,11 @@ public class ConversationVerbalizer
             case "tellAboutDayEvents":
             case "tellAbout#Event":
             case "tellAboutDayObservedEvents":
-                float coin = Random.value;
-                if(coin > .5)
+                //float coin = Random.value;
+                //if(coin > .5)
                     verbilization = "Today, "+ VerbalizeAllEvents(facts);
-                else
-                    verbilization = VerbalizeByTimePeriod(facts);
+                //else
+                //    verbilization = VerbalizeByTimePeriod(facts);
 
                 break;
             case "tellAboutGoals":

@@ -107,7 +107,7 @@ public class BarSpaceController : MonoBehaviour
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
         lc.AddElement(dialogueUnit);
-
+        barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
         NPCPhase(dialogueUnit.underpinningSocialMove);
     }
 

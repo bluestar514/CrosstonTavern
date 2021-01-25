@@ -11,6 +11,10 @@ public class ConversationEngine
 
     List<FoodItem> barMenu;
 
+    bool hasOrdered = false;
+    List<SocialMove> executedMoves = new List<SocialMove>();
+
+
     public ConversationEngine(Townie patron, string partner, List<FoodItem> barMenu)
     {
         speaker = patron;
@@ -43,7 +47,6 @@ public class ConversationEngine
                 if( scoreOfRecomended >= Mathf.Abs(scoreOfFavorite / 2)) {
                     return new SocialMove("order#OnRecomendation", new List<string>() { recomendedFood.name });
                 }else return new SocialMove("order#OffRecomendation", new List<string>() { favoriteFood.name });
-
             case "serveOrder#":
                 FoodItem servedFood = GetFromMenu(prompt.arguements[0]);
 
@@ -51,14 +54,26 @@ public class ConversationEngine
                 PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
 
                 List<WorldFact> facts = new List<WorldFact>();
-                facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
+
+                if(opinionOfDish != PreferenceLevel.neutral) 
+                    facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
                 foreach(PreferenceLevel level in ingredientOpinions.Keys) {
                     foreach(string ingredient in ingredientOpinions[level]) {
                         facts.Add(new WorldFactPreference(speaker.Id, level, ingredient));
                     }
                 }
 
+                hasOrdered = true;
+
                 return new SocialMove("thank", mentionedFacts: facts);
+
+            case "askAboutState":
+                return SocialMoveFactory.MakeMove("tellState#", speaker, prompt);
+            case "console":
+            case "congratulate":
+                if (!hasOrdered) goto case "greet";
+                else return new SocialMove("thank");
+
 
             case "askAboutGoals":
                 return SocialMoveFactory.MakeMove("tellAboutGoals", speaker, prompt);
@@ -99,19 +114,40 @@ public class ConversationEngine
                 moves.Add(new SocialMove("askAboutState"));
                 moves.Add(new SocialMove("greet"));
                 moves.Add(new SocialMove("askForOrder"));
-                return moves;
+                break;
 
             case "askForRecomendation":
                 foreach(FoodItem item in barMenu) {
                     moves.Add(new SocialMove("recomend#", new List<string>() { item.name }));
                 }
-                return moves;
+                break;
 
             case "order#":
             case "order#OnRecomendation":
             case "order#OffRecomendation":
                 moves.Add(new SocialMove("serveOrder#", prompt.arguements));
-                return moves;
+                break;
+
+            case "tellState#":
+                switch (prompt.arguements[0]) {
+                    case "sad":
+                    case "angry":
+                        moves.Add(new SocialMove("console", prompt.arguements));
+                        break;
+                    case "happy":
+                        moves.Add(new SocialMove("congratulate", prompt.arguements));
+                        break;
+                }
+
+                break;
+            case "tellStateNONE":
+                moves.Add(new SocialMove("congratulate"));
+                break;
+
+            case "tellAboutDayEvents":
+            case "tellAbout#Event":
+                moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
+                break;
 
             default:
                 List<SocialMove> barkeeperMoves = new List<SocialMove>() {
@@ -128,16 +164,22 @@ public class ConversationEngine
 
                 moves = new List<SocialMove>(barkeeperMoves);
                 moves.AddRange(GenAskWhyGoal());
-                moves.AddRange(GenAskWhyAction());
+                moves.AddRange(GenAskWhyAction(speaker.ws.knownFacts.GetFacts()));
                 moves.AddRange(GenTellAction());
                 moves.AddRange(GenTellPreference());
                 //moves.AddRange(GenAskAboutAction());
-                return moves;
+                break;
         }
 
+
+        return RemoveAlreadyAskedQuestions( moves );
         
     }
 
+    public void DoMove(SocialMove move)
+    {
+        executedMoves.Add(move);
+    }
 
     public void LearnFromInput(SocialMove prompt)
     {
@@ -154,9 +196,9 @@ public class ConversationEngine
                                     select new SocialMove("askWhyGoal#", new List<string> { ((WorldFactGoal)fact).goal.name}, 
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
-    List<SocialMove> GenAskWhyAction()
+    List<SocialMove> GenAskWhyAction(List<WorldFact> facts)
     {
-        return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
+        return new List<SocialMove>(from fact in facts
                                     where fact is WorldFactEvent
                                     where ((WorldFactEvent)fact).action.Action.ActorId == partner //I may take out this condition in the long run
                                     select new SocialMove("askWhyAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
@@ -167,6 +209,7 @@ public class ConversationEngine
         return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
                                     where fact is WorldFactEvent
                                     where ((WorldFactEvent)fact).action.Action.ActorId != partner
+                                    where ((WorldFactEvent)fact).action.Action.FeatureId != partner
                                     select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() }, 
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
@@ -187,6 +230,58 @@ public class ConversationEngine
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
 
+    List<SocialMove> RemoveAlreadyAskedQuestions(List<SocialMove> moves)
+    {
+        List<string> repeatableActions = new List<string>() { "console", "congratulate", "acknowledge" };
+
+        List<SocialMove> finalList = new List<SocialMove>();
+
+        foreach(SocialMove move in moves) {
+            if (repeatableActions.Contains(move.verb)) {
+                finalList.Add(move);
+                continue;
+            }
+
+            bool alreadyAsked = false;
+            foreach (SocialMove previous in executedMoves) {
+                if(move.ToString() == previous.ToString()) {
+                    alreadyAsked = true;
+                }
+
+                //if(move.verb == previous.verb) {
+                //    if(move.mentionedFacts.Count > 0 && FactsMatch(move.mentionedFacts, previous.mentionedFacts)) {
+                //        continue;
+                //    } else {
+                //        alreadyAsked = true;
+                //        break;
+                //    }
+                //} 
+            }
+
+            if (!alreadyAsked) finalList.Add(move);
+        }
+
+        return finalList;
+    }
+
+
+    bool FactsMatch(List<WorldFact> facts1, List<WorldFact> facts2)
+    {
+        if (facts1.Count != facts2.Count) return false;
+
+        foreach(WorldFact fact1 in facts1) {
+            bool foundMatch = false;
+            foreach(WorldFact fact2 in facts2) {
+                if (fact1.Equals(fact2)) {
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) return false;
+        }
+
+        return true;
+    }
 
     FoodItem GetFavoriteFoodFromMenu()
     {
