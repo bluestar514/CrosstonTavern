@@ -100,8 +100,12 @@ public class ConversationVerbalizer
                     }
                 }
                 verbilization = "";
-                if(motivations.Count > 0) verbilization = "I want to "+ string.Join(". I want to ", motivations)+". ";
-                verbilization = verbilization+ "I want " + string.Join(". I want ", goals) + ". ";
+                if (motivations.Count > 0) {
+                    verbilization = "I want to " + Verbalizer.MakeNiceList(motivations);
+                    verbilization += ", so I can " + Verbalizer.MakeNiceList(goals)+".";
+                } else {
+                    verbilization = verbilization + "I want " + string.Join(". I want ", goals) + ". ";
+                }
                 break;
             case "tellWhyAction#":
                 foreach (WorldFact fact in facts) {

@@ -100,6 +100,25 @@ public class ConversationEngine
             case "tellAction#":
             case "tellPreference#":
                 return SocialMoveFactory.MakeMove("acknowledge", speaker, prompt);
+
+            case "confirmGoal#":
+                WorldFact fact = prompt.mentionedFacts[0];
+
+                if(fact is WorldFactGoal) {
+                    Goal factGoal = ((WorldFactGoal)fact).goal;
+                    Goal registeredGoal = speaker.gm.GetGoalFromName(factGoal.name);
+                    if (registeredGoal == null) return new SocialMove("confirmGoal#OutOfDate",
+                                                 new List<string> { factGoal.name },
+                                                 retractedFacts: new List<WorldFact>() { fact });
+                    else return new SocialMove("confirmGoal#InDate",
+                                                new List<string>() { registeredGoal.name },
+                                                mentionedFacts: new List<WorldFact>() { new WorldFactGoal(registeredGoal, speaker.Id) });
+                }
+
+
+                throw new System.Exception("Fact included in confirmGoal# SocialMove was not a WorldFactGoal or no fact was provided.");
+            case "nice":
+                return new SocialMove("pass");
             default:
                 return new SocialMove("DEFAULT");
         }
@@ -146,9 +165,13 @@ public class ConversationEngine
 
             case "tellAboutDayEvents":
             case "tellAbout#Event":
-                moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
+            case "tellAboutGoals":
+                if (prompt.mentionedFacts.Count > 0) {
+                    moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
+                    moves.AddRange(GenAskWhyGoal(prompt.mentionedFacts));
+                }
+                moves.Add(new SocialMove("nice"));
                 break;
-
             default:
                 List<SocialMove> barkeeperMoves = new List<SocialMove>() {
                     new SocialMove("askAboutGoals"),
@@ -163,10 +186,11 @@ public class ConversationEngine
                 };
 
                 moves = new List<SocialMove>(barkeeperMoves);
-                moves.AddRange(GenAskWhyGoal());
+                moves.AddRange(GenAskWhyGoal(speaker.ws.knownFacts.GetFacts()));
                 moves.AddRange(GenAskWhyAction(speaker.ws.knownFacts.GetFacts()));
                 moves.AddRange(GenTellAction());
                 moves.AddRange(GenTellPreference());
+                moves.AddRange(GenConfirmGoal(speaker.ws.knownFacts.GetFacts()));
                 //moves.AddRange(GenAskAboutAction());
                 break;
         }
@@ -181,18 +205,23 @@ public class ConversationEngine
         executedMoves.Add(move);
     }
 
-    public void LearnFromInput(SocialMove prompt)
+    public List<WorldFact> LearnFromInput(List<WorldFact> facts)
     {
-        foreach(WorldFact fact in prompt.mentionedFacts) {
-            speaker.ws.LearnFact(fact);
+        List<WorldFact> learnedFacts = new List<WorldFact>();
+
+        foreach(WorldFact fact in facts) {
+            learnedFacts.AddRange(speaker.ws.LearnFact(fact));
         }
+
+        return learnedFacts;
     }
 
 
-    List<SocialMove> GenAskWhyGoal()
+    List<SocialMove> GenAskWhyGoal(List<WorldFact> facts)
     {
-        return new List<SocialMove>(from fact in speaker.ws.knownFacts.GetFacts()
+        return new List<SocialMove>(from fact in facts
                                     where fact is WorldFactGoal
+                                    where ((WorldFactGoal)fact).owner == partner
                                     select new SocialMove("askWhyGoal#", new List<string> { ((WorldFactGoal)fact).goal.name}, 
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
@@ -230,9 +259,18 @@ public class ConversationEngine
                                                                          mentionedFacts: new List<WorldFact>() { fact }));
     }
 
+    List<SocialMove> GenConfirmGoal(List<WorldFact> facts)
+    {
+        return new List<SocialMove>(from fact in facts
+                                    where fact is WorldFactGoal
+                                    where ((WorldFactGoal)fact).owner == partner
+                                    select new SocialMove("confirmGoal#", new List<string> { ((WorldFactGoal)fact).goal.name },
+                                                                        mentionedFacts: new List<WorldFact>() { fact }));
+    }
+
     List<SocialMove> RemoveAlreadyAskedQuestions(List<SocialMove> moves)
     {
-        List<string> repeatableActions = new List<string>() { "console", "congratulate", "acknowledge" };
+        List<string> repeatableActions = new List<string>() { "console", "congratulate", "acknowledge", "nice" };
 
         List<SocialMove> finalList = new List<SocialMove>();
 

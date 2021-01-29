@@ -19,6 +19,8 @@ public class ExecutedAction : ChosenAction
         this.executedEffect = executedEffect;
         this.executionTime = executionTime;
         this.effectVerbalizationPatterns = effectVerbalizationPatterns;
+
+        this.opinion = new Opinion();
     }
 
     public ExecutedAction(ChosenAction chosenAction, 

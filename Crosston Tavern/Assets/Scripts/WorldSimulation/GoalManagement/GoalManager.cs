@@ -151,9 +151,9 @@ public class GoalManager
     {
         List<OutcomeRestraints> relevantOutcomes = new List<OutcomeRestraints>();
         foreach(OutcomeRestraints outcome in outcomes) {
-            if (!ContainsConditionNotYou(outcome.preconditions, outcome.bindings)) continue; 
+            if (ContainsNonActionableConditions(outcome.preconditions, outcome.bindings)) continue; 
 
-            if (OutcomeProgressesGoal(outcome, goal)) {
+            if (OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal)) {
                 outcome.fullfillsGoal.Add(goal);
                 relevantOutcomes.Add(outcome);
             }
@@ -161,19 +161,76 @@ public class GoalManager
 
         return relevantOutcomes;
     }
+
+    bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings)
+    {
+        return ContainsConditionNotYou(preconditions, bindings) &&
+                ContainsOthersInventoryState(preconditions, bindings);
+
+    }
+
+    bool ContainsOthersInventoryState(List<Condition> preconditions, BoundBindingCollection bindings)
+    {
+        foreach (Condition condition in preconditions) {
+            if (condition is Condition_IsState) {
+                Condition_IsState condition_IsState = (Condition_IsState)condition;
+
+                State state = condition_IsState.state;
+                if (state is StateInventory) {
+                    StateInventory stateInventory = (StateInventory)state;
+                    string owner = bindings.BindString(stateInventory.ownerId);
+
+                    if (owner != actor.id) { 
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     bool ContainsConditionNotYou(List<Condition> preconditions, BoundBindingCollection bindings)
     {
         foreach (Condition condition in preconditions) {
             if (condition is Condition_NotYou) {
                 Condition_NotYou condition_NotYou = (Condition_NotYou)condition;
                 
-                if (bindings.BindString(condition_NotYou.featureId) == actor.id) { //this can never change, so we should just discard this action
-                    return false;
+                if (bindings.BindString(condition_NotYou.featureId) != actor.id) { //this can never change, so we should just discard this action
+                    return true;
                 }
             }
         }
 
-        return true;
+        return false;
+    }
+
+    bool OutcomeHurtsParentGoals(OutcomeRestraints outcome, Goal goal)
+    {
+        bool hurtful = OutcomeHurtsGoal(outcome, goal);
+
+        if(goal.parentGoals.Count > 0) {
+            foreach(Goal parent in goal.GetParentGoals()) {
+                if (hurtful == true) break;
+                hurtful = OutcomeHurtsParentGoals(outcome, parent);
+            }
+        }
+
+        return hurtful;
+
+        //return goal.GetParentGoals().All(parent => !OutcomeHurtsGoal(outcome, parent));
+    }
+
+    bool OutcomeHurtsGoal(OutcomeRestraints outcome, Goal goal)
+    {
+        foreach (Effect effect in outcome.effects) {
+
+            if (effect.WeighAgainstGoal(ws, outcome.bindings, outcome.resources, goal) < 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool OutcomeProgressesGoal(OutcomeRestraints outcome, Goal goal)
@@ -319,7 +376,7 @@ public class GoalManager
                 List<OutcomeRestraints> outcomes = DecomposeActionToOutcomes(action);
                 foreach (OutcomeRestraints outcome in outcomes) {
                     foreach (Goal goal in goals) {
-                        if (OutcomeProgressesGoal(outcome, goal)) {
+                        if (OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal)) {
                             string location = action.LocationId;
                             if (locationPriority.ContainsKey(location)) {
                                 locationPriority[location] += desire;

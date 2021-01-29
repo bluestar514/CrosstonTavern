@@ -97,14 +97,14 @@ public class WorldState
     }
 
 
-    public void AddHistory(ExecutedAction action)
+    public List<WorldFact> AddHistory(ExecutedAction action)
     {
-        knownFacts.AddHistory(action, this);
+        return knownFacts.AddHistory(action, this);
     }
 
-    public void LearnFact(WorldFact fact)
+    public List<WorldFact> LearnFact(WorldFact fact)
     {
-        knownFacts.AddFact(fact, this);
+        return knownFacts.AddFact(fact, this);
     }
 
 

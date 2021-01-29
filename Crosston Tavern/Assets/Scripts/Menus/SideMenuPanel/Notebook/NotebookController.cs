@@ -4,19 +4,32 @@ using UnityEngine;
 
 public class NotebookController : SideMenuController<WorldFact>
 {
-    public MainNotebookPanel notebook;
+    public MainNotebookController notebook;
 
     public override void AddElement(WorldFact element)
     {
-        bool addToSideNotebook = true;
-
-        if (element is WorldFactEvent) {
-            WorldFactEvent e = (WorldFactEvent)element;
-
-            addToSideNotebook = notebook.AddEvent(e);
-        }
+        bool addToSideNotebook = notebook.AddWorldFact(element);
 
 
         if(addToSideNotebook) base.AddElement(element);
+    }
+
+    public void RemoveElement(WorldFact fact)
+    {
+        DisplayPanel<WorldFact> matchingPanel = null;
+        foreach(DisplayPanel<WorldFact> panel in displayPanels) {
+            if (panel.Matches(fact)) {
+                matchingPanel = panel;
+                break;
+            }
+        }
+        if (matchingPanel != null) { 
+            displayPanels.Remove(matchingPanel);
+            Destroy(matchingPanel.gameObject);
+        }
+
+        notebook.RemoveWorldFact(fact);
+
+
     }
 }

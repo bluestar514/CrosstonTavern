@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainNotebookPanel : MonoBehaviour
+public class NotebookEventsPanel : MainNotebookTab
 {
     public Transform FilterHolder;
     public Transform EventHolder;
@@ -17,14 +17,11 @@ public class MainNotebookPanel : MonoBehaviour
     Dictionary<string, List<KnownEventPanel>> eventByActorDict = new Dictionary<string, List<KnownEventPanel>>();
 
 
-    private void Start()
+    public override bool AddWorldFact(WorldFact fact)
     {
-        gameObject.SetActive(false);
-    }
+        if (!(fact is WorldFactEvent)) return false;
 
-
-    public bool AddEvent(WorldFactEvent e)
-    {
+        WorldFactEvent e = (WorldFactEvent)fact;
         WorldTime time = e.action.executionTime;
 
         if (!dayDict.ContainsKey(time.GetDate())) {
@@ -56,14 +53,15 @@ public class MainNotebookPanel : MonoBehaviour
         return true;
     }
 
-    public void Close(GameObject obj)
+    public override bool RemoveWorldFact(WorldFact fact)
     {
-        obj.SetActive(false);
+        if(fact is WorldFactEvent) {
+            Debug.LogWarning("Trying to remove WorldFactEvent (" + fact + "). This is probably not desired and will result in unexpected behavior!");
+        }
+
+        return base.RemoveWorldFact(fact);
     }
-    public void Open(GameObject obj)
-    {
-        obj.SetActive(true);
-    }
+
 
     public void UpdateFilters()
     {

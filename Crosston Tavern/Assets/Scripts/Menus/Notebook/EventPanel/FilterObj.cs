@@ -8,9 +8,9 @@ public class FilterObj : MonoBehaviour
     public Toggle toggle;
     public Text nameText;
 
-    MainNotebookPanel main;
+    NotebookEventsPanel main;
 
-    public void Initialize(string characterName, MainNotebookPanel main)
+    public void Initialize(string characterName, NotebookEventsPanel main)
     {
         nameText.text = characterName;
         this.main = main;

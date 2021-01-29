@@ -35,7 +35,9 @@ public class SocialMoveFactory
             case "tellAboutDayObservedEvents":
                 return MakeTellAboutObservedEvents(speaker);
             case "tellWhyGoal#":
-                return MakeTellWhyGoal(speaker, prompt);
+                WorldFactGoal goalFact = (WorldFactGoal)prompt.mentionedFacts[0];
+
+                return MakeTellWhyGoal(speaker, goalFact);
             case "tellWhyAction#":
                 return MakeTellWhyAction(speaker, prompt);
             case "tellPreferenceLike":
@@ -86,7 +88,7 @@ public class SocialMoveFactory
             case Opinion.Tag.disapointed:
             case Opinion.Tag.excited:
                 history = new List<ExecutedAction>(from e in history
-                                                   where e.opinion.tags.Contains(Opinion.Tag.excited)
+                                                   where e.opinion.tags.Contains(tag)
                                                    select e);
                 break;
             case Opinion.Tag.noteworthy:
@@ -110,12 +112,13 @@ public class SocialMoveFactory
         return new SocialMove("tellAboutDayObservedEvents", mentionedFacts: facts);
     }
 
-    //TODO: make this not reliant on a "prompt" but rather the goal in question
-    public static SocialMove MakeTellWhyGoal(Townie speaker, SocialMove prompt)
+
+    // Uses the goalFact from the conversation so it is possible to veiw the rational at the time the goal was recorded
+    //TODO: Mark whether or not the goal is one the character still has
+    public static SocialMove MakeTellWhyGoal(Townie speaker, WorldFactGoal goalFact)
     {
-        string goalName = prompt.arguements[0];
-        WorldFactGoal goalFact = (WorldFactGoal)prompt.mentionedFacts[0];
         Goal goal = goalFact.goal;
+        
         List<WorldFact> facts;
         if (goal.unlockedActionsOnGoalCompletion.Count > 0) {
             int rand = Random.Range(0, goal.unlockedActionsOnGoalCompletion.Count);
@@ -132,7 +135,7 @@ public class SocialMoveFactory
 
         facts.AddRange(MakeGoalsFacts(speaker, parentGoals));
 
-        return new SocialMove("tellWhyGoal#", new List<string>() { goalName }, mentionedFacts: facts);
+        return new SocialMove("tellWhyGoal#", new List<string>() { goal.name }, mentionedFacts: facts);
     }
 
     //TODO: make this not reliant on a "prompt" but rather the action in question

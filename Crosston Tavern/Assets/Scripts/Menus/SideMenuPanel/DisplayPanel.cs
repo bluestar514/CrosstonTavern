@@ -15,4 +15,9 @@ public class DisplayPanel<T> : MonoBehaviour
 
         factText.text = fact.ToString();
     }
+
+    public bool Matches(T fact)
+    {
+        return this.fact.Equals(fact);
+    }
 }

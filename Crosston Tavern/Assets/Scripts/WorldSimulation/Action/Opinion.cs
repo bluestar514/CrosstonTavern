@@ -38,6 +38,11 @@ public class Opinion
         SetTags();
     }
 
+    public Opinion()
+    {
+        tags = new List<Tag>();
+    }
+
     void SetExpectation(ActionHeuristicManager ahm, BoundAction action)
     {
 

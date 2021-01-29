@@ -123,7 +123,7 @@ public class Verbalizer
     }
 
 
-    public string MakeNiceList(List<string> collectedEvents)
+    public static string MakeNiceList(List<string> collectedEvents)
     {
          collectedEvents = new List<string>(collectedEvents.Distinct());
 

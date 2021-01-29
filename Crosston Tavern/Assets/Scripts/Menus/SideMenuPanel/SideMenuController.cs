@@ -7,7 +7,7 @@ public class SideMenuController<T> : ToggleableMenuElement
     public GameObject contentPanel;
     public GameObject p_DisplayPanel;
 
-    List<DisplayPanel<T>> displayPanels = new List<DisplayPanel<T>>();
+    protected List<DisplayPanel<T>> displayPanels = new List<DisplayPanel<T>>();
 
     public void Initialize(List<T> records)
     {

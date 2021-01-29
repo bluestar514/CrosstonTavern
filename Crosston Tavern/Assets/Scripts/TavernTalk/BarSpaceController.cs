@@ -79,21 +79,30 @@ public class BarSpaceController : MonoBehaviour
     public void NPCPhase(SocialMove prompt)
     {
         
-        patronEngine.LearnFromInput(prompt);
+        patronEngine.LearnFromInput(prompt.mentionedFacts);
 
         lastSocialMove = patronEngine.GiveResponse(prompt);
-        DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(lastSocialMove);
-        
-        dbc.DisplayNPCAction(npcDialogue);
-        lc.AddElement(npcDialogue);
-        AddAllFacts(npcDialogue.facts);
 
-        barkeepEngine.LearnFromInput(lastSocialMove);
+        if (lastSocialMove.verb == "pass") {
+            AdvanceNPCDialogue();
+        } else {
+            DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(lastSocialMove);
+
+            dbc.DisplayNPCAction(npcDialogue);
+            lc.AddElement(npcDialogue);
+
+            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
+            AddAllFacts(newFacts);
+            RemoveRetractedFacts(lastSocialMove.retractedFacts);
+            
+        }
+
+        
     }
 
     public void PlayerPhase()
     {
-        Debug.Log(lastSocialMove);
+        Debug.Log(lastSocialMove + "("+ lastSocialMove.verb+")");
 
         List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
         List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
@@ -124,4 +133,11 @@ public class BarSpaceController : MonoBehaviour
         }
     }
 
+
+    void RemoveRetractedFacts(List<WorldFact> facts)
+    {
+        foreach(WorldFact fact in facts) {
+            nc.RemoveElement(fact);
+        }
+    }
 }

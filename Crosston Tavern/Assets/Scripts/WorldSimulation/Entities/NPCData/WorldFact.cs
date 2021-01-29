@@ -14,7 +14,9 @@ public class WorldFact
         return this;
     }
 
-    public virtual void UpdateWorldState(WorldState ws) { }
+    public virtual List<WorldFact> UpdateWorldState(WorldState ws) {
+        return new List<WorldFact>() { this };
+    }
 
 
     public virtual string Verbalize(string speaker, string listener, WorldState ws=null)
@@ -65,11 +67,13 @@ public class WorldFactResource: WorldFact {
         return new WorldFactResource(featureId, this.resourceId, potentialBinding);
     }
 
-    public override void UpdateWorldState(WorldState ws)
+    public override List<WorldFact> UpdateWorldState(WorldState ws)
     {
         Feature feature = ws.map.GetFeature(featureId);
 
         feature.relevantResources.Add(resourceId, potentialBinding);
+
+        return base.UpdateWorldState(ws);
     }
 
     public override int GetHashCode()
@@ -129,11 +133,13 @@ public class WorldFactPreference: WorldFact
         return new WorldFactPreference(person, this.level, item);
     }
 
-    public override void UpdateWorldState(WorldState ws)
+    public override List<WorldFact> UpdateWorldState(WorldState ws)
     {
         ItemPreference pref = ws.registry.GetPerson(person).preference;
 
         pref.Add(item, level);
+
+        return base.UpdateWorldState(ws);
     }
 
     public override int GetHashCode()
@@ -195,9 +201,12 @@ public class WorldFactEvent: WorldFact
         return false;
     }
 
-    public override void UpdateWorldState(WorldState ws)
+    public override List<WorldFact> UpdateWorldState(WorldState ws)
     {
-        ws.AddHistory(action);
+        List<WorldFact> learnedFacts = ws.AddHistory(action);
+        learnedFacts.Add(this);
+
+        return learnedFacts;
     }
 
     public override int GetHashCode()

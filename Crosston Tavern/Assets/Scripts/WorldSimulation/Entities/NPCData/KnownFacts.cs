@@ -20,24 +20,31 @@ public class KnownFacts
         this.ownerId = ownerId;
     }
 
-    public void AddHistory(ExecutedAction action, WorldState ws)
+    public List<WorldFact> AddHistory(ExecutedAction action, WorldState ws)
     {
         history.Add(action);
+
+        List<WorldFact> learnedFacts = new List<WorldFact>();
 
         foreach(Effect effect in action.executedEffect) {
             if(effect is EffectKnowledge) {
                 EffectKnowledge effectKnow = (EffectKnowledge)effect;
-                AddFact(effectKnow.fact, ws);
+                learnedFacts.AddRange(AddFact(effectKnow.fact, ws));
             }
         }
+
+        return learnedFacts;
     }
 
-    public void AddFact(WorldFact fact, WorldState ws)
+    public List<WorldFact> AddFact(WorldFact fact, WorldState ws)
     {
         if (!KnowFact(fact)) {
             knownFacts.Add(fact);
-            fact.UpdateWorldState(ws);
+            
+            return fact.UpdateWorldState(ws);
         }
+
+        return new List<WorldFact>();
     }
 
 
