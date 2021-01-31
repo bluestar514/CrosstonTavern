@@ -19,7 +19,7 @@ public class ConversationVerbalizer
     public DialogueUnit ExpressSocialMove(SocialMove socialMove)
     {
 
-        string verbilization = socialMove.ToString();
+        string verbalization = socialMove.ToString();
         string actionName;
         ExecutedAction actionObj;
         List<WorldFact> facts = socialMove.mentionedFacts;
@@ -28,49 +28,135 @@ public class ConversationVerbalizer
         WorldFactPotentialAction actionFact;
         switch (socialMove.verb) {
             case "greet":
-                verbilization = "Good evening.";
+                verbalization = "Good evening.";
                 break;
+
+            case "askAboutState":
+                verbalization = "How are you doing?";
+                break;
+            case "askForOrder":
+                verbalization = "What can I get you this evening?";
+                break;
+            case "tellStateNONE":    
+            case "tellState#":
+                string state;
+                if (socialMove.arguements.Count == 0) state = "none";
+                else state = socialMove.arguements[0];
+
+                if(state == EntityStatusEffectType.angry.ToString()) {
+                    verbalization = "I have had a real frustrating day!";
+                } else if (state == EntityStatusEffectType.sad.ToString()) {
+                    verbalization = "Nothing went right today...";
+                } else if (state == EntityStatusEffectType.happy.ToString()) {
+                    verbalization = "I had a great day!";
+                } else {
+                    verbalization = "I'm doing alright. You know how it is.";
+                }
+                break;
+            case "congratulate":
+                verbalization = "That's good!";
+                break;
+            case "console":
+                verbalization = "Sorry to hear that";
+                break;
+
+            case "askForRecomendation":
+                verbalization = "What's good on the menu tonight?";
+                break;
+            case "recomend#":
+                verbalization = "The " + socialMove.arguements[0] + " is quite good.";
+                break;
+            case "order#OnRecomendation":
+                verbalization = "Sound good, let's go with that tonight.";
+                break;
+            case "order#OffRecomendation":
+                verbalization = "Mmm, no. I don't think I'm feeling that tonight. How about " +
+                                    socialMove.arguements[0] + " instead?";
+                break;
+            case "order#":
+                verbalization = "Can I get a " + socialMove.arguements[0] + "?";
+                break;
+            case "serveOrder#":
+                verbalization = "Coming right up.";
+                break;
+            case "thank":
+                //Thanks. This is good. 
+                //Thanks. Oh man, I love strawberry cake. Actually, I like anything with strawberries. 
+                //Thanks. This was a good choice, I like anything with strawberries.
+
+                List<string> favorites = new List<string>();
+                foreach(WorldFact fact in socialMove.mentionedFacts) {
+                    if(fact is WorldFactPreference) {
+                        WorldFactPreference preference = (WorldFactPreference)fact;
+                        favorites.Add("I " + preference.level + " anything with " + preference.item); //preference.Verbalize(townie.Id, partner));
+                    }
+                }
+                string dishOpinion = "";
+                if (socialMove.mentionedFacts.Count > 0)
+                    dishOpinion = socialMove.mentionedFacts[0].Verbalize(townie.Id, partner);
+
+                verbalization = "Thanks.";
+                if(socialMove.arguements[0] == PreferenceLevel.loved.ToString()) {
+                    verbalization += "Oh man, " + dishOpinion + ".";
+                    favorites.RemoveAt(0); 
+                }else if (socialMove.arguements[0] == PreferenceLevel.liked.ToString()) {
+                    verbalization += dishOpinion + ".";
+                    favorites.RemoveAt(0);
+                }
+                else if(socialMove.arguements[0] == PreferenceLevel.neutral.ToString()) {
+                    verbalization += "This was a good choice.";
+                }else if (socialMove.arguements[0] == PreferenceLevel.disliked.ToString()) {
+
+                } else if (socialMove.arguements[0] == PreferenceLevel.hated.ToString()) {
+
+                }
+
+                if (favorites.Count > 0)
+                    verbalization += "Actually, " + Verbalizer.MakeNiceList(favorites);
+
+                break;
+
             case "askAboutDayHighlights":
-                verbilization = "What did you do today?";
+                verbalization = "What did you do today?";
                 break;
             case "askAboutObservation":
-                verbilization = "Did you see anything interesting today?";
+                verbalization = "Did you see anything interesting today?";
                 break;
             case "askAboutExcitement":
-                verbilization = "Did anything good happen today?";
+                verbalization = "Did anything good happen today?";
                 break;
             case "askAboutDisapointment":
-                verbilization = "Did anything disapointing happen today?";
+                verbalization = "Did anything disapointing happen today?";
                 break;
             case "askAboutGoals":
-                verbilization = "What have you been trying to do lately?";
+                verbalization = "What have you been trying to do lately?";
                 break;
             case "askWhyAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbilization = v.VerbalizeAction(actionObj, true);
-                verbilization = "Why did " + verbilization + "?";
+                verbalization = v.VerbalizeAction(actionObj, true);
+                verbalization = "Why did " + verbalization + "?";
                 break;
             case "askAboutPreferencesLike":
-                verbilization = "What do you like?";
+                verbalization = "What do you like?";
                 break;
             case "askAboutPreferencesHate":
-                verbilization = "What do you dislike?";
+                verbalization = "What do you dislike?";
                 break;
             case "tellAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbilization = v.VerbalizeAction(actionObj, false);
-                verbilization = "Did you hear that " + verbilization + "?";
+                verbalization = v.VerbalizeAction(actionObj, false);
+                verbalization = "Did you hear that " + verbalization + "?";
                 break;
             case "tellAboutDayEvents":
             case "tellAbout#Event":
             case "tellAboutDayObservedEvents":
                 //float coin = Random.value;
                 //if(coin > .5)
-                    verbilization = "Today, "+ VerbalizeAllEvents(facts);
+                    verbalization = "Today, "+ VerbalizeAllEvents(facts);
                 //else
                 //    verbilization = VerbalizeByTimePeriod(facts);
 
@@ -79,7 +165,7 @@ public class ConversationVerbalizer
             case "tellWhyGoal#":
 
                 if (facts.Count == 0) {
-                    verbilization = "I just do.";
+                    verbalization = "I just do.";
                     break;
                 }
 
@@ -99,12 +185,12 @@ public class ConversationVerbalizer
                         goals.Add(v.VerbalizaeState(goalFact.goal.state));
                     }
                 }
-                verbilization = "";
+                verbalization = "";
                 if (motivations.Count > 0) {
-                    verbilization = "I want to " + Verbalizer.MakeNiceList(motivations);
-                    verbilization += ", so I can " + Verbalizer.MakeNiceList(goals)+".";
+                    verbalization = "I want to " + Verbalizer.MakeNiceList(motivations);
+                    verbalization += ", so I can " + Verbalizer.MakeNiceList(goals)+".";
                 } else {
-                    verbilization = verbilization + "I want " + string.Join(". I want ", goals) + ". ";
+                    verbalization = verbalization + "I want " + string.Join(". I want ", goals) + ". ";
                 }
                 break;
             case "tellWhyAction#":
@@ -115,8 +201,8 @@ public class ConversationVerbalizer
                     }
                 }
 
-                verbilization = string.Join(", and so I wanted ", goals);
-                verbilization = "I wanted " + verbilization;
+                verbalization = string.Join(", and so I wanted ", goals);
+                verbalization = "I wanted " + verbalization;
                 break;
             case "askWhyGoal#":
                 foreach (WorldFact fact in facts) {
@@ -127,14 +213,14 @@ public class ConversationVerbalizer
                     }
                 }
 
-                verbilization = "Why do you want " + goals[0] + "?";
+                verbalization = "Why do you want " + goals[0] + "?";
                 break;
             case "askAboutAction#":
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbilization = v.VerbalizeAction(actionObj, false);
-                verbilization = "Could you tell me more about how " + verbilization + "?";
+                verbalization = v.VerbalizeAction(actionObj, false);
+                verbalization = "Could you tell me more about how " + verbalization + "?";
                 break;
             case "tellDetailsOfAction#":
                 foreach (WorldFact fact in facts) {
@@ -144,7 +230,7 @@ public class ConversationVerbalizer
                         ExecutedAction a = e.action;
 
                         foreach (Effect effect in a.executedEffect) {
-                            verbilization += effect.ToString();
+                            verbalization += effect.ToString();
                         }
                     }
                 }
@@ -154,22 +240,22 @@ public class ConversationVerbalizer
 
             case "tellPreference":
             case "tellPreference#":
-                if (socialMove.arguements.Count > 0) verbilization = "Did you know ";
-                else verbilization = "";
+                if (socialMove.arguements.Count > 0) verbalization = "Did you know ";
+                else verbalization = "";
                 foreach (WorldFact fact in facts) {
-                    verbilization += fact.Verbalize(townie.Id, partner);
+                    verbalization += fact.Verbalize(townie.Id, partner);
                 }
-                if (socialMove.arguements.Count > 0) verbilization += "?";
-                else verbilization += ".";
+                if (socialMove.arguements.Count > 0) verbalization += "?";
+                else verbalization += ".";
 
                 break;
             case "acknowledge":
-                verbilization = "No, I hadn't";
+                verbalization = "No, I hadn't";
                 Debug.LogWarning("No checking is done as to whether " + townie + " has actually heard " + string.Join(",",socialMove.mentionedFacts));
                 break;
         }
 
-        return new DialogueUnit(verbilization, townie.name, socialMove);
+        return new DialogueUnit(verbalization, townie.name, socialMove);
     }
 
     string VerbalizeAllEvents(List<WorldFact> facts)

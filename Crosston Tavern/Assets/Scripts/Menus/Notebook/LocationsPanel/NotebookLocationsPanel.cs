@@ -15,7 +15,7 @@ public class NotebookLocationsPanel : MainNotebookTab
     Dictionary<string, LocationSelectorPanel> locationSelectorDict = new Dictionary<string, LocationSelectorPanel>();
     Dictionary<string, FeatureContentPanel> featurePanelDict = new Dictionary<string, FeatureContentPanel>();
 
-    void Start()
+    void Awake()
     {
         Dictionary<string, Feature> featureDict = FeatureInitializer.GetAllFeatures();
 

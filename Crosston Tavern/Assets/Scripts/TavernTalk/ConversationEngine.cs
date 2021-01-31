@@ -65,7 +65,7 @@ public class ConversationEngine
 
                 hasOrdered = true;
 
-                return new SocialMove("thank", mentionedFacts: facts);
+                return new SocialMove("thank", arguements: new List<string>() { opinionOfDish.ToString() }, mentionedFacts: facts);
 
             case "askAboutState":
                 return SocialMoveFactory.MakeMove("tellState#", speaker, prompt);
