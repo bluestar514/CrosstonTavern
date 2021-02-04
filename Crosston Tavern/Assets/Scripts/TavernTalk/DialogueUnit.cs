@@ -10,15 +10,18 @@ public class DialogueUnit
     public string speakerName;
     public SocialMove underpinningSocialMove;
     public List<WorldFact> facts = new List<WorldFact>();
+
+    public NPCPortrait.State emotion;
     // also probably would hold:
     //  - speaker's emotion being displayed
-    
-    public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove)
+
+    public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove, NPCPortrait.State emotion)
     {
         this.verbalization = verbalization;
         this.speakerName = speakerName;
         this.underpinningSocialMove = underpinningSocialMove;
         SocialMoveContentToFacts(underpinningSocialMove);
+        this.emotion = emotion;
     }
 
     void SocialMoveContentToFacts(SocialMove socialMove)

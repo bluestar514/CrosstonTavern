@@ -30,7 +30,7 @@ public class NotebookLocationsPanel : MainNotebookTab
 
     public override bool AddWorldFact(WorldFact fact)
     {
-        Debug.Log(fact);
+        //Debug.Log(fact);
 
         if(fact is WorldFactResource) {
             WorldFactResource resourceFact = (WorldFactResource)fact;

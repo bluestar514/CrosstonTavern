@@ -186,11 +186,17 @@ public class ConversationEngine
                 };
 
                 moves = new List<SocialMove>(barkeeperMoves);
-                moves.AddRange(GenAskWhyGoal(speaker.ws.knownFacts.GetFacts()));
-                moves.AddRange(GenAskWhyAction(speaker.ws.knownFacts.GetFacts()));
+
+                List<WorldFact> facts = speaker.ws.knownFacts.GetFacts();
+
+                facts = TrimOldEvents(facts);
+                facts = TrimSimilarFacts(facts);
+
+                moves.AddRange(GenAskWhyGoal(facts));
+                moves.AddRange(GenAskWhyAction(facts));
                 moves.AddRange(GenTellAction());
                 moves.AddRange(GenTellPreference());
-                moves.AddRange(GenConfirmGoal(speaker.ws.knownFacts.GetFacts()));
+                moves.AddRange(GenConfirmGoal(facts));
                 //moves.AddRange(GenAskAboutAction());
                 break;
         }
@@ -302,6 +308,93 @@ public class ConversationEngine
         return finalList;
     }
 
+    List<WorldFact> TrimOldEvents(List<WorldFact> facts)
+    {
+        return new List<WorldFact>((from fact in facts
+                                   where fact is WorldFactEvent
+                                   where GetDayDif((WorldFactEvent)fact) < 7
+                                   select fact)
+                                   .Concat(
+                                    from fact in facts
+                                    where !(fact is WorldFactEvent)
+                                    select fact));
+    }
+    
+    int GetDayDif(WorldFactEvent fact)
+    {
+        int dif = speaker.ws.Time.ConvertToDayCount() - fact.action.executionTime.ConvertToDayCount();
+        return dif;
+    }
+
+    List<WorldFact> TrimSimilarFacts(List<WorldFact> facts)
+    {
+        List<WorldFact> finalList = new List<WorldFact>(from fact in facts
+                                                            where !(fact is WorldFactEvent)
+                                                            select fact);
+        List<WorldFactEvent> eventFacts = new List<WorldFactEvent>(from fact in facts
+                                                              where (fact is WorldFactEvent)
+                                                              orderby ((WorldFactEvent)fact).action.executionTime.ConvertToDayCount()
+                                                                   select (WorldFactEvent)fact);
+        eventFacts.Reverse();
+
+        Dictionary<VerbActorFeature, int> actionTimesDict = new Dictionary<VerbActorFeature, int>();
+
+        foreach (WorldFactEvent fact in eventFacts) {
+            Debug.Log(fact);
+            VerbActorFeature actionSummary = new VerbActorFeature(fact.action.Action.Id,
+                                                                  fact.action.Action.ActorId,
+                                                                  fact.action.Action.FeatureId);
+            if (!actionTimesDict.ContainsKey(actionSummary)) {
+                actionTimesDict.Add(actionSummary, 0);
+                
+            }
+            if (actionTimesDict.ContainsKey(actionSummary)
+                && actionTimesDict[actionSummary] < 3) {
+                finalList.Add(fact);
+                actionTimesDict[actionSummary]++;
+            }
+
+        }
+
+        return finalList;
+    }
+    class VerbActorFeature
+    {
+        public string verb;
+        public string actor;
+        public string feature;
+
+        public VerbActorFeature(string verb, string actor, string feature)
+        {
+            this.verb = verb;
+            this.actor = actor;
+            this.feature = feature;
+        }
+
+        public override string ToString()
+        {
+            return "<"+ string.Join(",", new List<string>() { verb, actor, feature }) + ">";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is VerbActorFeature)) return false;
+            VerbActorFeature other = (VerbActorFeature)obj;
+
+            return verb == other.verb &&
+                actor == other.actor &&
+                feature == other.feature;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1587983527;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(verb);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(actor);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(feature);
+            return hashCode;
+        }
+    }
 
     bool FactsMatch(List<WorldFact> facts1, List<WorldFact> facts2)
     {

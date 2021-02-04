@@ -110,7 +110,9 @@ public class Verbalizer
         foreach(Effect effect in action.executedEffect) {
             foreach(VerbilizationEffect verbalizationPattern in action.effectVerbalizationPatterns) {
                 string str = verbalizationPattern.Verbilize(actionActor, effect);
-                if (str != "") verbEffects.Add(str);
+                if (str != "") {
+                    verbEffects.Add(str);
+                }
             }
         }
         string verbalization = MakeNiceList(verbEffects);
@@ -120,6 +122,33 @@ public class Verbalizer
         verbalization = action.Action.Bindings.BindString(verbalization);
 
         return verbalization;
+    }
+
+     public string VerbalizeActionWithDate(ExecutedAction action, bool presentTense)
+    {
+        string verbalization = VerbalizeAction(action, presentTense);
+        WorldTime date = action.executionTime;
+
+        if(ws != null)
+            verbalization += " " + DateDifferenceToWords(ws.Time, date);
+
+        return verbalization;
+    }
+
+    public static string DateDifferenceToWords(WorldTime today, WorldTime date)
+    {
+        WorldTime.CasualTimeBlocks block = today.GetGeneralDifference(date);
+
+        switch (block) {
+            case WorldTime.CasualTimeBlocks.today:
+                return "today";
+            case WorldTime.CasualTimeBlocks.yesterday:
+                return "yesterday";
+            case WorldTime.CasualTimeBlocks.days:
+            default:
+                return (today.ConvertToDayCount() - date.ConvertToDayCount()).ToString() + " days ago";
+        }
+
     }
 
 

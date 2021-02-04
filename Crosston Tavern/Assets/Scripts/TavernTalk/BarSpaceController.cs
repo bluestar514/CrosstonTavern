@@ -102,7 +102,7 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerPhase()
     {
-        Debug.Log(lastSocialMove + "("+ lastSocialMove.verb+")");
+        //Debug.Log(lastSocialMove + "("+ lastSocialMove.verb+")");
 
         List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
         List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();

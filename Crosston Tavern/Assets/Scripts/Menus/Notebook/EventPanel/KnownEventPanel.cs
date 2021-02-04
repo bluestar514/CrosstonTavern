@@ -11,6 +11,6 @@ public class KnownEventPanel : MonoBehaviour
     {
         Verbalizer v = new Verbalizer("barkeep", "none");
 
-        this.text.text = v.VerbalizeAction(e.action, false);
+        this.text.text = v.VerbalizeActionWithResults(e.action, false);
     }
 }

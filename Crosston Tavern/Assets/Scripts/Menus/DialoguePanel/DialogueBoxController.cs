@@ -7,6 +7,7 @@ public class DialogueBoxController : MonoBehaviour
     public NPCTextBoxController speachPanelMenu;
     public PlayerTextBoxController playerResponseMenu;
     public SpeakerTagController speakerTagPanel;
+    public NPCPortraitController portraitController;
 
     
 
@@ -24,6 +25,8 @@ public class DialogueBoxController : MonoBehaviour
 
         speachPanelMenu.Fill(dialogueUnit.verbalization);
         speachPanelMenu.Open();
+
+        portraitController.SetPortrait(dialogueUnit.speakerName, dialogueUnit.emotion);
     }
 
     public void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)

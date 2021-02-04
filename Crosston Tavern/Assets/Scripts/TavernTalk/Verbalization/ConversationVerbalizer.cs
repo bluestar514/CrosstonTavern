@@ -132,10 +132,13 @@ public class ConversationVerbalizer
                 verbalization = "What have you been trying to do lately?";
                 break;
             case "askWhyAction#":
+                //Why did you go fishing yesterday?
+
+
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbalization = v.VerbalizeAction(actionObj, true);
+                verbalization = v.VerbalizeActionWithDate(actionObj, true);
                 verbalization = "Why did " + verbalization + "?";
                 break;
             case "askAboutPreferencesLike":
@@ -148,7 +151,7 @@ public class ConversationVerbalizer
                 actionName = socialMove.arguements[0];
                 actionObj = townie.ws.knownFacts.GetActionFromName(actionName);
 
-                verbalization = v.VerbalizeAction(actionObj, false);
+                verbalization = v.VerbalizeActionWithResults(actionObj, false);
                 verbalization = "Did you hear that " + verbalization + "?";
                 break;
             case "tellAboutDayEvents":
@@ -255,7 +258,7 @@ public class ConversationVerbalizer
                 break;
         }
 
-        return new DialogueUnit(verbalization, townie.name, socialMove);
+        return new DialogueUnit(verbalization, townie.name, socialMove, NPCPortrait.State.neutral);
     }
 
     string VerbalizeAllEvents(List<WorldFact> facts)

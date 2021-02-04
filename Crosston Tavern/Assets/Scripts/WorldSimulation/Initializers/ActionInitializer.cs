@@ -432,9 +432,9 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient)
             }, 
             
-            // I started dating alicia. 
-            // why did you start dating alicia?
-            new VerbilizationActionSocial("start dating", "started dating")
+            // I asked out alicia. 
+            // why did you ask out alicia?
+            new VerbilizationActionSocial("ask out", "asked out")
         ) },
         //{ "outing_shopping_at_#loc#_with_#b#", new GenericAction( "outing_shopping_at_#loc#_with_#b#", 1, 
         
@@ -551,54 +551,93 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient)
             },
             new VerbilizationActionResourceGathering("make stewed trout", "made stewed trout")
+        )},
+        { "treat_sick_patient", new GenericAction("treat_sick_patient", 1,
+            new Precondition(new List<Condition>(){
+                new Condition_IsState(new StateInventoryStatic("#a#", "medicine", 1, INF))
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectStatusModify("#b#", EntityStatusEffectType.sick, -2, -10),
+                        new EffectInventoryStatic("#a#", "medicine", -1),
+                        new EffectStatusEffect("#b#", 
+                                new EntityStatusEffect("medically_treated", EntityStatusEffectType.special, 
+                                                        stepsInDay*3, 1, new List<string>(){ "#a#" })
+                            )
+                    },
+                    new List<VerbilizationEffect>() {
+                        
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient)
+            },
+            new VerbilizationAction("treat", "treated")
+        )},
+        { "wait_for_treatment", new GenericAction("wait_for_treatment", 1,
+            new Precondition(new List<Condition>(){
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                    },
+                    new List<VerbilizationEffect>(){ }
+                )
+            },
+            new List<BindingPort>() {
+            },
+            new VerbilizationAction("wait", "waited")
+        )},
+        { "mix_medicine", new GenericAction("mix_medicine", 1,
+            new Precondition(new List<Condition>(){
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "herb", -3),
+                        new EffectInventoryStatic("#a#", "medicine", 1)
+                    },
+                    new List<VerbilizationEffect>(){ }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator)
+            },
+            new VerbilizationAction("make medicine", "made medicine")
+        )},
+        { "play_by_river", new GenericAction("play_by_river", 1,
+            new Precondition(new List<Condition>(){
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(.6f),
+                    new List<Effect>() {
+                        
+                    },
+                    new List<VerbilizationEffect>(){ }
+                ),
+                new Outcome(
+                    new ChanceModifierSimple(.4f),
+                    new List<Effect>() {
+                        new EffectStatusEffect("#a#", 
+                                    new EntityStatusEffect("sick_from_wet", EntityStatusEffectType.sick, 
+                                                                stepsInDay*7, 10, new List<string>(){"#a#"})),
+                        //new Effect
+                    },
+                    new List<VerbilizationEffect>(){ }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator)
+            },
+            new VerbilizationAction("make medicine", "made medicine")
         )}
-        
-        //,
-        //{"ask_for_#item#", new GenericAction("ask_for_#item#", 1,
-        //    new Precondition(new List<Condition>() {
-        //        new Condition_NotYou("#b#")
-        //    }),
-        //    new List<Outcome>() {
-        //        new Outcome(//success:
-        //            new ChanceModifierCombination(new List<ChanceModifier>() {
-        //                new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
-        //                new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), true)
-        //            }),
-        //            new List<Effect>() {
-        //                new EffectInventoryStatic("#b#", "#item#", -1),
-        //                new EffectInventoryStatic("#a#", "#item#", 1),
-        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
-        //            }
-        //        ),
-        //        new Outcome( //doesn't have item:
-        //            new ChanceModifierCombination(new List<ChanceModifier>() {
-        //                new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), true),
-        //                new ChanceModifierBoolState(new StateInventoryStatic("#b#", "#item#", 1, INF), false)
-        //            }),
-        //            new List<Effect>() {
-        //                new EffectGoal("#b#", new GoalModule(
-        //                    new List<GM_Precondition>() {},
-        //                    new List<Goal>() {
-        //                        new Goal(new StateInventoryStatic("#a#", "#item#", 1, INF), 3),
-        //                    }
-        //                )),
-        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, 2)
-        //            }
-        //        ),
-        //        new Outcome( //doesn't want to give item
-        //            new ChanceModifierRelation(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 0, 5), false),
-        //            new List<Effect>() {
-        //                new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -1),
-        //                new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -1)
-        //            }
-        //        )
-        //    },
-        //    new List<BindingPort>() {
-        //        new BindingPortEntity("a", ActionRole.initiator),
-        //        new BindingPortEntity("b", ActionRole.recipient),
-        //        new BindingPortInventoryItem("item", "_any_")
-        //    }
-        // ) }
     };
 
 

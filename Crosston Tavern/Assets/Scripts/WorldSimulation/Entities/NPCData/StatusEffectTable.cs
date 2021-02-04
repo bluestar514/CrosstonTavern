@@ -28,10 +28,21 @@ public class StatusEffectTable
         summary = CalculateStatus();
     }
 
-    public void Reduce(EntityStatusEffectType type, int amount)
+    public void Alter(EntityStatusEffectType type, int duration, int intensity)
     {
+        List<EntityStatusEffect> removedEffects = new List<EntityStatusEffect>();
         foreach(EntityStatusEffect effect in activeEffects) {
-            if (effect.type == type) effect.duration -= amount;
+            if (effect.type == type) {
+                effect.duration += duration;
+                effect.strength += intensity;
+
+                if (effect.duration <= 0 || effect.strength <= 0) removedEffects.Add(effect);
+            }
+        }
+
+        foreach(EntityStatusEffect effect in removedEffects) {
+            timedOutEffects.Add(effect);
+            activeEffects.Remove(effect);
         }
 
         summary = CalculateStatus();
@@ -71,7 +82,7 @@ public class StatusEffectTable
         foreach(EntityStatusEffect effect in activeEffects) {
             effect.Update();
 
-            if (effect.duration <= 0) timedOutEffects.Add(effect);
+            if (effect.duration <= 0 || effect.strength <= 0) timedOutEffects.Add(effect);
         }
 
         foreach(EntityStatusEffect effect in timedOutEffects) {

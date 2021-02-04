@@ -25,6 +25,21 @@ public class WorldTime : IComparable
     public static WorldTime Night = new WorldTime(-1, -1, -1, 22, 0);
 
 
+    public enum CasualTimeBlocks
+    {
+        today,
+        yesterday,
+        days,
+        lastweek,
+        weeks,
+        lastmonth,
+        months,
+        lastyear,
+        years,
+        future
+    }
+
+
     public WorldTime(int year, int month, int day, int hour, int minute)
     {
         this.day = day;
@@ -177,6 +192,38 @@ public class WorldTime : IComparable
         if (b.minute > 0) c.Tick(b.minute);
 
         return c;
+    }
+
+
+    public int ConvertToDayCount()
+    {
+        int count = year * MonthInYear;
+        count += month;
+        count *= DayInMonth;
+        count += day;
+
+        return count;
+    }
+
+    public CasualTimeBlocks GetGeneralDifference(WorldTime other)
+    {
+        int dayCount = ConvertToDayCount();
+        int otherCount = other.ConvertToDayCount();
+
+        int dif = dayCount - otherCount;
+
+        if (dif > (MonthInYear * DayInMonth) * 2) return CasualTimeBlocks.years;
+        if (dif >= (MonthInYear * DayInMonth)) return CasualTimeBlocks.lastyear;
+        if (dif > DayInMonth * 2) return CasualTimeBlocks.months;
+        if (dif >= DayInMonth) return CasualTimeBlocks.lastmonth;
+
+        if (dif > 14) return CasualTimeBlocks.weeks;
+        if (dif >= 7) return CasualTimeBlocks.lastweek;
+        if (dif > 1) return CasualTimeBlocks.days;
+        if (dif == 1) return CasualTimeBlocks.yesterday;
+        if (dif == 0) return CasualTimeBlocks.today;
+
+        return CasualTimeBlocks.future;
     }
 }
 
