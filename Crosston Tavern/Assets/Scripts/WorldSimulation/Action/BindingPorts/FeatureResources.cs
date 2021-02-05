@@ -29,6 +29,13 @@ public class FeatureResources
         }
     }
 
+    public void Remove(string key, string value)
+    {
+        if (resources.ContainsKey(key) && resources[key].Contains(value)) {
+            resources[key].Remove(value);
+        }
+    }
+
     public List<string> BindString(string str)
     {
         if (resources == null) return new List<string>() { str };

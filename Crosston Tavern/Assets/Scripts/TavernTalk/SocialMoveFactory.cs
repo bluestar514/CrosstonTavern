@@ -82,7 +82,7 @@ public class SocialMoveFactory
 
     public static SocialMove MakeTellAboutInterestingEvents(Townie speaker, Opinion.Tag tag)
     {
-        List<ExecutedAction> history = FilterMyActions(speaker, GetDayEvents(speaker));
+        List<ExecutedAction> history = GetDayEvents(speaker);
         string arg = tag.ToString().ToUpper();
         switch (tag) {
             case Opinion.Tag.disapointed:

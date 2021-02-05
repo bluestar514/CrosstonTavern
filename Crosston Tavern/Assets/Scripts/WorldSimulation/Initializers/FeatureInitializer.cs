@@ -10,10 +10,12 @@ public class FeatureInitializer
 
     static Dictionary<Feature.FeatureType, Feature> MakeFeatures()
     {
+        Dictionary<string, GenericAction> actions = ActionInitializer.GetAllActions();
+
         return new Dictionary<Feature.FeatureType, Feature>() {
             {Feature.FeatureType.river, new Feature("river", Feature.FeatureType.river, UNSET, 2,
                                     new List<GenericAction>(){
-                                        ActionInitializer.actions["fish"]
+                                        actions["fish"]
                                     },
                                     new Dictionary<string, List<string>>() {
                                         {"common_fish", new List<string>(){"trout", "bass"} },
@@ -21,7 +23,7 @@ public class FeatureInitializer
                                     })
             },
             {Feature.FeatureType.door, new Feature("door", Feature.FeatureType.door, UNSET, 100,
-                                    new List<GenericAction>(){ ActionInitializer.actions["move"] },
+                                    new List<GenericAction>(){ actions["move"] },
                                     new Dictionary<string, List<string>>())
             },
             {Feature.FeatureType.shop, new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
@@ -32,18 +34,13 @@ public class FeatureInitializer
                                     new Dictionary<string, int>(){})
             },
             {Feature.FeatureType.kitchen, new Feature("kitchen", Feature.FeatureType.kitchen, UNSET, 2,
-                                    new List<GenericAction>(){ ActionInitializer.actions["bake_strawberry_cake"],
-                                                                ActionInitializer.actions["fry_salmon"],
-                                                                ActionInitializer.actions["bake_blackberry_tart"],
-                                                                ActionInitializer.actions["stew_trout"]
-
-                                    },
+                                    new List<GenericAction>(ActionInitializer.GenerateRecipes().Values),
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})
             },
             {Feature.FeatureType.brush, new Feature("brush", Feature.FeatureType.brush, UNSET, 2,
                                     new List<GenericAction>(){
-                                        ActionInitializer.actions["forage"]
+                                        actions["forage"]
                                     },
                                     new Dictionary<string, List<string>>() {
                                         {"common_forage", new List<string>(){"blackberry"} },
@@ -52,7 +49,7 @@ public class FeatureInitializer
             },
             {Feature.FeatureType.meadow, new Feature("meadow", Feature.FeatureType.meadow, UNSET, 2,
                                     new List<GenericAction>(){
-                                        ActionInitializer.actions["forage"]
+                                        actions["forage"]
                                     },
                                     new Dictionary<string, List<string>>() {
                                         {"common_forage", new List<string>(){"tulip", "rose"} },

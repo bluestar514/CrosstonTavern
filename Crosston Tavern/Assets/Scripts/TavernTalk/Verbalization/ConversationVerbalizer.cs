@@ -20,6 +20,8 @@ public class ConversationVerbalizer
     {
 
         string verbalization = socialMove.ToString();
+        NPCPortrait.State emotion = NPCPortrait.State.neutral;
+
         string actionName;
         ExecutedAction actionObj;
         List<WorldFact> facts = socialMove.mentionedFacts;
@@ -45,10 +47,13 @@ public class ConversationVerbalizer
 
                 if(state == EntityStatusEffectType.angry.ToString()) {
                     verbalization = "I have had a real frustrating day!";
+                    emotion = NPCPortrait.State.angry;
                 } else if (state == EntityStatusEffectType.sad.ToString()) {
                     verbalization = "Nothing went right today...";
+                    emotion = NPCPortrait.State.sad;
                 } else if (state == EntityStatusEffectType.happy.ToString()) {
                     verbalization = "I had a great day!";
+                    emotion = NPCPortrait.State.happy;
                 } else {
                     verbalization = "I'm doing alright. You know how it is.";
                 }
@@ -68,6 +73,8 @@ public class ConversationVerbalizer
                 break;
             case "order#OnRecomendation":
                 verbalization = "Sound good, let's go with that tonight.";
+                emotion = NPCPortrait.State.happy;
+
                 break;
             case "order#OffRecomendation":
                 verbalization = "Mmm, no. I don't think I'm feeling that tonight. How about " +
@@ -83,6 +90,8 @@ public class ConversationVerbalizer
                 //Thanks. This is good. 
                 //Thanks. Oh man, I love strawberry cake. Actually, I like anything with strawberries. 
                 //Thanks. This was a good choice, I like anything with strawberries.
+                emotion = NPCPortrait.State.soup;
+
 
                 List<string> favorites = new List<string>();
                 foreach(WorldFact fact in socialMove.mentionedFacts) {
@@ -98,10 +107,14 @@ public class ConversationVerbalizer
                 verbalization = "Thanks.";
                 if(socialMove.arguements[0] == PreferenceLevel.loved.ToString()) {
                     verbalization += "Oh man, " + dishOpinion + ".";
-                    favorites.RemoveAt(0); 
+                    favorites.RemoveAt(0);
+
+                    emotion = NPCPortrait.State.happy;
                 }else if (socialMove.arguements[0] == PreferenceLevel.liked.ToString()) {
                     verbalization += dishOpinion + ".";
                     favorites.RemoveAt(0);
+
+                    
                 }
                 else if(socialMove.arguements[0] == PreferenceLevel.neutral.ToString()) {
                     verbalization += "This was a good choice.";
@@ -162,6 +175,15 @@ public class ConversationVerbalizer
                     verbalization = "Today, "+ VerbalizeAllEvents(facts);
                 //else
                 //    verbilization = VerbalizeByTimePeriod(facts);
+
+                if(socialMove.arguements.Count > 0) {
+                    if(socialMove.arguements[0] == "EXCITED") {
+                        emotion = NPCPortrait.State.happy;
+                    }
+                    if(socialMove.arguements[0] == "DISAPOINTED") {
+                        emotion = NPCPortrait.State.sad;
+                    }
+                }
 
                 break;
             case "tellAboutGoals":
@@ -252,13 +274,32 @@ public class ConversationVerbalizer
                 else verbalization += ".";
 
                 break;
+
+            case "confirmGoal#":
+                foreach (WorldFact fact in facts) {
+
+                    if (fact is WorldFactGoal) {
+                        goalFact = (WorldFactGoal)fact;
+                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
+                    }
+                }
+
+                verbalization = "Do you still want to "+goals[0] + "?";
+                break;
+            case "confirmGoal#InDate":
+                verbalization = "Yes, I do!";
+                break;
+            case "confirmGoal#OutOfDate":
+                verbalization = "No, I don't.";
+                break;
+
             case "acknowledge":
-                verbalization = "No, I hadn't";
+                verbalization = "No, I didn't";
                 Debug.LogWarning("No checking is done as to whether " + townie + " has actually heard " + string.Join(",",socialMove.mentionedFacts));
                 break;
         }
 
-        return new DialogueUnit(verbalization, townie.name, socialMove, NPCPortrait.State.neutral);
+        return new DialogueUnit(verbalization, townie.name, socialMove, emotion);
     }
 
     string VerbalizeAllEvents(List<WorldFact> facts)

@@ -8,7 +8,7 @@ public class Person: Feature
 {
     public Relationship relationships;
     public ItemPreference preference;
-    public Skill skill;
+    
 
     public List<Goal> knownGoals;
     public Schedule schedule;
@@ -22,7 +22,7 @@ public class Person: Feature
         this.relationships = new Relationship();
 
         preference = new ItemPreference();
-        skill = new Skill();
+        
 
         schedule = new Schedule();
     }
@@ -32,8 +32,6 @@ public class Person: Feature
         knownGoals = new List<Goal>();
         this.relationships = new Relationship();
         preference = new ItemPreference();
-
-        skill = new Skill();
 
         schedule = new Schedule();
     }
@@ -52,7 +50,7 @@ public class Person: Feature
         }
 
         p.preference = preference.Copy(perfect);
-        p.skill = skill.Copy(perfect);
+        
         p.relationships = relationships.Copy(perfect);
 
 

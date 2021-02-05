@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -19,6 +20,7 @@ public class Opinion
         excited,
         disapointed,
         surprised,
+        aboutPersonOfInterest,
         noteworthy
     }
 
@@ -35,7 +37,7 @@ public class Opinion
         SetExpectation(ahm, boundAction);
         SetReality(ahm, outcome);
 
-        SetTags();
+        SetTags(executedAction, ws);
     }
 
     public Opinion()
@@ -62,11 +64,42 @@ public class Opinion
         realityWeight = realizedRational.Key;
     }
 
-    void SetTags()
+    void SetTags(ExecutedAction executedAction, WorldState ws)
     {
         tags = new List<Tag>();
         if (realityWeight > expectationWeight) tags.Add(Tag.excited);
         if (realityWeight < expectationWeight) tags.Add(Tag.disapointed);
         if (realityWeight > 0 && expectationWeight == 0) tags.Add(Tag.surprised);
+
+        List<string> peopleOfInterest = new List<string>(from goal in townie.knownGoals
+                                                               where goal.state is StateRelation
+                                                               select ((StateRelation)goal.state).source);
+        peopleOfInterest.AddRange(from goal in townie.knownGoals
+                                     where goal.state is StateRelation
+                                     select ((StateRelation)goal.state).target);
+
+        peopleOfInterest.AddRange(from goal in townie.knownGoals
+                                  where goal.state is StateSocial
+                                  select ((StateSocial)goal.state).sourceId);
+        peopleOfInterest.AddRange(from goal in townie.knownGoals
+                                  where goal.state is StateSocial
+                                  select ((StateSocial)goal.state).targetId);
+
+        peopleOfInterest = new List<string>(peopleOfInterest.Distinct());
+
+        if (peopleOfInterest.Contains(townie.id)) peopleOfInterest.Remove(townie.id);
+
+        foreach(Feature feature in ws.map.GetAllFeatures()) {
+            if(feature.type != Feature.FeatureType.person && peopleOfInterest.Contains(feature.id)) {
+                peopleOfInterest.Remove(feature.id);
+            } 
+        }
+
+        
+        if(peopleOfInterest.Contains(executedAction.Action.ActorId) || 
+            peopleOfInterest.Contains(executedAction.Action.FeatureId)){
+            tags.Add(Tag.aboutPersonOfInterest);
+        }
+
     }
 }

@@ -25,11 +25,8 @@ public class BarSpaceController : MonoBehaviour
 
     SocialMove lastSocialMove = null;
 
-    List<FoodItem> barMenu = new List<FoodItem>() {
-        new FoodItem("strawberry_cake", new List<string>(){"strawberry"}),
-        new FoodItem("trout_stew", new List<string>(){"trout"}),
-        new FoodItem("fried_salmon", new List<string>(){"salmon" })
-    };
+    List<FoodItem> barMenu = new List<FoodItem>(from food in  ItemInitializer.menu.Values
+                                                select food);
 
     public void Start()
     {

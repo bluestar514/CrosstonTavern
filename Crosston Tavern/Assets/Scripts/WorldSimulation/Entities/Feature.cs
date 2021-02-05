@@ -14,6 +14,7 @@ public class Feature
 
     public Inventory inventory;
     public StringIntDictionary stockTable;
+    public Skill skill;
 
     public StatusEffectTable statusEffectTable;
 
@@ -50,6 +51,8 @@ public class Feature
 
         inventory = new Inventory(id);
         statusEffectTable = new StatusEffectTable();
+
+        skill = new Skill();
     }
 
     public virtual Feature Copy(bool perfect = true)
@@ -63,6 +66,7 @@ public class Feature
 
         f.inventory = inventory.Copy(perfect);
         f.statusEffectTable = statusEffectTable.Copy();
+        f.skill = skill.Copy(perfect);
 
         return f;
     }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class VerbilizationAction : VerbilizationInfo
 {
-    protected string verbPresent;
-    protected string verbPast;
+    public string verbPresent;
+    public string verbPast;
 
     public VerbilizationAction(string verbPresent, string verbPast)
     {
