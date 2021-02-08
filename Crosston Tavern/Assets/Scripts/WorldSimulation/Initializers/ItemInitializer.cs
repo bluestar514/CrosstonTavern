@@ -6,7 +6,7 @@ public class ItemInitializer
 {
     public static Dictionary<string, FoodItem> menu = new Dictionary<string, FoodItem>() {
         { "strawberry_cake", new FoodItem("strawberry_cake",
-                                            new List<string>(){ "strawberry", "flour", "egg", "butter" },
+                                            new List<string>(){ "strawberry", "egg", "milk" },
                                             new VerbilizationAction("bake", "baked")) },
         { "fried_salmon", new FoodItem("fried_salmon",
                                             new List<string>(){ "salmon", "butter" },
@@ -23,7 +23,8 @@ public class ItemInitializer
         "potato",
         "carrot",
         "strawberry",
-        "blackberry"
+        "blackberry",
+        "flour"
     };
 
 

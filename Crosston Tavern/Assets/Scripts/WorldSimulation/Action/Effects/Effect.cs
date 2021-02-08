@@ -36,18 +36,19 @@ public class Effect
     /// <param name="delta">Amount the value changed in this step</param>
     /// <param name="min">Minumum Goal Value</param>
     /// <param name="max">Maximum Goal Value</param>
-    /// <returns>Weight based on how much we have moved into the target zone</returns>
-    protected float CountInRange(float count, float delta, float min, float max)
+    /// <returns>Weight based on how much we have moved into the target zone. Value should be between -1 and 1</returns>
+    protected float CountInRange(float count, float delta, float min, float max, bool allowNegativeNewCount = true)
     {
         float weight = 0;
 
         float newCount = count + delta;
+        if (!allowNegativeNewCount) newCount = Mathf.Max(0, newCount);
 
         //get there in one step:
         // in range -> +1
         // outside -> -1
         if (newCount <= max && newCount >= min) weight += 1;
-        else weight -= 1;
+        else weight -= 1; 
 
         //less important if we are already in range
         // were in range -> -1
@@ -62,7 +63,14 @@ public class Effect
         if (Mathf.Abs(newCount - max) <= Mathf.Abs(count - max)) weight += 1;
         else weight -= 1;
 
-        return weight/2;
+        //roughly 5 options: 
+        //1. start outside the range, and move into it -> weight = 3
+        //2. start outside the range, and move toward it, but not into it -> weight = 2
+        //3. start in the range and don't move out of it -> weight = 0
+        //4. start outside the range, and move away from it -> weight = -3
+        //5. start in the range and move out of it -> weight = -4
+
+        return weight/4;
     }
 
     /// <summary>
@@ -136,18 +144,21 @@ public class EffectMovement: Effect
         float weight = 0;
 
         foreach (string location in locations) {
-            //get there in one step
-            if (location == goalLocation) weight += 2;
-            //else weight -= 1;
-            //Move in right direction
-            if (map.GetDistance(currentLocation, goalLocation) > map.GetDistance(location, goalLocation))
-                weight += 2 * (map.LocationCount - map.GetDistance(location, goalLocation)) / map.LocationCount;
-            //Don't leave the goalLocation
+            
+            // if we are there, disinsentivise leaving
+            // if we are a step away, incentivise taking that last step
+            // generally reward going in the right direction, punish going the wrong way
+            // weight varies between 2 and -2
+            if (location == goalLocation) weight += 1;
+            int currentDist = map.GetDistance(currentLocation, goalLocation);
+            int newDist = map.GetDistance(location, goalLocation);
+            if (currentDist > newDist) weight += 1;
+            if (currentDist < newDist) weight -= 1;
             if (currentLocation == goalLocation) weight -= 1;
         }
 
-        return weight / locations.Count / 4;
-        //4 is max score, this should normalize the number to always be between 0 and 1;
+        return weight / locations.Count / 2;
+        //2 is max score per location, this should normalize the number to always be between 0 and 1;
     }
 
     private float WeighToDoAction(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)

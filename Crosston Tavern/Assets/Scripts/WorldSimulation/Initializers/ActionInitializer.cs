@@ -68,7 +68,7 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#c_fish#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "common_fish", "#c_fish#")),
-                        new EffectSkill("#a#", "fishing", 2),
+                        new EffectSkill("#a#", "fishing", 3),
                         new EffectInventoryStatic("#a#", "fish_bait", -1)
                     },
                     new List<VerbilizationEffect>() {
@@ -80,7 +80,7 @@ public class ActionInitializer
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_fish#"}, 1, 1),
                         new EffectKnowledge(new WorldFactResource("#feature#", "rare_fish", "#r_fish#")),
-                        new EffectSkill("#a#", "fishing", 3),
+                        new EffectSkill("#a#", "fishing", 5),
                         new EffectInventoryStatic("#a#", "fish_bait", -1)
                     },
                     new List<VerbilizationEffect>() {
@@ -91,7 +91,7 @@ public class ActionInitializer
                     new ChanceModifierSimple(.5f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5),
-                        new EffectSkill("#a#", "fishing", 1)
+                        new EffectSkill("#a#", "fishing", 0)
                     },
                     new List<VerbilizationEffect>() {
                         new VerbilizationEffectItemGather("caught")
@@ -486,95 +486,6 @@ public class ActionInitializer
             // why did you ask out alicia?
             new VerbilizationActionSocial("ask out", "asked out")
         ) },
-        //{ "bake_strawberry_cake", new GenericAction("bake_stawrberry_cake", 1, 
-        //    new Precondition(new List<Condition>() {
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "strawberry", 1, INF)),
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "strawberry_cake_recipe", 1, INF)),
-        //        new Condition_NotYou("#b#")
-        //    }),
-        //    new List<Outcome>() {
-        //        new Outcome(
-        //            new ChanceModifierSimple(1),
-        //            new List<Effect>() {
-        //                new EffectInventoryStatic("#a#", "strawberry_cake", 1),
-        //                new EffectInventoryStatic("#a#", "strawberry", -1)
-        //            },
-        //            new List<VerbilizationEffect>() {
-        //            })
-        //    },
-        //    new List<BindingPort>() {
-        //        new BindingPortEntity("a", ActionRole.initiator),
-        //        new BindingPortEntity("b", ActionRole.recipient)
-        //    }, // bob baked a strawberry cake
-
-        //    new VerbilizationActionResourceGathering("bake a strawberry cake", "baked a strawberry cake") 
-        //)},
-        //{ "fry_salmon", new GenericAction("fry_salmon", 1,
-        //    new Precondition(new List<Condition>() {
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "salmon", 1, INF)),
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "fried_salmon_recipe", 1, INF)),
-        //        new Condition_NotYou("#b#")
-        //    }),
-        //    new List<Outcome>() {
-        //        new Outcome(
-        //            new ChanceModifierSimple(1),
-        //            new List<Effect>() {
-        //                new EffectInventoryStatic("#a#", "fried_salmon", 1),
-        //                new EffectInventoryStatic("#a#", "salmon", -1)
-        //            },
-        //            new List<VerbilizationEffect>() {
-        //            })
-        //    },
-        //    new List<BindingPort>() {
-        //        new BindingPortEntity("a", ActionRole.initiator),
-        //        new BindingPortEntity("b", ActionRole.recipient)
-        //    },
-        //    new VerbilizationActionResourceGathering("make fried salmon", "made fried salmon")
-        //)},
-        //{ "bake_blackberry_tart", new GenericAction("bake_blackberry_tart", 1,
-        //    new Precondition(new List<Condition>() {
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "blackberry", 1, INF)),
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "blackberry_tart_recipe", 1, INF)),
-        //        new Condition_NotYou("#b#")
-        //    }),
-        //    new List<Outcome>() {
-        //        new Outcome(
-        //            new ChanceModifierSimple(1),
-        //            new List<Effect>() {
-        //                new EffectInventoryStatic("#a#", "blackberry_tart", 1),
-        //                new EffectInventoryStatic("#a#", "blackberry", -1)
-        //            },
-        //            new List<VerbilizationEffect>() {
-        //            })
-        //    },
-        //    new List<BindingPort>() {
-        //        new BindingPortEntity("a", ActionRole.initiator),
-        //        new BindingPortEntity("b", ActionRole.recipient)
-        //    },
-        //    new VerbilizationActionResourceGathering("bake a blackberry tart", "baked a blackberry tart")
-        //)},
-        //{ "stew_trout", new GenericAction("stew_trout", 1,
-        //    new Precondition(new List<Condition>() {
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "trout", 1, INF)),
-        //        new Condition_IsState(new StateInventoryStatic("#a#", "trout_stew_recipe", 1, INF)),
-        //        new Condition_NotYou("#b#")
-        //    }),
-        //    new List<Outcome>() {
-        //        new Outcome(
-        //            new ChanceModifierSimple(1),
-        //            new List<Effect>() {
-        //                new EffectInventoryStatic("#a#", "trout_stew", 1),
-        //                new EffectInventoryStatic("#a#", "trout", -1)
-        //            },
-        //            new List<VerbilizationEffect>() {
-        //            })
-        //    },
-        //    new List<BindingPort>() {
-        //        new BindingPortEntity("a", ActionRole.initiator),
-        //        new BindingPortEntity("b", ActionRole.recipient)
-        //    },
-        //    new VerbilizationActionResourceGathering("make stewed trout", "made stewed trout")
-        //)},
         { "treat_sick_patient", new GenericAction("treat_sick_patient", 1,
             new Precondition(new List<Condition>(){
                 new Condition_IsState(new StateInventoryStatic("#a#", "medicine", 1, INF))
@@ -599,7 +510,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbilizationAction("treat", "treated")
+            new VerbilizationActionSocial("treat", "treated")
         )},
         { "wait_for_treatment", new GenericAction("wait_for_treatment", 1,
             new Precondition(new List<Condition>(){
@@ -614,7 +525,7 @@ public class ActionInitializer
             },
             new List<BindingPort>() {
             },
-            new VerbilizationAction("wait", "waited")
+            new VerbilizationActionResourceGathering("wait", "waited")
         )},
         { "mix_medicine", new GenericAction("mix_medicine", 1,
             new Precondition(new List<Condition>(){
@@ -659,7 +570,7 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
             },
-            new VerbilizationAction("play", "played")
+            new VerbilizationActionResourceGathering("play", "played")
         )},
         { "climb_trees" , new GenericAction("climb_trees", 1,
             new Precondition(new List<Condition>(){
@@ -686,7 +597,7 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
             },
-            new VerbilizationAction("climb", "climbed")
+            new VerbilizationActionResourceGathering("climb", "climbed")
         )},
         { "prepair_bait" , new GenericAction("prepair_bait", 1,
             new Precondition(new List<Condition>(){
@@ -723,7 +634,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbilizationAction("tend", "tended")
+            new VerbilizationActionResourceGathering("tend", "tended")
         )},
         { "harvest_crops" , new GenericAction("harvest_crops", 1,
             new Precondition(new List<Condition>(){
@@ -740,7 +651,8 @@ public class ActionInitializer
                     new ChanceModifierSkill(new StateSkill("#b#", "vitality", 3, 5), true),
                     new List<Effect>() {
                         new EffectSkill("#b#", "vitality", -4),
-                        new EffectInventoryStatic("#a#", "#crop#", 1)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 1, 3),
+                        new EffectResourceChange("#b#", "#planted#", "#crop#", false)
                     },
                     new List<VerbilizationEffect>(){ }
                 ),
@@ -748,16 +660,45 @@ public class ActionInitializer
                     new ChanceModifierSkill(new StateSkill("#b#", "vitality", 4, 8), true),
                     new List<Effect>() {
                         new EffectSkill("#b#", "vitality", -5),
-                        new EffectInventoryStatic("#a#", "#crop#", 5)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 4, 6),
+                        new EffectResourceChange("#b#", "#planted#", "#crop#", false)
                     },
                     new List<VerbilizationEffect>(){ }
                 )
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
-                new BindingPortEntity("b", ActionRole.recipient)
+                new BindingPortEntity("b", ActionRole.recipient),
+                new BindingPortString("crop", "#planted#")
             },
-            new VerbilizationAction("harvest", "harvested")
+            new VerbilizationActionResourceGathering("harvest", "harvested")
+        )},
+        { "tend_animal" , new GenericAction("tend_animal", 1,
+            new Precondition(new List<Condition>(){
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSkill(new StateSkill("#b#", "vitality", 0, 10), false),
+                    new List<Effect>() {
+                        new EffectSkill("#b#", "vitality", 1)
+                    },
+                    new List<VerbilizationEffect>(){ }
+                ),
+                new Outcome(
+                    new ChanceModifierSkill(new StateSkill("#b#", "vitality", 0, 10), true),
+                    new List<Effect>() {
+                        new EffectSkill("#b#", "vitality", -10),
+                        new EffectInventoryVariable("#a#", new List<string>(){"#animal_product#"}, 1, 1)
+                    },
+                    new List<VerbilizationEffect>(){ }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient),
+                new BindingPortString("animal_product", "#produce#")
+            },
+            new VerbilizationActionResourceGathering("tend", "tended")
         )}
     };
 
@@ -809,7 +750,7 @@ public class ActionInitializer
         return cookingActions;
     }
 
-    public static Dictionary<string, GenericAction> GeneratePlantingActions()
+    static Dictionary<string, GenericAction> GeneratePlantingActions()
     {
         Dictionary<string, GenericAction> plantingActions = new Dictionary<string, GenericAction>();
 
@@ -833,7 +774,30 @@ public class ActionInitializer
                     new BindingPortEntity("a", ActionRole.initiator),
                     new BindingPortEntity("b", ActionRole.recipient)
                 },
-                new VerbilizationAction("plant", "planted")
+                new VerbilizationActionResourceGathering("plant", "planted")
+                )
+            );
+
+            plantingActions.Add("make_seed_" + plant, new GenericAction("make_seed_" + plant, 1,
+                new Precondition(new List<Condition>() {
+                    new Condition_IsState(new StateInventoryStatic("#a#", plant, 1, INF)),
+                    new Condition_SpaceAtFeature("#b#")
+                }),
+                new List<Outcome>() {
+                    new Outcome(
+                        new ChanceModifierSimple(1),
+                        new List<Effect>() {
+                            new EffectInventoryStatic("#a#", "seed_"+plant, 1),
+                            new EffectInventoryStatic("#a#", plant, -1)
+                        },
+                        new List<VerbilizationEffect>()
+                        )
+                },
+                new List<BindingPort>() {
+                    new BindingPortEntity("a", ActionRole.initiator),
+                    new BindingPortEntity("b", ActionRole.recipient)
+                },
+                new VerbilizationActionResourceGathering("plant", "planted")
                 )
             );
         }
@@ -859,5 +823,19 @@ public class ActionInitializer
         }
 
         return items;
+    }
+
+    public static List<GenericAction> GetAllFieldActions()
+    {
+        List<GenericAction> actions = new List<GenericAction>();
+
+        foreach(KeyValuePair<string, GenericAction> pair in GetAllActions()) {
+            if (pair.Key == "harvest_crops" ||
+                pair.Key.StartsWith("plant_") ||
+                pair.Key.StartsWith("make_seed_"))
+                    actions.Add(pair.Value);
+        }
+
+        return actions;
     }
 }

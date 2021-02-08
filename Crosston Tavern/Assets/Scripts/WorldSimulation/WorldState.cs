@@ -78,10 +78,8 @@ public class WorldState
 
     public Skill GetSkillFor(string id)
     {
-        if (id.StartsWith("person_")) id = id.Replace("person_", "");
-
-        if (registry.GetPerson(id) != null) {
-            return registry.GetPerson(id).skill;
+        if (map.GetFeature(id) != null) {
+            return map.GetFeature(id).skill;
         }
 
         Debug.LogWarning("Could not find " + id);

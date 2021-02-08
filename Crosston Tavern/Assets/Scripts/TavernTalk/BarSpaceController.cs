@@ -41,14 +41,28 @@ public class BarSpaceController : MonoBehaviour
 
     public void SetNextPatron()
     {
-        string previousPatron = "";
-        if (patronEngine != null) previousPatron = patronEngine.speaker.name;
 
-        SetPatron(bps.PickRandomPatron(previousPatron));
+        Townie patron = bps.PickRandomPatron();
+
+        if(patron != null) 
+            SetPatron(patron);
+        else {
+            AdvanceDay();
+        }    
     }
+
+    public void AdvanceDay()
+    {
+        worldHub.DayStep();
+        AddDaySeperator();
+        bps.NewNight();
+        SetNextPatron();
+    }
+
     public void SetPatron(Townie townie)
     {
         string partner = townie.townieInformation.id;
+        bps.Visit(partner);
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
         barkeepEngine = new ConversationEngine(barkeepTownie, partner, barMenu); //new Patron(barkeepTownie, barkeeperMoves);

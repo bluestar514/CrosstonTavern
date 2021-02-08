@@ -12,7 +12,7 @@ public class GoalManager
     List<GoalModule> modules = new List<GoalModule>();
     List<Goal> lastSetOfGoals = new List<Goal>(); //only for use in GM, for outside GM use the Townie Information's KnownGoals
 
-    int lookAhead = 3;
+    int lookAhead = 7;
 
     public GoalManager(WorldState ws, Person actor)
     {
@@ -63,8 +63,10 @@ public class GoalManager
         List<Goal> allGoals = new List<Goal>(initialGoals);
         List<Goal> previousIterationGoals = new List<Goal>(initialGoals);
         List<Goal> newGoals = new List<Goal>();
-        for (int i= 0; i<lookAhead; i++) {
 
+
+        for (int i= 0; i<lookAhead; i++) {
+            
             // Foreach goal, grab relevant set of outcomes and their restraints
             foreach (Goal goal in previousIterationGoals) {
                 List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
@@ -164,7 +166,7 @@ public class GoalManager
 
     bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings)
     {
-        return ContainsConditionNotYou(preconditions, bindings) &&
+        return ContainsConditionNotYou(preconditions, bindings) ||
                 ContainsOthersInventoryState(preconditions, bindings);
 
     }
@@ -196,7 +198,7 @@ public class GoalManager
             if (condition is Condition_NotYou) {
                 Condition_NotYou condition_NotYou = (Condition_NotYou)condition;
                 
-                if (bindings.BindString(condition_NotYou.featureId) != actor.id) { //this can never change, so we should just discard this action
+                if (bindings.BindString(condition_NotYou.featureId) == actor.id) { //this can never change, so we should just discard this action
                     return true;
                 }
             }

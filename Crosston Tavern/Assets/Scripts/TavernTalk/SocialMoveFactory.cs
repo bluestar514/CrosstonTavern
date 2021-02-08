@@ -95,8 +95,10 @@ public class SocialMoveFactory
                 history = new List<ExecutedAction>(from e in history
                                                    where e.opinion.tags.Count > 0
                                                    select e);
+                history.AddRange(GetMostCommonEvents(GetDayEvents(speaker), speaker.Id));
                 break;
         }
+
         history = CondenseEvents(history);
 
         List<WorldFact> facts = MakeActionFacts(history);
@@ -279,6 +281,63 @@ public class SocialMoveFactory
         return facts;
     }
 
+    static List<ExecutedAction> GetMostCommonEvents(List<ExecutedAction> fullList, string speakerId)
+    {
+        int count = 0;
+        int initialCount = fullList.Count;
+
+        Dictionary<VerbActorFeature, int> verbCounts = new Dictionary<VerbActorFeature, int>();
+        Dictionary<VerbActorFeature, ExecutedAction> actions = new Dictionary<VerbActorFeature, ExecutedAction>();
+        HashSet<string> actors = new HashSet<string>();
+
+        
+        while (fullList.Count > 0) {
+            ExecutedAction action = fullList[0];
+            
+            fullList.RemoveAt(0);
+            count++;
+
+            if (action.Action.ActorId == speakerId) continue;
+
+            VerbActorFeature verb = new VerbActorFeature(action.Action.Id, action.Action.ActorId, action.Action.FeatureId);
+            verbCounts.Add(verb, 1);
+            actions.Add(verb, action);
+            actors.Add(verb.actor);
+
+            for (int i = fullList.Count - 1; i >= 0; i--) {
+                ExecutedAction combination = CondenseTwoEvents(action, fullList[i]);
+                if (combination != null) {
+                    action = combination;
+                    fullList.RemoveAt(i);
+                    count++;
+
+                    verbCounts[verb]++;
+                    actions[verb] = combination;
+                }
+            }
+
+            
+        }
+
+        List<ExecutedAction> commonAction = new List<ExecutedAction>();
+
+        foreach(string actor in actors) {
+            IEnumerable<KeyValuePair<VerbActorFeature, int>> relevant = from verb in verbCounts
+                                                                 where verb.Key.actor == actor || 
+                                                                        verb.Key.feature == actor
+                                                                 select verb;
+
+            int max = 0;
+            VerbActorFeature maxVerb = null; 
+            foreach(KeyValuePair<VerbActorFeature, int> pair in relevant) {
+                if (pair.Value >= max) maxVerb = pair.Key;
+            }
+
+            commonAction.Add(actions[maxVerb]);
+        }
+
+        return commonAction;
+    }
 
     static List<ExecutedAction> CondenseEvents(List<ExecutedAction> fullList)
     {
@@ -346,5 +405,44 @@ public class SocialMoveFactory
         }
 
         return condensed;
+    }
+
+
+    class VerbActorFeature
+    {
+        public string verb;
+        public string actor;
+        public string feature;
+
+        public VerbActorFeature(string verb, string actor, string feature)
+        {
+            this.verb = verb;
+            this.actor = actor;
+            this.feature = feature;
+        }
+
+        public override string ToString()
+        {
+            return "<" + string.Join(",", new List<string>() { verb, actor, feature }) + ">";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is VerbActorFeature)) return false;
+            VerbActorFeature other = (VerbActorFeature)obj;
+
+            return verb == other.verb &&
+                actor == other.actor &&
+                feature == other.feature;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1587983527;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(verb);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(actor);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(feature);
+            return hashCode;
+        }
     }
 }

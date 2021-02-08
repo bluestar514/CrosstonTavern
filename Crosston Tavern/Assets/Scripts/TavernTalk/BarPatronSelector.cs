@@ -14,19 +14,36 @@ public class BarPatronSelector
     List<Townie> allPeople;
     WorldState ws;
 
+
+    List<string> unvisited = new List<string>();
+
     public BarPatronSelector(List<Townie> allPeople, WorldState ws, List<string> validPatronNames)
     {
         this.allPeople = allPeople;
         this.ws = ws;
         this.validPatronNames = validPatronNames;
+        NewNight();
+    }
+
+    public void NewNight()
+    {
+        unvisited = new List<string>(validPatronNames);
     }
 
 
-    public Townie PickRandomPatron(string previousPatron = "")
+    public void Visit(string patron)
     {
+        if(unvisited.Contains(patron))
+            unvisited.Remove(patron);
+    }
+
+    public Townie PickRandomPatron()
+    {
+        if (unvisited.Count == 0) return null;
+
         List<Townie> validPatrons = new List<Townie>();
         foreach (Townie townie in allPeople) {
-            if (validPatronNames.Contains(townie.name) && townie.name != previousPatron) {
+            if (unvisited.Contains(townie.name)) {
                 validPatrons.Add(townie);
             }
         }

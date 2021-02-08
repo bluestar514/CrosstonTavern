@@ -26,6 +26,8 @@ public class ChanceModifierSkill : ChanceModifier
 
         currentSkillLevel = currentSkillLevel / max;
 
+        if (currentSkillLevel > 1 || currentSkillLevel < 0) throw new System.Exception("Chance values should be between 0 and 1. Value was " + currentSkillLevel);
+
         if (!positive) return 1 - currentSkillLevel;
         else return currentSkillLevel;
     }

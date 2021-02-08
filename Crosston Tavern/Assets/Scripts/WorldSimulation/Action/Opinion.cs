@@ -71,12 +71,18 @@ public class Opinion
         if (realityWeight < expectationWeight) tags.Add(Tag.disapointed);
         if (realityWeight > 0 && expectationWeight == 0) tags.Add(Tag.surprised);
 
+
+        //MarkIfDoneByPeopleIfInterest(executedAction, ws);
+    }
+
+    void MarkIfDoneByPeopleIfInterest(ExecutedAction executedAction, WorldState ws)
+    {
         List<string> peopleOfInterest = new List<string>(from goal in townie.knownGoals
-                                                               where goal.state is StateRelation
-                                                               select ((StateRelation)goal.state).source);
+                                                         where goal.state is StateRelation
+                                                         select ((StateRelation)goal.state).source);
         peopleOfInterest.AddRange(from goal in townie.knownGoals
-                                     where goal.state is StateRelation
-                                     select ((StateRelation)goal.state).target);
+                                  where goal.state is StateRelation
+                                  select ((StateRelation)goal.state).target);
 
         peopleOfInterest.AddRange(from goal in townie.knownGoals
                                   where goal.state is StateSocial
@@ -89,17 +95,16 @@ public class Opinion
 
         if (peopleOfInterest.Contains(townie.id)) peopleOfInterest.Remove(townie.id);
 
-        foreach(Feature feature in ws.map.GetAllFeatures()) {
-            if(feature.type != Feature.FeatureType.person && peopleOfInterest.Contains(feature.id)) {
+        foreach (Feature feature in ws.map.GetAllFeatures()) {
+            if (feature.type != Feature.FeatureType.person && peopleOfInterest.Contains(feature.id)) {
                 peopleOfInterest.Remove(feature.id);
-            } 
+            }
         }
 
-        
-        if(peopleOfInterest.Contains(executedAction.Action.ActorId) || 
-            peopleOfInterest.Contains(executedAction.Action.FeatureId)){
+
+        if (peopleOfInterest.Contains(executedAction.Action.ActorId) ||
+            peopleOfInterest.Contains(executedAction.Action.FeatureId)) {
             tags.Add(Tag.aboutPersonOfInterest);
         }
-
     }
 }

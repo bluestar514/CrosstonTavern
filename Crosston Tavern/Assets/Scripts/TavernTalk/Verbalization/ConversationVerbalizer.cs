@@ -130,7 +130,7 @@ public class ConversationVerbalizer
                 break;
 
             case "askAboutDayHighlights":
-                verbalization = "What did you do today?";
+                verbalization = "Anything interesting happen today?";
                 break;
             case "askAboutObservation":
                 verbalization = "Did you see anything interesting today?";

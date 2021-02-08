@@ -60,6 +60,7 @@ public class PeopleInitializer
 
 
             allPeople["dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
+            allPeople["bob"].inventory.ChangeInventoryContents(1, "flour");
 
 
         SetPreferencesRandom(allPeople);

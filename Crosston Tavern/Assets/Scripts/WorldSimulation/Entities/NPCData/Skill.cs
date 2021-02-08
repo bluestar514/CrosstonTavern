@@ -28,6 +28,8 @@ public class Skill
         if (GetSkillLevel(skillId) != 0) skillList[skillId] += count;
         else skillList.Add(skillId, count);
 
+        skillList[skillId] = Mathf.Max(0, skillList[skillId]);
+
         if (GetSkillLevel(skillId) == 0) skillList.Remove(skillId);
     }
 

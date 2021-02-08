@@ -43,6 +43,8 @@ public class ChanceModifierRelation : ChanceModifier
 
         currentRelValue = currentRelValue / max;
 
+        if (currentRelValue > 1 || currentRelValue < 0) throw new System.Exception("Chance values should be between 0 and 1. Value was " + currentRelValue);
+
         if (!positive) return 1 - currentRelValue;
         else return currentRelValue;
 

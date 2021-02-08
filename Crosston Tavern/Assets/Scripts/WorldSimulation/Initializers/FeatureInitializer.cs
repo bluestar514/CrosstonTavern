@@ -8,12 +8,12 @@ public class FeatureInitializer
 
 
 
-    static Dictionary<Feature.FeatureType, Feature> MakeFeatures()
+    static Dictionary<string, Feature> MakeFeatures()
     {
         Dictionary<string, GenericAction> actions = ActionInitializer.GetAllActions();
 
-        return new Dictionary<Feature.FeatureType, Feature>() {
-            {Feature.FeatureType.river, new Feature("river", Feature.FeatureType.river, UNSET, 2,
+        return new Dictionary<string, Feature>() {
+            {"river", new Feature("river", Feature.FeatureType.river, UNSET, 2,
                                     new List<GenericAction>(){
                                         actions["fish"]
                                     },
@@ -22,23 +22,23 @@ public class FeatureInitializer
                                         {"rare_fish", new List<string>(){"salmon"} }
                                     })
             },
-            {Feature.FeatureType.door, new Feature("door", Feature.FeatureType.door, UNSET, 100,
+            {"door", new Feature("door", Feature.FeatureType.door, UNSET, 100,
                                     new List<GenericAction>(){ actions["move"] },
                                     new Dictionary<string, List<string>>())
             },
-            {Feature.FeatureType.shop, new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
+            {"shop", new Feature("shop", Feature.FeatureType.shop, UNSET, 2,
                                     new List<GenericAction>(){ //ActionInitializer.actions["buy_#item#"],
                                                                 //ActionInitializer.actions["outing_shopping_at_#loc#_with_#b#"]
                                     },
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})
             },
-            {Feature.FeatureType.kitchen, new Feature("kitchen", Feature.FeatureType.kitchen, UNSET, 2,
+            {"kitchen", new Feature("kitchen", Feature.FeatureType.kitchen, UNSET, 2,
                                     new List<GenericAction>(ActionInitializer.GenerateRecipes().Values),
                                     new Dictionary<string, List<string>>(),
                                     new Dictionary<string, int>(){})
             },
-            {Feature.FeatureType.brush, new Feature("brush", Feature.FeatureType.brush, UNSET, 2,
+            {"brush", new Feature("brush", Feature.FeatureType.brush, UNSET, 2,
                                     new List<GenericAction>(){
                                         actions["forage"]
                                     },
@@ -47,7 +47,7 @@ public class FeatureInitializer
                                         {"rare_forage", new List<string>(){"strawberry"} }
                                     })
             },
-            {Feature.FeatureType.meadow, new Feature("meadow", Feature.FeatureType.meadow, UNSET, 2,
+            {"meadow", new Feature("meadow", Feature.FeatureType.meadow, UNSET, 2,
                                     new List<GenericAction>(){
                                         actions["forage"]
                                     },
@@ -56,7 +56,27 @@ public class FeatureInitializer
                                         {"rare_forage", new List<string>(){"morning_rose", "evening_tulip"} }
                                     })
             },
-            {Feature.FeatureType.SYSTEM, new Feature("SYSTEM", Feature.FeatureType.SYSTEM, UNSET, 100,
+            {"cow", new Feature("cow", Feature.FeatureType.animal, UNSET, 2,
+                                    new List<GenericAction>(){
+                                        actions["tend_animal"]
+                                    },
+                                    new Dictionary<string, List<string>>() {
+                                        {"produce", new List<string>(){ "milk"} }
+                                    })
+            },
+            {"chicken", new Feature("chicken", Feature.FeatureType.animal, UNSET, 2,
+                                    new List<GenericAction>(){
+                                        actions["tend_animal"]
+                                    },
+                                    new Dictionary<string, List<string>>() {
+                                        {"produce", new List<string>(){ "egg"} }
+                                    })
+            },
+            {"field", new Feature("field", Feature.FeatureType.field, UNSET, 2,
+                                    new List<GenericAction>( ActionInitializer.GetAllFieldActions() ),
+                                    new Dictionary<string, List<string>>() )
+            },
+            {"SYSTEM", new Feature("SYSTEM", Feature.FeatureType.SYSTEM, UNSET, 100,
                                     new List<GenericAction>(){
                                         
                                     },
@@ -67,12 +87,12 @@ public class FeatureInitializer
         };
     }
 
-    static Dictionary<string, List<Feature.FeatureType>> featuresInRoom = new Dictionary<string, List<Feature.FeatureType>>() {
-        {"farm", new List<Feature.FeatureType>(){ Feature.FeatureType.river} },
-        {"field", new List<Feature.FeatureType>(){ Feature.FeatureType.river, Feature.FeatureType.meadow} },
-        {"forest", new List<Feature.FeatureType>(){Feature.FeatureType.brush } },
-        {"inn", new List<Feature.FeatureType>(){Feature.FeatureType.kitchen} },
-        {"SYSTEM", new List<Feature.FeatureType>{Feature.FeatureType.SYSTEM } }
+    static Dictionary<string, List<string>> featuresInRoom = new Dictionary<string, List<string>>() {
+        {"farm", new List<string>(){"river", "chicken", "cow", "field"} },
+        {"field", new List<string>(){ "river", "meadow"} },
+        {"forest", new List<string>(){"brush" } },
+        {"inn", new List<string>(){"kitchen"} },
+        {"SYSTEM", new List<string>{"SYSTEM" } }
     };
 
     static List<KeyValuePair<string, string>> roomConnections = new List<KeyValuePair<string, string>>() {
@@ -90,7 +110,7 @@ public class FeatureInitializer
         Dictionary<string, Feature> allFeatures = new Dictionary<string, Feature>();
 
         foreach(string room in featuresInRoom.Keys) {
-            foreach(Feature.FeatureType ft in featuresInRoom[room]) {
+            foreach(string ft in featuresInRoom[room]) {
                 Feature newFeature = MakeFeatures()[ft];
                 newFeature.location = room;
                 newFeature.id += "_" + newFeature.location;
@@ -100,7 +120,7 @@ public class FeatureInitializer
         }
 
 
-        Feature shop = MakeFeatures()[Feature.FeatureType.shop];
+        Feature shop = MakeFeatures()["shop"];
         shop.id = "tackle_shop_town";
         shop.location = "town";
 
@@ -118,14 +138,14 @@ public class FeatureInitializer
 
 
         foreach (KeyValuePair<string, string> connection in roomConnections) {
-            Feature door = MakeFeatures()[Feature.FeatureType.door];
+            Feature door = MakeFeatures()["door"];
             door.location = connection.Key;
             door.relevantResources.Add(Map.R_CONNECTEDLOCATION, new List<string>() { connection.Value });
             door.id += "_" + door.location + "->" + connection.Value;
 
             allFeatures.Add(door.id, door);
 
-            door = MakeFeatures()[Feature.FeatureType.door];
+            door = MakeFeatures()["door"];
             door.location = connection.Value;
             door.relevantResources.Add(Map.R_CONNECTEDLOCATION, new List<string>() { connection.Key });
             door.id += "_" + door.location + "->" + connection.Key;

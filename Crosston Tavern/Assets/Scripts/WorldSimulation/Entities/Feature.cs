@@ -31,6 +31,8 @@ public class Feature
         brush,
         person,
         meadow,
+        animal,
+        field,
         SYSTEM
     }
 
