@@ -14,7 +14,7 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
         this.fact = fact;
 
         factText.text = fact.verbalization;
-        nameTag.text = fact.speakerName;
+        nameTag.text = VerbalizationDictionary.Replace( fact.speakerName);
 
 
         if(fact.speakerName == "barkeep") {

@@ -30,7 +30,11 @@ public class VerbilizationMovement : VerbilizationAction
     {
         string went = verbPast;
         if (presentTense) went = verbPresent;
-        return actor + went + feature.Split('>')[1];
+
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature.Split('>')[1]);
+
+        return actor + went + feature;
     }
 }
 
@@ -49,6 +53,9 @@ public class VerbilizationActionResourceGathering : VerbilizationAction
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
 
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature);
+
         return actor + " " + verb + " at " + feature;
     }
 }
@@ -66,6 +73,9 @@ public class VerbilizationActionSocial : VerbilizationAction
     {
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
+
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature);
 
         return actor + " " + verb + " " + feature;
     }
@@ -106,7 +116,11 @@ public class VerbilizationActionItemAskFor : VerbilizationActionItem
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
 
-        return actor + " " + verb + " " + feature + " for a " + itemBinding;
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature);
+        string item = VerbalizationDictionary.Replace(itemBinding);
+
+        return actor + " " + verb + " " + feature + " for a " + item;
     }
 }
 
@@ -123,6 +137,31 @@ public class VerbilizationActionItemGive : VerbilizationActionItem
         string verb = verbPresent;
         if (!presentTense) verb = verbPast;
 
-        return actor + " " + verb + " " + feature + " a " + itemBinding;
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature);
+        string item = VerbalizationDictionary.Replace(itemBinding);
+
+        return actor + " " + verb + " " + feature + " a " + item;
+    }
+}
+
+public class VerbalizationActionFeatureAt : VerbilizationAction
+{
+    public VerbalizationActionFeatureAt(string verbPresent, string verbPast) : base(verbPresent, verbPast){}
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
+
+    public override string Verbilize(string actor, string feature, bool presentTense)
+    {
+        string verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        actor = VerbalizationDictionary.Replace(actor);
+        feature = VerbalizationDictionary.Replace(feature);
+
+        return actor + " " + verb + " the " + feature;
     }
 }

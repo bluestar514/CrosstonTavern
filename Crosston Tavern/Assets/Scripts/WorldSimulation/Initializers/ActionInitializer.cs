@@ -634,7 +634,7 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator),
                 new BindingPortEntity("b", ActionRole.recipient)
             },
-            new VerbilizationActionResourceGathering("tend", "tended")
+            new VerbalizationActionFeatureAt("tend", "tended")
         )},
         { "harvest_crops" , new GenericAction("harvest_crops", 1,
             new Precondition(new List<Condition>(){
@@ -671,7 +671,7 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortString("crop", "#planted#")
             },
-            new VerbilizationActionResourceGathering("harvest", "harvested")
+            new VerbalizationActionFeatureAt("harvest", "harvested")
         )},
         { "tend_animal" , new GenericAction("tend_animal", 1,
             new Precondition(new List<Condition>(){
@@ -698,7 +698,7 @@ public class ActionInitializer
                 new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortString("animal_product", "#produce#")
             },
-            new VerbilizationActionResourceGathering("tend", "tended")
+            new VerbalizationActionFeatureAt("tend", "tended")
         )}
     };
 

@@ -9,6 +9,6 @@ public class SpeakerTagController : MenuElement
 
     public void Fill(string dialogue)
     {
-        speakerNameTagText.text = dialogue;
+        speakerNameTagText.text = VerbalizationDictionary.Replace( dialogue);
     }
 }

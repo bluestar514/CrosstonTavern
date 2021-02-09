@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -23,6 +22,7 @@ public class ConversationVerbalizer
         NPCPortrait.State emotion = NPCPortrait.State.neutral;
 
         string actionName;
+        string str;
         ExecutedAction actionObj;
         List<WorldFact> facts = socialMove.mentionedFacts;
         List<string> goals = new List<string>();
@@ -69,7 +69,9 @@ public class ConversationVerbalizer
                 verbalization = "What's good on the menu tonight?";
                 break;
             case "recomend#":
-                verbalization = "The " + socialMove.arguements[0] + " is quite good.";
+                str = VerbalizationDictionary.Replace(socialMove.arguements[0]);
+
+                verbalization = "The " + str + " is quite good.";
                 break;
             case "order#OnRecomendation":
                 verbalization = "Sound good, let's go with that tonight.";
@@ -77,11 +79,15 @@ public class ConversationVerbalizer
 
                 break;
             case "order#OffRecomendation":
+                str = VerbalizationDictionary.Replace(socialMove.arguements[0]);
+
                 verbalization = "Mmm, no. I don't think I'm feeling that tonight. How about " +
-                                    socialMove.arguements[0] + " instead?";
+                                    str + " instead?";
                 break;
             case "order#":
-                verbalization = "Can I get a " + socialMove.arguements[0] + "?";
+                str = VerbalizationDictionary.Replace(socialMove.arguements[0]);
+
+                verbalization = "Can I get a " + str + "?";
                 break;
             case "serveOrder#":
                 verbalization = "Coming right up.";
@@ -97,7 +103,7 @@ public class ConversationVerbalizer
                 foreach(WorldFact fact in socialMove.mentionedFacts) {
                     if(fact is WorldFactPreference) {
                         WorldFactPreference preference = (WorldFactPreference)fact;
-                        favorites.Add("I " + preference.level + " anything with " + preference.item); //preference.Verbalize(townie.Id, partner));
+                        favorites.Add("I " + preference.level + " anything with " + VerbalizationDictionary.Replace(preference.item, false)); //preference.Verbalize(townie.Id, partner));
                     }
                 }
                 string dishOpinion = "";
@@ -117,7 +123,7 @@ public class ConversationVerbalizer
                     
                 }
                 else if(socialMove.arguements[0] == PreferenceLevel.neutral.ToString()) {
-                    verbalization += "This was a good choice.";
+                    verbalization += " This was a good choice.";
                 }else if (socialMove.arguements[0] == PreferenceLevel.disliked.ToString()) {
 
                 } else if (socialMove.arguements[0] == PreferenceLevel.hated.ToString()) {
@@ -125,7 +131,7 @@ public class ConversationVerbalizer
                 }
 
                 if (favorites.Count > 0)
-                    verbalization += "Actually, " + Verbalizer.MakeNiceList(favorites);
+                    verbalization += " Actually, " + Verbalizer.MakeNiceList(favorites);
 
                 break;
 

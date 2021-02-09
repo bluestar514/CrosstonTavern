@@ -10,7 +10,7 @@ public class NotebookButton : MonoBehaviour
 
     public void Init(string text, MainNotebookTab panel)
     {
-        this.text.text = text;
+        this.text.text = VerbalizationDictionary.Replace( text );
         mainPanel = panel;
     }
 

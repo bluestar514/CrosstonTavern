@@ -28,13 +28,14 @@ public class VerbilizationEffectItemGather : VerbilizationEffect
     //found 2 strawberries
     public override string Verbilize(string actor, Effect effect)
     {
-//        Debug.Log(effect + ":" + (effect is EffectInventory));
 
 
         if (effect is EffectInventory) {
             EffectInventory invEffect = (EffectInventory)effect;
 
-            List<string> parts = new List<string>() {  verb, Mathf.Abs(invEffect.delta).ToString(), invEffect.itemId };
+            string itemId = VerbalizationDictionary.Replace(invEffect.itemId, Mathf.Abs(invEffect.delta) == 1);
+
+            List<string> parts = new List<string>() {  verb, Mathf.Abs(invEffect.delta).ToString(), itemId };
 
             return string.Join(" ", parts); //actor + " " + verb + " " + Mathf.Abs(invEffect.delta) + " " + invEffect.itemId;
         }

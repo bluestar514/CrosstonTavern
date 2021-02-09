@@ -27,7 +27,11 @@ public class Verbalizer
             if (stateInv.ownerId != speakerId) {
                 owner = stateInv.ownerId + " to ";
             }
-            return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + stateInv.itemId);
+
+            owner = VerbalizationDictionary.Replace(owner);
+            string item = VerbalizationDictionary.Replace(stateInv.itemId, false);
+
+            return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + item);
         } else if (goalState is StateSocial) {
             StateSocial stateSocial = (StateSocial)goalState;
 
@@ -42,10 +46,16 @@ public class Verbalizer
             if (stateSocial.targetId == speakerId) target = "me";
             else target = stateSocial.targetId;
 
+            owner = VerbalizationDictionary.Replace(owner);
+            target = VerbalizationDictionary.Replace(target);
+
             return (owner + " to be" + axisDirection + " " + stateSocial.axis + " with " + target);
         } else if (goalState is StatePosition) {
             StatePosition statePos = (StatePosition)goalState;
-            return ("go to the " + statePos.locationId);
+
+            string location = VerbalizationDictionary.Replace(statePos.locationId);
+
+            return ("go to the " + location);
         } else if (goalState is StateRelation) {
             StateRelation stateRelation = (StateRelation)goalState;
 
@@ -54,6 +64,10 @@ public class Verbalizer
             }
             if (stateRelation.target == speakerId) target = "me";
             else target = stateRelation.target;
+
+            owner = VerbalizationDictionary.Replace(owner);
+            target = VerbalizationDictionary.Replace(target);
+
             return (owner + "to be " + stateRelation.tag + " " + target);
         } else {
             return (goalState.id);
@@ -77,6 +91,8 @@ public class Verbalizer
             actionLocation = "you";
         }
 
+        actionActor = VerbalizationDictionary.Replace(actionActor);
+        actionLocation = VerbalizationDictionary.Replace(actionLocation);
 
         string verbilization = action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
         verbilization = action.Bindings.BindString(verbilization);
@@ -105,6 +121,9 @@ public class Verbalizer
         if (actionActor == listenerId) {
             actionActor = "you";
         }
+        actionActor = VerbalizationDictionary.Replace(actionActor);
+
+
 
         List<string> verbEffects = new List<string>();
         foreach(Effect effect in action.executedEffect) {
