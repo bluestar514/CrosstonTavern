@@ -22,8 +22,6 @@ public class ItemInitializer
     public static List<string> plantableCrops = new List<string>() {
         "potato",
         "carrot",
-        "strawberry",
-        "blackberry",
         "flour"
     };
 

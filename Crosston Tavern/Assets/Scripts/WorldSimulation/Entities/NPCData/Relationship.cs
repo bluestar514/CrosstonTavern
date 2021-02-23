@@ -16,43 +16,101 @@ public class Relationship
         friendly=0,
         romantic=1
     }
-    static int NUM_AXIS = 2; 
+    static int NUM_AXIS = 2;
+
+    public static List<RelationshipTag> romanticTags = new List<RelationshipTag>() {
+        RelationshipTag.dating,
+        RelationshipTag.crushing_on,
+        RelationshipTag.in_love_with,
+        RelationshipTag.head_over_heels
+    };
+
+    public static List<RelationshipTag>friendlyTags = new List<RelationshipTag>() {
+        RelationshipTag.rivals,
+        RelationshipTag.liked,
+        RelationshipTag.friend,
+        RelationshipTag.bestFriend,
+        RelationshipTag.disliked,
+        RelationshipTag.enemy,
+        RelationshipTag.nemisis
+    };
 
 
     public enum RelationshipTag
     {
+        self,
+
+        //social choices:
         dating,
         rivals,
-        family,
+
+        //passiveStates:
         acquantences,
-        friends,
-        lovers,
-        crushes,
-        enemies,
-        self
+
+        liked,
+        friend,
+        bestFriend,
+
+        crushing_on,
+        in_love_with,
+        head_over_heels,
+
+        disliked,
+        enemy,
+        nemisis,
+
+        //unused:
+        family
     }
+
+    static int low = 15;
+    static int medium = 35;
+    static int high = 70;
+    public static int maxValue = 100;
 
     static public Dictionary<RelationshipTag, Dictionary<RelationType, float[]>> codifiedRelationRanges =
         new Dictionary<RelationshipTag, Dictionary<RelationType, float[]>>() {
             {RelationshipTag.acquantences, new Dictionary<RelationType, float[]> {
-                {RelationType.friendly, new float[]{-2, 2} },
-                {RelationType.romantic, new float[]{-4, 4} }
+                {RelationType.friendly, new float[]{-maxValue, maxValue} },
+                {RelationType.romantic, new float[]{ -maxValue, maxValue } }
             } },
-            { RelationshipTag.friends, new Dictionary<RelationType, float[]> {
-                {RelationType.friendly, new float[]{2, 100} },
-                {RelationType.romantic, new float[]{-100, 100} }
+            { RelationshipTag.liked, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{low, medium} },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
             } },
-            { RelationshipTag.lovers, new Dictionary<RelationType, float[]> {
-                {RelationType.friendly, new float[]{0, 100} },
-                {RelationType.romantic, new float[]{4, 100} }
+            { RelationshipTag.friend, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{medium, high} },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
             } },
-            { RelationshipTag.enemies, new Dictionary<RelationType, float[]> {
-                {RelationType.friendly, new float[]{-100, -2} },
-                {RelationType.romantic, new float[]{-100, 100} }
+            { RelationshipTag.bestFriend, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{70, maxValue } },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
             } },
-            { RelationshipTag.crushes, new Dictionary<RelationType, float[]> {
-                {RelationType.friendly, new float[]{-100, 100} },
-                {RelationType.romantic, new float[]{2, 100} }
+
+            { RelationshipTag.crushing_on, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{-maxValue, maxValue } },
+                {RelationType.romantic, new float[]{ low, medium } }
+            } },
+            { RelationshipTag.in_love_with, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{0, maxValue } },
+                {RelationType.romantic, new float[]{ medium, high } }
+            } },
+            { RelationshipTag.head_over_heels, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{0, maxValue } },
+                {RelationType.romantic, new float[]{ high, maxValue } }
+            } },
+            
+            { RelationshipTag.disliked, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{-medium, -low} },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
+            } },
+            { RelationshipTag.enemy, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{-high, -medium} },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
+            } },
+            { RelationshipTag.nemisis, new Dictionary<RelationType, float[]> {
+                {RelationType.friendly, new float[]{-maxValue, -high } },
+                {RelationType.romantic, new float[]{-maxValue, maxValue } }
             } }
         };
 
@@ -138,6 +196,12 @@ public class Relationship
         if (!relationTags.ContainsKey(target)) relationTags.Add(target, new List<RelationshipTag>());
 
         if(!RelationTagged(target, tag)) relationTags[target].Add(tag);
+
+        foreach(RelationType axis in new List<RelationType>() { RelationType.romantic, RelationType.friendly }) {
+            relationships[target][(int)axis] = Mathf.Clamp(relationships[target][(int)axis],
+                                                            codifiedRelationRanges[tag][axis][0],
+                                                            codifiedRelationRanges[tag][axis][1]);
+        }
     }
 
     public void RemoveRelationTag(string target, RelationshipTag tag)
@@ -165,44 +229,4 @@ public class Relationship
         return new List<string>(relationships.Keys);
     }
 
-    public bool HasRelation(string other, RelationshipTag rel)
-    {
-        switch (rel) {
-            case RelationshipTag.friends:
-                return IsFriend(other);
-            case RelationshipTag.enemies:
-                return IsEnemy(other);
-            case RelationshipTag.crushes:
-                return HasCrush(other);
-            case RelationshipTag.acquantences:
-                return !IsEnemy(other) && !IsFriend(other);
-        }
-
-        return false;
-    }
-
-    public bool IsFriend(string other)
-    {
-
-        return relationships.ContainsKey(other) && 
-            relationships[other][(int)RelationType.friendly] > 2;
-    }
-
-    public bool IsEnemy(string other)
-    {
-        return relationships.ContainsKey(other) && 
-            relationships[other][(int)RelationType.friendly] < -2;
-    }
-
-    public bool HasCrush(string other)
-    {
-        return relationships.ContainsKey(other) && 
-            relationships[other][(int)RelationType.romantic] > 2;
-    }
-
-    public bool IsDisgusted(string other)
-    {
-        return relationships.ContainsKey(other) && 
-            relationships[other][(int)RelationType.romantic] < -2;
-    }
 }

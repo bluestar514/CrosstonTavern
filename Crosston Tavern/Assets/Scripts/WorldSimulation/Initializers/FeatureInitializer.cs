@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FeatureInitializer 
@@ -74,7 +75,9 @@ public class FeatureInitializer
             },
             {"field", new Feature("field", Feature.FeatureType.field, UNSET, 2,
                                     new List<GenericAction>( ActionInitializer.GetAllFieldActions() ),
-                                    new Dictionary<string, List<string>>() )
+                                    new Dictionary<string, List<string>>(){
+                                        {"planted", ItemInitializer.plantableCrops}
+                                    } )
             },
             {"SYSTEM", new Feature("SYSTEM", Feature.FeatureType.SYSTEM, UNSET, 100,
                                     new List<GenericAction>(){
@@ -92,6 +95,9 @@ public class FeatureInitializer
         {"field", new List<string>(){ "river", "meadow"} },
         {"forest", new List<string>(){"brush" } },
         {"inn", new List<string>(){"kitchen"} },
+        {"averysHouse", new List<string>(){"kitchen"} },
+        {"sammysHouse", new List<string>(){"kitchen"} },
+        {"finleysHouse", new List<string>(){"kitchen"} },
         {"SYSTEM", new List<string>{"SYSTEM" } }
     };
 
@@ -101,7 +107,23 @@ public class FeatureInitializer
         new KeyValuePair<string, string>("field", "forest"),
         new KeyValuePair<string, string>("field", "town"),
         new KeyValuePair<string, string>("town", "inn"),
-        new KeyValuePair<string, string>("town", "blacksmith")
+        new KeyValuePair<string, string>("farm", "averysHouse"),
+        new KeyValuePair<string, string>("town", "sammysHouse"),
+        new KeyValuePair<string, string>("field", "finleysHouse"),
+    };
+
+
+    static List<string> allLocationNames = new List<string>() {
+        "farm",
+        "field",
+        "town",
+        "forest",
+        "inn",
+        "averysHouse",
+        "sammysHouse",
+        "finleysHouse",
+        "hill",
+        "SYSTEM"
     };
 
 
@@ -124,7 +146,9 @@ public class FeatureInitializer
         shop.id = "tackle_shop_town";
         shop.location = "town";
 
+
         shop.providedActions.Add(ActionInitializer.actions["buy_fishing_rod"]);
+        shop.providedActions.Add(ActionInitializer.actions["sell_fish_at_market"]);
         shop.stockTable = new StringIntDictionary() {
             {"fishing_rod", 5 },
             {"bass", 2},
@@ -163,15 +187,11 @@ public class FeatureInitializer
 
     public static Dictionary<string, Location> GetAllLocations()
     {
-        Dictionary<string, Location> allLocations = new Dictionary<string, Location>() {
-            {"farm", new Location("farm", new Dictionary<string, List<string>>(){}) },
-            {"field", new Location("field", new Dictionary<string, List<string>>(){ }) },
-            {"hill", new Location("hill", new Dictionary<string, List<string>>(){ }) },
-            {"inn", new Location("inn", new Dictionary<string, List<string>>(){ }) },
-            {"forest", new Location("forest", new Dictionary<string, List<string>>(){ }) },
-            {"town", new Location("town", new Dictionary<string, List<string>>(){ }) },
-            {"blacksmith", new Location("blacksmith", new Dictionary<string, List<string>>(){ }) }
-        };
+        Dictionary<string, Location> allLocations = new Dictionary<string, Location>();
+
+        foreach(string loc in allLocationNames) {
+            allLocations.Add(loc, new Location(loc, new Dictionary<string, List<string>>()));
+        }
 
         foreach (KeyValuePair<string, string> connection in roomConnections) {
             Dictionary<string, List<string>> currentResources = allLocations[connection.Key].resources;

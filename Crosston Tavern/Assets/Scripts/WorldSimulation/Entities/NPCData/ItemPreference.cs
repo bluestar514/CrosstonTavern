@@ -35,9 +35,14 @@ public class ItemPreference
 
     public void Add(string item, PreferenceLevel level)
     {
-        if (itemPreference.ContainsKey(item)) throw new Exception("Item (" + item + ") already logged with a preference. Cannot add it again");
-        preferences[level].Add(item);
-        itemPreference.Add(item, level);
+        if (itemPreference.ContainsKey(item)) {
+            if (itemPreference[item] != level)
+                throw new Exception("Item (" + item + ") already logged with a preference (" + itemPreference[item] + "). " +
+                                    "Cannot add it again with preference " + level);
+        } else {
+            preferences[level].Add(item);
+            itemPreference.Add(item, level);
+        }
     }
 
     public PreferenceLevel GetLevel(string item)

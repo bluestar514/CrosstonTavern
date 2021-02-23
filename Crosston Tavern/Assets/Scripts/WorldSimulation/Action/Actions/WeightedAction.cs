@@ -78,7 +78,7 @@ public class WeightedAction : BoundAction
 
         public override string ToString()
         {
-            return "{"+goal.state+", "+effect+": "+weight+"("+desirability+"*"+chance+")}";
+            return "{"+goal+", "+effect+": "+weight+"("+desirability+"*"+chance+")}";
         }
     }
 }

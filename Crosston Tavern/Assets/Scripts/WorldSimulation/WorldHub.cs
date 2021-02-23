@@ -146,9 +146,12 @@ public class WorldHub : MonoBehaviour
                                             0, 
                                             new Precondition(new List<Condition>()), 
                                             new List<Outcome>() {
-                                                new Outcome(new ChanceModifier(), new List<Effect>(){ new EffectMovement(person.ws.id, person.homeLocation) },
-                                                                new List<VerbilizationEffect>(){ new VerbilizationEffect("SYSTEM TELEPORT") }
-                                                )
+                                                new Outcome(
+                                                    new ChanceModifier(), 
+                                                    new List<Effect>(){
+                                                        new EffectMovement(person.ws.id, person.homeLocation)
+                                                    }
+                                                ) 
                                             }, 
                                             new List<BindingPort>(),
                                             new VerbilizationAction("SYSTEM", "SYSTEM")), 
@@ -163,6 +166,9 @@ public class WorldHub : MonoBehaviour
                 new List<WeightedAction>())
             );
 
+
+
+            person.gm.DecrementModuleTimers();
         }
     }
 }

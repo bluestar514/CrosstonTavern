@@ -29,7 +29,7 @@ public class Opinion
         List<Effect> realizedEffects = executedAction.executedEffect;
         BoundAction boundAction = executedAction.Action;
 
-        Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects, new List<VerbilizationEffect>() { new VerbilizationEffectItemGather("OPINION_SYSTEM")});
+        Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects);
         WorldState ws = townie.ws;
         ActionHeuristicManager ahm = new ActionHeuristicManager(townie.townieInformation, ws);
         this.townie = townie.townieInformation;
@@ -67,8 +67,21 @@ public class Opinion
     void SetTags(ExecutedAction executedAction, WorldState ws)
     {
         tags = new List<Tag>();
-        if (realityWeight > expectationWeight) tags.Add(Tag.excited);
-        if (realityWeight < expectationWeight) tags.Add(Tag.disapointed);
+
+        IEnumerable<EntityStatusEffectType> statusEffects = from effect in executedAction.executedEffect
+                                                            where effect is EffectStatusEffect statusEffect &&
+                                                                    StatusEffectTable.emotions.Contains(statusEffect.status.type)
+                                                            select ((EffectStatusEffect)effect).status.type;
+
+        if (statusEffects.Contains(EntityStatusEffectType.happy)) tags.Add(Tag.excited);
+        if (statusEffects.Contains(EntityStatusEffectType.sad) || 
+            statusEffects.Contains(EntityStatusEffectType.sad)) tags.Add(Tag.disapointed);
+
+        if (tags.Count <= 0) {
+            if (realityWeight > expectationWeight) tags.Add(Tag.excited);
+            if (realityWeight < expectationWeight) tags.Add(Tag.disapointed);
+        }
+
         if (realityWeight > 0 && expectationWeight == 0) tags.Add(Tag.surprised);
 
 
@@ -78,18 +91,18 @@ public class Opinion
     void MarkIfDoneByPeopleIfInterest(ExecutedAction executedAction, WorldState ws)
     {
         List<string> peopleOfInterest = new List<string>(from goal in townie.knownGoals
-                                                         where goal.state is StateRelation
-                                                         select ((StateRelation)goal.state).source);
+                                                         where goal is GoalState goalState && goalState.state is StateRelation
+                                                         select ((StateRelation)((GoalState)goal).state).source);
         peopleOfInterest.AddRange(from goal in townie.knownGoals
-                                  where goal.state is StateRelation
-                                  select ((StateRelation)goal.state).target);
+                                  where goal is GoalState goalState && goalState.state is StateRelation
+                                  select ((StateRelation)((GoalState)goal).state).target);
 
         peopleOfInterest.AddRange(from goal in townie.knownGoals
-                                  where goal.state is StateSocial
-                                  select ((StateSocial)goal.state).sourceId);
+                                  where goal is GoalState goalState && goalState.state is StateSocial
+                                  select ((StateSocial)((GoalState)goal).state).sourceId);
         peopleOfInterest.AddRange(from goal in townie.knownGoals
-                                  where goal.state is StateSocial
-                                  select ((StateSocial)goal.state).targetId);
+                                  where goal is GoalState goalState && goalState.state is StateSocial
+                                  select ((StateSocial)((GoalState)goal).state).targetId);
 
         peopleOfInterest = new List<string>(peopleOfInterest.Distinct());
 

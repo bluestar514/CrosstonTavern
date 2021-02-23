@@ -14,6 +14,13 @@ public class StatusEffectTable
     [SerializeField]
     private StatusEffectSummary summary;
 
+
+    public static List<EntityStatusEffectType> emotions = new List<EntityStatusEffectType>() {
+        EntityStatusEffectType.happy,
+        EntityStatusEffectType.angry,
+        EntityStatusEffectType.sad
+    };
+
     public StatusEffectTable()
     {
         this.activeEffects = new List<EntityStatusEffect>();
@@ -74,6 +81,25 @@ public class StatusEffectTable
         }
 
         return s;
+    }
+
+    public EntityStatusEffectType GetStrongestStatus()
+    {
+        StatusEffectSummary emotionStrength = CalculateStatus();
+
+
+        int max = 0;
+        EntityStatusEffectType strongestState = EntityStatusEffectType.special;
+        foreach (EntityStatusEffectType emotion in emotionStrength.Keys) {
+            int strength = emotionStrength[emotion];
+
+            if (strength >= max) {
+                max = strength;
+                strongestState = emotion;
+            }
+        }
+
+        return strongestState;
     }
 
     public void Update()

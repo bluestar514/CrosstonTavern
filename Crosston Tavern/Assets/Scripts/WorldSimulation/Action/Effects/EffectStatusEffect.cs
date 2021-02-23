@@ -8,10 +8,12 @@ public class EffectStatusEffect : Effect
 
     public EntityStatusEffect status;
 
-    public EffectStatusEffect(string targetId, EntityStatusEffect status)
+    public EffectStatusEffect(string targetId, EntityStatusEffect status, VerbilizationEffect verbilizationEffect = null)
     {
         this.targetId = targetId;
         this.status = status;
+
+        verbalization = verbilizationEffect;
     }
 
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
@@ -30,7 +32,7 @@ public class EffectStatusEffect : Effect
 
         target.statusEffectTable.Add(status);
 
-        return new EffectStatusEffect(targetId, status);
+        return new EffectStatusEffect(targetId, status, verbalization);
     }
 
     public override string ToString()
@@ -52,16 +54,33 @@ public class EffectStatusModify : Effect
     public int intensityModification;
     public int timeModification;
 
-    public EffectStatusModify(string targetId, EntityStatusEffectType type, int intensityModification, int timeModification)
+    public EffectStatusModify(string targetId, EntityStatusEffectType type, int intensityModification, int timeModification, VerbilizationEffect verbilizationEffect = null)
     {
         this.targetId = targetId;
         this.type = type;
         this.intensityModification = intensityModification;
         this.timeModification = timeModification;
+
+        verbalization = verbilizationEffect;
     }
 
     public override Effect Combine(Effect other)
     {
+        if(other is EffectStatusModify otherMod &&
+            targetId == otherMod.targetId &&
+            type == otherMod.type) {
+
+            int intensity = intensityModification + otherMod.intensityModification;
+            int time = timeModification + otherMod.timeModification;
+
+            Effect effect = new EffectStatusModify(targetId, type, intensity, time);
+
+            if (verbalization == null) effect.verbalization = other.verbalization;
+            else effect.verbalization = verbalization.Combine(other.verbalization, effect);
+
+            return effect;
+        }
+
         return base.Combine(other);
     }
 
@@ -72,7 +91,7 @@ public class EffectStatusModify : Effect
 
         target.statusEffectTable.Alter(type, timeModification, intensityModification);
 
-        return new EffectStatusModify(targetId, type, intensityModification, timeModification);
+        return new EffectStatusModify(targetId, type, intensityModification, timeModification, verbalization);
     }
 
     public override string ToString()

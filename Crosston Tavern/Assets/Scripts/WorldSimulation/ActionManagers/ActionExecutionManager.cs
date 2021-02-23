@@ -34,7 +34,7 @@ public class ActionExecutionManager : ActionManager
 
         List <Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, bindings, resources);
 
-        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedEffects, chosenOutcome.effectVerbalizations, ws.Time);
+        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedEffects, ws.Time);
 
         RealizeActionForTownies(location, executedAction);
 

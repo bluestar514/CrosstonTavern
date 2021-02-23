@@ -6,28 +6,26 @@ using UnityEngine;
 public class ExecutedAction : ChosenAction
 {
     public List<Effect> executedEffect;
-    public List<VerbilizationEffect> effectVerbalizationPatterns;
     public WorldTime executionTime;
 
     public Opinion opinion;
 
 
     public ExecutedAction(WeightedAction chosenAction, List<BoundAction> invalidChoices, 
-                            List<WeightedAction> rejectedChoices, List<Effect> executedEffect, List<VerbilizationEffect> effectVerbalizationPatterns,
+                            List<WeightedAction> rejectedChoices, List<Effect> executedEffect,
                             WorldTime executionTime) : base(chosenAction, invalidChoices, rejectedChoices)
     {
         this.executedEffect = executedEffect;
         this.executionTime = executionTime;
-        this.effectVerbalizationPatterns = effectVerbalizationPatterns;
 
         this.opinion = new Opinion();
     }
 
     public ExecutedAction(ChosenAction chosenAction, 
-                            List<Effect> executedEffect, List<VerbilizationEffect> effectVerbalizationPatterns, 
+                            List<Effect> executedEffect, 
                             WorldTime executionTime) : 
                             this(chosenAction.Action, chosenAction.invalidChoices, 
-                                chosenAction.rejectedChoices, executedEffect, effectVerbalizationPatterns, 
+                                chosenAction.rejectedChoices, executedEffect, 
                                 executionTime) {
         inProgress = chosenAction.inProgress;
     }
@@ -40,7 +38,7 @@ public class ExecutedAction : ChosenAction
     /// <returns></returns>
     public ExecutedAction ShallowCopy() 
     {
-        return new ExecutedAction(Action, invalidChoices, rejectedChoices, executedEffect, effectVerbalizationPatterns, executionTime);
+        return new ExecutedAction(Action, invalidChoices, rejectedChoices, executedEffect, executionTime);
     }
 
     public override string ToString()

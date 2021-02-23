@@ -25,77 +25,73 @@ public class WorldStateInitializer
             townie.TownieInit(person, personalWorldState, new GoalManager(personalWorldState, person));
 
             string self = townie.townieInformation.id;
-            foreach (Person other in townie.ws.registry.GetPeople()) {
-                List<Relationship.RelationshipTag> relationshipTag = person.relationships.GetTag(other.id);
+            //foreach (Person other in townie.ws.registry.GetPeople()) {
+            //    List<Relationship.RelationshipTag> relationshipTag = person.relationships.GetTag(other.id);
 
-                foreach(Relationship.RelationshipTag tag in relationshipTag) {
-                    if(new List<Relationship.RelationshipTag>() {
-                        Relationship.RelationshipTag.acquantences,
-                        Relationship.RelationshipTag.enemies,
-                        Relationship.RelationshipTag.friends,
-                        Relationship.RelationshipTag.lovers
-                        }.Contains(tag)) {
+            //    foreach(Relationship.RelationshipTag tag in relationshipTag) {
+            //        if(new List<Relationship.RelationshipTag>() {
+            //            Relationship.RelationshipTag.acquantences,
+            //            Relationship.RelationshipTag.enemies,
+            //            Relationship.RelationshipTag.friends,
+            //            Relationship.RelationshipTag.lovers
+            //            }.Contains(tag)) {
 
-                        foreach (Relationship.RelationType relationType in new List<Relationship.RelationType>()
-                                            { Relationship.RelationType.friendly, Relationship.RelationType.romantic}) {
-                            float[] range = Relationship.codifiedRelationRanges[tag][relationType];
-                            float value = Random.Range(Mathf.Max(range[0], -6), Mathf.Min(range[1], 10));
+            //            foreach (Relationship.RelationType relationType in new List<Relationship.RelationType>()
+            //                                { Relationship.RelationType.friendly, Relationship.RelationType.romantic}) {
+            //                float[] range = Relationship.codifiedRelationRanges[tag][relationType];
+            //                float value = Random.Range(Mathf.Max(range[0], -6), Mathf.Min(range[1], 10));
 
-                            other.relationships.Increase(self, relationType, value);
-                        }
-                    }
-                }
-            }
+            //                other.relationships.Increase(self, relationType, value);
+            //            }
+            //        }
+            //    }
+            //}
 
             townieObj.transform.parent = townieHolder; 
 
-            townies.Add(townieObj.GetComponent<Townie>());
+            townies.Add(townie);
             //new Townie(person, ws, new GoalManager(ws, person)));
             //new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
 
-            townieObj.GetComponent<Townie>().homeLocation = "farm";
+            townie.homeLocation = townie.townieInformation.location;
         }
 
         int barkeep = 0;
-        int alicia = 1;
-        int bob = 2;
-        int clara = 3;
-        int dirk = 4;
+        int sammy = 2;
+        int avery = 1;
+        int finley = 3;
 
-        townies[barkeep].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StatePosition("barkeep", "inn"), 100)
-                                    }
-                                ));
-        townies[alicia].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[alicia].townieInformation.id, "trout", 20, 100), 1),
-                                        new Goal(new StateSkill(townies[alicia].townieInformation.id, "fishing", 90, 100), 1)
-                                    }
-                                ));
 
-        townies[bob].gm.AddModule(new GoalModule(
+        townies[sammy].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateRelation("bob", "alicia", Relationship.RelationshipTag.dating), 1)
-                                    }
-                                ));
-        townies[bob].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "flour", 5, 100), 1),
-                                        //new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "egg", 20, 100), 1),
-                                        //new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "milk", 20, 100), 1)
-                                    }
-                                ));
-        //townies[bob].gm.AddModule(new GoalModule(
+                                        new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "trout", 20, 100), 1),
+                                        new GoalState(new StateSkill(townies[sammy].townieInformation.id, "fishing", 90, 100), 1)
+                                    },
+                                    "I want to be a better fisher."
+                                )) ;
+        //townies[sammy].gm.AddModule(new GoalModule(
         //                            new List<GM_Precondition>(),
         //                            new List<Goal>() {
-        //                                new Goal(new StateInventoryStatic(townies[bob].townieInformation.id, "strawberry_cake", 1, 100), 4)
+        //                                new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "trout", 20, 100), 1)
+        //                            },
+        //                            "I want to be a better fisher."
+        //                        ));
+
+        townies[avery].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new GoalState(new StateRelation("avery", "sammy", Relationship.RelationshipTag.dating), 1)
+                                    },
+                                    "I think they're so cool!"
+                                ));
+        //townies[avery].gm.AddModule(new GoalModule(
+        //                            new List<GM_Precondition>(),
+        //                            new List<Goal>() {
+        //                                new GoalState(new StateInventoryStatic(townies[avery].townieInformation.id, "flour", 5, 100), 1),
         //                            }
         //                        ));
+
 
         /*townies[clara].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
@@ -103,25 +99,23 @@ public class WorldStateInitializer
                                         new Goal(new StateSocial("clara", "alicia", Relationship.RelationType.friendly, -100, -5), 1)
                                     }
                                 ));*/
-        townies[clara].gm.AddModule(new GoalModule(
+        townies[finley].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[clara].townieInformation.id, "strawberry", 20, 100), 1)
-                                    }
-                                ));
-        townies[dirk].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StateInventoryStatic(townies[dirk].townieInformation.id, "tulip", 20, 100), 1)
-                                    }
+                                        new GoalState(new StateInventoryStatic(townies[finley].townieInformation.id, "blackberry", 20, 100), 1)
+                                    },
+                                    "I like eating blackberries."
                                 ));
 
-        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[alicia].ws);
-        townies[alicia].ws.knownFacts.AddFact(new WorldFactResource("river_field", "common_fish", "trout"), townies[alicia].ws);
-        townies[bob].ws.knownFacts.AddFact(new WorldFactResource("chicken_farm", "produce", "egg"), townies[bob].ws);
-        townies[bob].ws.knownFacts.AddFact(new WorldFactResource("cow_farm", "produce", "milk"), townies[bob].ws);
-        townies[clara].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "rare_forage", "strawberry"), townies[clara].ws);
-        townies[dirk].ws.knownFacts.AddFact(new WorldFactResource("meadow_field", "common_forage", "tulip"), townies[dirk].ws);
+
+        townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[sammy].ws);
+        townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_field", "common_fish", "trout"), townies[sammy].ws);
+        townies[avery].ws.knownFacts.AddFact(new WorldFactResource("chicken_farm", "produce", "egg"), townies[avery].ws);
+        townies[avery].ws.knownFacts.AddFact(new WorldFactResource("cow_farm", "produce", "milk"), townies[avery].ws);
+        foreach(string item in ItemInitializer.plantableCrops) {
+            townies[avery].ws.knownFacts.AddFact(new WorldFactResource("field_farm", "planted", item), townies[avery].ws);
+        }
+        townies[finley].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "common_forage", "blackberry"), townies[finley].ws);
 
         return townies;
     }

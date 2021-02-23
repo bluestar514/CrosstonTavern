@@ -26,6 +26,8 @@ public class ChanceModifierSkill : ChanceModifier
 
         currentSkillLevel = currentSkillLevel / max;
 
+        currentSkillLevel = Mathf.Min(1, currentSkillLevel);
+
         if (currentSkillLevel > 1 || currentSkillLevel < 0) throw new System.Exception("Chance values should be between 0 and 1. Value was " + currentSkillLevel);
 
         if (!positive) return 1 - currentSkillLevel;
@@ -43,9 +45,9 @@ public class ChanceModifierSkill : ChanceModifier
     {
 
         if (positive) {
-            return new List<Goal>() { new Goal(new StateSkill(state.ownerId, state.skillId, state.max, 100), priority) };
+            return new List<Goal>() { new GoalState(new StateSkill(state.ownerId, state.skillId, state.max, 100), priority) };
         } else {
-            return new List<Goal>() { new Goal(new StateSkill(state.ownerId, state.skillId, -100, state.min), priority) };
+            return new List<Goal>() { new GoalState(new StateSkill(state.ownerId, state.skillId, -100, state.min), priority) };
         }
     }
 }

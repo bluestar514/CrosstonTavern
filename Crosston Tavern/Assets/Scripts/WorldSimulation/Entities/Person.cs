@@ -62,10 +62,9 @@ public class Person: Feature
     {
 
         foreach (Goal g in knownGoals) {
-            if (g.state is StateInventory) {
-                StateInventory state = (StateInventory)g.state;
-                if (state.itemId.Contains(item)) return true;
-            }
+            if ( g is GoalState goalState && 
+                goalState.state is StateInventory state &&
+                state.itemId.Contains(item)) return true;
         }
 
         return false;

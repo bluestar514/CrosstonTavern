@@ -63,14 +63,13 @@ public class EffectResourceChange : Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (!add) return 0;
-        
-        if(goal.state is StateInventory) {
-            StateInventory goalState = (StateInventory)goal.state;
 
-            if (goalState.itemId == potentialBinding) return .75f;
-        }
-
-        return 0;
+        if( add &&
+            goal is GoalState goalState && 
+            goalState.state is StateInventory stateInv &&
+            stateInv.itemId == potentialBinding)
+                return .75f;
+        else
+                return 0;
     }
 }

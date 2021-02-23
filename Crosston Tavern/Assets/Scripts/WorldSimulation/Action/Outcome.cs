@@ -8,15 +8,13 @@ public class Outcome
 {
     public ChanceModifier chanceModifier;
     public List<Effect> effects;
-    public List<VerbilizationEffect> effectVerbalizations;
 
     public float evaluatedChance;
 
-    public Outcome(ChanceModifier chanceModifier, List<Effect> effects, List<VerbilizationEffect> effectVerbalizations)
+    public Outcome(ChanceModifier chanceModifier, List<Effect> effects)
     {
         this.chanceModifier = chanceModifier;
         this.effects = effects;
-        this.effectVerbalizations = effectVerbalizations;
     }
 
     public float EvaluateChance(WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)

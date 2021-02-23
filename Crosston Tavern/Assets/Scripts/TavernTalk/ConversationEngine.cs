@@ -7,29 +7,55 @@ public class ConversationEngine
 {
     public Townie speaker;
     List<SocialMove> socialMoves;
+    Person partnerPerson;
     string partner;
 
     List<FoodItem> barMenu;
 
     bool hasOrdered = false;
+    FoodItem foodItem = null;
     List<SocialMove> executedMoves = new List<SocialMove>();
 
 
-    public ConversationEngine(Townie patron, string partner, List<FoodItem> barMenu)
+    int turns = 0;
+
+    public int MaxTurns { get; private set; } = 5;
+
+    List<SocialMove> hangingOptions = new List<SocialMove>();
+
+    string patronGeneralMood = "neutral";
+
+    public ConversationEngine(Townie patron, Person partner, List<FoodItem> barMenu)
     {
         speaker = patron;
-        this.partner = partner;
+        partnerPerson = partner;
+        this.partner = partner.id;
         this.barMenu = barMenu;
+    }
+
+    public int DecrementTurns()
+    {
+        MaxTurns--;
+        return MaxTurns;
+    }
+
+    void AskQuestion()
+    {
+        MaxTurns++;
     }
 
 
     public SocialMove GiveResponse(SocialMove prompt)
     {
+        List<WorldFact> facts = new List<WorldFact>();
+
         switch (prompt.verb) {
             case "start":
                 return new SocialMove("greet");
             case "greet":
             case "askForOrder":
+                AskQuestion();
+
                 float coin = Random.value;
                 if (coin > .5) {
                     FoodItem food = GetFavoriteFoodFromMenu();
@@ -44,7 +70,7 @@ public class ConversationEngine
                 int scoreOfRecomended = ScoreFood(recomendedFood);
                 int scoreOfFavorite = ScoreFood(favoriteFood);
 
-                if( scoreOfRecomended >= Mathf.Abs(scoreOfFavorite / 2)) {
+                if( scoreOfRecomended >= Mathf.Abs(scoreOfFavorite / 4)) {
                     return new SocialMove("order#OnRecomendation", new List<string>() { recomendedFood.name });
                 }else return new SocialMove("order#OffRecomendation", new List<string>() { favoriteFood.name });
             case "serveOrder#":
@@ -53,7 +79,7 @@ public class ConversationEngine
                 Dictionary<PreferenceLevel, List<string>> ingredientOpinions = GetOpinionIngredients(servedFood);
                 PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
 
-                List<WorldFact> facts = new List<WorldFact>();
+                
 
                 if(opinionOfDish != PreferenceLevel.neutral) 
                     facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
@@ -63,7 +89,18 @@ public class ConversationEngine
                     }
                 }
 
+
+                scoreOfRecomended = ScoreFood(servedFood);
+
+                if (scoreOfRecomended < 0) MaxTurns = 3;
+                else if (scoreOfRecomended < 3) MaxTurns = 5;
+                else MaxTurns = 7;
+
+                
+                
+
                 hasOrdered = true;
+                foodItem = servedFood;
 
                 return new SocialMove("thank", arguements: new List<string>() { opinionOfDish.ToString() }, mentionedFacts: facts);
 
@@ -83,16 +120,13 @@ public class ConversationEngine
                 return SocialMoveFactory.MakeMove("tellAboutNOTEWORTHYEvent", speaker, prompt);
             case "askAboutObservation":
                 return SocialMoveFactory.MakeMove("tellAboutDayObservedEvents", speaker, prompt);
-            case "askWhyGoal#":
-                return SocialMoveFactory.MakeMove("tellWhyGoal#", speaker, prompt);
+            
             case "askWhyAction#":
                 return SocialMoveFactory.MakeMove("tellWhyAction#", speaker, prompt);
             case "askAboutExcitement":
                 return SocialMoveFactory.MakeMove("tellAboutEXCITEDEvent", speaker, prompt);
             case "askAboutDisapointment":
                 return SocialMoveFactory.MakeMove("tellAboutDISAPOINTEDEvent", speaker, prompt);
-            case "askAboutAction#": //Currently not used, consider removing
-                return new SocialMove("tellDetailsOfAction#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
             case "askAboutPreferencesLike":
                 return SocialMoveFactory.MakeMove("tellPreferenceLike", speaker, prompt);
             case "askAboutPreferencesHate":
@@ -117,6 +151,73 @@ public class ConversationEngine
 
 
                 throw new System.Exception("Fact included in confirmGoal# SocialMove was not a WorldFactGoal or no fact was provided.");
+
+            case "suggest":
+                return new SocialMove("passOpenSuggestions", arguements: prompt.arguements, mentionedFacts:prompt.mentionedFacts);
+            case "suggest#":
+                AskQuestion();
+                return new SocialMove("askConfirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+            case "confirmSuggestion#":
+                if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
+                    BoundAction suggestedAction = potentialAction.action;
+
+                    speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>(),
+                                                        new List<Goal>() {
+                                                            new GoalAction(suggestedAction, 5)
+                                                        },
+                                                        "You told me it was a good idea.",
+                                                        name: "suggested action",
+                                                        timer: 3
+                                                        )
+                        );
+                }
+
+                return new SocialMove("acceptSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            case "cancelSuggestion#":
+                return new SocialMove("acceptCancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            case "askRelationWith":
+                return new SocialMove("passOpenAskRelationWith");
+            case "askRelationWith#":
+                return SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
+
+            case "askWhyGoal":
+                return new SocialMove("passOpenAskWhyGoal");
+            case "askWhyGoal#":
+                return SocialMoveFactory.MakeMove("tellWhyGoal#", speaker, prompt);
+
+            case "turnsUp":
+                MaxTurns = 100;
+
+                List<Goal> goals = speaker.gm.GetGoalsList();
+
+                if(goals != null &&
+                    goals.Count > 0 &&
+                    foodItem != null &&
+                    goals.Any(goal => goal is GoalState goalState &&
+                                   goalState.state is StateInventory invState &&
+                                   invState.itemId == foodItem.name)) {
+                    return new SocialMove("askForRecipe#", arguements: new List<string>() { foodItem.name });
+                }
+
+                return new SocialMove("goodbye");
+            case "giveRecipe#":
+                Feature homeKitchen = speaker.ws.map.GetFeature("kitchen_" + speaker.homeLocation);
+                if (homeKitchen == null) homeKitchen = speaker.ws.map.GetFeature("kitchen_inn");
+
+                GenericAction recipe = ActionInitializer.GetAllActions()[foodItem.verb.verbPresent + "_" + foodItem.name];
+
+                homeKitchen.providedActions.Add(recipe);
+
+                return new SocialMove("goodbyeThank");
+            case "refuseRecipe#":
+                return new SocialMove("goodbyeDejected");
+
+            case "goodbye":
+                return new SocialMove("ENDCONVERSATION");
+
+
             case "nice":
                 return new SocialMove("pass");
             default:
@@ -158,6 +259,8 @@ public class ConversationEngine
                         break;
                 }
 
+                patronGeneralMood = prompt.arguements[0];
+
                 break;
             case "tellStateNONE":
                 moves.Add(new SocialMove("congratulate"));
@@ -165,6 +268,7 @@ public class ConversationEngine
 
             case "tellAboutDayEvents":
             case "tellAbout#Event":
+            case "tellWhyAction#":
             case "tellAboutGoals":
                 if (prompt.mentionedFacts.Count > 0) {
                     moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
@@ -172,20 +276,62 @@ public class ConversationEngine
                 }
                 moves.Add(new SocialMove("nice"));
                 break;
+
+            
+            case "tellWhyGoal#":
+                List<BoundAction> suggestedActions = GenSuggestedAction(prompt.mentionedFacts[0]);
+
+                if(suggestedActions.Count > 0) {
+                    moves.Add(new SocialMove("suggest", arguements: prompt.arguements, 
+                        mentionedFacts: new List<WorldFact>( from action in suggestedActions
+                                                             select new WorldFactPotentialAction(action))));
+                }
+
+                moves.Add(new SocialMove("nice"));
+                break;
+            case "passOpenSuggestions":
+
+                moves.AddRange(from fact in prompt.mentionedFacts
+                               select new SocialMove("suggest#", arguements: new List<string>() { fact.ToString() },
+                               mentionedFacts: new List<WorldFact>() {fact}));
+                moves.Add(new SocialMove("nevermind"));
+                break;
+            case "askConfirmSuggestion#":
+                moves.Add(new SocialMove("confirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                break;
+
+            case "passOpenAskRelationWith":
+                moves.AddRange(GenAskOpinionOfPerson());
+                moves.Add(new SocialMove("nevermind"));
+                break;
+
+            case "askForRecipe#":
+                moves.Add(new SocialMove("giveRecipe#", arguements: prompt.arguements));
+                moves.Add(new SocialMove("refuseRecipe#", arguements: prompt.arguements));
+                break;
+            case "goodbye":
+            case "goodbyeThank":
+            case "goodbyeDejected":
+                moves.Add(new SocialMove("goodbye"));
+                break;
             default:
                 List<SocialMove> barkeeperMoves = new List<SocialMove>() {
                     new SocialMove("askAboutGoals"),
                     //new SocialMove("askAboutGoalFrustration"),
                     //new SocialMove("askAboutDayFull"),
-                    new SocialMove("askAboutDayHighlights"),
+                    new SocialMove("askAboutDayHighlights", arguements: new List<string>(){ patronGeneralMood }),
                     //new SocialMove("askAboutObservation"),
-                    new SocialMove("askAboutExcitement"),
-                    new SocialMove("askAboutDisapointment"),
+                    //new SocialMove("askAboutExcitement"),
+                    //new SocialMove("askAboutDisapointment"),
+                    //new SocialMove("askWhyGoal"),
                     new SocialMove("askAboutPreferencesLike"),
                     new SocialMove("askAboutPreferencesHate")
                 };
 
                 moves = new List<SocialMove>(barkeeperMoves);
+
+                moves.Add(new SocialMove("askRelationWith"));
 
                 List<WorldFact> facts = speaker.ws.knownFacts.GetFacts();
 
@@ -197,6 +343,7 @@ public class ConversationEngine
                 moves.AddRange(GenTellAction());
                 moves.AddRange(GenTellPreference());
                 moves.AddRange(GenConfirmGoal(facts));
+                //moves.AddRange(GenSuggestedAction());
                 //moves.AddRange(GenAskAboutAction());
                 break;
         }
@@ -274,9 +421,62 @@ public class ConversationEngine
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
+    List<BoundAction> GenSuggestedAction(WorldFact fact)
+    {
+        ActionBuilder ab = new ActionBuilder(speaker.ws, partnerPerson);
+
+        List<BoundAction> possibleActions = ab.GetAllActions(respectLocation: false);
+
+        System.Func<BoundAction, bool> filter = action=> true;
+
+        if(fact is WorldFactGoal factGoal) {
+            Goal goal = factGoal.goal;
+
+            if (goal is GoalAction) return new List<BoundAction>() { };
+
+            GoalState goalState = (GoalState)goal;
+
+            State state = goalState.state;
+
+            if(state is StateInventory stateInv) {
+                filter = action => {
+                    return (speaker.ws.map.GetFeature(action.FeatureId).type != Feature.FeatureType.person &&
+                            speaker.ws.map.GetFeature(action.FeatureId).type != Feature.FeatureType.door) ||
+                            (action.Id.StartsWith("ask_") && action.Id.Contains(stateInv.itemId));
+                };
+            }
+            if(state is StateSocial stateSocial) {
+                filter = action => {
+                    return 
+                            action.FeatureId == stateSocial.targetId;
+                };
+            }
+            if (state is StateRelation stateRelation) {
+                filter = action => {
+                    return
+                            action.FeatureId == stateRelation.target;
+                };
+            }
+        }
+
+        return new List<BoundAction>(from action in possibleActions
+                                    where filter(action)
+                                    select action
+                                    );
+    }
+
+    List<SocialMove> GenAskOpinionOfPerson(List<string> people=null)
+    {
+        if (people == null) people = speaker.townieInformation.relationships.GetKnownPeople();
+
+        return new List<SocialMove>(from person in people
+                                    where person != speaker.Id && person != "barkeep" && person != partner
+                                    select new SocialMove("askRelationWith#", new List<string>() { person }));
+    }
+
     List<SocialMove> RemoveAlreadyAskedQuestions(List<SocialMove> moves)
     {
-        List<string> repeatableActions = new List<string>() { "console", "congratulate", "acknowledge", "nice" };
+        List<string> repeatableActions = new List<string>() { "console", "congratulate", "acknowledge", "nice", "suggest", "nevermind", "askRelationWith" };
 
         List<SocialMove> finalList = new List<SocialMove>();
 
@@ -340,7 +540,7 @@ public class ConversationEngine
         Dictionary<VerbActorFeature, int> actionTimesDict = new Dictionary<VerbActorFeature, int>();
 
         foreach (WorldFactEvent fact in eventFacts) {
-            Debug.Log(fact);
+
             VerbActorFeature actionSummary = new VerbActorFeature(fact.action.Action.Id,
                                                                   fact.action.Action.ActorId,
                                                                   fact.action.Action.FeatureId);

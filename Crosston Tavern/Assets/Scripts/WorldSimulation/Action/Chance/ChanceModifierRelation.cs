@@ -4,72 +4,76 @@ using UnityEngine;
 
 public class ChanceModifierRelation : ChanceModifier
 {
-    public StateSocial socialState;
+    public StateRelation state;
     public bool positive;
 
-    public ChanceModifierRelation(StateSocial socialState, bool positive)
+    public ChanceModifierRelation(StateRelation state, bool positive)
     {
-        this.socialState = socialState;
+        this.state = state;
         this.positive = positive;
     }
 
     public override float Chance(WorldState ws)
     {
-        Person source = ws.registry.GetPerson(socialState.sourceId);
-        string target = socialState.targetId;
-        Relationship.RelationType type = socialState.axis;
+        Person source = ws.registry.GetPerson(state.source);
+        string target = state.target;
+        Relationship.RelationshipTag tag = state.tag;
 
-        float currentRelValue = source.relationships.Get(target, type);
+        if (source.relationships.GetTag(target).Contains(tag) == positive) return 1;
 
-        //Account for Emotion:
-        StatusEffectSummary emotionState = source.statusEffectTable.CalculateStatus(target);
-        switch (type) {
-            case Relationship.RelationType.friendly:
-                currentRelValue += emotionState[EntityStatusEffectType.happy];
-                currentRelValue -= emotionState[EntityStatusEffectType.angry];
-                currentRelValue -= emotionState[EntityStatusEffectType.sad];
-                break;
-            case Relationship.RelationType.romantic:
-                currentRelValue -= emotionState[EntityStatusEffectType.angry];
-                break;
+        if (!Relationship.codifiedRelationRanges.ContainsKey(tag)) return 0;
+
+        float chance = 1;
+        Dictionary<Relationship.RelationType, float[]> ranges = Relationship.codifiedRelationRanges[tag];
+        foreach(Relationship.RelationType axis in ranges.Keys) {
+            if (Mathf.Abs(ranges[axis][0]) == Relationship.maxValue &&
+                Mathf.Abs(ranges[axis][1]) == Relationship.maxValue) continue;
+
+            int min = 0;
+            int max = Relationship.maxValue;
+            if (ranges[axis][0] < 0) min = -Relationship.maxValue;
+            if (ranges[axis][1] < 0) max = 0;
+
+            chance *= new ChanceModifierSocial(
+                            new StateSocial(state.source, target, axis, min, (int)ranges[axis][0]),
+                            positive)
+                      .Chance(ws);
+            chance *= new ChanceModifierSocial(
+                            new StateSocial(state.source, target, axis, (int)ranges[axis][1], max),
+                            !positive)
+                      .Chance(ws);
         }
 
-        //currentRelValue should be between 0 and 1, never negative
-        //at deltaMax -> 1
-        //at deltaMin -> 0
-
-        currentRelValue = Mathf.Max(0, currentRelValue - socialState.min);
-        float max = socialState.max - socialState.min;
-
-        currentRelValue = currentRelValue / max;
-
-        if (currentRelValue > 1 || currentRelValue < 0) throw new System.Exception("Chance values should be between 0 and 1. Value was " + currentRelValue);
-
-        if (!positive) return 1 - currentRelValue;
-        else return currentRelValue;
-
+        return chance;
     }
 
     public override ChanceModifier MakeBound(BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        string source = bindings.BindString(socialState.sourceId);
-        string target = bindings.BindString(socialState.targetId);
+        string source = bindings.BindString(state.source);
+        string target = bindings.BindString(state.target);
 
 
-        return new ChanceModifierRelation(new StateSocial(source, target, socialState.axis, socialState.min, socialState.max), positive);
+        return new ChanceModifierRelation(
+                    new StateRelation(source, target, state.tag), 
+                    positive);
     }
 
     public override List<Goal> MakeGoal(WorldState ws, float priority)
     {
-        string source = socialState.sourceId;
-        string target = socialState.targetId;
-        Relationship.RelationType axis = socialState.axis;
-        int min = socialState.min;
-        int max = socialState.max;
+        string source = state.source;
+        string target = state.target;
+        Relationship.RelationshipTag tag = state.tag;
 
-        if (positive)
-            return new List<Goal>() { new Goal(new StateSocial(source, target, axis, max, 1000000), priority) };
-        else
-            return new List<Goal>() { new Goal(new StateSocial(source, target, axis, -1000000, min), priority) };
+
+        if (positive) {
+            return new List<Goal>() {
+                new GoalState(new StateRelation(source, target, tag), priority)
+            };
+        } else {
+            return new List<Goal>() {
+                new GoalState(new StateRelation(source, target, tag), -priority)
+            };
+        }
+
     }
 }

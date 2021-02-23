@@ -21,6 +21,18 @@ public class ConversationVerbalizer
         string verbalization = socialMove.ToString();
         NPCPortrait.State emotion = NPCPortrait.State.neutral;
 
+        switch(townie.townieInformation.statusEffectTable.GetStrongestStatus()) {
+            case EntityStatusEffectType.happy:
+                emotion = NPCPortrait.State.happy;
+                break;
+            case EntityStatusEffectType.angry:
+                emotion = NPCPortrait.State.angry;
+                break;
+            case EntityStatusEffectType.sad:
+                emotion = NPCPortrait.State.sad;
+                break;
+        }
+
         string actionName;
         string str;
         ExecutedAction actionObj;
@@ -136,7 +148,25 @@ public class ConversationVerbalizer
                 break;
 
             case "askAboutDayHighlights":
-                verbalization = "Anything interesting happen today?";
+                string patronGeneralMood = socialMove.arguements[0];
+
+                switch (patronGeneralMood) {
+                    case "happy":
+                        verbalization = "So, what happened today that's got you in such a good mood?";
+                        break;
+                    case "sad":
+                        verbalization = "You want to talk about what's got you so upset today?";
+                        break;
+                    case "angry":
+                        verbalization = "You want to tell me what's got you in such a bed mood today?";
+                        break;
+                    default:
+                        verbalization = "Anything interesting happen today?";
+                        break;
+                }
+
+
+                
                 break;
             case "askAboutObservation":
                 verbalization = "Did you see anything interesting today?";
@@ -192,15 +222,22 @@ public class ConversationVerbalizer
                 }
 
                 break;
-            case "tellAboutGoals":
+            
             case "tellWhyGoal#":
 
-                if (facts.Count == 0) {
+                if (facts.Count == 1) {
                     verbalization = "I just do.";
                     break;
+                } else {
+                    //0th element is the goal in question
+                    facts.RemoveAt(0);
+                    goto case "tellAboutGoals";
                 }
 
+            case "tellAboutGoals":
                 List<string> motivations = new List<string>();
+
+                
 
                 //I want to have 3 to 1000 trout
                 //I want to be friendlier with Alicia
@@ -213,7 +250,7 @@ public class ConversationVerbalizer
                     }
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
+                        goals.Add(v.VerbalizeGoal(goalFact.goal));
                     }
                 }
                 verbalization = "";
@@ -228,7 +265,7 @@ public class ConversationVerbalizer
                 foreach (WorldFact fact in facts) {
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.AddRange(UnrollGoalChain(goalFact.goal));
+                        goals.Add(v.VerbalizeGoal(goalFact.goal));//UnrollGoalChain(goalFact.goal));
                     }
                 }
 
@@ -240,7 +277,7 @@ public class ConversationVerbalizer
 
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
+                        goals.Add(v.VerbalizeGoal(goalFact.goal));
                     }
                 }
 
@@ -286,7 +323,7 @@ public class ConversationVerbalizer
 
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizaeState(goalFact.goal.state));
+                        goals.Add(v.VerbalizeGoal(goalFact.goal));
                     }
                 }
 
@@ -297,6 +334,29 @@ public class ConversationVerbalizer
                 break;
             case "confirmGoal#OutOfDate":
                 verbalization = "No, I don't.";
+                break;
+
+
+            case "suggest":
+                verbalization = "Suggest...";
+                break;
+            case "suggest#":
+                verbalization = "Why not try " + socialMove.mentionedFacts[0];
+                break;
+            case "askConfirmSuggestion#":
+                verbalization = "You really think that will help?";
+                break;
+            case "confirmSuggestion#":
+                verbalization = "Yeah, go for it!";
+                break;
+            case "cancelSuggestion#":
+                verbalization = "Actually, no, nevermind...";
+                break;
+            case "acceptSuggestion#":
+                verbalization = "Alright, I guess I'll try doing that tomorrow.";
+                break;
+            case "acceptCancelSuggestion#":
+                verbalization = "Well, alright then.";
                 break;
 
             case "acknowledge":
@@ -421,7 +481,7 @@ public class ConversationVerbalizer
 
         List<string> subVerbilizations = new List<string>();
         foreach (Goal goal in noDups) {
-            subVerbilizations.Add(v.VerbalizaeState(goal.state));
+            subVerbilizations.Add(v.VerbalizeGoal(goal));
         }
 
         return subVerbilizations;

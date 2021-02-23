@@ -12,11 +12,22 @@ public class GoalModule
     public List<GM_Precondition> preconditions;
     public List<Goal> goals;
 
-    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals, string name = "GENERIC GOAL")
+    public string reason;
+
+    public int timer;
+
+    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals, string reason, string name = "GENERIC GOAL",  int timer = -1)
     {
         this.preconditions = preconditions;
         this.goals = goals;
+        this.reason = reason;
         this.name = name;
+        this.timer = timer;
+    }
+
+    public void DecrementTimer()
+    {
+        if (timer > 0) timer--;
     }
 
     public virtual bool Precondtion(WorldState ws) {

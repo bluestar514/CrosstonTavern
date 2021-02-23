@@ -6,9 +6,10 @@ public class EffectKnowledge : Effect
 {
     public WorldFact fact;
 
-    public EffectKnowledge(WorldFact fact)
+    public EffectKnowledge(WorldFact fact, VerbilizationEffect verbilizationEffect = null)
     {
         this.fact = fact;
+        verbalization = verbilizationEffect;
     }
 
 
@@ -23,7 +24,7 @@ public class EffectKnowledge : Effect
     /// <returns></returns>
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
-        return new EffectKnowledge(fact.Bind(bindings, resources));
+        return new EffectKnowledge(fact.Bind(bindings, resources), verbalization);
     }
 
     public override string ToString()

@@ -61,13 +61,13 @@ public class BarSpaceController : MonoBehaviour
 
     public void SetPatron(Townie townie)
     {
-        string partner = townie.townieInformation.id;
-        bps.Visit(partner);
+        Person partner = townie.townieInformation;
+        bps.Visit(partner.id);
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
-        barkeepEngine = new ConversationEngine(barkeepTownie, partner, barMenu); //new Patron(barkeepTownie, barkeeperMoves);
-        patronEngine = new ConversationEngine(townie, "barkeep", barMenu); //new Patron(townie, genericSocialMoves);
-        barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner);
+        barkeepEngine = new ConversationEngine(barkeepTownie, partner, barMenu);
+        patronEngine = new ConversationEngine(townie, barkeepTownie.townieInformation, barMenu); 
+        barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner.id);
         patronVerbalizer = new ConversationVerbalizer(townie, "barkeep");
 
         pp.gameObject.SetActive(false);
@@ -94,38 +94,55 @@ public class BarSpaceController : MonoBehaviour
 
         lastSocialMove = patronEngine.GiveResponse(prompt);
 
-        if (lastSocialMove.verb == "pass") {
+        if (lastSocialMove.verb.Contains( "pass" ) || lastSocialMove.verb.Contains("ENDCONVERSATION")) {
             AdvanceNPCDialogue();
-        } else {
-            DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(lastSocialMove);
-
-            dbc.DisplayNPCAction(npcDialogue);
-            lc.AddElement(npcDialogue);
-
-            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
-            AddAllFacts(newFacts);
-            RemoveRetractedFacts(lastSocialMove.retractedFacts);
-            
+        }else { 
+            NPCSpeak(lastSocialMove);
         }
 
-        
+        Debug.Log(lastSocialMove + "(" + lastSocialMove.verb + ")");
+    }
+
+    void NPCSpeak(SocialMove move)
+    {
+        DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(move);
+
+        dbc.DisplayNPCAction(npcDialogue);
+        lc.AddElement(npcDialogue);
+
+        List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
+        AddAllFacts(newFacts);
+        RemoveRetractedFacts(move.retractedFacts);
     }
 
     public void PlayerPhase()
     {
-        //Debug.Log(lastSocialMove + "("+ lastSocialMove.verb+")");
 
-        List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
-        List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
-        foreach (SocialMove socialMove in bestSocialMoves)
-        {
-            dialogueUnits.Add(barkeepVerbalizer.ExpressSocialMove(socialMove));
+        if (!lastSocialMove.verb.Contains("pass")) patronEngine.DecrementTurns();
+
+        if ( patronEngine.MaxTurns <= 0) {
+            lastSocialMove = new SocialMove("turnsUp");
+
+            NPCPhase(lastSocialMove);
+            
+        } else {
+
+            List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
+            List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
+            foreach (SocialMove socialMove in bestSocialMoves) {
+                dialogueUnits.Add(barkeepVerbalizer.ExpressSocialMove(socialMove));
+            }
+            dbc.DisplayPlayerActions(dialogueUnits);
+
+
+            
         }
-        dbc.DisplayPlayerActions(dialogueUnits);
     }
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
+        Debug.Log(dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
+
         lc.AddElement(dialogueUnit);
         barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
         NPCPhase(dialogueUnit.underpinningSocialMove);
@@ -133,7 +150,11 @@ public class BarSpaceController : MonoBehaviour
 
     public void AdvanceNPCDialogue()
     {
-        PlayerPhase();
+        if (lastSocialMove.verb.Contains("ENDCONVERSATION")) {
+            SetNextPatron();
+        } else {
+            PlayerPhase();
+        }
     }
 
 
@@ -150,5 +171,10 @@ public class BarSpaceController : MonoBehaviour
         foreach(WorldFact fact in facts) {
             nc.RemoveElement(fact);
         }
+    }
+
+    public bool Test()
+    {
+        return true;
     }
 }

@@ -38,5 +38,30 @@ public class BoundAction : WorldAction
         return n;
     }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is BoundAction otherAction) {
+            string thisActionId = Id;
+            if (Bindings != null) thisActionId = Bindings.BindString(thisActionId);
+            string otherActionId = otherAction.Id;
+            if (otherAction.Bindings != null) otherActionId = otherAction.Bindings.BindString(otherActionId);
 
+            return
+                thisActionId == otherActionId &&
+                ActorId == otherAction.ActorId &&
+                FeatureId == otherAction.FeatureId;
+        }
+
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 1998656861;
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ActorId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FeatureId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LocationId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<BoundBindingCollection>.Default.GetHashCode(Bindings);
+        return hashCode;
+    }
 }

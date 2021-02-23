@@ -4,75 +4,146 @@ using UnityEngine;
 
 public class PeopleInitializer
 {
-    public static List<GenericAction> peopleActions = new List<GenericAction>() {
-        ActionInitializer.actions["talk"],
-        ActionInitializer.actions["give_#item#"],
-        ActionInitializer.actions["insult"],
-        ActionInitializer.actions["compliment"],
-        ActionInitializer.actions["start_dating"],
-        ActionInitializer.actions["ask_#item#"]
+    public static List<GenericAction> peopleActions = ActionInitializer.GetAllPeopleActions();
+
+    //avery, sammy, finley
+
+    static List<Dictionary<string, List<string>>> peopleData = new List<Dictionary<string, List<string>>>() {
+        new Dictionary<string, List<string>>() {
+            {"name", new List<string>(){"avery"}},
+            {"home", new List<string>(){"averysHouse"} },
+            {"loves", new List<string>(){"stewed_trout"} },
+            {"likes", new List<string>(){"blackberry", "trout", "blackberry_tart", "strawberry_cake"} },
+            {"dislikes", new List<string>(){"carrot", "bell_pepper"} },
+            {"hates", new List<string>(){"carrot_cake"} },
+            {"inventory", new List<string>(){} }
+        },
+        new Dictionary<string, List<string>>() {
+            {"name", new List<string>(){"sammy"}},
+            {"home", new List<string>(){"sammysHouse"} },
+            {"loves", new List<string>(){"strawberry_cake"} },
+            {"likes", new List<string>(){"strawberry", "salmon", "fried_salmon"} },
+            {"dislikes", new List<string>(){"blackberry", "trout"} },
+            {"hates", new List<string>(){"blackberry_trout"} },
+            {"inventory", new List<string>(){} }
+        },
+        new Dictionary<string, List<string>>() {
+            {"name", new List<string>(){"finley"}},
+            {"home", new List<string>(){"finleysHouse"} },
+            {"loves", new List<string>(){"blackberry_tart"} },
+            {"likes", new List<string>(){"blackberry", "salmon", "fried_salmon"} },
+            {"dislikes", new List<string>(){"bell_pepper"} },
+            {"hates", new List<string>(){"veg_stirfry"} },
+            {"inventory", new List<string>(){} }
+        }
+    };
+
+    static Dictionary<string, Dictionary<string, Dictionary<Relationship.RelationType, int>>> initialRelations =
+        new Dictionary<string, Dictionary<string, Dictionary<Relationship.RelationType, int>>>() {
+            {"avery", new Dictionary<string, Dictionary<Relationship.RelationType, int>>(){
+                    {"sammy", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 20 },
+                        {Relationship.RelationType.romantic, 40 }  }
+                    },
+                    {"finley", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 40 },
+                        {Relationship.RelationType.romantic, 5 }  }
+                    },
+                    {"barkeep", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 5 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    }
+                }
+            },
+            {"sammy", new Dictionary<string, Dictionary<Relationship.RelationType, int>>(){
+                    {"avery", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 20 },
+                        {Relationship.RelationType.romantic, -5 }  }
+                    },
+                    {"finley", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 10 },
+                        {Relationship.RelationType.romantic, 15 }  }
+                    },
+                    {"barkeep", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 5 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    }
+                }
+            },
+            {"finley", new Dictionary<string, Dictionary<Relationship.RelationType, int>>(){
+                    {"avery", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 40 },
+                        {Relationship.RelationType.romantic, 20 }  }
+                    },
+                    {"sammy", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, -10 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    }
+                }
+            },
+            {"barkeep", new Dictionary<string, Dictionary<Relationship.RelationType, int>>(){
+                    {"avery", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 5 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    },
+                    {"sammy", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 5 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    },
+                    {"finley", new Dictionary<Relationship.RelationType, int>() {
+                        {Relationship.RelationType.friendly, 5 },
+                        {Relationship.RelationType.romantic, 0 }  }
+                    }
+                }
+            }
     };
 
     public static Dictionary<string, Person> GetAllPeople() {
+
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
             {"barkeep",   new Person("barkeep",     "SYSTEM", 2, peopleActions, new Dictionary<string, List<string>>())}, 
-            {"alicia",    new Person("alicia",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"bob",       new Person("bob",         "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"clara",     new Person("clara",       "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            {"dirk",      new Person("dirk",        "blacksmith", 2, peopleActions, new Dictionary<string, List<string>>())}//,
-            //{"everet",  new Person("everet",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            //{"faraz",   new Person("faraz",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            //{"gigi",    new Person("gigi",      "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            //{"henri",   new Person("henri",     "farm", 2, peopleActions, new Dictionary<string, List<string>>())},
-            //{"isabel",  new Person("isabel",    "farm", 2, peopleActions, new Dictionary<string, List<string>>())}
         };
 
-        // Fill all values at random for everyone initially
-        SetRelationsRandom(allPeople);
-        //SetInventoryRandom(allPeople);
-        
+        foreach(Dictionary<string, List<string>> personData in peopleData) {
+            Person person = new Person(personData["name"][0], personData["home"][0], 2, peopleActions, new Dictionary<string, List<string>>());
+            foreach(KeyValuePair<string, PreferenceLevel> catagory in 
+                new List<KeyValuePair<string, PreferenceLevel>> {
+                    new KeyValuePair<string, PreferenceLevel>("loves", PreferenceLevel.loved),
+                    new KeyValuePair<string, PreferenceLevel>("likes", PreferenceLevel.liked),
+                    new KeyValuePair<string, PreferenceLevel>("dislikes", PreferenceLevel.disliked),
+                    new KeyValuePair<string, PreferenceLevel>("hates", PreferenceLevel.hated) }) {
+                foreach(string item in personData[catagory.Key]) {
+                    person.preference.Add(item, catagory.Value);
+                }
+            }
 
-        // Override with specific things for the senario and or testing
-            //Lover scenario Details:
-            allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.friendly, 2);
-            allPeople["bob"].relationships.Set("alicia", Relationship.RelationType.romantic, 5);
+            foreach(string item in personData["inventory"]) {
+                person.inventory.ChangeInventoryContents(1, item);
+            }
 
-            allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
-            allPeople["alicia"].relationships.Set("bob", Relationship.RelationType.romantic, 0);
+            allPeople.Add(personData["name"][0], person);
+        }
 
+        foreach(string name in initialRelations.Keys) {
+            Person person = allPeople[name];
 
-        //allPeople["lover_bob"].inventory.ChangeInventoryContents(3, "trout");
-        //allPeople["lover_bob"].inventory.ChangeInventoryContents(2, "dragon_egg");
-
-            allPeople["alicia"].preference.Add("strawberry_cake",   PreferenceLevel.loved);
-            allPeople["alicia"].preference.Add("salmon_fried",      PreferenceLevel.loved);
-            allPeople["alicia"].preference.Add("morning_rose",      PreferenceLevel.loved);
-            allPeople["alicia"].preference.Add("strawberry",        PreferenceLevel.liked);
-            allPeople["alicia"].preference.Add("salmon",            PreferenceLevel.liked);
-            allPeople["alicia"].preference.Add("rose",              PreferenceLevel.liked);
-            allPeople["alicia"].preference.Add("dandilion",         PreferenceLevel.liked);
-            allPeople["alicia"].preference.Add("blackberry",        PreferenceLevel.disliked);
-            allPeople["alicia"].preference.Add("trout",             PreferenceLevel.disliked);
-            allPeople["alicia"].preference.Add("tulip",             PreferenceLevel.disliked);
-            allPeople["alicia"].preference.Add("blackberry_tart",   PreferenceLevel.hated);
-            allPeople["alicia"].preference.Add("trout_stew",        PreferenceLevel.hated);
-            allPeople["alicia"].preference.Add("evening_tulip",     PreferenceLevel.hated);
-
-
-            allPeople["dirk"].inventory.ChangeInventoryContents(1, "strawberry_cake_recipe");
-            allPeople["bob"].inventory.ChangeInventoryContents(1, "flour");
-
-
-        SetPreferencesRandom(allPeople);
-
-
-        //Clara Testing Rivals
-        allPeople["clara"].relationships.Set("bob", Relationship.RelationType.friendly, 3);
-        allPeople["bob"].relationships.Set("clara", Relationship.RelationType.friendly, 3);
-
+            foreach(string other in initialRelations[name].Keys) {
+                foreach (Relationship.RelationType axis in initialRelations[name][other].Keys) {
+                    person.relationships.Set(other, axis, initialRelations[name][other][axis]);
+                }
+            }
+        }
 
         return allPeople;
     }
+
+
+
+
+
+
+    ///DEPRECIATED:
+
 
     static void SetRelationsRandom(Dictionary<string, Person> allPeople)
     {
@@ -82,15 +153,15 @@ public class PeopleInitializer
                 new List<int>(){-2, 2},
                 new List<int>(){-4, 4}
             } },
-            {Relationship.RelationshipTag.friends, new List<List<int>>(){
+            {Relationship.RelationshipTag.friend, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){-4, 6}
             } },
-            {Relationship.RelationshipTag.enemies, new List<List<int>>(){
+            {Relationship.RelationshipTag.enemy, new List<List<int>>(){
                 new List<int>(){-6, -2},
                 new List<int>(){-6, 4}
             } },
-            {Relationship.RelationshipTag.lovers, new List<List<int>>(){
+            {Relationship.RelationshipTag.in_love_with, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){4, 10}
             } }

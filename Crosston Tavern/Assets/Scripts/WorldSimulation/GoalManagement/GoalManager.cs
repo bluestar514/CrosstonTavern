@@ -25,6 +25,21 @@ public class GoalManager
         modules.Add(goalModule);
     }
 
+    public void DecrementModuleTimers()
+    {
+
+        List<GoalModule> deactivatedModules = new List<GoalModule>();
+        foreach(GoalModule gm in modules) {
+            gm.DecrementTimer();
+
+            if (gm.timer == 0) deactivatedModules.Add(gm);
+        }
+
+        foreach(GoalModule gm in deactivatedModules) {
+            modules.Remove(gm);
+        }
+    }
+
     public Goal GetGoalFromName(string name)
     {
         foreach(Goal goal in lastSetOfGoals) {
@@ -69,8 +84,12 @@ public class GoalManager
             
             // Foreach goal, grab relevant set of outcomes and their restraints
             foreach (Goal goal in previousIterationGoals) {
-                List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
-                newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
+                if (goal is GoalState) {
+                    List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
+                    newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
+                }else if(goal is GoalAction goalAction) {
+                    newGoals.AddRange(MakeGoalFromAction(goalAction, allActions));
+                }
             }
 
             List<Goal> condensedGoals = CondenseGoals(newGoals);
@@ -122,12 +141,7 @@ public class GoalManager
     {
         ActionBuilder ab = new ActionBuilder(ws, actor);
 
-        List<BoundAction> lba = new List<BoundAction>();
-        foreach (string location in ws.map.GetNameOfLocations()) {
-            lba.AddRange(ab.GetAllActions(location));
-        }
-
-        return lba;
+        return ab.GetAllActions(respectLocation:false);
     }
 
     List<OutcomeRestraints> DecomposeActionToOutcomes(BoundAction action)
@@ -267,22 +281,42 @@ public class GoalManager
             newGoals.AddRange(MakeChanceModifierGoal(outcome, parentGoal.priority * effectStrength));
         }
 
-        List<Goal> unloopingGoals = new List<Goal>();
-        foreach(Goal goal in newGoals) {
-            bool looping = false;
-            foreach(string parent in goal.parentGoals) {
-                if (goal.state.ToString() == parent.Split(':')[0]) {
-                    looping = true;
-                } 
-            }
+        //List<Goal> unloopingGoals = new List<Goal>();
+        //foreach(Goal goal in newGoals) {
+        //    bool looping = false;
+        //    foreach(string parent in goal.parentGoals) {
+        //        if (goal.state.ToString() == parent.Split(':')[0]) {
+        //            looping = true;
+        //        } 
+        //    }
 
-            if (!looping) {
-                unloopingGoals.Add(goal);
+        //    if (!looping) {
+        //        unloopingGoals.Add(goal);
+        //    }
+
+        //}
+
+        return newGoals; //unloopingGoals;
+    }
+
+    List<Goal> MakeGoalFromAction(GoalAction parentGoal, List<BoundAction> actions)
+    {
+        List<Goal> newGoals = new List<Goal>();
+        foreach (BoundAction action in actions) {
+
+            if (parentGoal.action.Equals(action)){
+
+                BoundBindingCollection bindings = action.Bindings;
+                FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+
+                OutcomeRestraints outcome = new OutcomeRestraints(new List<Effect>(), new ChanceModifierSimple(1),
+                                                                   action.preconditions.conditions, bindings, resources, action);
+
+                newGoals.AddRange(MakePreconditionsGoal(outcome, parentGoal.priority ));
             }
-            
         }
 
-        return unloopingGoals;
+        return newGoals;
     }
 
     List<Goal> MakePreconditionsGoal(OutcomeRestraints outcome, float parentPriority)
@@ -297,7 +331,7 @@ public class GoalManager
             if (condition is Condition_IsState) {
                 Condition_IsState stateCondition = (Condition_IsState)condition;
 
-                Goal g = new Goal(stateCondition.state.Bind(outcome.bindings, outcome.resources), parentPriority);
+                GoalState g = new GoalState(stateCondition.state.Bind(outcome.bindings, outcome.resources), parentPriority);
                 g.AddUnlockedAction(outcome.parentAction);
 
                 foreach(Goal parentGoal in outcome.fullfillsGoal) {
@@ -335,7 +369,7 @@ public class GoalManager
         return newGoals;
     }
  
-    List<Goal> CondenseGoals(List<Goal> goals)
+    public static List<Goal> CondenseGoals(List<Goal> goals)
     {
         List<Goal> condensedGoals = new List<Goal>();
 
@@ -378,7 +412,8 @@ public class GoalManager
                 List<OutcomeRestraints> outcomes = DecomposeActionToOutcomes(action);
                 foreach (OutcomeRestraints outcome in outcomes) {
                     foreach (Goal goal in goals) {
-                        if (OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal)) {
+                        if ((OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal))||
+                            (goal is GoalAction goalAction && goalAction.action.Equals(action))) {
                             string location = action.LocationId;
                             if (locationPriority.ContainsKey(location)) {
                                 locationPriority[location] += desire;
@@ -398,7 +433,7 @@ public class GoalManager
 
 
         foreach(string location in locationPriority.Keys) {
-            Goal goal = new Goal(new StatePosition(actor.id, location), locationPriority[location]);
+            GoalState goal = new GoalState(new StatePosition(actor.id, location), locationPriority[location]);
             
             foreach(Goal g in locationReason[location]) {
                 goal.AddParentGoal(g);

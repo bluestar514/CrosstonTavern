@@ -29,7 +29,14 @@ public class WorldState
     {
         Map c_map = map.Copy(name);
         c_map.RemoveFeature(owner.id);
-        c_map.AddFeature(owner.id, owner.Copy(true));
+        c_map.AddFeature(owner.id, owner);
+
+        //remove recipe actions from each character's knowledge
+        foreach(Feature f in c_map.GetAllFeatures()) {
+            if(f.type == Feature.FeatureType.kitchen) {
+                f.providedActions = new List<GenericAction>();
+            }
+        }
 
         Registry c_reg = new Registry(c_map.GetAllFeatures(), name);
 

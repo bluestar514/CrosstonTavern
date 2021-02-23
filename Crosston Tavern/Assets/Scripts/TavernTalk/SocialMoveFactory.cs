@@ -46,6 +46,10 @@ public class SocialMoveFactory
                 return MakeTellPreference(speaker, false);
             case "tellState#":
                 return MakeTellState(speaker);
+            case "tellRelationWith#":
+                string subject = prompt.arguements[0];
+
+                return MakeTellRelation(speaker, subject);
 
             case "acknowledge":
                 return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
@@ -95,7 +99,7 @@ public class SocialMoveFactory
                 history = new List<ExecutedAction>(from e in history
                                                    where e.opinion.tags.Count > 0
                                                    select e);
-                history.AddRange(GetMostCommonEvents(GetDayEvents(speaker), speaker.Id));
+                //history.AddRange(GetMostCommonEvents(GetDayEvents(speaker), speaker.Id));
                 break;
         }
 
@@ -115,23 +119,28 @@ public class SocialMoveFactory
     }
 
 
-    // Uses the goalFact from the conversation so it is possible to veiw the rational at the time the goal was recorded
-    //TODO: Mark whether or not the goal is one the character still has
+
+    /// <summary>
+    /// TODO: Mark whether or not the goal is one the character still has
+    /// </summary>
+    /// <param name="speaker"></param>
+    /// <param name="goalFact">Uses the goalFact from the conversation so 
+    /// it is possible to veiw the rational at the time the goal was recorded</param>
+    /// <returns> mentionedFacts: 0-goal we are talking about, 1- an action unlocked by completing this goal, 2+ reasons for goal </returns>
     public static SocialMove MakeTellWhyGoal(Townie speaker, WorldFactGoal goalFact)
     {
         Goal goal = goalFact.goal;
         
-        List<WorldFact> facts;
+        List<WorldFact> facts = new List<WorldFact>() { goalFact };
         if (goal.unlockedActionsOnGoalCompletion.Count > 0) {
             int rand = Random.Range(0, goal.unlockedActionsOnGoalCompletion.Count);
 
             BoundAction potentialAction = goal.unlockedActionsOnGoalCompletion[rand];
 
             WorldFact fact = new WorldFactPotentialAction(potentialAction);
-            facts = new List<WorldFact>() { fact };
-        } else {
-            facts = new List<WorldFact>();
-        }
+            facts.Add(fact);
+        } 
+
         List<Goal> parentGoals = goal.GetParentGoals();
 
 
@@ -149,6 +158,8 @@ public class SocialMoveFactory
 
         List<Goal> goals = new List<Goal>(from rational in action.Action.weightRationals
                                           select rational.goal);
+        goals = GoalManager.CondenseGoals(goals);
+
         List<WorldFact> facts = MakeGoalsFacts(speaker, goals);
 
         return new SocialMove("tellWhyAction#", new List<string>() { actionName },
@@ -188,19 +199,7 @@ public class SocialMoveFactory
 
     public static SocialMove MakeTellState(Townie speaker)
     {
-        StatusEffectSummary emotionStrength = speaker.townieInformation.statusEffectTable.CalculateStatus();
-
-
-        int max = 0;
-        EntityStatusEffectType strongestState = EntityStatusEffectType.special;
-        foreach (EntityStatusEffectType emotion in emotionStrength.Keys) {
-            int strength = emotionStrength[emotion];
-
-            if (strength >= max) {
-                max = strength;
-                strongestState = emotion;
-            }
-        }
+        EntityStatusEffectType strongestState = speaker.townieInformation.statusEffectTable.GetStrongestStatus();
 
         if (strongestState != EntityStatusEffectType.special) {
             List<ExecutedAction> history = GetDayEvents(speaker);
@@ -237,6 +236,14 @@ public class SocialMoveFactory
         return new SocialMove("tellStateNONE");
     }
 
+    static SocialMove MakeTellRelation(Townie speaker, string target)
+    {
+        List<WorldFact> facts = GetInterRelationship(speaker.townieInformation, target);
+        facts.AddRange(GetInterRelationship(speaker.ws.registry.GetPerson(target), speaker.Id));
+
+        return new SocialMove("tellRelationWith#", arguements: new List<string>() { target }, mentionedFacts: facts);
+    }
+
 
     // Helpers:
     static List<ExecutedAction> GetDayEvents(Townie speaker)
@@ -266,6 +273,7 @@ public class SocialMoveFactory
         List<WorldFact> facts = new List<WorldFact>();
         string owner = speaker.townieInformation.id;
         foreach (Goal goal in goals) {
+
             facts.Add(new WorldFactGoal(goal, owner));
         }
 
@@ -405,6 +413,25 @@ public class SocialMoveFactory
         }
 
         return condensed;
+    }
+
+
+    static List<WorldFact> GetInterRelationship(Person subject, string target)
+    {
+        List<WorldFact> facts = new List<WorldFact>();
+
+        foreach (Relationship.RelationType axis in
+                        new List<Relationship.RelationType>() {
+                            Relationship.RelationType.friendly,
+                            Relationship.RelationType.romantic}) {
+            int value = subject.relationships.Get(target, axis);
+            facts.Add(new WorldFactState(new StateSocial(subject.id, target, axis, value, value)));
+        }
+
+        facts.AddRange(from tag in subject.relationships.GetTag(target)
+                       select new WorldFactState(new StateRelation(subject.id, target, tag)));
+
+        return facts;
     }
 
 

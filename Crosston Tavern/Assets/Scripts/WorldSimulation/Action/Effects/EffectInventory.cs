@@ -16,19 +16,25 @@ public class EffectInventory : Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (!(goal.state is StateInventory)) return 0;
-        StateInventoryStatic state = (StateInventoryStatic)((StateInventory)goal.state).Bind(bindings, resources);
+        if (goal is GoalState goalState) {
 
-        string goalInvOwner = state.ownerId;
-        string goalItem = state.itemId;
+            if (goalState.state is StateInventory stateInv) {
+                StateInventoryStatic state = (StateInventoryStatic)(stateInv).Bind(bindings, resources);
 
-        string owner = bindings.BindString(ownerId);
+                string goalInvOwner = state.ownerId;
+                string goalItem = state.itemId;
 
-        if (goalInvOwner != owner.Replace("person_", "")) return 0;
-        Inventory inv = ws.GetInventory(owner);
+                string owner = bindings.BindString(ownerId);
+
+                if (goalInvOwner != owner.Replace("person_", "")) return 0;
+                Inventory inv = ws.GetInventory(owner);
 
 
-        return FinishWeighing(goalItem, inv, bindings, resources, state.min, state.max);
+                return FinishWeighing(goalItem, inv, bindings, resources, state.min, state.max);
+            }
+        }
+
+        return 0;
     }
 
     protected virtual float FinishWeighing(string goalItem, Inventory inv, BoundBindingCollection bindings, FeatureResources resources, int min, int max)
@@ -49,7 +55,7 @@ public class EffectInventory : Effect
         Inventory inv = ws.GetInventory(owner);
         inv.ChangeInventoryContents(num, itemid);
 
-        Effect realizedEffect = new EffectInventoryStatic(owner, itemid, num);
+        Effect realizedEffect = new EffectInventoryStatic(owner, itemid, num, verbalization);
 
         return realizedEffect;
     }
@@ -61,7 +67,12 @@ public class EffectInventory : Effect
 
             if(ownerId == otherInv.ownerId &&
                 itemId == otherInv.itemId) {
-                return new EffectInventoryStatic(ownerId, itemId, delta + otherInv.delta);
+                Effect effect = new EffectInventoryStatic(ownerId, itemId, delta + otherInv.delta);
+
+                if (verbalization == null) effect.verbalization = otherInv.verbalization;
+                else effect.verbalization = verbalization.Combine(other.verbalization, effect);
+
+                return effect;
             }
         }
 
@@ -82,12 +93,14 @@ public class EffectInventoryVariable : EffectInventory
         get => itemIds[Mathf.FloorToInt(UnityEngine.Random.value * itemIds.Count)];
     }
 
-    public EffectInventoryVariable(string ownerId, List<string> itemIds, int min, int max)
+    public EffectInventoryVariable(string ownerId, List<string> itemIds, int min, int max, VerbilizationEffect verbilizationEffect = null)
     {
         this.ownerId = ownerId;
         this.itemIds = new List<string>(itemIds);
         this.min = min;
         this.max = max;
+
+        verbalization = verbilizationEffect;
 
         id = ToString();
     }
@@ -117,11 +130,12 @@ public class EffectInventoryVariable : EffectInventory
 public class EffectInventoryStatic : EffectInventory
 {
 
-    public EffectInventoryStatic(string ownerId, string itemId, int delta)
+    public EffectInventoryStatic(string ownerId, string itemId, int delta, VerbilizationEffect verbilizationEffect = null)
     {
         this.ownerId = ownerId;
         this.itemId = itemId;
         this.delta = delta;
+        verbalization = verbilizationEffect;
 
         id = ToString();
     }
@@ -152,11 +166,12 @@ public class EffectInventoryBound: EffectInventory
     }
 
 
-    public EffectInventoryBound(string ownerId, string itemId, string delta)
+    public EffectInventoryBound(string ownerId, string itemId, string delta, VerbilizationEffect verbilizationEffect = null)
     {
         this.ownerId = ownerId;
         this.itemId = itemId;
         this.s_delta = delta;
+        verbalization = verbilizationEffect;
     }
 
     public override string ToString()
@@ -166,7 +181,7 @@ public class EffectInventoryBound: EffectInventory
 
     public EffectInventoryStatic Bind(BoundBindingCollection bindings)
     {
-        return new EffectInventoryStatic(ownerId, itemId, int.Parse(bindings.BindString(s_delta)));
+        return new EffectInventoryStatic(ownerId, itemId, int.Parse(bindings.BindString(s_delta)), verbalization);
     }
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)

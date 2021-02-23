@@ -8,10 +8,11 @@ public class EffectGoal : Effect
     public string owner;
     public GoalModule newGoal;
 
-    public EffectGoal(string owner, GoalModule newGoal)
+    public EffectGoal(string owner, GoalModule newGoal, VerbilizationEffect verbilizationEffect = null)
     {
         this.owner = owner;
         this.newGoal = newGoal;
+        verbalization = verbilizationEffect; 
     }
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
@@ -35,7 +36,7 @@ public class EffectGoal : Effect
         if (townie != null && owner == townie.townieInformation.id) {
             townie.gm.AddModule(goalModule);
         }
-        return new EffectGoal(owner, goalModule);
+        return new EffectGoal(owner, goalModule, verbalization);
     }
 
     public override string ToString()

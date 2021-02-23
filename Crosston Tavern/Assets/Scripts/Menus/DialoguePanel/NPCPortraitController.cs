@@ -62,6 +62,7 @@ public class NPCPortrait
     {
         bird,
         sheep,
+        fox,
         stickGuy
     }
 

@@ -16,27 +16,29 @@ public class EffectSocial : Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (!(goal.state is StateSocial)) return 0;
-        StateSocial state = (StateSocial)goal.state;
+        if (goal is GoalState goalState &&
+            goalState.state is StateSocial state) {
 
 
-        string source = bindings.BindString(sourceId);
-        string target = bindings.BindString(targetId);
-        Relationship.RelationType axis = this.axis;
 
-        string goalSource = state.sourceId;
-        string goalTarget = state.targetId;
-        Relationship.RelationType goalAxis = state.axis;
+            string source = bindings.BindString(sourceId);
+            string target = bindings.BindString(targetId);
+            Relationship.RelationType axis = this.axis;
 
-        if (source != goalSource ||
-            target != goalTarget ||
-            axis != goalAxis) return 0;
+            string goalSource = state.sourceId;
+            string goalTarget = state.targetId;
+            Relationship.RelationType goalAxis = state.axis;
 
-        Relationship rel = ws.GetRelationshipsFor(source);
-        int value = rel.Get(target, axis);
+            if (source != goalSource ||
+                target != goalTarget ||
+                axis != goalAxis) return 0;
 
-        return FinishWeighing(value, state.min, state.max);
+            Relationship rel = ws.GetRelationshipsFor(source);
+            int value = rel.Get(target, axis);
 
+            return FinishWeighing(value, state.min, state.max);
+        }
+        return 0;
     }
 
     protected virtual float FinishWeighing(int value, int min, int max)
@@ -53,7 +55,7 @@ public class EffectSocial : Effect
         Relationship rel = ws.GetRelationshipsFor(sourceId);
         rel.Increase(targetId, axis, delta);
 
-        return new EffectSocialStatic(sourceId, targetId, axis, delta);
+        return new EffectSocialStatic(sourceId, targetId, axis, delta, verbalization);
     }
 
     public override Effect Combine(Effect other)
@@ -64,7 +66,12 @@ public class EffectSocial : Effect
             if (sourceId == otherSoc.sourceId &&
                 targetId == otherSoc.targetId &&
                 axis == otherSoc.axis) {
-                return new EffectSocialStatic(sourceId, targetId, axis, delta + otherSoc.delta);
+                Effect effect = new EffectSocialStatic(sourceId, targetId, axis, delta + otherSoc.delta);
+
+                if (verbalization == null) effect.verbalization = other.verbalization;
+                else effect.verbalization = verbalization.Combine(other.verbalization, effect);
+
+                return effect;
             }
         }
 
@@ -81,13 +88,16 @@ public class EffectSocialVariable : EffectSocial
         get => Mathf.RoundToInt((UnityEngine.Random.value * (max - min)) + min);
     }
 
-    public EffectSocialVariable(string sourceId, string targetId, Relationship.RelationType axis, int min, int max)
+    public EffectSocialVariable(string sourceId, string targetId, Relationship.RelationType axis, int min, int max, VerbilizationEffect verbilizationEffect = null)
     {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.axis = axis;
         this.min = min;
         this.max = max;
+
+        verbalization = verbilizationEffect;
+
         id = ToString();
     }
 
@@ -107,12 +117,15 @@ public class EffectSocialVariable : EffectSocial
 public class EffectSocialStatic : EffectSocial
 {
 
-    public EffectSocialStatic(string sourceId, string targetId, Relationship.RelationType axis, int delta)
+    public EffectSocialStatic(string sourceId, string targetId, Relationship.RelationType axis, int delta, VerbilizationEffect verbilizationEffect = null)
     {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.axis = axis;
         this.delta = delta;
+
+        verbalization = verbilizationEffect;
+
         id = ToString();
     }
 

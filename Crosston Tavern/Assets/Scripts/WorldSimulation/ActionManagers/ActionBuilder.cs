@@ -21,6 +21,7 @@ public class ActionBuilder
 
     public List<BoundAction> GetAllActions(string locationId="", bool respectLocation = true)
     {
+
         if (respectLocation) {
 
             if (locationId == "") locationId = actor.location;

@@ -101,7 +101,9 @@ public class ActionHeuristicManager : ActionManager
     public WeightedAction GetWeightOfBoundAction(BoundAction boundAction, List<Goal> goals = null)
     {
         //Weight = sum of(chance of occuring * desirablity of outcome)
-
+        if (goals == null) {
+            goals = actor.knownGoals;
+        }
 
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
         float weight = 0;
@@ -115,6 +117,18 @@ public class ActionHeuristicManager : ActionManager
             weight += result.Key;
             rationals.AddRange(result.Value);
         }
+
+
+        foreach (Goal goal in goals) {
+            if (goal is GoalAction goalAction) {
+                if (goalAction.action.Equals(boundAction)) {
+                    rationals.Add(new WeightedAction.WeightRational(
+                        new NotAnEffect("actionIsGoal"), goal, goal.priority, goal.priority, 1));
+                    weight += goal.priority;
+                }
+            }
+        }
+        
 
         return new WeightedAction(boundAction, weight, rationals);
     }
@@ -131,12 +145,15 @@ public class ActionHeuristicManager : ActionManager
         List<WeightedAction.WeightRational> rationals = new List<WeightedAction.WeightRational>();
 
         foreach (Goal goal in goals) {
-            foreach (Effect effect in outcome.effects) {
-                float desirability = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal) ;
-                float value = desirability * chance;
-                weight += value;
-                if (value != 0)
-                    rationals.Add(new WeightedAction.WeightRational(effect, goal, value, desirability, chance));
+            if (goal is GoalState) {
+
+                foreach (Effect effect in outcome.effects) {
+                    float desirability = GetWeightOfEffectGivenGoal(effect, bindings, resources, goal);
+                    float value = desirability * chance;
+                    weight += value;
+                    if (value != 0)
+                        rationals.Add(new WeightedAction.WeightRational(effect, goal, value, desirability, chance));
+                }
             }
         }
         return new KeyValuePair<float, List<WeightedAction.WeightRational>>(weight, rationals) ;

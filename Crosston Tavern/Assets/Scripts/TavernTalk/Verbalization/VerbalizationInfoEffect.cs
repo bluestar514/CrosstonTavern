@@ -16,6 +16,11 @@ public class VerbilizationEffect : VerbilizationInfo
     {
         return verb;
     }
+
+    virtual public VerbilizationEffect Combine(VerbilizationEffect other, Effect effect)
+    {
+        return this;
+    }
 }
 
 public class VerbilizationEffectItemGather : VerbilizationEffect
@@ -42,31 +47,40 @@ public class VerbilizationEffectItemGather : VerbilizationEffect
 
         return "";
     }
-
 }
 
 public class VerbilizationEffectSocialThreshold : VerbilizationEffect
 {
-    string negative;
     float threshold;
+    bool greater;
 
-    public VerbilizationEffectSocialThreshold(string verb, string negative, float threshold) : base(verb)
+    public VerbilizationEffectSocialThreshold(string verb, float threshold, bool greater) : base(verb)
     {
-        this.negative = negative;
         this.threshold = threshold;
+        this.greater = greater;
     }
 
     public override string Verbilize(string actor, Effect effect)
     {
-        if (effect is EffectSocial) {
-            EffectSocial socEffect = (EffectSocial)effect;
-
-            if (socEffect.delta >= threshold) {
+        if (effect is EffectSocial socEffect) {
+            if ((socEffect.delta >= threshold) == greater) {
                 return verb;
-            } else return negative;
+            }
         }
 
         return "";
+    }
+
+
+    public override VerbilizationEffect Combine(VerbilizationEffect other, Effect effect)
+    {
+        if (effect is EffectSocial socEffect) {
+            if((socEffect.delta >= threshold)==greater) {
+                return this;
+            } else return other;
+        }
+
+        return base.Combine(other, effect);
     }
 }
 

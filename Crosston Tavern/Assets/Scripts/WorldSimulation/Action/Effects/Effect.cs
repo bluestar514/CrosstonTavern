@@ -6,6 +6,7 @@ using UnityEngine;
 public class Effect 
 {
     public string id;
+    public VerbilizationEffect verbalization;
 
     public Effect()
     {
@@ -105,10 +106,11 @@ public class EffectMovement: Effect
     public string moverId;
     public string newLocationId;
 
-    public EffectMovement(string moverId, string newLocationId)
+    public EffectMovement(string moverId, string newLocationId, VerbilizationEffect verbilizationEffect = null)
     {
         this.moverId = moverId;
         this.newLocationId = newLocationId;
+        this.verbalization = verbilizationEffect;
 
         id = ToString();
     }
@@ -120,12 +122,13 @@ public class EffectMovement: Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (!(goal.state is StatePosition)) return WeighToDoAction(ws, bindings, resources, goal);
-        else return WeighForLocation(ws, bindings, resources, goal);
+        if (goal is GoalState goalState && goalState.state is StatePosition) return WeighForLocation(ws, bindings, resources, goalState);
         
+        else return WeighToDoAction(ws, bindings, resources, goal);
+
     }
 
-    private float WeighForLocation(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    private float WeighForLocation(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, GoalState goal)
     {
         StatePosition state = (StatePosition)goal.state;
 
@@ -154,7 +157,8 @@ public class EffectMovement: Effect
             int newDist = map.GetDistance(location, goalLocation);
             if (currentDist > newDist) weight += 1;
             if (currentDist < newDist) weight -= 1;
-            if (currentLocation == goalLocation) weight -= 1;
+            if (currentLocation == goalLocation) weight -= .5f; //I would like characters to float between equally 
+                                                                //good locations a bit more than they were when this was set to 1
         }
 
         return weight / locations.Count / 2;
@@ -178,7 +182,21 @@ public class EffectMovement: Effect
         if (townie != null)  townie.Move(moverId, newLocationId);
         ws.map.MovePerson(moverId, newLocationId, false);
 
-        return new EffectMovement(moverId, newLocationId);
+        return new EffectMovement(moverId, newLocationId, verbalization);
     }
 
+}
+
+public class NotAnEffect : Effect
+{
+    public NotAnEffect(string id, VerbilizationEffect verbilizationEffect = null)
+    {
+        this.id = id;
+        verbalization = verbilizationEffect;
+    }
+
+    public override string ToString()
+    {
+        return "<NotReallyAnEffect:"+id+">";
+    }
 }

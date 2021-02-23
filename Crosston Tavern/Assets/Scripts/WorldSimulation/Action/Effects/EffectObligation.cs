@@ -8,10 +8,11 @@ public class EffectObligation : Effect
     public string owner;
     public Obligation obligation;
 
-    public EffectObligation(string owner, Obligation obligation)
+    public EffectObligation(string owner, Obligation obligation, VerbilizationEffect verbilizationEffect = null)
     {
         this.owner = owner;
         this.obligation = obligation;
+        verbalization = verbilizationEffect;
     }
 
 
@@ -37,7 +38,7 @@ public class EffectObligation : Effect
 
         ws.registry.GetPerson(owner).schedule.Add(ob);
 
-        return new EffectObligation(owner, ob);
+        return new EffectObligation(owner, ob, verbalization);
     }
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
@@ -57,13 +58,15 @@ public class EffectObligationNow: Effect
     public bool blocking;
     public GoalModule goalModule;
 
-    public EffectObligationNow(string owner, string obligationName, WorldTime length, bool blocking, GoalModule goalModule)
+    public EffectObligationNow(string owner, string obligationName, WorldTime length, bool blocking, 
+        GoalModule goalModule, VerbilizationEffect verbilizationEffect = null)
     {
         this.owner = owner;
         this.length = length;
         this.blocking = blocking;
         this.goalModule = goalModule;
         this.obligationName = obligationName;
+        verbalization = verbilizationEffect;
     }
 
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
@@ -71,7 +74,9 @@ public class EffectObligationNow: Effect
         WorldTime start = new WorldTime(ws.Time);
         WorldTime end = start + length;
 
-        return new EffectObligation(owner, new Obligation(obligationName, start, end, blocking, goalModule)).ExecuteEffect(ws, townie, bindings, resources);
+        return new EffectObligation(owner, 
+                            new Obligation(obligationName, start, end, blocking, goalModule), verbalization)
+            .ExecuteEffect(ws, townie, bindings, resources);
     }
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)

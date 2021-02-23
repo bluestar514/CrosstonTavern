@@ -16,7 +16,7 @@ public class Verbalizer
         this.ws = ws;
     }
 
-    public string VerbalizaeState(State goalState)
+    public string VerbalizeState(State goalState)
     {
         string owner = "";
         string target;
@@ -127,12 +127,13 @@ public class Verbalizer
 
         List<string> verbEffects = new List<string>();
         foreach(Effect effect in action.executedEffect) {
-            foreach(VerbilizationEffect verbalizationPattern in action.effectVerbalizationPatterns) {
-                string str = verbalizationPattern.Verbilize(actionActor, effect);
+            if (effect.verbalization != null) {
+                string str = effect.verbalization.Verbilize(actionActor, effect);
                 if (str != "") {
                     verbEffects.Add(str);
                 }
             }
+            
         }
         string verbalization = MakeNiceList(verbEffects);
         if (verbalization != "") verbalization = VerbalizeAction(action, presentTense) + " and " + verbalization;
@@ -170,6 +171,17 @@ public class Verbalizer
 
     }
 
+    public string VerbalizeGoal(Goal goal)
+    {
+       if(goal is GoalState goalState) {
+            return VerbalizeState(goalState.state);
+        }
+       if(goal is GoalAction goalAction) {
+            return VerbalizeAction(goalAction.action, true);
+        }
+
+        return goal.ToString();
+    }
 
     public static string MakeNiceList(List<string> collectedEvents)
     {

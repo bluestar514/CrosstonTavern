@@ -42,6 +42,10 @@ public class VerbalizationDictionary
         {"clara", new EntityVerbalization("clara", "Clara") },
         {"dirk", new EntityVerbalization("dirk", "Dirk") },
 
+        {"avery", new EntityVerbalization("avery", "Avery") },
+        {"sammy", new EntityVerbalization("sammy", "Sammy") },
+        {"finley", new EntityVerbalization("finley", "Finley") },
+
 
         {"river_farm", new EntityVerbalization("river_farm", "the river by the farm") },
         {"chicken_farm", new EntityVerbalization("chicken_farm", "chickens") },
