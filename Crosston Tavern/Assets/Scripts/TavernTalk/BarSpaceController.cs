@@ -61,6 +61,8 @@ public class BarSpaceController : MonoBehaviour
 
     public void SetPatron(Townie townie)
     {
+        AddConvSeperator();
+
         Person partner = townie.townieInformation;
         bps.Visit(partner.id);
 
@@ -101,6 +103,8 @@ public class BarSpaceController : MonoBehaviour
         }
 
         Debug.Log(lastSocialMove + "(" + lastSocialMove.verb + ")");
+
+        PlayerPhase();
     }
 
     void NPCSpeak(SocialMove move)

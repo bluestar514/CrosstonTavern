@@ -23,16 +23,12 @@ public class DialogueBoxController : MonoBehaviour
         speakerTagPanel.Fill(dialogueUnit.speakerName);
         speakerTagPanel.Open();
 
-        speachPanelMenu.Fill(dialogueUnit.verbalization);
-        speachPanelMenu.Open();
-
         portraitController.SetPortrait(dialogueUnit.speakerName, dialogueUnit.emotion);
     }
 
     public void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
         CloseAll();
-        speakerTagPanel.Fill("Barkeep");
         speakerTagPanel.Open();
 
         playerResponseMenu.Open();
@@ -42,7 +38,6 @@ public class DialogueBoxController : MonoBehaviour
     void CloseAll()
     {
         speakerTagPanel.Close();
-        speachPanelMenu.Close();
         playerResponseMenu.Close();
     }
 

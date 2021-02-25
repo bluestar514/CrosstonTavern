@@ -22,6 +22,6 @@ public class PatronPickerButton : MonoBehaviour
     public void SetPatron()
     {
         bsc.SetPatron(patron);
-        bsc.AddConvSeperator();
+        //bsc.AddConvSeperator();
     }
 }
