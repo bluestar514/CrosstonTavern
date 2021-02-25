@@ -36,7 +36,7 @@ public class EffectObligation : Effect
 
         Obligation ob = new Obligation(obName, obligation.Start, obligation.End, obligation.Blocking, goalModule);
 
-        ws.registry.GetPerson(owner).schedule.Add(ob);
+        ws.map.GetPerson(owner).schedule.Add(ob);
 
         return new EffectObligation(owner, ob, verbalization);
     }

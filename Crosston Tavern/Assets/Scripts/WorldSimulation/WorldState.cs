@@ -8,17 +8,15 @@ public class WorldState
 {
     public string id = "default";
     public Map map;
-    public Registry registry;
     [SerializeField] private WorldTime time;
     public KnownFacts knownFacts;
 
     public WorldTime Time { get => new WorldTime(time); set => time = value; }
     public List<string> completeItemsList;
 
-    public WorldState(Map map, Registry registry, WorldTime time, string owner)
+    public WorldState(Map map, WorldTime time, string owner)
     {
         this.map = map;
-        this.registry = registry;
         this.Time = time;
         knownFacts = new KnownFacts(owner);
 
@@ -38,9 +36,7 @@ public class WorldState
             }
         }
 
-        Registry c_reg = new Registry(c_map.GetAllFeatures(), name);
-
-        WorldState copy = new WorldState(c_map, c_reg, time, name);
+        WorldState copy = new WorldState(c_map, time, name);
         copy.id = name;
         return copy;
     }
@@ -58,8 +54,8 @@ public class WorldState
 
     public Inventory GetInventory(string id)
     {
-        if(registry.GetPerson(id) != null) {
-            return registry.GetPerson(id).inventory;
+        if(map.GetPerson(id) != null) {
+            return map.GetPerson(id).inventory;
         }
         if(map.GetFeature(id) != null) {
             return map.GetFeature(id).inventory;
@@ -74,8 +70,8 @@ public class WorldState
     {
         if (id.StartsWith("person_")) id = id.Replace("person_", "");
 
-        if (registry.GetPerson(id) != null) {
-            return registry.GetPerson(id).relationships;
+        if (map.GetPerson(id) != null) {
+            return map.GetPerson(id).relationships;
         }
 
         Debug.LogWarning("Could not find " + id);
@@ -129,7 +125,7 @@ public class WorldState
         }
 
 
-        foreach(Person person in registry.GetPeople()) {
+        foreach(Person person in map.GetPeople()) {
             foreach(string item in person.inventory.GetItemList()) {
                 allItems.Add(item);
             }

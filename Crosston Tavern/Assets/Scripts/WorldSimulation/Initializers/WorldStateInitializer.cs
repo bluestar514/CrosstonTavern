@@ -8,50 +8,26 @@ public class WorldStateInitializer
     {
         Map map = new Map(new List<Feature>(FeatureInitializer.GetAllFeatures().Values),
                           new List<Location>(FeatureInitializer.GetAllLocations().Values));
-        Registry registry = new Registry(map.GetAllFeatures());
 
-        return new WorldState(map, registry, WorldTime.DayZeroEightAM, "global");
+        return new WorldState(map, WorldTime.DayZeroEightAM, "global");
     }
 
-    static public List<Townie> GetTownies( WorldState ws, Transform townieHolder)
+    static public List<Townie> GetTownies( WorldState globalWs, Transform townieHolder)
     {
         List<Townie> townies = new List<Townie>();
 
-        foreach (Person person in ws.registry.GetPeople()) {
-            WorldState personalWorldState = ws.Copy(person, person.id);
+        foreach (Person person in globalWs.map.GetPeople()) {
+            WorldState personalWorldState = globalWs.Copy((Person)person.Copy(true), person.id);
 
+            //Make Each Townie their own Game Object for debugging purposes:
             GameObject townieObj = new GameObject(person.id);
-            Townie townie = townieObj.AddComponent<Townie>();
-            townie.TownieInit(person, personalWorldState, new GoalManager(personalWorldState, person));
-
-            string self = townie.townieInformation.id;
-            //foreach (Person other in townie.ws.registry.GetPeople()) {
-            //    List<Relationship.RelationshipTag> relationshipTag = person.relationships.GetTag(other.id);
-
-            //    foreach(Relationship.RelationshipTag tag in relationshipTag) {
-            //        if(new List<Relationship.RelationshipTag>() {
-            //            Relationship.RelationshipTag.acquantences,
-            //            Relationship.RelationshipTag.enemies,
-            //            Relationship.RelationshipTag.friends,
-            //            Relationship.RelationshipTag.lovers
-            //            }.Contains(tag)) {
-
-            //            foreach (Relationship.RelationType relationType in new List<Relationship.RelationType>()
-            //                                { Relationship.RelationType.friendly, Relationship.RelationType.romantic}) {
-            //                float[] range = Relationship.codifiedRelationRanges[tag][relationType];
-            //                float value = Random.Range(Mathf.Max(range[0], -6), Mathf.Min(range[1], 10));
-
-            //                other.relationships.Increase(self, relationType, value);
-            //            }
-            //        }
-            //    }
-            //}
-
             townieObj.transform.parent = townieHolder; 
+            Townie townie = townieObj.AddComponent<Townie>();
+            townie.TownieInit(person.id, personalWorldState, new GoalManager(personalWorldState, person));
+
+            PeopleInitializer.SetAssumedPerceptionsOfOthers(townie);
 
             townies.Add(townie);
-            //new Townie(person, ws, new GoalManager(ws, person)));
-            //new Townie(person, personalWorldState, new GoalManager(personalWorldState, person)));
 
             townie.homeLocation = townie.townieInformation.location;
         }

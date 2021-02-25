@@ -28,7 +28,7 @@ public class WorldHub : MonoBehaviour
 
     private void Start()
     {
-        wsdm.AddPeople(new List<Person>(ws.registry.GetPeople()));
+        wsdm.AddPeople(new List<Person>(ws.map.GetPeople()));
 
         foreach (Townie person in allPeople) {
             if (person.name == "barkeep") continue;
@@ -83,7 +83,7 @@ public class WorldHub : MonoBehaviour
         }
 
         foreach(Townie person in allPeople) {
-            ProximityRelationChange(person.townieInformation);
+            //ProximityRelationChange(person.townieInformation); //isn't visible from the bar space so removing it for simplicity's sake
             person.townieInformation.statusEffectTable.Update();
         }
 
@@ -99,7 +99,7 @@ public class WorldHub : MonoBehaviour
 
     void ProximityRelationChange(Person person)
     {
-        foreach(string other in from p in ws.registry.GetPeople()
+        foreach(string other in from p in ws.map.GetPeople()
                                 where p.location == person.location
                                 select p.id) {
             person.relationships.Increase(other, Relationship.RelationType.friendly, UnityEngine.Random.Range(0, .3f));

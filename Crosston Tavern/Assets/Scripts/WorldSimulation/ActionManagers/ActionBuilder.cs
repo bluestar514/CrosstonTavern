@@ -84,7 +84,7 @@ public class ActionBuilder
                                                                                      select new BoundPortEntity(entity.tag, person)));
                         break;
                     case ActionRole.any:
-                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.registry.GetPeople()
+                        potentialBindings.Add(entity.tag, new List<BoundBindingPort>(from person in ws.map.GetPeople()
                                                                                      select new BoundPortEntity(entity.tag, person.id)));
                         break;
                     case ActionRole.location_any:
@@ -120,7 +120,7 @@ public class ActionBuilder
                     
 
                     string ownerId = ((BoundPortEntity)GetPortWithTag(invPort.owner, bindings)).participantId;
-                    Inventory inv = ws.registry.GetPerson(ownerId).inventory;
+                    Inventory inv = ws.map.GetPerson(ownerId).inventory;
 
                     itemCombinations.Add(port.tag, new List<BoundBindingPort>(from item in ws.completeItemsList
                                                                                 select new BoundPortInventoryItem(port.tag, item, inv.GetInventoryCount(item))));

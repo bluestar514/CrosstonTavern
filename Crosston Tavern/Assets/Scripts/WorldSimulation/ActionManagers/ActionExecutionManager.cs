@@ -11,53 +11,67 @@ using System.Linq;
 public class ActionExecutionManager : ActionManager
 {
     Townie actor;
-    WorldState ws; //global world state
+    WorldState globalWs;
     List<Townie> townies;
 
     public ActionExecutionManager(Townie actor, WorldState ws, List<Townie> townies)
     {
         this.actor = actor;
-        this.ws = ws;
+        this.globalWs = ws;
         this.townies = townies;
     }
 
 
     public ExecutedAction ExecuteAction(ChosenAction chosenAction)
     {
-        string location = actor.townieInformation.location;
+        ExecutedAction executedAction = UpdateGlobalWorldState(chosenAction);
 
-        Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
-
-        FeatureResources resources = ws.map.GetFeature(chosenAction.Action.FeatureId).relevantResources;
-        BoundBindingCollection bindings = chosenAction.Action.Bindings;
-        bindings.BindResources(resources);
-
-        List <Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, bindings, resources);
-
-        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedEffects, ws.Time);
-
-        RealizeActionForTownies(location, executedAction);
-
-        //exectute action in minds of townies at both destination and source
-        if (location != actor.townieInformation.location)
-            RealizeActionForTownies(actor.townieInformation.location, executedAction);
-
-        ws.AddHistory(executedAction);
+        UpdateIndividualTownieStates(executedAction);
 
         return executedAction;
 
     }
 
+    ExecutedAction UpdateGlobalWorldState(ChosenAction chosenAction)
+    {
+        Outcome chosenOutcome = ChooseOutcome(chosenAction.Action);
+
+        FeatureResources resources = globalWs.map.GetFeature(chosenAction.Action.FeatureId).relevantResources;
+        BoundBindingCollection bindings = chosenAction.Action.Bindings;
+        bindings.BindResources(resources);
+
+
+        List<Effect> realizedEffects = RealizeEffectsOfOutcome(chosenOutcome, bindings, resources);
+
+
+        ExecutedAction executedAction = new ExecutedAction(chosenAction, realizedEffects, globalWs.Time);
+        globalWs.AddHistory(executedAction);
+
+        return executedAction;
+
+    }
+
+    void UpdateIndividualTownieStates(ExecutedAction executedAction)
+    {
+        string location = executedAction.Action.LocationId;
+
+        RealizeActionForTownies(location, executedAction);
+        if (location != actor.townieInformation.location)
+            RealizeActionForTownies(actor.townieInformation.location, executedAction);
+
+    }
+
+
     Outcome ChooseOutcome(WeightedAction action)
     {
         BoundBindingCollection bindings = action.Bindings;
-        FeatureResources featureResources = ws.map.GetFeature(action.FeatureId).relevantResources;
+        FeatureResources featureResources = globalWs.map.GetFeature(action.FeatureId).relevantResources;
 
-        float totalChance = action.potentialOutcomes.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(ws));
+        float totalChance = action.potentialOutcomes.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(globalWs));
         float rand = UnityEngine.Random.value * totalChance;
 
         foreach(Outcome outcome in action.potentialOutcomes) {
-            float num = outcome.chanceModifier.MakeBound( bindings,featureResources).Chance(ws);
+            float num = outcome.chanceModifier.MakeBound( bindings,featureResources).Chance(globalWs);
 
             if (num > rand) return outcome;
             rand -= num;
@@ -73,7 +87,7 @@ public class ActionExecutionManager : ActionManager
         // updates the global WS
         // which is why the Townies feild here is null because we arent' updating anyone's internal state
         foreach (Effect effect in chosenOutcome.effects) {
-            realizedEffects.Add(effect.ExecuteEffect(ws, null, bindings, resources));
+            realizedEffects.Add(effect.ExecuteEffect(globalWs, null, bindings, resources));
         }
 
         return realizedEffects;
@@ -86,7 +100,7 @@ public class ActionExecutionManager : ActionManager
 
         List <Effect> realizedEffects = executedAction.executedEffect;
         BoundBindingCollection bindings = action.Bindings;
-        FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+        FeatureResources resources = globalWs.map.GetFeature(action.FeatureId).relevantResources;
 
         foreach (Townie townie in townies) {
             if(townie.townieInformation.location == location) {

@@ -15,7 +15,7 @@ public class ChanceModifierSocial : ChanceModifier
 
     public override float Chance(WorldState ws)
     {
-        Person source = ws.registry.GetPerson(socialState.sourceId);
+        Person source = ws.map.GetPerson(socialState.sourceId);
         string target = socialState.targetId;
         Relationship.RelationType type = socialState.axis;
 

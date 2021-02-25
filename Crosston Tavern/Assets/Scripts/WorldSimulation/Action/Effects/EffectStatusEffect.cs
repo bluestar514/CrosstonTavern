@@ -19,7 +19,7 @@ public class EffectStatusEffect : Effect
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
         string targetId = bindings.BindString(this.targetId);
-        Person target = ws.registry.GetPerson(targetId);
+        Person target = ws.map.GetPerson(targetId);
 
 
         EntityStatusEffect status = new EntityStatusEffect(this.status);
@@ -87,7 +87,7 @@ public class EffectStatusModify : Effect
     public override Effect ExecuteEffect(WorldState ws, Townie townie, BoundBindingCollection bindings, FeatureResources resources)
     {
         string targetId = bindings.BindString(this.targetId);
-        Person target = ws.registry.GetPerson(targetId);
+        Person target = ws.map.GetPerson(targetId);
 
         target.statusEffectTable.Alter(type, timeModification, intensityModification);
 

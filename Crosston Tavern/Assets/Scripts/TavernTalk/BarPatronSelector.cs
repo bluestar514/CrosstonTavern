@@ -204,7 +204,7 @@ public class BarPatronSelector
                 itemOpnion = (ChanceModifierItemOpinion)itemOpnion.MakeBound(bindings, resources);
                 string item = itemOpnion.item;
                 string person = itemOpnion.person;
-                PreferenceLevel level = ws.registry.GetPerson(person).ItemPreference(item);
+                PreferenceLevel level = ws.map.GetPerson(person).ItemPreference(item);
 
                 relatedKnowledge.Add(new WorldFactPreference(person, level, item));
 

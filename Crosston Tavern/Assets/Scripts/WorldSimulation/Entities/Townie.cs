@@ -9,7 +9,7 @@ public class Townie: MonoBehaviour
     private string id;
     public string Id { get => id; private set => id = value; }
 
-    public Person townieInformation; //should be them as a person in the WS;
+    public Person townieInformation { get => ws.map.GetPerson(id);}
 
     public WorldState ws; //there understanding of the WorldState
 
@@ -17,10 +17,9 @@ public class Townie: MonoBehaviour
     
     public string homeLocation;
 
-    public void TownieInit(Person townieInformation, WorldState ws, GoalManager gm)
+    public void TownieInit(string id, WorldState ws, GoalManager gm)
     {
-        id = townieInformation.id;
-        this.townieInformation = townieInformation;
+        this.id = id;
         this.ws = ws;
         this.gm = gm;
     }

@@ -45,7 +45,7 @@ public class ChanceModifierItemOpinion : ChanceModifier
     {
         int value = 0;
 
-        Person p = ws.registry.GetPerson(person);
+        Person p = ws.map.GetPerson(person);
 
         switch (p.preference.GetLevel(item)) {
             case PreferenceLevel.loved:

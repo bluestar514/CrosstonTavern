@@ -33,7 +33,7 @@ public class EffectGoal : Effect
 
         GoalModule goalModule = new GoalModule(preconditions, goals, name);
 
-        if (townie != null && owner == townie.townieInformation.id) {
+        if (townie != null && owner == townie.Id) {
             townie.gm.AddModule(goalModule);
         }
         return new EffectGoal(owner, goalModule, verbalization);

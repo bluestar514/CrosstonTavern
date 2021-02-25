@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LogController: MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class LogController: MonoBehaviour
     public GameObject p_DisplayPanel;
     public GameObject daySeperatorPrefab;
     public GameObject conversationSeperatorPrefab;
+
+    public ScrollRect scrollRect;
 
     List<RecordDisplay> displayPanels = new List<RecordDisplay>();
 
@@ -30,15 +33,34 @@ public class LogController: MonoBehaviour
         panel.Fill(element);
 
         displayPanels.Add(panel);
+
+        ScrollToBottom();
     }
 
     public void AddDaySeperator(WorldTime date)
     {
         Instantiate(daySeperatorPrefab, contentPanel.transform).GetComponent<DaySeperator>().Initialize(date);
+        ScrollToBottom();
     }
 
     public void AddConversationSeperator()
     {
         Instantiate(conversationSeperatorPrefab, contentPanel.transform);
+        ScrollToBottom();
+    }
+
+
+    private void ScrollToBottom()
+    {
+
+        StartCoroutine(Scroll());
+    }
+
+    IEnumerator Scroll()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        //Canvas.ForceUpdateCanvases();
+        scrollRect.verticalNormalizedPosition = 0;
     }
 }

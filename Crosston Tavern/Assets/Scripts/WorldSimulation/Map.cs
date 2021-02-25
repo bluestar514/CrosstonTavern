@@ -147,4 +147,19 @@ public class Map
         features.Add(key, f);
         Features.Add(f);
     }
+
+    public Person GetPerson(string id)
+    { 
+        if (features.ContainsKey(id) && 
+            features[id] is Person person)
+            return person;
+        return null;
+    }
+
+    public IEnumerable<Person> GetPeople()
+    {
+        return from feature in features.Values
+               where feature is Person
+               select (Person)feature;
+    }
 }

@@ -19,7 +19,7 @@ public class StateAvailable : State
     {
         string actor = bindings.BindString(this.actor);
 
-        return ws.registry.GetPerson(actor).schedule.TimeFree(start, end);
+        return ws.map.GetPerson(actor).schedule.TimeFree(start, end);
     }
 
     public override State Bind(BoundBindingCollection bindings, FeatureResources resources)

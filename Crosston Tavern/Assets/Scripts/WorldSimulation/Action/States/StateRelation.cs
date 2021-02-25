@@ -27,7 +27,7 @@ public class StateRelation : State
     {
         StateRelation state = (StateRelation)Bind(bindings, resources);
 
-        Person source = ws.registry.GetPerson(state.source);
+        Person source = ws.map.GetPerson(state.source);
 
         return source.relationships.RelationTagged(state.target, tag);
     }

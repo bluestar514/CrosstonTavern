@@ -135,7 +135,7 @@ public class WorldFactPreference: WorldFact
 
     public override List<WorldFact> UpdateWorldState(WorldState ws)
     {
-        ItemPreference pref = ws.registry.GetPerson(person).preference;
+        ItemPreference pref = ws.map.GetPerson(person).preference;
 
         pref.Add(item, level);
 

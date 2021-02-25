@@ -33,7 +33,7 @@ public class StateSocial : State
         string source = bindings.BindString(sourceId);
         string target = bindings.BindString(targetId);
 
-        float relValue = ws.registry.GetPerson(source).relationships.Get(target, axis);
+        float relValue = ws.map.GetPerson(source).relationships.Get(target, axis);
 
         return relValue <= max && relValue >= min;
     }

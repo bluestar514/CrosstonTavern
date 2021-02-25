@@ -139,7 +139,7 @@ public class EffectMovement: Effect
 
         Map map = ws.map;
 
-        string currentLocation = ws.registry.GetPerson(mover).location;
+        string currentLocation = ws.map.GetPerson(mover).location;
         string goalLocation = state.locationId;
 
         if (mover != state.moverId) return 0;

@@ -239,7 +239,7 @@ public class SocialMoveFactory
     static SocialMove MakeTellRelation(Townie speaker, string target)
     {
         List<WorldFact> facts = GetInterRelationship(speaker.townieInformation, target);
-        facts.AddRange(GetInterRelationship(speaker.ws.registry.GetPerson(target), speaker.Id));
+        facts.AddRange(GetInterRelationship(speaker.ws.map.GetPerson(target), speaker.Id));
 
         return new SocialMove("tellRelationWith#", arguements: new List<string>() { target }, mentionedFacts: facts);
     }
