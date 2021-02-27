@@ -17,14 +17,16 @@ public class PeopleDetailTab : DetailTab
     public GameObject entryPrefab;
 
     [System.NonSerialized]
-    public Person displayedPerson;
+    public Townie displayedTownie;
+    Person displayedPerson;
 
-    public void Set(Person person)
+    public void Set(Townie person)
     {
-        displayedPerson = person;
+        displayedTownie = person;
+        displayedPerson = person.townieInformation;
 
-        displayName.text = person.id;
-        location.text = person.location;
+        displayName.text = person.Id;
+        location.text = displayedPerson.location;
 
         Clear();
         Fill();
@@ -59,10 +61,14 @@ public class PeopleDetailTab : DetailTab
             IEnumerable<string> relTags = from tag in rel.GetTag(people)
                                           select tag.ToString();
 
+            Relationship reverseRel = displayedTownie.ws.GetRelationshipsFor(people);
+
             Instantiate(entryPrefab, relationsHolder)
                 .GetComponent<DisplayEntry>().Init(people + ":("+ 
                                                     rel.Get(people, Relationship.RelationType.friendly) +","+
-                                                    rel.Get(people, Relationship.RelationType.romantic) + ") {" +
+                                                    rel.Get(people, Relationship.RelationType.romantic) + ") - ("+
+                                                    reverseRel.Get(displayedTownie.Id, Relationship.RelationType.friendly)+","+
+                                                    reverseRel.Get(displayedTownie.Id, Relationship.RelationType.romantic) + ") - {"+
                                                     string.Join(", ", relTags)+"}");
         }
     }

@@ -11,12 +11,12 @@ public class DialogueBoxController : MonoBehaviour
 
     
 
-    public void Initialize(BarSpaceController bsc)
+    public virtual void Initialize(BarSpaceController bsc)
     {
         playerResponseMenu.Initialize(bsc);
     }
 
-    public void DisplayNPCAction(DialogueUnit dialogueUnit)
+    public virtual void DisplayNPCAction(DialogueUnit dialogueUnit)
     {
         CloseAll();
 
@@ -26,7 +26,7 @@ public class DialogueBoxController : MonoBehaviour
         portraitController.SetPortrait(dialogueUnit.speakerName, dialogueUnit.emotion);
     }
 
-    public void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
+    public virtual void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
         CloseAll();
         speakerTagPanel.Open();

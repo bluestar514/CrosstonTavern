@@ -34,7 +34,12 @@ public class SocialMove
     {
         string name = verb;
         foreach(string arg in arguements) {
-            name = name.Replace("#", arg);
+            int index = name.IndexOf("#");
+            if(index >0) {
+                name = name.Substring(0, index) + 
+                        arg + 
+                        name.Substring(index+1);
+            } 
         }
 
         if (content == "")

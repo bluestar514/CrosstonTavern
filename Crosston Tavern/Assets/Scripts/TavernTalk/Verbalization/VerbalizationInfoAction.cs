@@ -7,14 +7,28 @@ public class VerbilizationAction : VerbilizationInfo
     public string verbPresent;
     public string verbPast;
 
+    protected string verb;
+    protected string actor;
+    protected string feature;
+
+
     public VerbilizationAction(string verbPresent, string verbPast)
     {
         this.verbPresent = verbPresent;
         this.verbPast = verbPast;
     }
 
-    public virtual string Verbilize(string actor, string feature, bool presentTense)
+    public virtual string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
+        verb = verbPresent;
+        if (!presentTense) verb = verbPast;
+
+        if (includeSubject)
+            this.actor = VerbalizationDictionary.Replace(actor);
+        else
+            this.actor = "";
+        this.feature = VerbalizationDictionary.Replace(feature);
+
         return verbPresent;
     }
 }
@@ -26,15 +40,13 @@ public class VerbilizationMovement : VerbilizationAction
     }
 
     // bob, door_farm->feild, true
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string went = verbPast;
-        if (presentTense) went = verbPresent;
+        base.Verbilize(actor, feature, presentTense, includeSubject);
 
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature.Split('>')[1]);
+        this.feature = VerbalizationDictionary.Replace(feature.Split('>')[1]);
 
-        return actor + went + feature;
+        return this.actor + this.verb + this.feature;
     }
 }
 
@@ -48,15 +60,11 @@ public class VerbilizationActionResourceGathering : VerbilizationAction
     //I went fishing at the pond in the forest
     //you went foraging at the feild bushes
     //Bob went fishing at the farm river
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string verb = verbPresent;
-        if (!presentTense) verb = verbPast;
+        base.Verbilize(actor, feature, presentTense, includeSubject);
 
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature);
-
-        return actor + " " + verb + " at " + feature;
+        return this.actor + " " + this.verb + " at " + this.feature;
     }
 }
 
@@ -69,15 +77,11 @@ public class VerbilizationActionSocial : VerbilizationAction
     //I complimented Alicia
     //you insulted Alicia
     //Bob started dating Alicia
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string verb = verbPresent;
-        if (!presentTense) verb = verbPast;
+        base.Verbilize(actor, feature, presentTense, includeSubject);
 
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature);
-
-        return actor + " " + verb + " " + feature;
+        return this.actor + " " + this.verb + " " + this.feature;
     }
 }
 
@@ -96,7 +100,7 @@ public class VerbilizationActionItem : VerbilizationAction
     //I gave Alicia a strawberry
     //you asked Alicia for a rose
     //Bob gave Alicia a cake
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
         return base.Verbilize(actor, feature, presentTense);
     }
@@ -111,16 +115,12 @@ public class VerbilizationActionItemAskFor : VerbilizationActionItem
     //I gave Alicia a strawberry
     //you asked Alicia for a rose
     //Bob gave Alicia a cake
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string verb = verbPresent;
-        if (!presentTense) verb = verbPast;
-
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature);
+        base.Verbilize(actor, feature, presentTense, includeSubject);
         string item = VerbalizationDictionary.Replace(itemBinding);
 
-        return actor + " " + verb + " " + feature + " for a " + item;
+        return this.actor + " " + this.verb + " " + this.feature + " for a " + item;
     }
 }
 
@@ -132,16 +132,12 @@ public class VerbilizationActionItemGive : VerbilizationActionItem
 
     //I gave Alicia a strawberry
     //Bob gave Alicia a cake
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string verb = verbPresent;
-        if (!presentTense) verb = verbPast;
-
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature);
+        base.Verbilize(actor, feature, presentTense, includeSubject);
         string item = VerbalizationDictionary.Replace(itemBinding);
 
-        return actor + " " + verb + " " + feature + " a " + item;
+        return this.actor + " " + this.verb + " " + this.feature + " a " + item;
     }
 }
 
@@ -154,14 +150,10 @@ public class VerbalizationActionFeatureAt : VerbilizationAction
         return base.ToString();
     }
 
-    public override string Verbilize(string actor, string feature, bool presentTense)
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        string verb = verbPresent;
-        if (!presentTense) verb = verbPast;
+        base.Verbilize(actor, feature, presentTense, includeSubject);
 
-        actor = VerbalizationDictionary.Replace(actor);
-        feature = VerbalizationDictionary.Replace(feature);
-
-        return actor + " " + verb + " the " + feature;
+        return this.actor + " " + this.verb + " the " + this.feature;
     }
 }

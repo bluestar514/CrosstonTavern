@@ -29,7 +29,7 @@ public class Verbalizer
             }
 
             owner = VerbalizationDictionary.Replace(owner);
-            string item = VerbalizationDictionary.Replace(stateInv.itemId, false);
+            string item = VerbalizationDictionary.Replace(stateInv.itemId, VerbalizationDictionary.Form.plural);
 
             return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + item);
         } else if (goalState is StateSocial) {
@@ -49,7 +49,7 @@ public class Verbalizer
             owner = VerbalizationDictionary.Replace(owner);
             target = VerbalizationDictionary.Replace(target);
 
-            return (owner + " to be" + axisDirection + " " + stateSocial.axis + " with " + target);
+            return (owner + " will feel" + axisDirection + " " + stateSocial.axis + " toward " + target);
         } else if (goalState is StatePosition) {
             StatePosition statePos = (StatePosition)goalState;
 
@@ -59,22 +59,38 @@ public class Verbalizer
         } else if (goalState is StateRelation) {
             StateRelation stateRelation = (StateRelation)goalState;
 
-            if (stateRelation.source != speakerId) {
-                owner = stateRelation.source + " to ";
-            }
-            if (stateRelation.target == speakerId) target = "me";
-            else target = stateRelation.target;
+            string source = stateRelation.source;
+            target = stateRelation.target;
 
-            owner = VerbalizationDictionary.Replace(owner);
+            if (source == speakerId) source = "I";
+            if (target == speakerId) target = "me";
+
+            if (source == listenerId) source = "you";
+            if (target == listenerId) target = "you";
+
+
+            source = VerbalizationDictionary.Replace(source);
             target = VerbalizationDictionary.Replace(target);
+            string tag = stateRelation.tag.ToString();
 
-            return (owner + "to be " + stateRelation.tag + " " + target);
+            switch (stateRelation.tag) {
+                case Relationship.RelationshipTag.dating:
+                    if (source == "I") return "I can date " + target;
+
+                    return source+" will date "+target;
+                case Relationship.RelationshipTag.liked:
+                    return source + " will like " + target + " some";
+                case Relationship.RelationshipTag.disliked:
+                    return source + " will dislike " + target + " some";
+                default:
+                    return source+" will be "+tag+ "s with "+target;
+            }
         } else {
             return (goalState.id);
         }
     }
 
-    public string VerbalizeAction(BoundAction action, bool presentTense)
+    public string VerbalizeAction(BoundAction action, bool presentTense, bool includeSubject = true)
     {
         string actionActor = action.ActorId;
         if (actionActor == speakerId) {
@@ -94,7 +110,7 @@ public class Verbalizer
         actionActor = VerbalizationDictionary.Replace(actionActor);
         actionLocation = VerbalizationDictionary.Replace(actionLocation);
 
-        string verbilization = action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense);
+        string verbilization = action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense, includeSubject);
         verbilization = action.Bindings.BindString(verbilization);
 
         return verbilization;
@@ -177,25 +193,28 @@ public class Verbalizer
             return VerbalizeState(goalState.state);
         }
        if(goal is GoalAction goalAction) {
-            return VerbalizeAction(goalAction.action, true);
+            return VerbalizeAction(goalAction.action, true, goalAction.action.ActorId != speakerId);
         }
 
         return goal.ToString();
     }
 
-    public static string MakeNiceList(List<string> collectedEvents)
+    public static string MakeNiceList(List<string> collectedEvents, bool and = true)
     {
          collectedEvents = new List<string>(collectedEvents.Distinct());
 
         string verbalization = "";
 
+        string AND = "and";
+        if (!and) AND = "or";
+
         if (collectedEvents.Count >= 3) {
             string lastevent = collectedEvents.Last();
             collectedEvents.RemoveAt(collectedEvents.Count - 1);
 
-            verbalization += string.Join(", ", collectedEvents) + ", and " + lastevent;
+            verbalization += string.Join(", ", collectedEvents) + ", "+AND+" " + lastevent;
         } else if (collectedEvents.Count == 2) {
-            verbalization += string.Join(" and ", collectedEvents);
+            verbalization += string.Join(", " + AND + " ", collectedEvents);
         } else if (collectedEvents.Count == 1) {
             verbalization += collectedEvents[0];
         } else {

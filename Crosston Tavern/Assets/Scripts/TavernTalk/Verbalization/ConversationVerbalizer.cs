@@ -110,42 +110,13 @@ public class ConversationVerbalizer
                 //Thanks. This was a good choice, I like anything with strawberries.
                 emotion = NPCPortrait.State.soup;
 
+                KeyValuePair<string, NPCPortrait.State> pair = VerbalizeDishThank(socialMove);
 
-                List<string> favorites = new List<string>();
-                foreach(WorldFact fact in socialMove.mentionedFacts) {
-                    if(fact is WorldFactPreference) {
-                        WorldFactPreference preference = (WorldFactPreference)fact;
-                        favorites.Add("I " + preference.level + " anything with " + VerbalizationDictionary.Replace(preference.item, false)); //preference.Verbalize(townie.Id, partner));
-                    }
-                }
-                string dishOpinion = "";
-                if (socialMove.mentionedFacts.Count > 0)
-                    dishOpinion = socialMove.mentionedFacts[0].Verbalize(townie.Id, partner);
-
-                verbalization = "Thanks.";
-                if(socialMove.arguements[0] == PreferenceLevel.loved.ToString()) {
-                    verbalization += "Oh man, " + dishOpinion + ".";
-                    favorites.RemoveAt(0);
-
-                    emotion = NPCPortrait.State.happy;
-                }else if (socialMove.arguements[0] == PreferenceLevel.liked.ToString()) {
-                    verbalization += dishOpinion + ".";
-                    favorites.RemoveAt(0);
-
-                    
-                }
-                else if(socialMove.arguements[0] == PreferenceLevel.neutral.ToString()) {
-                    verbalization += " This was a good choice.";
-                }else if (socialMove.arguements[0] == PreferenceLevel.disliked.ToString()) {
-
-                } else if (socialMove.arguements[0] == PreferenceLevel.hated.ToString()) {
-
-                }
-
-                if (favorites.Count > 0)
-                    verbalization += " Actually, " + Verbalizer.MakeNiceList(favorites);
+                verbalization = pair.Key;
+                if (pair.Value != NPCPortrait.State.none) emotion = pair.Value;
 
                 break;
+
 
             case "askAboutDayHighlights":
                 string patronGeneralMood = socialMove.arguements[0];
@@ -224,16 +195,47 @@ public class ConversationVerbalizer
                 break;
             
             case "tellWhyGoal#":
-
+                /*mentionedFacts:   0 - goal we are talking about,
+                                    1 - an action unlocked by completing this goal, 
+                                    2 + reasons for goal
+                */
                 if (facts.Count == 1) {
                     verbalization = "I just do.";
                     break;
                 } else {
-                    //0th element is the goal in question
-                    facts.RemoveAt(0);
-                    goto case "tellAboutGoals";
+
+                    if(facts.Count < 3) 
+                        throw new System.Exception(
+                            "Incorrect number of mentioned facts for " +
+                            "\"tellWhyGoal#\" SocialAction. Should be 1 " +
+                            "or 3+. Was "+facts.Count);
+                    if (facts[0] is WorldFactGoal subjectGoalFact &&
+                        facts[1] is WorldFactPotentialAction potentialDesirableAction) {
+
+                        List<WorldFact> reasonsForSubjectGoal = facts;
+                        reasonsForSubjectGoal.RemoveAt(1);
+                        reasonsForSubjectGoal.RemoveAt(0);
+                        
+
+
+                        verbalization = "I want to" + v.VerbalizeAction(potentialDesirableAction.action, true, false);
+
+                        List<string> reasons = new List<string>();
+                        foreach(WorldFact fact in reasonsForSubjectGoal) {
+                            if(fact is WorldFactGoal parentGoalFact) {
+                                Goal parentGoal = parentGoalFact.goal;
+
+                                reasons.Add(v.VerbalizeGoal(parentGoal));
+                            }
+                        }
+
+                        verbalization += " so " + Verbalizer.MakeNiceList(reasons)+".";
+                    }
+
+                   
                 }
 
+                break;
             case "tellAboutGoals":
                 List<string> motivations = new List<string>();
 
@@ -246,7 +248,7 @@ public class ConversationVerbalizer
                 foreach (WorldFact fact in facts) {
                     if(fact is WorldFactPotentialAction) {
                         actionFact = (WorldFactPotentialAction)fact;
-                        motivations.Add(v.VerbalizeAction(actionFact.action, true));
+                        motivations.Add(v.VerbalizeAction(actionFact.action, true, false));
                     }
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
@@ -366,6 +368,120 @@ public class ConversationVerbalizer
         }
 
         return new DialogueUnit(verbalization, townie.name, socialMove, emotion);
+    }
+
+
+    KeyValuePair<string, NPCPortrait.State> VerbalizeDishThank(SocialMove socialMove)
+    {
+        string verbalization = "";
+        NPCPortrait.State emotion = NPCPortrait.State.none;
+
+
+        if (socialMove.mentionedFacts.Count == 0 || !(socialMove.mentionedFacts[0] is WorldFactPreference))
+            throw new System.Exception("Can't verbalize opinion of dish if opinion was not given with social move!" +
+                " (" + socialMove + ")");
+
+        WorldFactPreference opinionOfDish = (WorldFactPreference)socialMove.mentionedFacts[0];
+        socialMove.mentionedFacts.RemoveAt(0);
+
+        Dictionary<PreferenceLevel, List<string>> prefDict = new Dictionary<PreferenceLevel, List<string>>();
+
+        foreach (WorldFact fact in socialMove.mentionedFacts) {
+
+            if (fact is WorldFactPreference) {
+                WorldFactPreference preference = (WorldFactPreference)fact;
+
+                PreferenceLevel level = preference.level;
+                string item = VerbalizationDictionary.Replace(preference.item, VerbalizationDictionary.Form.plural);
+
+                if (!prefDict.ContainsKey(level)) prefDict.Add(level, new List<string>());
+                prefDict[level].Add(item);
+            }
+        }
+
+        Dictionary<PreferenceLevel, string> opinions = new Dictionary<PreferenceLevel, string>();
+
+        if (prefDict.ContainsKey(PreferenceLevel.loved)) {
+            opinions.Add(PreferenceLevel.loved, 
+                    "I absolutely love anything with " +
+                    Verbalizer.MakeNiceList(prefDict[PreferenceLevel.loved], false));
+        }
+        if (prefDict.ContainsKey(PreferenceLevel.liked)) {
+            opinions.Add(PreferenceLevel.liked, 
+                    "I like stuff with " +
+                    Verbalizer.MakeNiceList(prefDict[PreferenceLevel.liked], false));
+        }
+        if (prefDict.ContainsKey(PreferenceLevel.disliked)) {
+            opinions.Add(PreferenceLevel.disliked, 
+                    "I don't really like " +
+                    Verbalizer.MakeNiceList(prefDict[PreferenceLevel.disliked], false) + 
+                    " in my food");
+        }
+        if (prefDict.ContainsKey(PreferenceLevel.hated)) {
+            opinions.Add(PreferenceLevel.hated, 
+                    "I hate " +
+                    Verbalizer.MakeNiceList(prefDict[PreferenceLevel.hated], true));
+        }
+
+
+        string dishOpinion = "";
+        if (socialMove.mentionedFacts.Count > 0)
+            dishOpinion = opinionOfDish.Verbalize(townie.Id, partner);
+
+        bool loved = opinions.ContainsKey(PreferenceLevel.loved);
+        bool liked = opinions.ContainsKey(PreferenceLevel.liked);
+        bool dised = opinions.ContainsKey(PreferenceLevel.disliked);
+        bool hated = opinions.ContainsKey(PreferenceLevel.hated);
+
+        if(opinionOfDish.level == PreferenceLevel.loved ||
+            opinionOfDish.level == PreferenceLevel.liked ||
+            opinionOfDish.level == PreferenceLevel.neutral) {
+            
+            verbalization = "Thanks. ";
+            if (opinionOfDish.level == PreferenceLevel.loved) {
+                verbalization += "Oh man, " + dishOpinion + ". ";
+                emotion = NPCPortrait.State.happy;
+            }
+            if (opinionOfDish.level == PreferenceLevel.liked) {
+                verbalization += dishOpinion + ". ";
+            }
+
+            if (loved) verbalization += opinions[PreferenceLevel.loved];
+            if (loved && liked) verbalization += " and ";
+            if (liked) verbalization += opinions[PreferenceLevel.liked];
+
+            if ((loved || liked) && (dised || hated)) verbalization += ". Although, ";
+
+            if (dised) verbalization += opinions[PreferenceLevel.disliked];
+            if (dised && hated) verbalization += " and ";
+            if (hated) verbalization += opinions[PreferenceLevel.hated];
+            verbalization += ".";
+        } else {
+            if (opinionOfDish.level == PreferenceLevel.disliked) {
+                verbalization += "Hmm, " + dishOpinion + ". ";
+            }
+            if (opinionOfDish.level == PreferenceLevel.liked) {
+                verbalization +="Oh. Um. Sorry. I hate this. This is kind of gross.";
+                emotion = NPCPortrait.State.sad;
+            }
+
+            if (hated) verbalization += opinions[PreferenceLevel.hated];
+            if (dised && hated) verbalization += " and ";
+            if (dised) verbalization += opinions[PreferenceLevel.disliked];
+
+            if ((loved || liked) && (dised || hated)) verbalization += ". Although, ";
+
+            if (liked) verbalization += opinions[PreferenceLevel.liked];
+            if (loved && liked) verbalization += " and ";
+            if (loved) verbalization += opinions[PreferenceLevel.loved];
+
+            verbalization += ".";
+        }
+
+
+        
+
+        return new KeyValuePair<string, NPCPortrait.State>( verbalization, emotion);
     }
 
     string VerbalizeAllEvents(List<WorldFact> facts)

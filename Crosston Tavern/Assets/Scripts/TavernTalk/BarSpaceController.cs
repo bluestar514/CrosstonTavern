@@ -15,11 +15,8 @@ public class BarSpaceController : MonoBehaviour
     public List<string> validPatronNames = new List<string>();
 
 
-    //public Patron patron;
-    //public Patron barkeep;
-
-    ConversationEngine patronEngine;
-    ConversationEngine barkeepEngine;
+    PatronEngine patronEngine;
+    BarkeepEngine barkeepEngine;
     ConversationVerbalizer patronVerbalizer;
     ConversationVerbalizer barkeepVerbalizer;
 
@@ -28,13 +25,22 @@ public class BarSpaceController : MonoBehaviour
     List<FoodItem> barMenu = new List<FoodItem>(from food in  ItemInitializer.menu.Values
                                                 select food);
 
-    public void Start()
+
+    public virtual void Start()
+    {
+        Init();
+    }
+
+    protected  void Init()
     {
         dbc.Initialize(this);
         nc.Initialize(new List<WorldFact>());
         lc.Initialize(new List<DialogueUnit>());
 
         bps = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
+
+        
+
         SetNextPatron();
     }
 
@@ -67,8 +73,8 @@ public class BarSpaceController : MonoBehaviour
         bps.Visit(partner.id);
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
-        barkeepEngine = new ConversationEngine(barkeepTownie, partner, barMenu);
-        patronEngine = new ConversationEngine(townie, barkeepTownie.townieInformation, barMenu); 
+        barkeepEngine = new BarkeepEngine(barkeepTownie, partner, barMenu);
+        patronEngine = new PatronEngine(townie, barMenu); 
         barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner.id);
         patronVerbalizer = new ConversationVerbalizer(townie, "barkeep");
 
@@ -102,7 +108,7 @@ public class BarSpaceController : MonoBehaviour
             NPCSpeak(lastSocialMove);
         }
 
-        Debug.Log(lastSocialMove + "(" + lastSocialMove.verb + ")");
+        //Debug.Log(lastSocialMove + "(" + lastSocialMove.verb + ")");
 
         PlayerPhase();
     }
@@ -145,7 +151,7 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
-        Debug.Log(dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
+        //Debug.Log(dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
 
         lc.AddElement(dialogueUnit);
         barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
@@ -175,10 +181,5 @@ public class BarSpaceController : MonoBehaviour
         foreach(WorldFact fact in facts) {
             nc.RemoveElement(fact);
         }
-    }
-
-    public bool Test()
-    {
-        return true;
     }
 }

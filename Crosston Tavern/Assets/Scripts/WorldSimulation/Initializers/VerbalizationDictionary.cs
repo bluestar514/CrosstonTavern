@@ -5,11 +5,18 @@ using UnityEngine;
 public class VerbalizationDictionary 
 {
 
+    public enum Form
+    {
+        singular,
+        plural,
+        general
+    }
+
     public static Dictionary<string, EntityVerbalization> verbalizationData = new Dictionary<string, EntityVerbalization>() {
         {"strawberry_cake", new EntityVerbalization("strawberry_cake", "strawberry cake", "strawberry cakes") },
         {"fried_salmon", new EntityVerbalization("fried_salmon", "fried salmon", "fried salmon") },
         {"blackberry_tart", new EntityVerbalization("blackberry_tart", "blackberry tart", "blackberry tarts") },
-        {"stewed_trout", new EntityVerbalization("stewed_trout", "bowl of stewed trout", "bowls of stewed trout") },
+        {"stewed_trout", new EntityVerbalization("stewed_trout", "bowl of stewed trout", "bowls of stewed trout", "stewed trout") },
 
 
         {"dandelion", new EntityVerbalization("dandelion", "dandelion", "dandelions") }, 
@@ -27,10 +34,10 @@ public class VerbalizationDictionary
         {"seed_blackberry", new EntityVerbalization("seed_blackberry", "blackberry seed", "blackberry seeds") },
         {"blackberry", new EntityVerbalization("blackberry", "blackberry", "blackberries") },
         {"seed_flour", new EntityVerbalization("seed_flour", "wheat seed", "wheat seeds") },
-        {"flour", new EntityVerbalization("flour", "bag of flour", "bags of flour") },
+        {"flour", new EntityVerbalization("flour", "bag of flour", "bags of flour", "flour") },
         {"egg", new EntityVerbalization("egg", "egg", "eggs") },
-        {"milk", new EntityVerbalization("milk", "carton of milk", "cartons of milk") },
-        {"butter", new EntityVerbalization("butter", "stick of butter", "sticks of butter") },
+        {"milk", new EntityVerbalization("milk", "carton of milk", "cartons of milk", "milk") },
+        {"butter", new EntityVerbalization("butter", "stick of butter", "sticks of butter", "butter") },
         {"tulip", new EntityVerbalization("tulip", "tulip", "tulips") },
         {"rose", new EntityVerbalization("rose", "rose", "roses") },
         {"morning_rose", new EntityVerbalization("morning_rose", "morning rose", "morning roses") },
@@ -65,14 +72,31 @@ public class VerbalizationDictionary
         
     };
 
-    public static string Replace(string id, bool singular=true)
+    public static string Replace(string id, Form form = Form.singular)
     {
         if (verbalizationData.ContainsKey(id)) {
-            if (singular) return verbalizationData[id].singularNoun;
-            else return verbalizationData[id].pluralNoun;
+            switch (form) {
+                case Form.singular:
+                    return verbalizationData[id].singularNoun;
+                case Form.plural:
+                    return verbalizationData[id].pluralNoun;
+                case Form.general:
+                    return verbalizationData[id].generalNoun;
+            }
         }
 
         return id;
+    }
+
+
+    public static string VerbalizePreferenceLevel(PreferenceLevel level, bool endInS=false)
+    {
+        string levelStr = level.ToString();
+        levelStr = levelStr.Remove(levelStr.Length - 1, 1);
+
+        if(endInS) levelStr += "s";
+
+        return levelStr;
     }
 }
 
@@ -82,12 +106,16 @@ public class EntityVerbalization
     public string id;
     public string singularNoun;
     public string pluralNoun;
+    public string generalNoun;
 
-    public EntityVerbalization(string id, string singularNoun, string pluralNoun="")
+    public EntityVerbalization(string id, string singularNoun, string pluralNoun="", string generalNoun="")
     {
         this.id = id;
         this.singularNoun = singularNoun;
         if (pluralNoun == "") pluralNoun = singularNoun;
         this.pluralNoun = pluralNoun;
+
+        if (generalNoun == "") generalNoun = singularNoun;
+        this.generalNoun = generalNoun;
     }
 }

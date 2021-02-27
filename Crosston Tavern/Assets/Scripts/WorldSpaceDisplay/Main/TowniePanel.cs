@@ -7,15 +7,15 @@ public class TowniePanel : MonoBehaviour
 {
     public string townie;
     [System.NonSerialized]
-    public Person person;
+    public Townie person;
     public Text display;
 
     public PeopleDetailTab PeopleDetailTab;
 
-    public void Set(Person person, PeopleDetailTab PeopleDetailTab)
+    public void Set(Townie person, PeopleDetailTab PeopleDetailTab)
     {
         this.person = person;
-        this.townie = person.id;
+        this.townie = person.Id;
         this.PeopleDetailTab = PeopleDetailTab;
 
         display.text = this.townie;

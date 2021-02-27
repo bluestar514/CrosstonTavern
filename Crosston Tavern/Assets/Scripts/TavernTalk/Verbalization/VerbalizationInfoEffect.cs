@@ -37,8 +37,11 @@ public class VerbilizationEffectItemGather : VerbilizationEffect
 
         if (effect is EffectInventory) {
             EffectInventory invEffect = (EffectInventory)effect;
-
-            string itemId = VerbalizationDictionary.Replace(invEffect.itemId, Mathf.Abs(invEffect.delta) == 1);
+            string itemId = "";
+            if (Mathf.Abs(invEffect.delta) == 1)
+                itemId = VerbalizationDictionary.Replace(invEffect.itemId, VerbalizationDictionary.Form.singular);
+            else 
+                itemId = VerbalizationDictionary.Replace(invEffect.itemId, VerbalizationDictionary.Form.plural);
 
             List<string> parts = new List<string>() {  verb, Mathf.Abs(invEffect.delta).ToString(), itemId };
 

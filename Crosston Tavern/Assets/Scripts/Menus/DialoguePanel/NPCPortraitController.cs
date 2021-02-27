@@ -55,7 +55,8 @@ public class NPCPortrait
         happy,
         angry,
         sad,
-        soup
+        soup,
+        none
     }
 
     public enum NPC

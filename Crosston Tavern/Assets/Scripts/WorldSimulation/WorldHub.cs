@@ -17,6 +17,8 @@ public class WorldHub : MonoBehaviour
     public WorldSpaceDisplayManager wsdm;
 
     Dictionary<Townie, ChosenAction> chosenActions = new Dictionary<Townie, ChosenAction>();
+
+    public bool ready = false;
     private void Awake()
     {
         ws = WorldStateInitializer.GetWorldState();
@@ -28,7 +30,7 @@ public class WorldHub : MonoBehaviour
 
     private void Start()
     {
-        wsdm.AddPeople(new List<Person>(ws.map.GetPeople()));
+        wsdm.AddPeople(allPeople);
 
         foreach (Townie person in allPeople) {
             if (person.name == "barkeep") continue;
@@ -41,7 +43,12 @@ public class WorldHub : MonoBehaviour
         for (int i = 0; i < simulatedInitialDays; i++) {
             DayStep();
         }
+
+
+        ready = true;
     }
+
+
 
     public void TimeStep()
     {
@@ -56,7 +63,7 @@ public class WorldHub : MonoBehaviour
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
         foreach (Townie person in allPeople) {
             if (person.name == "barkeep") continue;
-
+            
             if (chosenActions[person] == null) {
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, person.ws);

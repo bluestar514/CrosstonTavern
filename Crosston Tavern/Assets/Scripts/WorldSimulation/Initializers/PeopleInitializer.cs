@@ -172,7 +172,38 @@ public class PeopleInitializer
         }
         
     }
+    
+    public static void SetInitialRelationTags(Townie townie)
+    {
+        foreach(Person person in townie.ws.map.GetPeople()) {
+            Relationship rel = person.relationships;
 
+            foreach (string other in rel.GetKnownPeople()) {
+                foreach (KeyValuePair<Relationship.RelationshipTag,
+                    Dictionary<Relationship.RelationType, float[]>> pair in Relationship.codifiedRelationRanges) {
+                    Relationship.RelationshipTag tag = pair.Key;
+                    Dictionary<Relationship.RelationType, float[]> data = pair.Value;
+
+                    bool inRange = true;
+                    foreach (Relationship.RelationType axis in data.Keys) {
+                        int currentValue = person.relationships.Get(other, axis);
+
+                        if (currentValue < data[axis][0] ||
+                            currentValue > data[axis][1]) {
+                            inRange = false;
+                            break;
+                        }
+                    }
+
+                    if (inRange) {
+                        rel.AddRelationTag(other, tag);
+                    }
+
+                }
+
+            }
+        }
+    }
 
 
 

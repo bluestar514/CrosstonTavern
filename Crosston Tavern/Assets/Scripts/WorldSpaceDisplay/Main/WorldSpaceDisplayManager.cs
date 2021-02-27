@@ -37,13 +37,13 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         history = new List<Dictionary<string, EventPanel>>() {};
     }
 
-    public void AddPeople(List<Person> people)
+    public void AddPeople(List<Townie> people)
     {
         townieDisplayOrder = new List<string>(from person in people
-                                                select person.id);
+                                                select person.Id);
 
-        foreach(Person person in people) {
-            if (person.id == "barkeep") continue;
+        foreach(Townie person in people) {
+            if (person.Id == "barkeep") continue;
             AddTownieRow(person);
         }
     }
@@ -84,7 +84,7 @@ public class WorldSpaceDisplayManager : MonoBehaviour
         panel.GetComponent<RectTransform>().localPosition = new Vector3(panelX, -y);
     }
 
-    GameObject AddTownieRow(Person townie)
+    GameObject AddTownieRow(Townie townie)
     {
         GameObject towniePanel = Instantiate(TownieNamePanelPrefab, PeopleContent.transform);
         towniePanel.GetComponent<TowniePanel>().Set(townie, PeopleDetailTab);

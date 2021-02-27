@@ -14,19 +14,19 @@ public class LogController: MonoBehaviour
 
     List<RecordDisplay> displayPanels = new List<RecordDisplay>();
 
-    public void Initialize(List<DialogueUnit> records)
+    public virtual void Initialize(List<DialogueUnit> records)
     {
         GenerateFactPanels(records);
     }
 
-    void GenerateFactPanels(List<DialogueUnit> knownRecords)
+    protected virtual void GenerateFactPanels(List<DialogueUnit> knownRecords)
     {
         foreach (DialogueUnit record in knownRecords) {
             AddElement(record);
         }
     }
 
-    public void AddElement(DialogueUnit element)
+    public virtual void AddElement(DialogueUnit element)
     {
         RecordDisplay panel = Instantiate(p_DisplayPanel, contentPanel.transform).GetComponent<RecordDisplay>();
 
@@ -37,20 +37,20 @@ public class LogController: MonoBehaviour
         ScrollToBottom();
     }
 
-    public void AddDaySeperator(WorldTime date)
+    public virtual void AddDaySeperator(WorldTime date)
     {
         Instantiate(daySeperatorPrefab, contentPanel.transform).GetComponent<DaySeperator>().Initialize(date);
         ScrollToBottom();
     }
 
-    public void AddConversationSeperator()
+    public virtual void AddConversationSeperator()
     {
         Instantiate(conversationSeperatorPrefab, contentPanel.transform);
         ScrollToBottom();
     }
 
 
-    private void ScrollToBottom()
+    protected virtual void ScrollToBottom()
     {
 
         StartCoroutine(Scroll());

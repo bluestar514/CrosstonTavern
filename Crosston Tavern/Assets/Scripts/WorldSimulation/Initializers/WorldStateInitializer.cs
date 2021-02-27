@@ -26,6 +26,7 @@ public class WorldStateInitializer
             townie.TownieInit(person.id, personalWorldState, new GoalManager(personalWorldState, person));
 
             PeopleInitializer.SetAssumedPerceptionsOfOthers(townie);
+            PeopleInitializer.SetInitialRelationTags(townie);
 
             townies.Add(townie);
 
