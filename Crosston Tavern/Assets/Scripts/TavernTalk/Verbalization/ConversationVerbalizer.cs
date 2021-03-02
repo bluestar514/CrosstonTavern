@@ -32,7 +32,7 @@ public class ConversationVerbalizer
                 emotion = NPCPortrait.State.sad;
                 break;
         }
-
+        KeyValuePair<string, NPCPortrait.State> pair;
         string actionName;
         string str;
         ExecutedAction actionObj;
@@ -110,11 +110,10 @@ public class ConversationVerbalizer
                 //Thanks. This was a good choice, I like anything with strawberries.
                 emotion = NPCPortrait.State.soup;
 
-                KeyValuePair<string, NPCPortrait.State> pair = VerbalizeDishThank(socialMove);
+                pair = VerbalizeDishThank(socialMove);
 
                 verbalization = pair.Key;
                 if (pair.Value != NPCPortrait.State.none) emotion = pair.Value;
-
                 break;
 
 
@@ -137,7 +136,6 @@ public class ConversationVerbalizer
                 }
 
 
-                
                 break;
             case "askAboutObservation":
                 verbalization = "Did you see anything interesting today?";
@@ -199,16 +197,12 @@ public class ConversationVerbalizer
                                     1 - an action unlocked by completing this goal, 
                                     2 + reasons for goal
                 */
-                if (facts.Count == 1) {
+                if (facts.Count <= 2) {
                     verbalization = "I just do.";
                     break;
                 } else {
 
-                    if(facts.Count < 3) 
-                        throw new System.Exception(
-                            "Incorrect number of mentioned facts for " +
-                            "\"tellWhyGoal#\" SocialAction. Should be 1 " +
-                            "or 3+. Was "+facts.Count);
+                    
                     if (facts[0] is WorldFactGoal subjectGoalFact &&
                         facts[1] is WorldFactPotentialAction potentialDesirableAction) {
 
@@ -229,7 +223,7 @@ public class ConversationVerbalizer
                             }
                         }
 
-                        verbalization += " so " + Verbalizer.MakeNiceList(reasons)+".";
+                        verbalization += " " + Verbalizer.MakeNiceList(reasons)+".";
                     }
 
                    
@@ -238,8 +232,6 @@ public class ConversationVerbalizer
                 break;
             case "tellAboutGoals":
                 List<string> motivations = new List<string>();
-
-                
 
                 //I want to have 3 to 1000 trout
                 //I want to be friendlier with Alicia
@@ -257,7 +249,7 @@ public class ConversationVerbalizer
                 }
                 verbalization = "";
                 if (motivations.Count > 0) {
-                    verbalization = "I want to " + Verbalizer.MakeNiceList(motivations);
+                    verbalization = "I want " + Verbalizer.MakeNiceList(motivations);
                     verbalization += ", so I can " + Verbalizer.MakeNiceList(goals)+".";
                 } else {
                     verbalization = verbalization + "I want " + string.Join(". I want ", goals) + ". ";
@@ -267,7 +259,7 @@ public class ConversationVerbalizer
                 foreach (WorldFact fact in facts) {
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizeGoal(goalFact.goal));//UnrollGoalChain(goalFact.goal));
+                        goals.Add(v.VerbalizeGoal(goalFact.goal));
                     }
                 }
 
@@ -279,7 +271,13 @@ public class ConversationVerbalizer
 
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizeGoal(goalFact.goal));
+
+                        string snippet = v.VerbalizeGoal(goalFact.goal);
+                        if(snippet.StartsWith("you ")) {
+                            snippet = snippet.Remove(0, 4);
+                        }
+
+                        goals.Add(snippet);
                     }
                 }
 
@@ -361,6 +359,67 @@ public class ConversationVerbalizer
                 verbalization = "Well, alright then.";
                 break;
 
+            case "askRelationWith":
+                verbalization = "What do you think about...";
+                break;
+            case "askRelationWith#":
+                verbalization = "What do you think about " + VerbalizationDictionary.Replace(socialMove.arguements[0])+"?";
+                break;
+            case "tellRelationWith#":
+
+                pair = VerbalizePeopleOpinion(facts);
+                verbalization = pair.Key;
+                if (pair.Value != NPCPortrait.State.none) emotion = pair.Value;
+                break;
+            case "openTellRelationWith#":
+                verbalization = "I think...";
+                break;
+            case "tell#Relation#":
+
+                string subject = "ERROR";
+                Relationship.RelationshipTag tag = Relationship.RelationshipTag.acquantences;
+                if( facts.Count > 0 &&
+                    facts[0] is WorldFactRelation factRelation ) {
+                    tag = factRelation.relation.tag;
+                    subject = factRelation.relation.source;
+                }
+
+                subject = VerbalizationDictionary.Replace(subject);
+
+                switch (tag) {
+                    case Relationship.RelationshipTag.bestFriend:
+                        verbalization = subject + " thinks of you as a very close friend.";
+                        break;
+                    case Relationship.RelationshipTag.friend:
+                        verbalization = subject + " thinks of you as a good friend.";
+                        break;
+                    case Relationship.RelationshipTag.liked:
+                        verbalization = subject +  " thinks positively of you.";
+                        break;
+                    case Relationship.RelationshipTag.disliked:
+                        verbalization = subject + " thinks negatively of you.";
+                        break;
+                    case Relationship.RelationshipTag.enemy:
+                        verbalization = subject + " doesn't like you very much.";
+                        break;
+                    case Relationship.RelationshipTag.nemisis:
+                        verbalization = subject + " hates you.";
+                        break;
+                    case Relationship.RelationshipTag.crushing_on:
+                        verbalization = subject + " might have a crush on you.";
+                        break;
+                    case Relationship.RelationshipTag.in_love_with:
+                        verbalization = subject + " is in love with you.";
+                        break;
+                    case Relationship.RelationshipTag.head_over_heels:
+                        verbalization = subject + " is deeply in love with you.";
+                        break;
+                    default:
+                        verbalization = "I don't think they have a strong opinion about you.";
+                        break;
+                }
+
+                break;
             case "acknowledge":
                 verbalization = "No, I didn't";
                 Debug.LogWarning("No checking is done as to whether " + townie + " has actually heard " + string.Join(",",socialMove.mentionedFacts));
@@ -455,7 +514,8 @@ public class ConversationVerbalizer
             if (dised) verbalization += opinions[PreferenceLevel.disliked];
             if (dised && hated) verbalization += " and ";
             if (hated) verbalization += opinions[PreferenceLevel.hated];
-            verbalization += ".";
+
+            if (loved || liked || dised || hated) verbalization += ".";
         } else {
             if (opinionOfDish.level == PreferenceLevel.disliked) {
                 verbalization += "Hmm, " + dishOpinion + ". ";
@@ -475,13 +535,115 @@ public class ConversationVerbalizer
             if (loved && liked) verbalization += " and ";
             if (loved) verbalization += opinions[PreferenceLevel.loved];
 
-            verbalization += ".";
+            if (loved || liked || dised || hated) verbalization += ".";
         }
 
 
         
 
         return new KeyValuePair<string, NPCPortrait.State>( verbalization, emotion);
+    }
+
+    KeyValuePair<string, NPCPortrait.State> VerbalizePeopleOpinion(List<WorldFact> facts)
+    {
+        string verbalization = "";
+        NPCPortrait.State emotion = NPCPortrait.State.none;
+
+        List<Relationship.RelationshipTag> speakerToTargetTags = new List<Relationship.RelationshipTag>();
+        List<Relationship.RelationshipTag> targetToSpeakerTags = new List<Relationship.RelationshipTag>();
+
+        Dictionary<Relationship.RelationType, int> speakerToTargetFeeling = new Dictionary<Relationship.RelationType, int>();
+        Dictionary<Relationship.RelationType, int> targetToSpeakerFeeling = new Dictionary<Relationship.RelationType, int>();
+
+        foreach (WorldFact fact in facts) {
+            if (fact is WorldFactState factRel &&
+                factRel.state is StateRelation rel) {
+                if (rel.source == townie.Id) speakerToTargetTags.Add(rel.tag);
+                else targetToSpeakerTags.Add(rel.tag);
+            }
+            if (fact is WorldFactState factState &&
+                factState.state is StateSocial social) {
+                if (social.sourceId == townie.Id) speakerToTargetFeeling.Add(social.axis, social.min);
+                else targetToSpeakerFeeling.Add(social.axis, social.min);
+            }
+        }
+
+        if (speakerToTargetTags.Contains(Relationship.RelationshipTag.dating)) {
+            verbalization += "We're dating";
+            if (speakerToTargetTags.Contains(Relationship.RelationshipTag.head_over_heels) ||
+               speakerToTargetTags.Contains(Relationship.RelationshipTag.in_love_with)) {
+                verbalization += "! ";
+            } else {
+                verbalization += ". ";
+            }
+
+            emotion = NPCPortrait.State.happy;
+        }
+
+        int friendDif = 0;
+        int romanceDif = 0;
+        if (speakerToTargetTags.Contains(Relationship.RelationshipTag.head_over_heels)) {
+            verbalization += "I absolutely love them. They're just the best. ";
+            romanceDif = 50;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.in_love_with)) {
+            verbalization += "I love them. ";
+            romanceDif = 20;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.crushing_on)) {
+            verbalization += "I think they're really cute. ";
+            romanceDif = 10;
+        }
+        if (speakerToTargetTags.Contains(Relationship.RelationshipTag.bestFriend)) {
+            verbalization += "We're best friends. ";
+            emotion = NPCPortrait.State.happy;
+            friendDif = 50;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.friend)) {
+            verbalization += "We're friends. ";
+            friendDif = 20;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.liked)) {
+            verbalization += "They seem like a good person. ";
+            friendDif = 10;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.nemisis)) {
+            verbalization += "I hate them. They are the absolute worst! ";
+            emotion = NPCPortrait.State.angry;
+            friendDif = 50;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.enemy)) {
+            verbalization += "We don't get along. I don't like them at all. ";
+            emotion = NPCPortrait.State.sad;
+            friendDif = 20;
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.disliked)) {
+            verbalization += "I don't like them very much. ";
+            friendDif = 10;
+        } 
+        
+        
+        if(speakerToTargetTags.Count == 0) {
+            verbalization += "They're fine, I guess. ";
+        }
+
+        if (speakerToTargetTags.Contains(Relationship.RelationshipTag.in_love_with)) {
+            if (speakerToTargetFeeling[Relationship.RelationType.romantic] >
+            targetToSpeakerFeeling[Relationship.RelationType.romantic] + romanceDif) {
+                verbalization += "But, I'm worried that they might not love me as much as I love them...";
+            }
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.crushing_on)) {
+            if (speakerToTargetFeeling[Relationship.RelationType.romantic] >
+            targetToSpeakerFeeling[Relationship.RelationType.romantic] + romanceDif) {
+                verbalization += "But, I don't think they like me the same way...";
+            }
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.liked)) {
+            if (speakerToTargetFeeling[Relationship.RelationType.friendly] >
+            targetToSpeakerFeeling[Relationship.RelationType.friendly] + friendDif) {
+                verbalization += "But, I feel like I might like them more than they like me...";
+            }
+        } else if (speakerToTargetTags.Contains(Relationship.RelationshipTag.disliked)) {
+            if (speakerToTargetFeeling[Relationship.RelationType.friendly] <
+            targetToSpeakerFeeling[Relationship.RelationType.friendly] + friendDif) {
+                verbalization += "But, I don't know why, but they don't seem to dislike me nearly as much.";
+            }
+        }
+
+
+        return new KeyValuePair<string, NPCPortrait.State>(verbalization, emotion);
     }
 
     string VerbalizeAllEvents(List<WorldFact> facts)
@@ -546,9 +708,6 @@ public class ConversationVerbalizer
         return verbalization;
 
     }
-
-
-
 
     List<string> UnrollGoalChain(Goal initGoal)
     {

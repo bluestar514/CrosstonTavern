@@ -60,4 +60,27 @@ public class StateSkill : State
         };
     }
 
+
+    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+
+        string owner = ownerId;
+        if (speakerId == ownerId) owner = "I";
+        if (listenerId == ownerId) owner = "you";
+
+        string skillLevel = SkillDictionary.Replace(skillId, (int)min);
+
+        if (goal) {
+            if(owner == "I")
+                return "to become " + skillLevel; 
+            else
+                return owner + " to become " + skillLevel; 
+        } else {
+            if (owner == "you")
+                return owner + " are " + skillLevel;
+            else
+                return owner + " am " + skillLevel;
+        }
+    }
+
 }

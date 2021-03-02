@@ -1,4 +1,113 @@
-2/26/2021 6:18:08 PM
+3/1/2021 4:10:00 PM
+
+
+--CONVERSATION START--
+
+
+
+	avery (neutral):	<greet>
+
+		Good evening.
+
+
+	barkeep (neutral):	<greet>
+
+		Good evening.
+
+
+	avery (neutral):	<orderstewed_trout>
+
+		Can I get a bowl of stewed trout?
+
+
+	barkeep (neutral):	<serveOrderstewed_trout>
+
+		Coming right up.
+
+
+	avery (happy):	<thank>
+
+		Thanks. Oh man, I love stewed trout. I like stuff with trout. Although, I don't really like carrots in my food.
+
+
+	barkeep (neutral):	<askAboutDayHighlights>
+
+		Anything interesting happen today?
+
+
+	avery (neutral):	<tellAboutNOTEWORTHYEvent>
+
+		Today, I complimented Sammy and Sammy seemed pleased
+
+
+	barkeep (neutral):	<askWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 10:0>}>
+
+		Why did you compliment Sammy today?
+
+
+	avery (neutral):	<tellWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 10:0>}>
+
+		I wanted Sammy to feel more friendly toward me, and so I wanted Sammy to feel more romantic toward me
+
+
+	barkeep (neutral):	<askWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>>
+
+		Why do you want Sammy to feel more romantic toward you?
+
+
+	avery (neutral):	<tellWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>>
+
+		I want to ask out Sammy so to date Sammy.
+
+
+	barkeep (neutral):	<suggest>
+
+		Suggest...
+
+
+	barkeep (neutral):	<suggest<give_blackberry(avery, sammy)>>
+
+		Why not try {PotentialAction:<give_blackberry(avery, sammy)>}
+
+
+	avery (neutral):	<askConfirmSuggestion<give_blackberry(avery, sammy)>>
+
+		You really think that will help?
+
+
+	barkeep (neutral):	<confirmSuggestion<give_blackberry(avery, sammy)>>
+
+		Yeah, go for it!
+
+
+	avery (neutral):	<acceptSuggestion<give_blackberry(avery, sammy)>>
+
+		Alright, I guess I'll try doing that tomorrow.
+
+
+	barkeep (neutral):	<askAboutGoals>
+
+		What have you been trying to do lately?
+
+
+	avery (neutral):	<tellAboutGoals>
+
+		I want to go to the farm. I want to date Sammy. I want I give Sammy a blackberry. I want to have some blackberries. I want Sammy to feel more romantic toward me. 
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	avery (neutral):	<goodbye>
+
+		<goodbye>
+
+
+	barkeep (neutral):	<goodbye>
+
+		<goodbye>
 
 
 --CONVERSATION START--
@@ -15,7 +124,7 @@
 		How are you doing?
 
 
-	sammy (happy):	<tellStatehappy:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
+	sammy (happy):	<tellStatehappy>
 
 		I had a great day!
 
@@ -25,19 +134,9 @@
 		That's good!
 
 
-	sammy (happy):	<askForRecomendation>
+	sammy (happy):	<orderstrawberry_cake>
 
-		What's good on the menu tonight?
-
-
-	barkeep (neutral):	<recomendstrawberry_cake>
-
-		The strawberry cake is quite good.
-
-
-	sammy (happy):	<orderstrawberry_cakeOnRecomendation>
-
-		Sound good, let's go with that tonight.
+		Can I get a strawberry cake?
 
 
 	barkeep (neutral):	<serveOrderstrawberry_cake>
@@ -45,74 +144,19 @@
 		Coming right up.
 
 
-	sammy (happy):	<thank:{sammy:(loved,strawberry_cake)},{sammy:(liked,strawberry)}>
+	sammy (happy):	<thank>
 
 		Thanks. Oh man, I love strawberry cake. I like stuff with strawberries.
 
 
-	barkeep (neutral):	<askAboutPreferencesHate>
+	barkeep (neutral):	<tellPreferenceMenu>
 
-		What do you dislike?
-
-
-	sammy (happy):	<tellPreference:{sammy:(disliked,blackberry)}>
-
-		Did you know I don't really like blackberry?
+		<tellPreferenceMenu>
 
 
-	barkeep (neutral):	<askAboutPreferencesLike>
+	barkeep (neutral):	<nevermind>
 
-		What do you like?
-
-
-	sammy (happy):	<tellPreference:{sammy:(liked,strawberry)}>
-
-		Did you know I like strawberry?
-
-
-	barkeep (neutral):	<askAboutGoals>
-
-		What have you been trying to do lately?
-
-
-	sammy (happy):	<tellAboutGoals:{Goal:sammy - <StatePosition(sammy,field)>:1.5225},{Goal:sammy - <StatePosition(sammy,farm)>:1.5225},{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1},{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125}>
-
-		I want go to the field. I want go to the farm. I want <StateSkill(sammy-fishing:{90~100})>. I want have 20 to 100 trout. 
-
-
-	barkeep (neutral):	<askWhyGoal<StateSkill(sammy-fishing:{90~100})>:{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1}>
-
-		Why do you want <StateSkill(sammy-fishing:{90~100})>?
-
-
-	sammy (happy):	<tellWhyGoal<StateSkill(sammy-fishing:{90~100})>:{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1}>
-
-		I just do.
-
-
-	barkeep (neutral):	<suggest:{PotentialAction:<fish(sammy, river_farm)>},{PotentialAction:<tend_animal(sammy, chicken_farm)>},{PotentialAction:<tend_animal(sammy, cow_farm)>},{PotentialAction:<harvest_crops(sammy, field_farm)>},{PotentialAction:<move(sammy, door_farm->field)>},{PotentialAction:<move(sammy, door_farm->averysHouse)>},{PotentialAction:<fish(sammy, river_field)>},{PotentialAction:<forage(sammy, meadow_field)>},{PotentialAction:<move(sammy, door_field->farm)>},{PotentialAction:<move(sammy, door_field->hill)>},{PotentialAction:<move(sammy, door_field->forest)>},{PotentialAction:<move(sammy, door_field->town)>},{PotentialAction:<move(sammy, door_field->finleysHouse)>},{PotentialAction:<buy_fishing_rod(sammy, tackle_shop_town)>},{PotentialAction:<sell_fish_at_market(sammy, tackle_shop_town)>},{PotentialAction:<move(sammy, door_town->field)>},{PotentialAction:<move(sammy, door_town->inn)>},{PotentialAction:<move(sammy, door_town->sammysHouse)>},{PotentialAction:<forage(sammy, brush_forest)>},{PotentialAction:<move(sammy, door_forest->field)>},{PotentialAction:<move(sammy, door_inn->town)>},{PotentialAction:<move(sammy, door_averysHouse->farm)>},{PotentialAction:<talk(sammy, avery)>},{PotentialAction:<give_algee(sammy, avery)>},{PotentialAction:<give_fishing_rod(sammy, avery)>},{PotentialAction:<give_dandelion(sammy, avery)>},{PotentialAction:<give_trout(sammy, avery)>},{PotentialAction:<give_strawberry(sammy, avery)>},{PotentialAction:<give_egg(sammy, avery)>},{PotentialAction:<give_milk(sammy, avery)>},{PotentialAction:<give_strawberry_cake(sammy, avery)>},{PotentialAction:<give_salmon(sammy, avery)>},{PotentialAction:<give_butter(sammy, avery)>},{PotentialAction:<give_fried_salmon(sammy, avery)>},{PotentialAction:<give_blackberry(sammy, avery)>},{PotentialAction:<give_flour(sammy, avery)>},{PotentialAction:<give_blackberry_tart(sammy, avery)>},{PotentialAction:<give_potato(sammy, avery)>},{PotentialAction:<give_carrot(sammy, avery)>},{PotentialAction:<give_stewed_trout(sammy, avery)>},{PotentialAction:<insult(sammy, avery)>},{PotentialAction:<compliment(sammy, avery)>},{PotentialAction:<ask_out(sammy, avery)>},{PotentialAction:<ask_algee(sammy, avery)>},{PotentialAction:<ask_fishing_rod(sammy, avery)>},{PotentialAction:<ask_dandelion(sammy, avery)>},{PotentialAction:<ask_trout(sammy, avery)>},{PotentialAction:<ask_strawberry(sammy, avery)>},{PotentialAction:<ask_egg(sammy, avery)>},{PotentialAction:<ask_milk(sammy, avery)>},{PotentialAction:<ask_strawberry_cake(sammy, avery)>},{PotentialAction:<ask_salmon(sammy, avery)>},{PotentialAction:<ask_butter(sammy, avery)>},{PotentialAction:<ask_fried_salmon(sammy, avery)>},{PotentialAction:<ask_blackberry(sammy, avery)>},{PotentialAction:<ask_flour(sammy, avery)>},{PotentialAction:<ask_blackberry_tart(sammy, avery)>},{PotentialAction:<ask_potato(sammy, avery)>},{PotentialAction:<ask_carrot(sammy, avery)>},{PotentialAction:<ask_stewed_trout(sammy, avery)>},{PotentialAction:<ask_if_friends(sammy, avery)>},{PotentialAction:<ask_if_acquantences(sammy, avery)>},{PotentialAction:<ask_if_liked(sammy, avery)>},{PotentialAction:<ask_if_friend(sammy, avery)>},{PotentialAction:<ask_if_bestFriend(sammy, avery)>},{PotentialAction:<ask_if_crushing_on(sammy, avery)>},{PotentialAction:<ask_if_in_love_with(sammy, avery)>},{PotentialAction:<ask_if_head_over_heels(sammy, avery)>},{PotentialAction:<ask_if_disliked(sammy, avery)>},{PotentialAction:<ask_if_enemy(sammy, avery)>},{PotentialAction:<ask_if_nemisis(sammy, avery)>},{PotentialAction:<move(sammy, door_sammysHouse->town)>},{PotentialAction:<talk(sammy, sammy)>},{PotentialAction:<give_algee(sammy, sammy)>},{PotentialAction:<give_fishing_rod(sammy, sammy)>},{PotentialAction:<give_dandelion(sammy, sammy)>},{PotentialAction:<give_trout(sammy, sammy)>},{PotentialAction:<give_strawberry(sammy, sammy)>},{PotentialAction:<give_egg(sammy, sammy)>},{PotentialAction:<give_milk(sammy, sammy)>},{PotentialAction:<give_strawberry_cake(sammy, sammy)>},{PotentialAction:<give_salmon(sammy, sammy)>},{PotentialAction:<give_butter(sammy, sammy)>},{PotentialAction:<give_fried_salmon(sammy, sammy)>},{PotentialAction:<give_blackberry(sammy, sammy)>},{PotentialAction:<give_flour(sammy, sammy)>},{PotentialAction:<give_blackberry_tart(sammy, sammy)>},{PotentialAction:<give_potato(sammy, sammy)>},{PotentialAction:<give_carrot(sammy, sammy)>},{PotentialAction:<give_stewed_trout(sammy, sammy)>},{PotentialAction:<insult(sammy, sammy)>},{PotentialAction:<compliment(sammy, sammy)>},{PotentialAction:<ask_out(sammy, sammy)>},{PotentialAction:<ask_algee(sammy, sammy)>},{PotentialAction:<ask_fishing_rod(sammy, sammy)>},{PotentialAction:<ask_dandelion(sammy, sammy)>},{PotentialAction:<ask_trout(sammy, sammy)>},{PotentialAction:<ask_strawberry(sammy, sammy)>},{PotentialAction:<ask_egg(sammy, sammy)>},{PotentialAction:<ask_milk(sammy, sammy)>},{PotentialAction:<ask_strawberry_cake(sammy, sammy)>},{PotentialAction:<ask_salmon(sammy, sammy)>},{PotentialAction:<ask_butter(sammy, sammy)>},{PotentialAction:<ask_fried_salmon(sammy, sammy)>},{PotentialAction:<ask_blackberry(sammy, sammy)>},{PotentialAction:<ask_flour(sammy, sammy)>},{PotentialAction:<ask_blackberry_tart(sammy, sammy)>},{PotentialAction:<ask_potato(sammy, sammy)>},{PotentialAction:<ask_carrot(sammy, sammy)>},{PotentialAction:<ask_stewed_trout(sammy, sammy)>},{PotentialAction:<ask_if_friends(sammy, sammy)>},{PotentialAction:<ask_if_acquantences(sammy, sammy)>},{PotentialAction:<ask_if_liked(sammy, sammy)>},{PotentialAction:<ask_if_friend(sammy, sammy)>},{PotentialAction:<ask_if_bestFriend(sammy, sammy)>},{PotentialAction:<ask_if_crushing_on(sammy, sammy)>},{PotentialAction:<ask_if_in_love_with(sammy, sammy)>},{PotentialAction:<ask_if_head_over_heels(sammy, sammy)>},{PotentialAction:<ask_if_disliked(sammy, sammy)>},{PotentialAction:<ask_if_enemy(sammy, sammy)>},{PotentialAction:<ask_if_nemisis(sammy, sammy)>},{PotentialAction:<move(sammy, door_finleysHouse->field)>},{PotentialAction:<talk(sammy, finley)>},{PotentialAction:<give_algee(sammy, finley)>},{PotentialAction:<give_fishing_rod(sammy, finley)>},{PotentialAction:<give_dandelion(sammy, finley)>},{PotentialAction:<give_trout(sammy, finley)>},{PotentialAction:<give_strawberry(sammy, finley)>},{PotentialAction:<give_egg(sammy, finley)>},{PotentialAction:<give_milk(sammy, finley)>},{PotentialAction:<give_strawberry_cake(sammy, finley)>},{PotentialAction:<give_salmon(sammy, finley)>},{PotentialAction:<give_butter(sammy, finley)>},{PotentialAction:<give_fried_salmon(sammy, finley)>},{PotentialAction:<give_blackberry(sammy, finley)>},{PotentialAction:<give_flour(sammy, finley)>},{PotentialAction:<give_blackberry_tart(sammy, finley)>},{PotentialAction:<give_potato(sammy, finley)>},{PotentialAction:<give_carrot(sammy, finley)>},{PotentialAction:<give_stewed_trout(sammy, finley)>},{PotentialAction:<insult(sammy, finley)>},{PotentialAction:<compliment(sammy, finley)>},{PotentialAction:<ask_out(sammy, finley)>},{PotentialAction:<ask_algee(sammy, finley)>},{PotentialAction:<ask_fishing_rod(sammy, finley)>},{PotentialAction:<ask_dandelion(sammy, finley)>},{PotentialAction:<ask_trout(sammy, finley)>},{PotentialAction:<ask_strawberry(sammy, finley)>},{PotentialAction:<ask_egg(sammy, finley)>},{PotentialAction:<ask_milk(sammy, finley)>},{PotentialAction:<ask_strawberry_cake(sammy, finley)>},{PotentialAction:<ask_salmon(sammy, finley)>},{PotentialAction:<ask_butter(sammy, finley)>},{PotentialAction:<ask_fried_salmon(sammy, finley)>},{PotentialAction:<ask_blackberry(sammy, finley)>},{PotentialAction:<ask_flour(sammy, finley)>},{PotentialAction:<ask_blackberry_tart(sammy, finley)>},{PotentialAction:<ask_potato(sammy, finley)>},{PotentialAction:<ask_carrot(sammy, finley)>},{PotentialAction:<ask_stewed_trout(sammy, finley)>},{PotentialAction:<ask_if_friends(sammy, finley)>},{PotentialAction:<ask_if_acquantences(sammy, finley)>},{PotentialAction:<ask_if_liked(sammy, finley)>},{PotentialAction:<ask_if_friend(sammy, finley)>},{PotentialAction:<ask_if_bestFriend(sammy, finley)>},{PotentialAction:<ask_if_crushing_on(sammy, finley)>},{PotentialAction:<ask_if_in_love_with(sammy, finley)>},{PotentialAction:<ask_if_head_over_heels(sammy, finley)>},{PotentialAction:<ask_if_disliked(sammy, finley)>},{PotentialAction:<ask_if_enemy(sammy, finley)>},{PotentialAction:<ask_if_nemisis(sammy, finley)>},{PotentialAction:<move(sammy, door_hill->field)>},{PotentialAction:<talk(sammy, barkeep)>},{PotentialAction:<give_algee(sammy, barkeep)>},{PotentialAction:<give_fishing_rod(sammy, barkeep)>},{PotentialAction:<give_dandelion(sammy, barkeep)>},{PotentialAction:<give_trout(sammy, barkeep)>},{PotentialAction:<give_strawberry(sammy, barkeep)>},{PotentialAction:<give_egg(sammy, barkeep)>},{PotentialAction:<give_milk(sammy, barkeep)>},{PotentialAction:<give_strawberry_cake(sammy, barkeep)>},{PotentialAction:<give_salmon(sammy, barkeep)>},{PotentialAction:<give_butter(sammy, barkeep)>},{PotentialAction:<give_fried_salmon(sammy, barkeep)>},{PotentialAction:<give_blackberry(sammy, barkeep)>},{PotentialAction:<give_flour(sammy, barkeep)>},{PotentialAction:<give_blackberry_tart(sammy, barkeep)>},{PotentialAction:<give_potato(sammy, barkeep)>},{PotentialAction:<give_carrot(sammy, barkeep)>},{PotentialAction:<give_stewed_trout(sammy, barkeep)>},{PotentialAction:<insult(sammy, barkeep)>},{PotentialAction:<compliment(sammy, barkeep)>},{PotentialAction:<ask_out(sammy, barkeep)>},{PotentialAction:<ask_algee(sammy, barkeep)>},{PotentialAction:<ask_fishing_rod(sammy, barkeep)>},{PotentialAction:<ask_dandelion(sammy, barkeep)>},{PotentialAction:<ask_trout(sammy, barkeep)>},{PotentialAction:<ask_strawberry(sammy, barkeep)>},{PotentialAction:<ask_egg(sammy, barkeep)>},{PotentialAction:<ask_milk(sammy, barkeep)>},{PotentialAction:<ask_strawberry_cake(sammy, barkeep)>},{PotentialAction:<ask_salmon(sammy, barkeep)>},{PotentialAction:<ask_butter(sammy, barkeep)>},{PotentialAction:<ask_fried_salmon(sammy, barkeep)>},{PotentialAction:<ask_blackberry(sammy, barkeep)>},{PotentialAction:<ask_flour(sammy, barkeep)>},{PotentialAction:<ask_blackberry_tart(sammy, barkeep)>},{PotentialAction:<ask_potato(sammy, barkeep)>},{PotentialAction:<ask_carrot(sammy, barkeep)>},{PotentialAction:<ask_stewed_trout(sammy, barkeep)>},{PotentialAction:<ask_if_friends(sammy, barkeep)>},{PotentialAction:<ask_if_acquantences(sammy, barkeep)>},{PotentialAction:<ask_if_liked(sammy, barkeep)>},{PotentialAction:<ask_if_friend(sammy, barkeep)>},{PotentialAction:<ask_if_bestFriend(sammy, barkeep)>},{PotentialAction:<ask_if_crushing_on(sammy, barkeep)>},{PotentialAction:<ask_if_in_love_with(sammy, barkeep)>},{PotentialAction:<ask_if_head_over_heels(sammy, barkeep)>},{PotentialAction:<ask_if_disliked(sammy, barkeep)>},{PotentialAction:<ask_if_enemy(sammy, barkeep)>},{PotentialAction:<ask_if_nemisis(sammy, barkeep)>}>
-
-		Suggest...
-
-
-	barkeep (neutral):	<suggest{PotentialAction:<ask_trout(sammy, finley)>}:{PotentialAction:<ask_trout(sammy, finley)>}>
-
-		Why not try {PotentialAction:<ask_trout(sammy, finley)>}
-
-
-	sammy (happy):	<askConfirmSuggestion{PotentialAction:<ask_trout(sammy, finley)>}:{PotentialAction:<ask_trout(sammy, finley)>}>
-
-		You really think that will help?
-
-
-	barkeep (neutral):	<confirmSuggestion{PotentialAction:<ask_trout(sammy, finley)>}:{PotentialAction:<ask_trout(sammy, finley)>}>
-
-		Yeah, go for it!
-
-
-	sammy (happy):	<acceptSuggestion{PotentialAction:<ask_trout(sammy, finley)>}:{PotentialAction:<ask_trout(sammy, finley)>}>
-
-		Alright, I guess I'll try doing that tomorrow.
+		<nevermind>
 
 
 	barkeep (neutral):	<askAboutDayHighlights>
@@ -120,9 +164,99 @@
 		So, what happened today that's got you in such a good mood?
 
 
-	sammy (happy):	<tellAboutNOTEWORTHYEvent:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}},{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}},{Event:{<fish(sammy, river_field)>:0.380625-<1-1-1 13:30>}}>
+	sammy (happy):	<tellAboutNOTEWORTHYEvent>
 
-		Today, I went fishing at the river by the farm and caught 1 salmon, and caught 1 trout, Avery complimented me and sammy seemed pleased, and I went fishing at the river running through the meadow and caught 5 salmon, caught 8 algee, caught 5 bass, and caught 2 trout.
+		Today, I went fishing at the river running through the meadow and caught a few trout, caught a few algee, caught a salmon, and caught a bass, Avery complimented me and I seemed pleased, and I went fishing at the river by the farm and caught a bass, caught a trout, caught a few algee, and caught a salmon.
+
+
+	barkeep (neutral):	<askWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 9:30>}>
+
+		Why did you go fishing at the river running through the meadow today?
+
+
+	sammy (happy):	<tellWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 9:30>}>
+
+		I wanted to become a skilled fisher, and so I wanted to have a few trout
+
+
+	barkeep (neutral):	<askWhyGoal<StateSkill(sammy-fishing:{90~100})>>
+
+		Why do you want to become a skilled fisher?
+
+
+	sammy (happy):	<tellWhyGoal<StateSkill(sammy-fishing:{90~100})>>
+
+		I just do.
+
+
+	barkeep (neutral):	<suggest>
+
+		Suggest...
+
+
+	barkeep (neutral):	<suggest<give_blackberry_tart(sammy, sammy)>>
+
+		Why not try {PotentialAction:<give_blackberry_tart(sammy, sammy)>}
+
+
+	sammy (happy):	<askConfirmSuggestion<give_blackberry_tart(sammy, sammy)>>
+
+		You really think that will help?
+
+
+	barkeep (neutral):	<cancelSuggestion<give_blackberry_tart(sammy, sammy)>>
+
+		Actually, no, nevermind...
+
+
+	sammy (happy):	<acceptCancelSuggestion<give_blackberry_tart(sammy, sammy)>>
+
+		Well, alright then.
+
+
+	barkeep (neutral):	<whyGoalMenu>
+
+		<whyGoalMenu>
+
+
+	barkeep (neutral):	<nevermind>
+
+		<nevermind>
+
+
+	barkeep (neutral):	<whyGoalMenu>
+
+		<whyGoalMenu>
+
+
+	barkeep (neutral):	<nevermind>
+
+		<nevermind>
+
+
+	barkeep (neutral):	<confirmGoalMenu>
+
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<confirmGoal<StateSkill(sammy-fishing:{90~100})>>
+
+		Do you still want to you to become a skilled fisher?
+
+
+	sammy (happy):	<confirmGoal<StateSkill(sammy-fishing:{90~100})>InDate>
+
+		Yes, I do!
+
+
+	barkeep (neutral):	<askAboutGoals>
+
+		What have you been trying to do lately?
+
+
+	sammy (happy):	<tellAboutGoals>
+
+		I want to go to the field. I want to go to the farm. I want to become a skilled fisher. I want to have a few trout. 
 
 
 	sammy (happy):	<goodbye>
@@ -139,49 +273,44 @@
 
 
 
-	avery (neutral):	<greet>
+	finley (neutral):	<greet>
 
 		Good evening.
 
 
-	barkeep (neutral):	<askAboutState>
+	barkeep (neutral):	<askForOrder>
 
-		How are you doing?
-
-
-	avery (neutral):	<tellStateNONE>
-
-		I'm doing alright. You know how it is.
+		What can I get you this evening?
 
 
-	barkeep (neutral):	<congratulate>
+	finley (neutral):	<orderblackberry_tart>
 
-		That's good!
-
-
-	avery (neutral):	<orderstewed_trout>
-
-		Can I get a bowl of stewed trout?
+		Can I get a blackberry tart?
 
 
-	barkeep (neutral):	<serveOrderstewed_trout>
+	barkeep (neutral):	<serveOrderblackberry_tart>
 
 		Coming right up.
 
 
-	avery (happy):	<thank:{avery:(loved,stewed_trout)},{avery:(liked,trout)},{avery:(disliked,carrot)}>
+	finley (happy):	<thank>
 
-		Thanks. Oh man, I love stewed trout. I like stuff with trout. Although, I don't really like carrots in my food.
-
-
-	barkeep (neutral):	<askAboutDayHighlights>
-
-		Anything interesting happen today?
+		Thanks. Oh man, I love blackberry tart. I like stuff with blackberries.
 
 
-	avery (neutral):	<tellAboutNOTEWORTHYEvent:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
+	barkeep (neutral):	<askRelationWith>
 
-		Today, I complimented Sammy and sammy seemed pleased
+		What do you think about...
+
+
+	barkeep (neutral):	<askRelationWithsammy>
+
+		What do you think about Sammy?
+
+
+	finley (neutral):	<tellRelationWithsammy>
+
+		
 
 
 	barkeep (neutral):	<nice>
@@ -189,69 +318,588 @@
 		<nice>
 
 
-	barkeep (neutral):	<tellPreference{sammy:(liked,strawberry)}:{sammy:(liked,strawberry)}>
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<askAboutDayHighlights>
+
+		Anything interesting happen today?
+
+
+	finley (neutral):	<tellAboutNOTEWORTHYEvent>
+
+		Today, I went foraging at the forest and found a few dandelions, found a few strawberries, and found a few blackberries
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<whyActionMenu>
+
+		<whyActionMenu>
+
+
+	barkeep (neutral):	<whyActionMenu>
+
+		<whyActionMenu>
+
+
+	barkeep (neutral):	<askWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}>
+
+		Why did you go foraging at the forest today?
+
+
+	finley (neutral):	<tellWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}>
+
+		I wanted to have a few blackberries
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	finley (neutral):	<goodbye>
+
+		<goodbye>
+
+
+	barkeep (neutral):	<goodbye>
+
+		<goodbye>
+
+
+----DAY START 1/2/1----
+
+
+
+--CONVERSATION START--
+
+
+
+	avery (neutral):	<greet>
+
+		Good evening.
+
+
+	barkeep (neutral):	<greet>
+
+		Good evening.
+
+
+	avery (neutral):	<askForRecomendation>
+
+		What's good on the menu tonight?
+
+
+	barkeep (neutral):	<recomendstewed_trout>
+
+		The bowl of stewed trout is quite good.
+
+
+	avery (happy):	<orderstewed_troutOnRecomendation>
+
+		Sound good, let's go with that tonight.
+
+
+	barkeep (neutral):	<serveOrderstewed_trout>
+
+		Coming right up.
+
+
+	avery (happy):	<thank>
+
+		Thanks. Oh man, I love stewed trout. I like stuff with trout. Although, I don't really like carrots in my food.
+
+
+	barkeep (neutral):	<askAboutGoals>
+
+		What have you been trying to do lately?
+
+
+	avery (neutral):	<tellAboutGoals>
+
+		I want to go to the farm. I want to date Sammy. I want I give Sammy a blackberry. I want to have some blackberries. I want Sammy to feel more romantic toward me. 
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<confirmGoalMenu>
+
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<confirmGoal<StateSocial(sammy-(friendly)->avery,{20~1000000})>>
+
+		Do you still want to Sammy to feel more friendly toward you?
+
+
+	avery (neutral):	<confirmGoal<StateSocial(sammy-(friendly)->avery,{20~1000000})>OutOfDate>
+
+		No, I don't.
+
+
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<tellAction{<fish(sammy, river_field)>:0.380625-<1-1-1 9:30>}>
+
+		Did you hear that Sammy went fishing at the river running through the meadow and caught a few trout, caught a few algee, caught a salmon, and caught a bass?
+
+
+	avery (neutral):	<acknowledge>
+
+		No, I didn't
+
+
+	barkeep (neutral):	<tellPreferenceMenu>
+
+		<tellPreferenceMenu>
+
+
+	barkeep (neutral):	<nevermind>
+
+		<nevermind>
+
+
+	barkeep (neutral):	<confirmGoalMenu>
+
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<confirmGoal<StateInventory(avery,{1~100000000},blackberry)>>
+
+		Do you still want to to have some blackberries?
+
+
+	avery (neutral):	<confirmGoal<StateInventory(avery,{1~100000000},blackberry)>InDate>
+
+		Yes, I do!
+
+
+	barkeep (neutral):	<confirmGoalMenu>
+
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<confirmGoal<StatePosition(avery,farm)>>
+
+		Do you still want to you to go to the farm?
+
+
+	avery (neutral):	<confirmGoal<StatePosition(avery,farm)>InDate>
+
+		Yes, I do!
+
+
+	avery (neutral):	<goodbye>
+
+		<goodbye>
+
+
+	barkeep (neutral):	<goodbye>
+
+		<goodbye>
+
+
+--CONVERSATION START--
+
+
+
+	sammy (happy):	<greet>
+
+		Good evening.
+
+
+	barkeep (neutral):	<askForOrder>
+
+		What can I get you this evening?
+
+
+	sammy (happy):	<orderstrawberry_cake>
+
+		Can I get a strawberry cake?
+
+
+	barkeep (neutral):	<serveOrderstrawberry_cake>
+
+		Coming right up.
+
+
+	sammy (happy):	<thank>
+
+		Thanks. Oh man, I love strawberry cake. I like stuff with strawberries.
+
+
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<tellAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}>
+
+		Did you hear that Finley went foraging at the forest and found a few dandelions, found a few strawberries, and found a few blackberries?
+
+
+	sammy (happy):	<acknowledge>
+
+		No, I didn't
+
+
+	barkeep (neutral):	<askAboutGoals>
+
+		What have you been trying to do lately?
+
+
+	sammy (happy):	<tellAboutGoals>
+
+		I want to go to the town. I want to go to the field. I want to go to the farm. I want to have a few trout. I want to become a skilled fisher. 
+
+
+	barkeep (neutral):	<askWhyGoal<StatePosition(sammy,town)>>
+
+		Why do you want to go to the town?
+
+
+	sammy (happy):	<tellWhyGoal<StatePosition(sammy,town)>>
+
+		I want to sell trout at the tackle shop so to become a skilled fisher.
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<confirmGoalMenu>
+
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<nevermind>
+
+		<nevermind>
+
+
+	barkeep (neutral):	<confirmGoal<StateSkill(sammy-fishing:{90~100})>>
+
+		Do you still want to you to become a skilled fisher?
+
+
+	sammy (happy):	<confirmGoal<StateSkill(sammy-fishing:{90~100})>InDate>
+
+		Yes, I do!
+
+
+	barkeep (neutral):	<askAboutDayHighlights>
+
+		Anything interesting happen today?
+
+
+	sammy (happy):	<tellAboutNOTEWORTHYEvent>
+
+		Today, I went fishing at the river running through the meadow and caught a few bass, caught a few algee, and caught a few trout, Avery complimented me and I blushed bright red, and I went fishing at the river by the farm and caught a few salmon, caught a few algee, caught a trout, and caught a bass.
+
+
+	sammy (happy):	<goodbye>
+
+		<goodbye>
+
+
+	barkeep (neutral):	<goodbye>
+
+		<goodbye>
+
+
+--CONVERSATION START--
+
+
+
+	finley (neutral):	<greet>
+
+		Good evening.
+
+
+	barkeep (neutral):	<askForOrder>
+
+		What can I get you this evening?
+
+
+	finley (neutral):	<orderblackberry_tart>
+
+		Can I get a blackberry tart?
+
+
+	barkeep (neutral):	<serveOrderblackberry_tart>
+
+		Coming right up.
+
+
+	finley (happy):	<thank>
+
+		Thanks. Oh man, I love blackberry tart. I like stuff with blackberries.
+
+
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<tellAction{<fish(sammy, river_farm)>:0.380625-<1-1-1 15:30>}>
+
+		Did you hear that Sammy went fishing at the river by the farm and caught a bass, caught a trout, caught a few algee, and caught a salmon?
+
+
+	finley (neutral):	<acknowledge>
+
+		No, I didn't
+
+
+	barkeep (neutral):	<tellPreferenceMenu>
+
+		<tellPreferenceMenu>
+
+
+	barkeep (neutral):	<tellPreference{sammy:(liked,strawberry)}>
 
 		Did you know Sammy likes strawberry?
 
 
-	avery (neutral):	<acknowledge:{sammy:(liked,strawberry)}>
+	finley (neutral):	<acknowledge>
 
 		No, I didn't
 
 
-	barkeep (neutral):	<tellAction{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
+	barkeep (neutral):	<whyActionMenu>
 
-		Did you hear that Sammy went fishing at the river by the farm and caught 1 salmon, and caught 1 trout?
+		<whyActionMenu>
 
 
-	avery (neutral):	<acknowledge:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
+	barkeep (neutral):	<askWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}>
+
+		Why did you go foraging at the forest yesterday?
+
+
+	finley (neutral):	<tellWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}>
+
+		I wanted to have a few blackberries
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<tellPreferenceMenu>
+
+		<tellPreferenceMenu>
+
+
+	barkeep (neutral):	<askAboutDayHighlights>
+
+		Anything interesting happen today?
+
+
+	finley (neutral):	<tellAboutNOTEWORTHYEvent>
+
+		Today, I went foraging at the forest and found a few strawberries, found a few blackberries, and found a few dandelions
+
+
+	barkeep (neutral):	<askWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-2 9:0>}>
+
+		Why did you go foraging at the forest today?
+
+
+	finley (neutral):	<tellWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-2 9:0>}>
+
+		I wanted to have a few blackberries
+
+
+	finley (neutral):	<goodbye>
+
+		<goodbye>
+
+
+	barkeep (neutral):	<goodbye>
+
+		<goodbye>
+
+
+----DAY START 1/3/1----
+
+
+
+--CONVERSATION START--
+
+
+
+	avery (neutral):	<greet>
+
+		Good evening.
+
+
+	barkeep (neutral):	<greet>
+
+		Good evening.
+
+
+	avery (neutral):	<askForRecomendation>
+
+		What's good on the menu tonight?
+
+
+	barkeep (neutral):	<recomendblackberry_tart>
+
+		The blackberry tart is quite good.
+
+
+	avery (happy):	<orderblackberry_tartOnRecomendation>
+
+		Sound good, let's go with that tonight.
+
+
+	barkeep (neutral):	<serveOrderblackberry_tart>
+
+		Coming right up.
+
+
+	avery (soup):	<thank>
+
+		Thanks. I like blackberry tart. I like stuff with blackberries.
+
+
+	barkeep (neutral):	<askRelationWith>
+
+		What do you think about...
+
+
+	barkeep (neutral):	<askRelationWithfinley>
+
+		What do you think about Finley?
+
+
+	avery (neutral):	<tellRelationWithfinley>
+
+		We're friends. 
+
+
+	barkeep (neutral):	<openTellRelationWithfinley>
+
+		I think...
+
+
+	barkeep (neutral):	<tellfinleyRelationliked>
+
+		Finley thinks positively of you.
+
+
+	avery (neutral):	<acknowledge>
 
 		No, I didn't
 
 
-	barkeep (neutral):	<askWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
+	barkeep (neutral):	<tellActionMenu>
 
-		Why did you compliment Sammy today?
-
-
-	avery (neutral):	<tellWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Goal:avery - <StateSocial(sammy-(friendly)->avery,{20~1000000})>:0.125},{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:3}>
-
-		I wanted Sammy will feel more friendly with me, and so I wanted Sammy will feel more romantic with me
+		<tellActionMenu>
 
 
-	barkeep (neutral):	<askWhyGoal<StateSocial(sammy-(friendly)->avery,{20~1000000})>:{Goal:avery - <StateSocial(sammy-(friendly)->avery,{20~1000000})>:0.125}>
+	barkeep (neutral):	<nevermind>
 
-		Why do you want Sammy will feel more friendly with Avery?
-
-
-	avery (neutral):	<tellWhyGoal<StateSocial(sammy-(friendly)->avery,{20~1000000})>:{Goal:avery - <StateSocial(sammy-(friendly)->avery,{20~1000000})>:0.125},{PotentialAction:<compliment(avery, sammy)>},{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:1}>
-
-		I want to compliment Sammy so Sammy will feel more romantic with me.
+		<nevermind>
 
 
-	barkeep (neutral):	<suggest:{PotentialAction:<talk(avery, avery)>},{PotentialAction:<give_algee(avery, avery)>},{PotentialAction:<give_fishing_rod(avery, avery)>},{PotentialAction:<give_dandelion(avery, avery)>},{PotentialAction:<give_trout(avery, avery)>},{PotentialAction:<give_strawberry(avery, avery)>},{PotentialAction:<give_egg(avery, avery)>},{PotentialAction:<give_milk(avery, avery)>},{PotentialAction:<give_strawberry_cake(avery, avery)>},{PotentialAction:<give_salmon(avery, avery)>},{PotentialAction:<give_butter(avery, avery)>},{PotentialAction:<give_fried_salmon(avery, avery)>},{PotentialAction:<give_blackberry(avery, avery)>},{PotentialAction:<give_flour(avery, avery)>},{PotentialAction:<give_blackberry_tart(avery, avery)>},{PotentialAction:<give_potato(avery, avery)>},{PotentialAction:<give_carrot(avery, avery)>},{PotentialAction:<give_stewed_trout(avery, avery)>},{PotentialAction:<insult(avery, avery)>},{PotentialAction:<compliment(avery, avery)>},{PotentialAction:<ask_out(avery, avery)>},{PotentialAction:<ask_algee(avery, avery)>},{PotentialAction:<ask_fishing_rod(avery, avery)>},{PotentialAction:<ask_dandelion(avery, avery)>},{PotentialAction:<ask_trout(avery, avery)>},{PotentialAction:<ask_strawberry(avery, avery)>},{PotentialAction:<ask_egg(avery, avery)>},{PotentialAction:<ask_milk(avery, avery)>},{PotentialAction:<ask_strawberry_cake(avery, avery)>},{PotentialAction:<ask_salmon(avery, avery)>},{PotentialAction:<ask_butter(avery, avery)>},{PotentialAction:<ask_fried_salmon(avery, avery)>},{PotentialAction:<ask_blackberry(avery, avery)>},{PotentialAction:<ask_flour(avery, avery)>},{PotentialAction:<ask_blackberry_tart(avery, avery)>},{PotentialAction:<ask_potato(avery, avery)>},{PotentialAction:<ask_carrot(avery, avery)>},{PotentialAction:<ask_stewed_trout(avery, avery)>},{PotentialAction:<ask_if_friends(avery, avery)>},{PotentialAction:<ask_if_acquantences(avery, avery)>},{PotentialAction:<ask_if_liked(avery, avery)>},{PotentialAction:<ask_if_friend(avery, avery)>},{PotentialAction:<ask_if_bestFriend(avery, avery)>},{PotentialAction:<ask_if_crushing_on(avery, avery)>},{PotentialAction:<ask_if_in_love_with(avery, avery)>},{PotentialAction:<ask_if_head_over_heels(avery, avery)>},{PotentialAction:<ask_if_disliked(avery, avery)>},{PotentialAction:<ask_if_enemy(avery, avery)>},{PotentialAction:<ask_if_nemisis(avery, avery)>}>
+	barkeep (neutral):	<tellActionMenu>
+
+		<tellActionMenu>
+
+
+	barkeep (neutral):	<nevermind>
+
+		<nevermind>
+
+
+	barkeep (neutral):	<askRelationWith>
+
+		What do you think about...
+
+
+	barkeep (neutral):	<askRelationWithsammy>
+
+		What do you think about Sammy?
+
+
+	avery (neutral):	<tellRelationWithsammy>
+
+		I love them. They seem like a good person. 
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<whyGoalMenu>
+
+		<whyGoalMenu>
+
+
+	barkeep (neutral):	<askRelationWith>
+
+		What do you think about...
+
+
+	barkeep (neutral):	<askWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>>
+
+		Why do you want Sammy to feel more romantic toward you?
+
+
+	avery (neutral):	<tellWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>>
+
+		I want to ask out Sammy so to date Sammy.
+
+
+	barkeep (neutral):	<suggest>
 
 		Suggest...
 
 
-	barkeep (neutral):	<suggest{PotentialAction:<give_butter(avery, avery)>}:{PotentialAction:<give_butter(avery, avery)>}>
+	barkeep (neutral):	<suggest<ask_egg(avery, sammy)>>
 
-		Why not try {PotentialAction:<give_butter(avery, avery)>}
+		Why not try {PotentialAction:<ask_egg(avery, sammy)>}
 
 
-	avery (neutral):	<askConfirmSuggestion{PotentialAction:<give_butter(avery, avery)>}:{PotentialAction:<give_butter(avery, avery)>}>
+	avery (neutral):	<askConfirmSuggestion<ask_egg(avery, sammy)>>
 
 		You really think that will help?
 
 
-	barkeep (neutral):	<cancelSuggestion{PotentialAction:<give_butter(avery, avery)>}:{PotentialAction:<give_butter(avery, avery)>}>
+	barkeep (neutral):	<confirmSuggestion<ask_egg(avery, sammy)>>
 
-		Actually, no, nevermind...
+		Yeah, go for it!
 
 
-	avery (neutral):	<acceptCancelSuggestion{PotentialAction:<give_butter(avery, avery)>}:{PotentialAction:<give_butter(avery, avery)>}>
+	avery (neutral):	<acceptSuggestion<ask_egg(avery, sammy)>>
 
-		Well, alright then.
+		Alright, I guess I'll try doing that tomorrow.
 
 
 	avery (neutral):	<goodbye>
@@ -288,9 +936,19 @@
 		That's good!
 
 
-	finley (neutral):	<orderblackberry_tart>
+	finley (neutral):	<askForRecomendation>
 
-		Can I get a blackberry tart?
+		What's good on the menu tonight?
+
+
+	barkeep (neutral):	<recomendstewed_trout>
+
+		The bowl of stewed trout is quite good.
+
+
+	finley (neutral):	<orderblackberry_tartOffRecomendation>
+
+		Mmm, no. I don't think I'm feeling that tonight. How about blackberry tart instead?
 
 
 	barkeep (neutral):	<serveOrderblackberry_tart>
@@ -298,59 +956,59 @@
 		Coming right up.
 
 
-	finley (happy):	<thank:{finley:(loved,blackberry_tart)},{finley:(liked,blackberry)}>
+	finley (happy):	<thank>
 
 		Thanks. Oh man, I love blackberry tart. I like stuff with blackberries.
 
 
-	barkeep (neutral):	<tellAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
+	barkeep (neutral):	<tellActionMenu>
 
-		Did you hear that Avery complimented Sammy and sammy seemed pleased?
-
-
-	finley (neutral):	<acknowledge:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
-
-		No, I didn't
+		<tellActionMenu>
 
 
-	barkeep (neutral):	<tellPreference{sammy:(liked,strawberry)}:{sammy:(liked,strawberry)}>
+	barkeep (neutral):	<nevermind>
 
-		Did you know Sammy likes strawberry?
-
-
-	finley (neutral):	<acknowledge:{sammy:(liked,strawberry)}>
-
-		No, I didn't
+		<nevermind>
 
 
-	barkeep (neutral):	<askAboutPreferencesHate>
+	barkeep (neutral):	<tellPreferenceMenu>
 
-		What do you dislike?
-
-
-	finley (neutral):	<tellPreference:{finley:(disliked,bell_pepper)}>
-
-		Did you know I don't really like bell_pepper?
+		<tellPreferenceMenu>
 
 
-	barkeep (neutral):	<tellPreference{avery:(disliked,carrot)}:{avery:(disliked,carrot)}>
+	barkeep (neutral):	<tellPreference{avery:(disliked,carrot)}>
 
 		Did you know Avery doesn't really like carrot?
 
 
-	finley (neutral):	<acknowledge:{avery:(disliked,carrot)}>
+	finley (neutral):	<acknowledge>
 
 		No, I didn't
 
 
-	barkeep (neutral):	<askAboutDayHighlights>
+	barkeep (neutral):	<whyActionMenu>
 
-		Anything interesting happen today?
+		<whyActionMenu>
 
 
-	finley (neutral):	<tellAboutNOTEWORTHYEvent:{Event:{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}}>
+	barkeep (neutral):	<nevermind>
 
-		Today, I went foraging at the forest and found 16 blackberries, found 6 strawberries, and found 17 dandelions
+		<nevermind>
+
+
+	barkeep (neutral):	<whyActionMenu>
+
+		<whyActionMenu>
+
+
+	barkeep (neutral):	<askWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-2 9:0>}>
+
+		Why did you go foraging at the forest yesterday?
+
+
+	finley (neutral):	<tellWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-2 9:0>}>
+
+		I wanted to have a few blackberries
 
 
 	barkeep (neutral):	<nice>
@@ -358,12 +1016,37 @@
 		<nice>
 
 
-	barkeep (neutral):	<tellAction{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
+	barkeep (neutral):	<askAboutDayHighlights>
 
-		Did you hear that Sammy went fishing at the river by the farm and caught 1 salmon, and caught 1 trout?
+		Anything interesting happen today?
 
 
-	finley (neutral):	<acknowledge:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
+	finley (neutral):	<tellAboutNOTEWORTHYEvent>
+
+		Today, Avery complimented Sammy and Sammy seemed pleased
+
+
+	barkeep (neutral):	<nice>
+
+		<nice>
+
+
+	barkeep (neutral):	<tellPreferenceMenu>
+
+		<tellPreferenceMenu>
+
+
+	barkeep (neutral):	<whyGoalMenu>
+
+		<whyGoalMenu>
+
+
+	barkeep (neutral):	<tellPreference{avery:(liked,trout)}>
+
+		Did you know Avery likes trout?
+
+
+	finley (neutral):	<acknowledge>
 
 		No, I didn't
 
@@ -376,10 +1059,6 @@
 	barkeep (neutral):	<goodbye>
 
 		<goodbye>
-
-
-----DAY START 1/2/1----
-
 
 
 --CONVERSATION START--
@@ -401,34 +1080,64 @@
 		What's good on the menu tonight?
 
 
-	barkeep (neutral):	<recomendstewed_trout>
+	barkeep (neutral):	<recomendfried_salmon>
 
-		The bowl of stewed trout is quite good.
-
-
-	sammy (happy):	<orderstrawberry_cakeOffRecomendation>
-
-		Mmm, no. I don't think I'm feeling that tonight. How about strawberry cake instead?
+		The fried salmon is quite good.
 
 
-	barkeep (neutral):	<serveOrderstrawberry_cake>
+	sammy (happy):	<orderfried_salmonOnRecomendation>
+
+		Sound good, let's go with that tonight.
+
+
+	barkeep (neutral):	<serveOrderfried_salmon>
 
 		Coming right up.
 
 
-	sammy (happy):	<thank:{sammy:(loved,strawberry_cake)},{sammy:(liked,strawberry)}>
+	sammy (soup):	<thank>
 
-		Thanks. Oh man, I love strawberry cake. I like stuff with strawberries.
-
-
-	barkeep (neutral):	<askWhyGoal<StateSkill(sammy-fishing:{90~100})>:{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1}>
-
-		Why do you want <StateSkill(sammy-fishing:{90~100})>?
+		Thanks. I like fried salmon. I like stuff with salmon.
 
 
-	sammy (happy):	<tellWhyGoal<StateSkill(sammy-fishing:{90~100})>:{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1}>
+	barkeep (neutral):	<confirmGoalMenu>
 
-		I just do.
+		<confirmGoalMenu>
+
+
+	barkeep (neutral):	<confirmGoal<StatePosition(sammy,farm)>>
+
+		Do you still want to you to go to the farm?
+
+
+	sammy (happy):	<confirmGoal<StatePosition(sammy,farm)>InDate>
+
+		Yes, I do!
+
+
+	barkeep (neutral):	<whyActionMenu>
+
+		<whyActionMenu>
+
+
+	barkeep (neutral):	<askWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 9:30>}>
+
+		Why did you go fishing at the river running through the meadow 2 days ago?
+
+
+	sammy (happy):	<tellWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 9:30>}>
+
+		I wanted to become a skilled fisher, and so I wanted to have a few trout
+
+
+	barkeep (neutral):	<askWhyGoal<StateInventory(sammy,{20~100},trout)>>
+
+		Why do you want to have a few trout?
+
+
+	sammy (happy):	<tellWhyGoal<StateInventory(sammy,{20~100},trout)>>
+
+		I want to sell trout at the tackle shop so to become a skilled fisher.
 
 
 	barkeep (neutral):	<nice>
@@ -436,59 +1145,24 @@
 		<nice>
 
 
-	barkeep (neutral):	<askWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 13:30>}:{Event:{<fish(sammy, river_field)>:0.380625-<1-1-1 13:30>}}>
+	barkeep (neutral):	<askAboutDayHighlights>
 
-		Why did you go fishing at the river running through the meadow yesterday?
-
-
-	sammy (happy):	<tellWhyAction{<fish(sammy, river_field)>:0.380625-<1-1-1 13:30>}:{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:4},{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125}>
-
-		I wanted <StateSkill(sammy-fishing:{90~100})>, and so I wanted have 20 to 100 trout
+		Anything interesting happen today?
 
 
-	barkeep (neutral):	<askWhyGoal<StateInventory(sammy,{20~100},trout)>:{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125}>
+	sammy (happy):	<tellAboutNOTEWORTHYEvent>
 
-		Why do you want sammy to have 20 to 100 trout?
-
-
-	sammy (happy):	<tellWhyGoal<StateInventory(sammy,{20~100},trout)>:{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125},{PotentialAction:<sell_fish_at_market(sammy, tackle_shop_town)>},{Goal:sammy - <StateSkill(sammy-fishing:{90~100})>:1}>
-
-		I want to sell the the tackle shop so <StateSkill(sammy-fishing:{90~100})>.
+		Today, Avery complimented me and I blushed bright red, I went fishing at the river by the farm and caught a few algee, caught a trout, caught a bass, and caught a salmon, and I went fishing at the river running through the meadow and caught a trout, caught a few algee, and caught a salmon.
 
 
-	barkeep (neutral):	<nice>
+	barkeep (neutral):	<askWhyAction{<fish(sammy, river_field)>:0.365-<1-1-3 11:30>}>
 
-		<nice>
-
-
-	barkeep (neutral):	<askAboutPreferencesLike>
-
-		What do you like?
+		Why did you go fishing at the river running through the meadow today?
 
 
-	sammy (happy):	<tellPreference:{sammy:(liked,strawberry)}>
+	sammy (happy):	<tellWhyAction{<fish(sammy, river_field)>:0.365-<1-1-3 11:30>}>
 
-		Did you know I like strawberry?
-
-
-	barkeep (neutral):	<confirmGoal<StatePosition(sammy,field)>:{Goal:sammy - <StatePosition(sammy,field)>:1.5225}>
-
-		Do you still want to go to the field?
-
-
-	sammy (happy):	<confirmGoal<StatePosition(sammy,field)>InDate:{Goal:sammy - <StatePosition(sammy,field)>:1.5225}>
-
-		Yes, I do!
-
-
-	barkeep (neutral):	<confirmGoal<StateInventory(sammy,{20~100},trout)>:{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125}>
-
-		Do you still want to sammy to have 20 to 100 trout?
-
-
-	sammy (happy):	<confirmGoal<StateInventory(sammy,{20~100},trout)>InDate:{Goal:sammy - <StateInventory(sammy,{20~100},trout)>:1.125}>
-
-		Yes, I do!
+		I wanted to become a skilled fisher, and so I wanted to have a few trout
 
 
 	sammy (happy):	<goodbye>
@@ -501,245 +1175,7 @@
 		<goodbye>
 
 
---CONVERSATION START--
-
-
-
-	finley (sad):	<greet>
-
-		Good evening.
-
-
-	barkeep (neutral):	<askAboutState>
-
-		How are you doing?
-
-
-	finley (sad):	<tellStatesad:{Event:{<give_trout(sammy, finley)>:2.90625-<1-1-2 10:0>}}>
-
-		Nothing went right today...
-
-
-	barkeep (neutral):	<console>
-
-		Sorry to hear that
-
-
-	finley (sad):	<orderblackberry_tart>
-
-		Can I get a blackberry tart?
-
-
-	barkeep (neutral):	<serveOrderblackberry_tart>
-
-		Coming right up.
-
-
-	finley (happy):	<thank:{finley:(loved,blackberry_tart)},{finley:(liked,blackberry)}>
-
-		Thanks. Oh man, I love blackberry tart. I like stuff with blackberries.
-
-
-	barkeep (neutral):	<tellAction{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
-
-		Did you hear that Sammy went fishing at the river by the farm and caught 1 salmon, and caught 1 trout?
-
-
-	finley (sad):	<acknowledge:{Event:{<fish(sammy, river_farm)>:0.380625-<1-1-1 11:0>}}>
-
-		No, I didn't
-
-
-	barkeep (neutral):	<tellAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
-
-		Did you hear that Avery complimented Sammy and sammy seemed pleased?
-
-
-	finley (sad):	<acknowledge:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
-
-		No, I didn't
-
-
-	barkeep (neutral):	<askAboutPreferencesHate>
-
-		What do you dislike?
-
-
-	finley (sad):	<tellPreference:{finley:(hated,veg_stirfry)}>
-
-		Did you know I hate veg_stirfry?
-
-
-	barkeep (neutral):	<tellPreference{avery:(liked,trout)}:{avery:(liked,trout)}>
-
-		Did you know Avery likes trout?
-
-
-	finley (sad):	<acknowledge:{avery:(liked,trout)}>
-
-		No, I didn't
-
-
-	barkeep (neutral):	<askAboutPreferencesLike>
-
-		What do you like?
-
-
-	finley (sad):	<tellPreference:{finley:(liked,blackberry)}>
-
-		Did you know I like blackberry?
-
-
-	barkeep (neutral):	<tellPreference{sammy:(liked,strawberry)}:{sammy:(liked,strawberry)}>
-
-		Did you know Sammy likes strawberry?
-
-
-	finley (sad):	<acknowledge:{sammy:(liked,strawberry)}>
-
-		No, I didn't
-
-
-	finley (sad):	<goodbye>
-
-		<goodbye>
-
-
-	barkeep (neutral):	<goodbye>
-
-		<goodbye>
-
-
---CONVERSATION START--
-
-
-
-	avery (neutral):	<greet>
-
-		Good evening.
-
-
-	barkeep (neutral):	<askForOrder>
-
-		What can I get you this evening?
-
-
-	avery (neutral):	<orderstewed_trout>
-
-		Can I get a bowl of stewed trout?
-
-
-	barkeep (neutral):	<serveOrderstewed_trout>
-
-		Coming right up.
-
-
-	avery (happy):	<thank:{avery:(loved,stewed_trout)},{avery:(liked,trout)},{avery:(disliked,carrot)}>
-
-		Thanks. Oh man, I love stewed trout. I like stuff with trout. Although, I don't really like carrots in my food.
-
-
-	barkeep (neutral):	<askAboutDayHighlights>
-
-		Anything interesting happen today?
-
-
-	avery (neutral):	<tellAboutNOTEWORTHYEvent:{Event:{<compliment(avery, sammy)>:0.5-<1-1-2 9:0>}},{Event:{<give_trout(sammy, finley)>:2.90625-<1-1-2 10:0>}}>
-
-		Today, I complimented Sammy and sammy seemed pleased and Sammy gave Finley a trout and finley didn't like it at all.
-
-
-	barkeep (neutral):	<nice>
-
-		<nice>
-
-
-	barkeep (neutral):	<askWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>:{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:1}>
-
-		Why do you want Sammy will feel more romantic with Avery?
-
-
-	avery (neutral):	<tellWhyGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>:{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:1},{PotentialAction:<ask_out(avery, sammy)>},{Goal:avery - <StateRelation(avery,sammy,dating)>:1}>
-
-		I want to ask out Sammy so I can date Sammy.
-
-
-	barkeep (neutral):	<nice>
-
-		<nice>
-
-
-	barkeep (neutral):	<confirmGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>:{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:1}>
-
-		Do you still want to Sammy will feel more romantic with Avery?
-
-
-	avery (neutral):	<confirmGoal<StateSocial(sammy-(romantic)->avery,{100~1000000})>InDate:{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:1}>
-
-		Yes, I do!
-
-
-	barkeep (neutral):	<askWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Event:{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}}>
-
-		Why did you compliment Sammy yesterday?
-
-
-	avery (neutral):	<tellWhyAction{<compliment(avery, sammy)>:0.1783088-<1-1-1 11:30>}:{Goal:avery - <StateSocial(sammy-(friendly)->avery,{20~1000000})>:0.125},{Goal:avery - <StateSocial(sammy-(romantic)->avery,{100~1000000})>:3}>
-
-		I wanted Sammy will feel more friendly with me, and so I wanted Sammy will feel more romantic with me
-
-
-	barkeep (neutral):	<nice>
-
-		<nice>
-
-
-	barkeep (neutral):	<askWhyGoal<StateRelation(avery,sammy,dating)>:{Goal:avery - <StateRelation(avery,sammy,dating)>:1}>
-
-		Why do you want you will date Sammy?
-
-
-	avery (neutral):	<tellWhyGoal<StateRelation(avery,sammy,dating)>:{Goal:avery - <StateRelation(avery,sammy,dating)>:1}>
-
-		I just do.
-
-
-	barkeep (neutral):	<suggest:{PotentialAction:<talk(avery, sammy)>},{PotentialAction:<give_algee(avery, sammy)>},{PotentialAction:<give_fishing_rod(avery, sammy)>},{PotentialAction:<give_dandelion(avery, sammy)>},{PotentialAction:<give_trout(avery, sammy)>},{PotentialAction:<give_strawberry(avery, sammy)>},{PotentialAction:<give_egg(avery, sammy)>},{PotentialAction:<give_milk(avery, sammy)>},{PotentialAction:<give_strawberry_cake(avery, sammy)>},{PotentialAction:<give_salmon(avery, sammy)>},{PotentialAction:<give_butter(avery, sammy)>},{PotentialAction:<give_fried_salmon(avery, sammy)>},{PotentialAction:<give_blackberry(avery, sammy)>},{PotentialAction:<give_flour(avery, sammy)>},{PotentialAction:<give_blackberry_tart(avery, sammy)>},{PotentialAction:<give_potato(avery, sammy)>},{PotentialAction:<give_carrot(avery, sammy)>},{PotentialAction:<give_stewed_trout(avery, sammy)>},{PotentialAction:<insult(avery, sammy)>},{PotentialAction:<compliment(avery, sammy)>},{PotentialAction:<ask_out(avery, sammy)>},{PotentialAction:<ask_algee(avery, sammy)>},{PotentialAction:<ask_fishing_rod(avery, sammy)>},{PotentialAction:<ask_dandelion(avery, sammy)>},{PotentialAction:<ask_trout(avery, sammy)>},{PotentialAction:<ask_strawberry(avery, sammy)>},{PotentialAction:<ask_egg(avery, sammy)>},{PotentialAction:<ask_milk(avery, sammy)>},{PotentialAction:<ask_strawberry_cake(avery, sammy)>},{PotentialAction:<ask_salmon(avery, sammy)>},{PotentialAction:<ask_butter(avery, sammy)>},{PotentialAction:<ask_fried_salmon(avery, sammy)>},{PotentialAction:<ask_blackberry(avery, sammy)>},{PotentialAction:<ask_flour(avery, sammy)>},{PotentialAction:<ask_blackberry_tart(avery, sammy)>},{PotentialAction:<ask_potato(avery, sammy)>},{PotentialAction:<ask_carrot(avery, sammy)>},{PotentialAction:<ask_stewed_trout(avery, sammy)>},{PotentialAction:<ask_if_friends(avery, sammy)>},{PotentialAction:<ask_if_acquantences(avery, sammy)>},{PotentialAction:<ask_if_liked(avery, sammy)>},{PotentialAction:<ask_if_friend(avery, sammy)>},{PotentialAction:<ask_if_bestFriend(avery, sammy)>},{PotentialAction:<ask_if_crushing_on(avery, sammy)>},{PotentialAction:<ask_if_in_love_with(avery, sammy)>},{PotentialAction:<ask_if_head_over_heels(avery, sammy)>},{PotentialAction:<ask_if_disliked(avery, sammy)>},{PotentialAction:<ask_if_enemy(avery, sammy)>},{PotentialAction:<ask_if_nemisis(avery, sammy)>}>
-
-		Suggest...
-
-
-	barkeep (neutral):	<suggest{PotentialAction:<ask_salmon(avery, sammy)>}:{PotentialAction:<ask_salmon(avery, sammy)>}>
-
-		Why not try {PotentialAction:<ask_salmon(avery, sammy)>}
-
-
-	avery (neutral):	<askConfirmSuggestion{PotentialAction:<ask_salmon(avery, sammy)>}:{PotentialAction:<ask_salmon(avery, sammy)>}>
-
-		You really think that will help?
-
-
-	barkeep (neutral):	<cancelSuggestion{PotentialAction:<ask_salmon(avery, sammy)>}:{PotentialAction:<ask_salmon(avery, sammy)>}>
-
-		Actually, no, nevermind...
-
-
-	avery (neutral):	<acceptCancelSuggestion{PotentialAction:<ask_salmon(avery, sammy)>}:{PotentialAction:<ask_salmon(avery, sammy)>}>
-
-		Well, alright then.
-
-
-	avery (neutral):	<goodbye>
-
-		<goodbye>
-
-
-	barkeep (neutral):	<goodbye>
-
-		<goodbye>
-
-
-----DAY START 1/3/1----
+----DAY START 1/4/1----
 
 
 
@@ -747,46 +1183,6 @@
 
 
 
-	finley (sad):	<greet>
+	sammy (happy):	<greet>
 
 		Good evening.
-
-
-	barkeep (neutral):	<greet>
-
-		Good evening.
-
-
-	finley (sad):	<orderblackberry_tart>
-
-		Can I get a blackberry tart?
-
-
-	barkeep (neutral):	<serveOrderblackberry_tart>
-
-		Coming right up.
-
-
-	finley (happy):	<thank:{finley:(loved,blackberry_tart)},{finley:(liked,blackberry)}>
-
-		Thanks. Oh man, I love blackberry tart. I like stuff with blackberries.
-
-
-	barkeep (neutral):	<askAboutPreferencesLike>
-
-		What do you like?
-
-
-	finley (sad):	<tellPreference:{finley:(loved,blackberry_tart)}>
-
-		Did you know I love blackberry tart?
-
-
-	barkeep (neutral):	<askWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}:{Event:{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}}>
-
-		Why did you go foraging at the forest 2 days ago?
-
-
-	finley (sad):	<tellWhyAction{<forage(finley, brush_forest)>:0.125-<1-1-1 9:0>}:{Goal:finley - <StateInventory(finley,{20~100},blackberry)>:1}>
-
-		I wanted have 20 to 100 blackberries

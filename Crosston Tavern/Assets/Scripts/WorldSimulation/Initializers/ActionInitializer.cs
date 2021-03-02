@@ -464,7 +464,7 @@ public class ActionInitializer
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator)
             },
-            new VerbalizationActionFeatureAt("sell", "sold")
+            new VerbalizationActionFeatureAt("sell trout", "sold trout")
         ) }
     };
 

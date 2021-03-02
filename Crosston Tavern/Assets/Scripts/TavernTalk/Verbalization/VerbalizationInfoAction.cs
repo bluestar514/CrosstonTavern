@@ -154,6 +154,6 @@ public class VerbalizationActionFeatureAt : VerbilizationAction
     {
         base.Verbilize(actor, feature, presentTense, includeSubject);
 
-        return this.actor + " " + this.verb + " the " + this.feature;
+        return this.actor + " " + this.verb+ " at "+ this.feature;
     }
 }

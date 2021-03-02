@@ -22,101 +22,108 @@ public class BarkeepEngine : ConversationEngine
 
     public List<SocialMove> GetSocialMoves(SocialMove prompt)
     {
+        
         List<SocialMove> moves = new List<SocialMove>();
+        SocialMenu subMenu;
+        List<SocialMove> menuOptions;
+        if (prompt is SocialMenu menu) {
+            moves.AddRange(menu.menuOptions);
+        } else {
 
-        switch (prompt.verb) {
-            case "greet":
-                moves.Add(new SocialMove("askAboutState"));
-                moves.Add(new SocialMove("greet"));
-                moves.Add(new SocialMove("askForOrder"));
-                break;
+            switch (prompt.verb) {
+                case "greet":
+                    moves.Add(new SocialMove("askAboutState"));
+                    moves.Add(new SocialMove("greet"));
+                    moves.Add(new SocialMove("askForOrder"));
+                    break;
 
-            case "askForRecomendation":
-                foreach (FoodItem item in barMenu) {
-                    moves.Add(new SocialMove("recomend#", new List<string>() { item.name }));
-                }
-                break;
+                case "askForRecomendation":
+                    foreach (FoodItem item in barMenu) {
+                        moves.Add(new SocialMove("recomend#", new List<string>() { item.name }));
+                    }
+                    break;
 
-            case "order#":
-            case "order#OnRecomendation":
-            case "order#OffRecomendation":
-                moves.Add(new SocialMove("serveOrder#", prompt.arguements));
-                break;
+                case "order#":
+                case "order#OnRecomendation":
+                case "order#OffRecomendation":
+                    moves.Add(new SocialMove("serveOrder#", prompt.arguements));
+                    break;
 
-            case "tellState#":
-                switch (prompt.arguements[0]) {
-                    case "sad":
-                    case "angry":
-                        moves.Add(new SocialMove("console", prompt.arguements));
-                        break;
-                    case "happy":
-                        moves.Add(new SocialMove("congratulate", prompt.arguements));
-                        break;
-                }
+                case "tellState#":
+                    switch (prompt.arguements[0]) {
+                        case "sad":
+                        case "angry":
+                            moves.Add(new SocialMove("console", prompt.arguements));
+                            break;
+                        case "happy":
+                            moves.Add(new SocialMove("congratulate", prompt.arguements));
+                            break;
+                    }
 
-                patronGeneralMood = prompt.arguements[0];
+                    patronGeneralMood = prompt.arguements[0];
 
-                break;
-            case "tellStateNONE":
-                moves.Add(new SocialMove("congratulate"));
-                break;
+                    break;
+                case "tellStateNONE":
+                    moves.Add(new SocialMove("congratulate"));
+                    break;
 
-            case "tellAboutDayEvents":
-            case "tellAbout#Event":
-            case "tellWhyAction#":
-            case "tellAboutGoals":
-                if (prompt.mentionedFacts.Count > 0) {
-                    moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
-                    moves.AddRange(GenAskWhyGoal(prompt.mentionedFacts));
-                }
-                moves.Add(new SocialMove("nice"));
-                break;
+                case "tellAboutDayEvents":
+                case "tellAbout#Event":
+                case "tellWhyAction#":
+                case "tellAboutGoals":
+                    if (prompt.mentionedFacts.Count > 0) {
+                        moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
+                        moves.AddRange(GenAskWhyGoal(prompt.mentionedFacts));
+                    }
+                    moves.Add(new SocialMove("nice"));
+                    break;
 
 
-            case "tellWhyGoal#":
-                List<BoundAction> suggestedActions = GenSuggestedAction(prompt.mentionedFacts[0]);
+                case "tellWhyGoal#":
+                    List<BoundAction> suggestedActions = GenSuggestedAction(prompt.mentionedFacts[0]);
+                    menuOptions = new List<SocialMove>(
+                                        from action in suggestedActions
+                                        select new SocialMove(
+                                            "suggest#",
+                                            arguements: new List<string>() { action.ToString() },
+                                            mentionedFacts: new List<WorldFact>() { new WorldFactPotentialAction(action) })
+                                    );
 
-                if (suggestedActions.Count > 0) {
-                    moves.Add(new SocialMove("suggest", arguements: prompt.arguements,
-                        mentionedFacts: new List<WorldFact>(from action in suggestedActions
-                                                            select new WorldFactPotentialAction(action))));
-                }
+                    subMenu = new SocialMenu("suggest", menuOptions, arguements: prompt.arguements);
+                    if (suggestedActions.Count > 0) {
+                        moves.Add(subMenu);
+                    }
 
-                moves.Add(new SocialMove("nice"));
-                break;
-            case "passOpenSuggestions":
+                    moves.Add(new SocialMove("nice"));
 
-                moves.AddRange(from fact in prompt.mentionedFacts
-                               select new SocialMove("suggest#", arguements: new List<string>() { fact.ToString() },
-                               mentionedFacts: new List<WorldFact>() { fact }));
-                moves.Add(new SocialMove("nevermind"));
-                break;
-            case "askConfirmSuggestion#":
-                moves.Add(new SocialMove("confirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
-                moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
-                break;
+                    subMenu.AddPreviousContext(new SocialMenu("nevermind", moves));
+                    break;
 
-            case "passOpenAskRelationWith":
-                moves.AddRange(GenAskOpinionOfPerson());
-                moves.Add(new SocialMove("nevermind"));
-                break;
 
-            case "tellRelationWith#":
-                moves.AddRange(GenTellRelationshipGuess(prompt.arguements[0]));
-                moves.Add(new SocialMove("nice"));
-                break;
+                case "askConfirmSuggestion#":
+                    moves.Add(new SocialMove("confirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                    moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                    break;
 
-            case "askForRecipe#":
-                moves.Add(new SocialMove("giveRecipe#", arguements: prompt.arguements));
-                moves.Add(new SocialMove("refuseRecipe#", arguements: prompt.arguements));
-                break;
-            case "goodbye":
-            case "goodbyeThank":
-            case "goodbyeDejected":
-                moves.Add(new SocialMove("goodbye"));
-                break;
-            default:
-                List<SocialMove> barkeeperMoves = new List<SocialMove>() {
+                case "tellRelationWith#":
+                    subMenu = new SocialMenu("openTellRelationWith#", 
+                                            GenTellRelationshipGuess(prompt.arguements[0]), 
+                                            arguements: prompt.arguements);
+                    moves.Add(subMenu);
+                    moves.Add(new SocialMove("nice"));
+                    subMenu.AddPreviousContext(new SocialMenu("nevermind", moves));
+                    break;
+                case "askForRecipe#":
+                    moves.Add(new SocialMove("giveRecipe#", arguements: prompt.arguements));
+                    moves.Add(new SocialMove("refuseRecipe#", arguements: prompt.arguements));
+                    break;
+                case "goodbye":
+                case "goodbyeThank":
+                case "goodbyeDejected":
+                    moves.Add(new SocialMove("goodbye"));
+                    break;
+                default:
+                    List<SocialMove> barkeeperMoves = new List<SocialMove>() {
                     new SocialMove("askAboutGoals"),
                     //new SocialMove("askAboutGoalFrustration"),
                     //new SocialMove("askAboutDayFull"),
@@ -125,32 +132,57 @@ public class BarkeepEngine : ConversationEngine
                     //new SocialMove("askAboutExcitement"),
                     //new SocialMove("askAboutDisapointment"),
                     //new SocialMove("askWhyGoal"),
-                    new SocialMove("askAboutPreferencesLike"),
-                    new SocialMove("askAboutPreferencesHate")
+                    //new SocialMove("askAboutPreferencesLike"),
+                    //new SocialMove("askAboutPreferencesHate")
                 };
 
-                moves = new List<SocialMove>(barkeeperMoves);
+                    moves = new List<SocialMove>(barkeeperMoves);
+                    List<SocialMenu> menus = new List<SocialMenu>();
+                    
 
-                moves.Add(new SocialMove("askRelationWith"));
+                    List<WorldFact> facts = speaker.ws.knownFacts.GetFacts();
 
-                List<WorldFact> facts = speaker.ws.knownFacts.GetFacts();
+                    facts = TrimOldEvents(facts);
+                    facts = TrimSimilarFacts(facts);
 
-                facts = TrimOldEvents(facts);
-                facts = TrimSimilarFacts(facts);
 
-                moves.AddRange(GenAskWhyGoal(facts));
-                moves.AddRange(GenAskWhyAction(facts));
-                moves.AddRange(GenTellAction());
-                moves.AddRange(GenTellPreference());
-                moves.AddRange(GenConfirmGoal(facts));
-                //moves.AddRange(GenSuggestedAction());
-                //moves.AddRange(GenAskAboutAction());
-                break;
+                    AddSubmenu("askRelationWith", GenAskOpinionOfPerson(), moves, menus);
+                    AddSubmenu("whyGoalMenu", GenAskWhyGoal(facts), moves, menus);
+                    AddSubmenu("whyActionMenu", GenAskWhyAction(facts), moves, menus);
+                    AddSubmenu("tellActionMenu", GenTellAction(), moves, menus);
+                    AddSubmenu("tellPreferenceMenu", GenTellPreference(), moves, menus);
+                    AddSubmenu("confirmGoalMenu", GenConfirmGoal(facts), moves, menus);
+
+
+
+                    //moves.AddRange(GenSuggestedAction());
+                    //moves.AddRange(GenAskAboutAction());
+
+
+                    SocialMove nevermind = new SocialMenu("nevermind", moves);
+                    
+                    foreach(SocialMenu submenu in menus) {
+                        submenu.AddPreviousContext(nevermind);
+                    }
+
+                    break;
+            }
         }
-
 
         return RemoveAlreadyAskedQuestions(moves);
 
+    }
+
+    void AddSubmenu(string name, List<SocialMove> submenuOptions, 
+        List<SocialMove> overallMovesList, List<SocialMenu> overallSubmenusList)
+    {
+        submenuOptions = RemoveAlreadyAskedQuestions(submenuOptions);
+
+        if (submenuOptions.Count > 0) {
+            SocialMenu submenu = new SocialMenu(name, submenuOptions);
+            overallMovesList.Add(submenu);
+            overallSubmenusList.Add(submenu);
+        }
     }
 
     List<SocialMove> GenAskWhyGoal(List<WorldFact> facts)

@@ -76,6 +76,45 @@ public class StateInventoryStatic : StateInventory
             new StateInventoryStatic(ownerId, itemId, min, max)
         };
     }
+
+    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+        string subject = ownerId;
+        if (subject == speakerId) subject = "I";
+        if (subject == listenerId) subject = "you";
+        subject = VerbalizationDictionary.Replace(subject);
+
+        string count = "some";
+        if(min != max) {
+            if (min == 1 && max > 100) count = "some";
+            if (min > 20) count = "a lot of";
+            if (min > 5) count = "a few";
+        } else {
+            if (min > 10) count = "a ton of";
+            if (min > 5) count = "a lot of";
+            if (min > 2) count = "a few";
+            if (min == 1) count = "a";
+        }
+
+        string item = itemId;
+        if(count == "a") item = VerbalizationDictionary.Replace(item, VerbalizationDictionary.Form.singular);
+        else item = VerbalizationDictionary.Replace(item, VerbalizationDictionary.Form.plural);
+
+        List<string> parts;
+        if (goal) {
+            if (subject == "I" || subject == "you")
+                parts = new List<string>() { "to have", count, item };
+            else
+                parts = new List<string>() { subject, "to have", count, item };
+        } else {
+            if (subject == "I")
+                parts = new List<string>() { "I have", count, item };
+            else
+                parts = new List<string>() { subject, " has ", count, item };
+        }
+
+        return string.Join(" ", parts);
+    }
 }
 
 

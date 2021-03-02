@@ -16,77 +16,14 @@ public class Verbalizer
         this.ws = ws;
     }
 
-    public string VerbalizeState(State goalState)
+    public string VerbalizeState(State goalState, bool includeSubject = true)
     {
-        string owner = "";
-        string target;
 
-        if (goalState is StateInventoryStatic) {
-            StateInventoryStatic stateInv = (StateInventoryStatic)goalState;
-
-            if (stateInv.ownerId != speakerId) {
-                owner = stateInv.ownerId + " to ";
-            }
-
-            owner = VerbalizationDictionary.Replace(owner);
-            string item = VerbalizationDictionary.Replace(stateInv.itemId, VerbalizationDictionary.Form.plural);
-
-            return (owner + "have " + stateInv.min + " to " + stateInv.max + " " + item);
-        } else if (goalState is StateSocial) {
-            StateSocial stateSocial = (StateSocial)goalState;
-
-            string axisDirection = "";
-            if (ws != null) {
-                if (stateSocial.max > ws.GetRelationshipsFor(stateSocial.sourceId).Get(stateSocial.sourceId, stateSocial.axis)) axisDirection = " more";
-                else axisDirection = " less";
-            }
-            if (stateSocial.sourceId != speakerId) {
-                owner = stateSocial.sourceId;
-            }
-            if (stateSocial.targetId == speakerId) target = "me";
-            else target = stateSocial.targetId;
-
-            owner = VerbalizationDictionary.Replace(owner);
-            target = VerbalizationDictionary.Replace(target);
-
-            return (owner + " will feel" + axisDirection + " " + stateSocial.axis + " toward " + target);
-        } else if (goalState is StatePosition) {
-            StatePosition statePos = (StatePosition)goalState;
-
-            string location = VerbalizationDictionary.Replace(statePos.locationId);
-
-            return ("go to the " + location);
-        } else if (goalState is StateRelation) {
-            StateRelation stateRelation = (StateRelation)goalState;
-
-            string source = stateRelation.source;
-            target = stateRelation.target;
-
-            if (source == speakerId) source = "I";
-            if (target == speakerId) target = "me";
-
-            if (source == listenerId) source = "you";
-            if (target == listenerId) target = "you";
-
-
-            source = VerbalizationDictionary.Replace(source);
-            target = VerbalizationDictionary.Replace(target);
-            string tag = stateRelation.tag.ToString();
-
-            switch (stateRelation.tag) {
-                case Relationship.RelationshipTag.dating:
-                    if (source == "I") return "I can date " + target;
-
-                    return source+" will date "+target;
-                case Relationship.RelationshipTag.liked:
-                    return source + " will like " + target + " some";
-                case Relationship.RelationshipTag.disliked:
-                    return source + " will dislike " + target + " some";
-                default:
-                    return source+" will be "+tag+ "s with "+target;
-            }
+        if (goalState is StateSocial stateSocial) {
+            return stateSocial.Verbalize(speakerId, listenerId, false, ws);
+        
         } else {
-            return (goalState.id);
+            return  goalState.Verbalize(speakerId, listenerId, false);
         }
     }
 
@@ -155,7 +92,22 @@ public class Verbalizer
         if (verbalization != "") verbalization = VerbalizeAction(action, presentTense) + " and " + verbalization;
         else verbalization = VerbalizeAction(action, presentTense);
 
-        verbalization = action.Action.Bindings.BindString(verbalization);
+        BoundBindingCollection bindings = action.Action.Bindings;
+        List<BoundBindingPort> newBindings = new List<BoundBindingPort>();
+        foreach(BoundBindingPort bindingPort in bindings.bindings) {
+            if(bindingPort.Value == speakerId) {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag, "I"));
+            }else if(bindingPort.Value == listenerId) {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag, "you"));
+            } else {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag,
+                    VerbalizationDictionary.Replace(bindingPort.Value)));
+            }
+        }
+
+        BoundBindingCollection newCollection = new BoundBindingCollection(newBindings);
+
+        verbalization = newCollection.BindString(verbalization);
 
         return verbalization;
     }
@@ -190,7 +142,10 @@ public class Verbalizer
     public string VerbalizeGoal(Goal goal)
     {
        if(goal is GoalState goalState) {
-            return VerbalizeState(goalState.state);
+            if (goalState.state is StateSocial stateSocial)
+                return stateSocial.Verbalize(speakerId, listenerId, true, ws);
+
+            return goalState.state.Verbalize(speakerId, listenerId, true);
         }
        if(goal is GoalAction goalAction) {
             return VerbalizeAction(goalAction.action, true, goalAction.action.ActorId != speakerId);
@@ -222,6 +177,17 @@ public class Verbalizer
         }
 
         return verbalization;
+    }
+
+    static public string VerbalizeSubject(string subjectId, string speakerId, string listenerId)
+    {
+        string name = subjectId;
+        
+        if (name == speakerId) name = "I";
+        if (name == listenerId) name = "you";
+        name = VerbalizationDictionary.Replace(name);
+
+        return name;
     }
 
 

@@ -21,4 +21,9 @@ public class State
     {
         return new List<State>() { this, state };
     }
+
+    public virtual string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+        return id;
+    }
 }

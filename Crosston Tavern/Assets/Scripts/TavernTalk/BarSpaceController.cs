@@ -101,6 +101,7 @@ public class BarSpaceController : MonoBehaviour
         patronEngine.LearnFromInput(prompt.mentionedFacts);
 
         lastSocialMove = patronEngine.GiveResponse(prompt);
+        patronEngine.DecrementTurns();
 
         if (lastSocialMove.verb.Contains( "pass" ) || lastSocialMove.verb.Contains("ENDCONVERSATION")) {
             AdvanceNPCDialogue();
@@ -108,7 +109,7 @@ public class BarSpaceController : MonoBehaviour
             NPCSpeak(lastSocialMove);
         }
 
-        //Debug.Log(lastSocialMove + "(" + lastSocialMove.verb + ")");
+        Debug.Log(patronEngine.speaker + ":"+ lastSocialMove + "(" + lastSocialMove.verb + ")");
 
         PlayerPhase();
     }
@@ -127,8 +128,6 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerPhase()
     {
-
-        if (!lastSocialMove.verb.Contains("pass")) patronEngine.DecrementTurns();
 
         if ( patronEngine.MaxTurns <= 0) {
             lastSocialMove = new SocialMove("turnsUp");
@@ -151,11 +150,17 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
-        //Debug.Log(dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
+        Debug.Log("Barkeep: " + dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
 
         lc.AddElement(dialogueUnit);
-        barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
-        NPCPhase(dialogueUnit.underpinningSocialMove);
+
+        if(dialogueUnit.underpinningSocialMove is SocialMenu menu) {
+            lastSocialMove = menu;
+            PlayerPhase();
+        } else {
+            barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
+            NPCPhase(dialogueUnit.underpinningSocialMove);
+        }
     }
 
     public void AdvanceNPCDialogue()

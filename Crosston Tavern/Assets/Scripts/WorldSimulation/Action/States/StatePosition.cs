@@ -59,4 +59,25 @@ public class StatePosition : State
             new StatePosition(moverId, locationId)
         };
     }
+
+    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+        string location = VerbalizationDictionary.Replace(locationId);
+
+        string subject = Verbalizer.VerbalizeSubject(moverId, speakerId, listenerId);
+
+        if (goal) {
+            if (subject == "I")
+                return "to go to the " + location;
+            else
+                return subject + " to go to the " + location;
+        } else {
+            if (subject == "I")
+                return subject + " was at " + location;
+            else if (subject == "you")
+                return subject + " were at " + location;
+            else 
+                return subject + " was at " + location;
+        }
+    }
 }

@@ -184,8 +184,6 @@ public class Relationship
     /// stored internally as a float... Not sure whats up with that.</returns>
     public int Get(string target, RelationType axis)
     {
-        if (target.StartsWith("person_")) target = target.Replace("person_", "");
-
         if (relationships.ContainsKey(target))
             return (int)relationships[target][(int)axis];
         else return 0;
@@ -197,10 +195,17 @@ public class Relationship
 
         if(!RelationTagged(target, tag)) relationTags[target].Add(tag);
 
-        foreach(RelationType axis in new List<RelationType>() { RelationType.romantic, RelationType.friendly }) {
-            relationships[target][(int)axis] = Mathf.Clamp(relationships[target][(int)axis],
-                                                            codifiedRelationRanges[tag][axis][0],
-                                                            codifiedRelationRanges[tag][axis][1]);
+        
+        if (codifiedRelationRanges.ContainsKey(tag)) {
+            if (!relationships.ContainsKey(target)) {
+                Set(target, RelationType.friendly, 0);
+                Set(target, RelationType.romantic, 0);
+            }
+            foreach (RelationType axis in new List<RelationType>() { RelationType.romantic, RelationType.friendly }) {
+                relationships[target][(int)axis] = Mathf.Clamp(relationships[target][(int)axis],
+                                                                codifiedRelationRanges[tag][axis][0],
+                                                                codifiedRelationRanges[tag][axis][1]);
+            }
         }
     }
 

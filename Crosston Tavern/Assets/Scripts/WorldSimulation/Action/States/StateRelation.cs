@@ -38,4 +38,56 @@ public class StateRelation : State
             source + "," + target
             + "," + tag + ")>"; 
     }
+
+    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+        
+
+        string source = this.source;
+        string target = this.target;
+
+        source = Verbalizer.VerbalizeSubject(source, speakerId, listenerId);
+        target = Verbalizer.VerbalizeSubject(target, speakerId, listenerId);
+        if (target == "I") target = "me";
+
+        string tag = this.tag.ToString();
+
+        if (goal) {
+            switch (this.tag) {
+                case Relationship.RelationshipTag.dating:
+                    if (source == "I") return "to date " + target;
+
+                    return source + " to date " + target;
+                case Relationship.RelationshipTag.liked:
+                    if (source == "I")
+                        return "to like " + target + " some";
+                    else
+                        return source + " will like " + target + " some";
+                case Relationship.RelationshipTag.disliked:
+                    if (source == "I")
+                        return "to dislike " + target + " some";
+                    else
+                        return source + " to dislike " + target + " some";
+                default:
+                    if (source == "I")
+                        return "to be " + tag + "s with " + target;
+                    else
+                        return source + " to be " + tag + "s with " + target;
+            }
+
+        } else {
+            switch (this.tag) {
+                case Relationship.RelationshipTag.dating:
+                    if (source == "I") return "I can date " + target;
+
+                    return source + " will date " + target;
+                case Relationship.RelationshipTag.liked:
+                    return source + " will like " + target + " some";
+                case Relationship.RelationshipTag.disliked:
+                    return source + " will dislike " + target + " some";
+                default:
+                    return source + " will be " + tag + "s with " + target;
+            }
+        }
+    }
 }

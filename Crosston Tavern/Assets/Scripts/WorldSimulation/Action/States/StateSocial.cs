@@ -64,4 +64,36 @@ public class StateSocial : State
             new StateSocial(sourceId, targetId, axis, min, max)
         };
     }
+
+    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    {
+        return Verbalize(speakerId, listenerId, goal, null);
+    }
+
+    public string Verbalize(string speakerId, string listenerId, bool goal, WorldState ws)
+    {
+        string subject = this.sourceId;
+        subject = Verbalizer.VerbalizeSubject(subject, speakerId, listenerId);
+        string target = this.targetId;
+        target = Verbalizer.VerbalizeSubject(target, speakerId, listenerId);
+        if (target == "I") target = "me";
+
+        string axisDirection = "";
+        if (ws != null) {
+            if (this.max > ws.GetRelationshipsFor(this.sourceId).Get(this.sourceId, this.axis)) 
+                axisDirection = "more";
+            else 
+                axisDirection = "less";
+        }
+
+
+        if (goal) {
+            if (subject == "I")
+                return " to feel " + axisDirection + " " + axis + " toward " + target;
+            else
+                return subject + " to feel "+ axisDirection+" " + axis + " toward " + target;
+
+        } else
+            return (subject + " will feel "+axisDirection+ " " + axis + " toward " + target);
+    }
 }

@@ -43,9 +43,17 @@ public class VerbilizationEffectItemGather : VerbilizationEffect
             else 
                 itemId = VerbalizationDictionary.Replace(invEffect.itemId, VerbalizationDictionary.Form.plural);
 
-            List<string> parts = new List<string>() {  verb, Mathf.Abs(invEffect.delta).ToString(), itemId };
+            int delta = Mathf.Abs(invEffect.delta);
+            string count = "a";
+            if (delta > 10) count = "a lot of";
+            if (delta > 5) count = "some";
+            if (delta > 1) count = "a few";
 
-            return string.Join(" ", parts); //actor + " " + verb + " " + Mathf.Abs(invEffect.delta) + " " + invEffect.itemId;
+
+            List<string> parts = new List<string>() {  
+                verb, count, itemId };
+
+            return string.Join(" ", parts);
         }
 
         return "";

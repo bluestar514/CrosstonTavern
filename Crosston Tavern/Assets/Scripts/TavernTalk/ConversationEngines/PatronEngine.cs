@@ -140,8 +140,6 @@ public class PatronEngine :ConversationEngine
 
                 throw new System.Exception("Fact included in confirmGoal# SocialMove was not a WorldFactGoal or no fact was provided.");
 
-            case "suggest":
-                return new SocialMove("passOpenSuggestions", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
             case "suggest#":
                 AskQuestion();
                 return new SocialMove("askConfirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
@@ -169,6 +167,7 @@ public class PatronEngine :ConversationEngine
                 return new SocialMove("passOpenAskRelationWith");
             case "askRelationWith#":
                 return SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
+
             case "tell#Relation#":
                 return new SocialMove("acknowledge");
 
