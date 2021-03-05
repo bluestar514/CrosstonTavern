@@ -96,18 +96,18 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, 1, 3),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, 1, 3, 
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, 1, 3),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, 1, 3, 
                                             new VerbilizationEffectSocialThreshold("we had a good time", 0, true))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, -10, 10), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -3, -1),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1, 
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -3, -1),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1, 
                                             new VerbilizationEffectSocialThreshold("it was frustrating", 0, false))
                     }
                 ),
@@ -144,7 +144,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.loved, ChanceModifierItemOpinion.OpinionLevel.max),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 10, 15, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, 10, 15, 
                                                                         new VerbilizationEffect("#b# loved it")),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
@@ -161,7 +161,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.liked, ChanceModifierItemOpinion.OpinionLevel.liked),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, 0, 5,
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, 0, 5,
                                                                         new VerbilizationEffect("#b# liked it")),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
@@ -177,9 +177,9 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -30, -15, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -30, -15, 
                                                                 new VerbilizationEffect("#b# didn't like it at all")),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -20, -10),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -20, -10),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
                         new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.disliked, "#item#")),
@@ -210,7 +210,7 @@ public class ActionInitializer
                         new ChanceModifierItemOpinion("#item#", "#b#",
                                                         ChanceModifierItemOpinion.OpinionLevel.min,
                                                         ChanceModifierItemOpinion.OpinionLevel.neutral),
-                        new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 100), true)
+                        new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 100), true)
                     }, ChanceModifierCombination.Mode.additive),
                     new List<Effect>() {
                         new EffectInventoryStatic("#b#", "#item#", -1, new VerbilizationEffect("#b# gave it happily")),
@@ -220,9 +220,9 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifier(),
                     new List<Effect>() {
-                        new EffectSocialStatic("#a#", "#b#", Relationship.RelationType.friendly, -2, 
+                        new EffectSocialStatic("#a#", "#b#", Relationship.Axis.friendly, -2, 
                                                     new VerbilizationEffect("#b# wouldn't give it to #a#")),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -2)
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -2)
                     }
                 )
             },
@@ -257,17 +257,17 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -3, -1, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1, 
                                             new VerbilizationEffectSocialThreshold("#b# got real mad",  0, false)),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -2, 1, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -2, 1, 
                                                 new VerbilizationEffectSocialThreshold("#b# ignored it", 0, true))
                     }
                 ),
@@ -284,26 +284,26 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 3, 10), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 3, 10), true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 2,
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, 2,
                                             new VerbilizationEffectSocialThreshold("#b# blushed bright red",  0, true)),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, 1,
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, 1,
                                         new VerbilizationEffectSocialThreshold("#b# seemed pleased", 0, true)),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 3, 20), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.friendly, -3),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.RelationType.romantic, -3, 
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -3),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, -3, 
                                             new VerbilizationEffectSocialThreshold("#b# didn't believe it",  0, false))
                     }
                 ),
@@ -317,23 +317,23 @@ public class ActionInitializer
         {"ask_out", new GenericAction("ask_out", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.RelationshipTag.dating), false),
-                new Condition_IsState(new StateSocial("#a#", "#b#", Relationship.RelationType.romantic, 60, 1000), true)
+                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.Tag.dating), false),
+                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.Tag.in_love_with), true)
             }),
             new List<Outcome>() {
                 new Outcome( //success:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 60, 100), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 60, 100), true),
                     new List<Effect>() {
-                        new EffectRelationship("#a#", "#b#", Relationship.RelationshipTag.dating, true, true)
+                        new EffectRelationship("#a#", "#b#", Relationship.Tag.dating, true, true)
                     }
                 ),
                 new Outcome( //failure:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.romantic, 60, 100), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 60, 100), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.friendly, -10, -5),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.RelationType.romantic, -15, -5),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.romantic, -5, 0),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.RelationType.friendly, -5, 0)
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -10, -5),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -15, -5),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.romantic, -5, 0),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -5, 0)
                     }
                 ),
             },
@@ -352,15 +352,15 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome( //success:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 40, 40), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 40, 40), true),
                     new List<Effect>() {
-                        new EffectRelationship("#b#", "#a#", Relationship.RelationshipTag.friend, false, true)
+                        new EffectRelationship("#b#", "#a#", Relationship.Tag.friend, false, true)
                     }
                 ),
                 new Outcome( //failure:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.RelationType.friendly, 40, 40), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 40, 40), false),
                     new List<Effect>() {
-                        new EffectRelationship("#b#", "#a#", Relationship.RelationshipTag.friend, false, false)
+                        new EffectRelationship("#b#", "#a#", Relationship.Tag.friend, false, false)
                     }
                 ),
             },
@@ -465,7 +465,41 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator)
             },
             new VerbalizationActionFeatureAt("sell trout", "sold trout")
-        ) }
+        ) },
+        {"eat_#item#", new GenericAction("eat_#item#", 1,
+            new Precondition(new List<Condition>() {
+                new Condition_IsState(new StateInventoryStatic("#a#", "#item#", 1, INF)),
+                new Condition_IsItemClass("#item#", ItemInitializer.ItemClass.food)
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierItemOpinion("#item#", "#a#",
+                                                        ChanceModifierItemOpinion.OpinionLevel.min,
+                                                        ChanceModifierItemOpinion.OpinionLevel.neutral),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "#item#", -1, 
+                                new VerbilizationEffect("#a# ate it grudgingly"))
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierItemOpinion("#item#", "#a#",
+                                                        ChanceModifierItemOpinion.OpinionLevel.liked,
+                                                        ChanceModifierItemOpinion.OpinionLevel.max),
+                    new List<Effect>() {
+                        new EffectInventoryStatic("#a#", "#item#", -1, 
+                                new VerbilizationEffect("#a# ate it happily")),
+                        new EffectStatusEffect("#a#", 
+                            new EntityStatusEffect("ate_something_delicious", EntityStatusEffectType.happy, 
+                                                            stepsInDay, 1, new List<string>(){ }))
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortInventoryItem("item", "a")
+            },
+            new VerbilizationActionItem("eat", "ate", "#item#")
+        ) },
     };
 
 
@@ -485,9 +519,9 @@ public class ActionInitializer
         Dictionary<string, GenericAction> cookingActions = new Dictionary<string, GenericAction>();
 
         foreach (FoodItem food in ItemInitializer.menu.Values) {
-            List<Condition> preconditions = new List<Condition>(from ingredient in food.ingredients
-                                                                      select new Condition_IsState(new StateInventoryStatic("#a#", ingredient, 1, INF)));
-            //preconditions.Add(new Condition_IsState(new StateInventoryStatic("#a#", "recipe_" + food.name, 1, INF)));
+            List<Condition> preconditions = new List<Condition>(
+                                from ingredient in food.ingredients
+                                select new Condition_IsState(new StateInventoryStatic("#a#", ingredient, 1, INF)));
             preconditions.Add(new Condition_NotYou("#b#"));
 
             List<Effect> effects = new List<Effect>(from ingredient in food.ingredients
@@ -571,11 +605,11 @@ public class ActionInitializer
     {
         Dictionary<string, GenericAction> relationActions = new Dictionary<string, GenericAction>();
 
-        Dictionary<Relationship.RelationshipTag, Dictionary<Relationship.RelationType, float[]>> codifiedRelationRanges = 
+        Dictionary<Relationship.Tag, Dictionary<Relationship.Axis, float[]>> codifiedRelationRanges = 
                                                                                             Relationship.codifiedRelationRanges;
 
-        foreach (Relationship.RelationshipTag tag in codifiedRelationRanges.Keys) {
-            Dictionary<Relationship.RelationType, float[]> relationRanges = codifiedRelationRanges[tag];
+        foreach (Relationship.Tag tag in codifiedRelationRanges.Keys) {
+            Dictionary<Relationship.Axis, float[]> relationRanges = codifiedRelationRanges[tag];
 
             
             string name = "ask_if_" + tag;
@@ -655,7 +689,8 @@ public class ActionInitializer
             actions["insult"],
             actions["compliment"],
             actions["ask_out"],
-            actions["ask_#item#"]
+            actions["ask_#item#"],
+            actions["eat_#item#"]
         };
 
         foreach(KeyValuePair<string, GenericAction> pair in GetAllActions()) {

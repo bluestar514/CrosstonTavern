@@ -31,7 +31,7 @@ public class WorldState
 
         //remove recipe actions from each character's knowledge
         foreach(Feature f in c_map.GetAllFeatures()) {
-            if(f.type == Feature.FeatureType.kitchen) {
+            if(owner.id != "barkeep" && f.type == Feature.FeatureType.kitchen) {
                 f.providedActions = new List<GenericAction>();
             }
         }
@@ -133,4 +133,6 @@ public class WorldState
 
         return new List<string>(allItems);
     }
+
+    
 }

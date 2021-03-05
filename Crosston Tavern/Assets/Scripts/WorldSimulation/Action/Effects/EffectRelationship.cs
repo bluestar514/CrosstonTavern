@@ -6,11 +6,11 @@ public class EffectRelationship : Effect
 {
     public string source;
     public string target;
-    public Relationship.RelationshipTag tag;
+    public Relationship.Tag tag;
     public bool bidirectional;
     public bool add;
 
-    public EffectRelationship(string source, string target, Relationship.RelationshipTag tag, 
+    public EffectRelationship(string source, string target, Relationship.Tag tag, 
                                 bool bidirectional, bool add, VerbilizationEffect verbilizationEffect = null)
     {
         this.source = source;

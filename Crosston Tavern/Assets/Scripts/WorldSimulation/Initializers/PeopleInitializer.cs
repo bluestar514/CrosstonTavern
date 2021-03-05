@@ -50,65 +50,65 @@ public class PeopleInitializer
         }
     }
 
-    static Dictionary<string, Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>> initialRelations =
-        new Dictionary<string, Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>>() {
-            {"avery", new Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>(){
-                    {"sammy", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(20,15) },
-                        {Relationship.RelationType.romantic, new relationPair(40, 10) }  }
+    static Dictionary<string, Dictionary<string, Dictionary<Relationship.Axis, relationPair>>> initialRelations =
+        new Dictionary<string, Dictionary<string, Dictionary<Relationship.Axis, relationPair>>>() {
+            {"avery", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                    {"sammy", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(20,15) },
+                        {Relationship.Axis.romantic, new relationPair(40, 10) }  }
                     },
-                    {"finley", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(40, 45) },
-                        {Relationship.RelationType.romantic, new relationPair(5, 0) }  }
+                    {"finley", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(40, 45) },
+                        {Relationship.Axis.romantic, new relationPair(5, 0) }  }
                     },
-                    {"barkeep", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5, 5) },
-                        {Relationship.RelationType.romantic, new relationPair(0,0) }  }
+                    {"barkeep", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5, 5) },
+                        {Relationship.Axis.romantic, new relationPair(0,0) }  }
                     }
                 }
             },
-            {"sammy", new Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>(){
-                    {"avery", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(20, 25) },
-                        {Relationship.RelationType.romantic, new relationPair(-5, 5) }  }
+            {"sammy", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                    {"avery", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(20, 25) },
+                        {Relationship.Axis.romantic, new relationPair(-5, 5) }  }
                     },
-                    {"finley", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(10, -15) },
-                        {Relationship.RelationType.romantic, new relationPair(30, -5) }  }
+                    {"finley", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(10, -15) },
+                        {Relationship.Axis.romantic, new relationPair(30, -5) }  }
                     },
-                    {"barkeep", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5, 5) },
-                        {Relationship.RelationType.romantic, new relationPair(0, 0) }  }
+                    {"barkeep", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5, 5) },
+                        {Relationship.Axis.romantic, new relationPair(0, 0) }  }
                     }
                 }
             },
-            {"finley", new Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>(){
-                    {"avery", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(40, 45) },
-                        {Relationship.RelationType.romantic, new relationPair(20, -10) }  }
+            {"finley", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                    {"avery", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(40, 45) },
+                        {Relationship.Axis.romantic, new relationPair(20, -10) }  }
                     },
-                    {"sammy", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(-10, -10) },
-                        {Relationship.RelationType.romantic, new relationPair(0, 0) }  }
+                    {"sammy", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(-10, -10) },
+                        {Relationship.Axis.romantic, new relationPair(0, 0) }  }
                     },
-                    {"barkeep", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5, 5) },
-                        {Relationship.RelationType.romantic, new relationPair(0, 0) }  }
+                    {"barkeep", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5, 5) },
+                        {Relationship.Axis.romantic, new relationPair(0, 0) }  }
                     }
                 }
             },
-            {"barkeep", new Dictionary<string, Dictionary<Relationship.RelationType, relationPair>>(){
-                    {"avery", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5, 5) },
-                        {Relationship.RelationType.romantic, new relationPair(0,0) }  }
+            {"barkeep", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                    {"avery", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5, 5) },
+                        {Relationship.Axis.romantic, new relationPair(0,0) }  }
                     },
-                    {"sammy", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5,5) },
-                        {Relationship.RelationType.romantic, new relationPair(0,0) }  }
+                    {"sammy", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5,5) },
+                        {Relationship.Axis.romantic, new relationPair(0,0) }  }
                     },
-                    {"finley", new Dictionary<Relationship.RelationType, relationPair>() {
-                        {Relationship.RelationType.friendly, new relationPair(5,5) },
-                        {Relationship.RelationType.romantic, new relationPair(0,0) }  }
+                    {"finley", new Dictionary<Relationship.Axis, relationPair>() {
+                        {Relationship.Axis.friendly, new relationPair(5,5) },
+                        {Relationship.Axis.romantic, new relationPair(0,0) }  }
                     }
                 }
             }
@@ -144,7 +144,7 @@ public class PeopleInitializer
             Person person = allPeople[name];
 
             foreach(string other in initialRelations[name].Keys) {
-                foreach (Relationship.RelationType axis in initialRelations[name][other].Keys) {
+                foreach (Relationship.Axis axis in initialRelations[name][other].Keys) {
                     person.relationships.Set(other, axis, initialRelations[name][other][axis].to);
                 }
             }
@@ -157,14 +157,14 @@ public class PeopleInitializer
     public static void SetAssumedPerceptionsOfOthers(Townie townie)
     {
 
-        foreach(KeyValuePair <string, Dictionary <Relationship.RelationType, relationPair>> relation in initialRelations[townie.Id]) {
+        foreach(KeyValuePair <string, Dictionary <Relationship.Axis, relationPair>> relation in initialRelations[townie.Id]) {
             string other = relation.Key;
-            Dictionary<Relationship.RelationType, relationPair> initialRelationData = relation.Value;
+            Dictionary<Relationship.Axis, relationPair> initialRelationData = relation.Value;
 
             Relationship liveRelationship = townie.ws.GetRelationshipsFor(other);
 
-            foreach (KeyValuePair<Relationship.RelationType, relationPair> pair in initialRelationData) {
-                Relationship.RelationType axis = pair.Key;
+            foreach (KeyValuePair<Relationship.Axis, relationPair> pair in initialRelationData) {
+                Relationship.Axis axis = pair.Key;
                 int initialValue = pair.Value.from;
 
                 liveRelationship.Set(townie.Id, axis, initialValue);
@@ -179,13 +179,13 @@ public class PeopleInitializer
             Relationship rel = person.relationships;
 
             foreach (string other in rel.GetKnownPeople()) {
-                foreach (KeyValuePair<Relationship.RelationshipTag,
-                    Dictionary<Relationship.RelationType, float[]>> pair in Relationship.codifiedRelationRanges) {
-                    Relationship.RelationshipTag tag = pair.Key;
-                    Dictionary<Relationship.RelationType, float[]> data = pair.Value;
+                foreach (KeyValuePair<Relationship.Tag,
+                    Dictionary<Relationship.Axis, float[]>> pair in Relationship.codifiedRelationRanges) {
+                    Relationship.Tag tag = pair.Key;
+                    Dictionary<Relationship.Axis, float[]> data = pair.Value;
 
                     bool inRange = true;
-                    foreach (Relationship.RelationType axis in data.Keys) {
+                    foreach (Relationship.Axis axis in data.Keys) {
                         int currentValue = person.relationships.Get(other, axis);
 
                         if (currentValue < data[axis][0] ||
@@ -213,28 +213,28 @@ public class PeopleInitializer
     static void SetRelationsRandom(Dictionary<string, Person> allPeople)
     {
 
-        Dictionary<Relationship.RelationshipTag, List<List<int>>> relationValues = new Dictionary<Relationship.RelationshipTag, List<List<int>>>() {
-            {Relationship.RelationshipTag.acquantences, new List<List<int>>() {
+        Dictionary<Relationship.Tag, List<List<int>>> relationValues = new Dictionary<Relationship.Tag, List<List<int>>>() {
+            {Relationship.Tag.acquantences, new List<List<int>>() {
                 new List<int>(){-2, 2},
                 new List<int>(){-4, 4}
             } },
-            {Relationship.RelationshipTag.friend, new List<List<int>>(){
+            {Relationship.Tag.friend, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){-4, 6}
             } },
-            {Relationship.RelationshipTag.enemy, new List<List<int>>(){
+            {Relationship.Tag.enemy, new List<List<int>>(){
                 new List<int>(){-6, -2},
                 new List<int>(){-6, 4}
             } },
-            {Relationship.RelationshipTag.in_love_with, new List<List<int>>(){
+            {Relationship.Tag.in_love_with, new List<List<int>>(){
                 new List<int>(){2, 6},
                 new List<int>(){4, 10}
             } }
         };
 
-        List<Relationship.RelationshipTag> relations = new List<Relationship.RelationshipTag>(relationValues.Keys);
+        List<Relationship.Tag> relations = new List<Relationship.Tag>(relationValues.Keys);
 
-        Dictionary<string, Dictionary<string, Relationship.RelationshipTag>> relationMatrix = new Dictionary<string, Dictionary<string, Relationship.RelationshipTag>>();
+        Dictionary<string, Dictionary<string, Relationship.Tag>> relationMatrix = new Dictionary<string, Dictionary<string, Relationship.Tag>>();
 
         foreach (Person personA in allPeople.Values) {
             string a = personA.id;
@@ -242,8 +242,8 @@ public class PeopleInitializer
             foreach (Person personB in allPeople.Values) {
                 string b = personB.id;
                 
-                if (!relationMatrix.ContainsKey(a)) relationMatrix[a] = new Dictionary<string, Relationship.RelationshipTag>();
-                if (!relationMatrix.ContainsKey(b)) relationMatrix[b] = new Dictionary<string, Relationship.RelationshipTag>();
+                if (!relationMatrix.ContainsKey(a)) relationMatrix[a] = new Dictionary<string, Relationship.Tag>();
+                if (!relationMatrix.ContainsKey(b)) relationMatrix[b] = new Dictionary<string, Relationship.Tag>();
 
                 if (relationMatrix[b].ContainsKey(a)) {
                     relationMatrix[a][b] = relationMatrix[b][a];
@@ -251,7 +251,7 @@ public class PeopleInitializer
                 }
 
                 if (a == b) {
-                    relationMatrix[a].Add(b, Relationship.RelationshipTag.self);
+                    relationMatrix[a].Add(b, Relationship.Tag.self);
                     continue;
                 }
 
@@ -264,17 +264,17 @@ public class PeopleInitializer
 
         foreach (Person person in allPeople.Values) {
             foreach (Person other in allPeople.Values) {
-                Relationship.RelationshipTag relation = relationMatrix[person.id][other.id];
+                Relationship.Tag relation = relationMatrix[person.id][other.id];
 
-                if (relation == Relationship.RelationshipTag.self) continue;
+                if (relation == Relationship.Tag.self) continue;
                 else {
                     List<List<int>> valueRange = relationValues[relation];
 
                     int friendly = UnityEngine.Random.Range(valueRange[0][0], valueRange[0][1]);
                     int romance = UnityEngine.Random.Range(valueRange[1][0], valueRange[1][1]);
 
-                    person.relationships.Increase(other.id, Relationship.RelationType.friendly, friendly);
-                    person.relationships.Increase(other.id, Relationship.RelationType.romantic, romance);
+                    person.relationships.Increase(other.id, Relationship.Axis.friendly, friendly);
+                    person.relationships.Increase(other.id, Relationship.Axis.romantic, romance);
 
                     person.relationships.AddRelationTag(other.id, relation);
                 }

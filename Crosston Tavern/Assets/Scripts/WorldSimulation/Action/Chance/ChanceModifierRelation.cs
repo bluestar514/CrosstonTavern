@@ -17,15 +17,15 @@ public class ChanceModifierRelation : ChanceModifier
     {
         Person source = ws.map.GetPerson(state.source);
         string target = state.target;
-        Relationship.RelationshipTag tag = state.tag;
+        Relationship.Tag tag = state.tag;
 
         if (source.relationships.GetTag(target).Contains(tag) == positive) return 1;
 
         if (!Relationship.codifiedRelationRanges.ContainsKey(tag)) return 0;
 
         float chance = 1;
-        Dictionary<Relationship.RelationType, float[]> ranges = Relationship.codifiedRelationRanges[tag];
-        foreach(Relationship.RelationType axis in ranges.Keys) {
+        Dictionary<Relationship.Axis, float[]> ranges = Relationship.codifiedRelationRanges[tag];
+        foreach(Relationship.Axis axis in ranges.Keys) {
             if (Mathf.Abs(ranges[axis][0]) == Relationship.maxValue &&
                 Mathf.Abs(ranges[axis][1]) == Relationship.maxValue) continue;
 
@@ -62,7 +62,7 @@ public class ChanceModifierRelation : ChanceModifier
     {
         string source = state.source;
         string target = state.target;
-        Relationship.RelationshipTag tag = state.tag;
+        Relationship.Tag tag = state.tag;
 
 
         if (positive) {

@@ -25,8 +25,7 @@ public class VerbilizationAction : VerbilizationInfo
 
         if (includeSubject)
             this.actor = VerbalizationDictionary.Replace(actor);
-        else
-            this.actor = "";
+
         this.feature = VerbalizationDictionary.Replace(feature);
 
         return verbPresent;
@@ -45,8 +44,10 @@ public class VerbilizationMovement : VerbilizationAction
         base.Verbilize(actor, feature, presentTense, includeSubject);
 
         this.feature = VerbalizationDictionary.Replace(feature.Split('>')[1]);
-
-        return this.actor + this.verb + this.feature;
+        if (includeSubject)
+            return this.actor + this.verb + this.feature;
+        else
+            return this.verb + this.feature;
     }
 }
 
@@ -63,8 +64,10 @@ public class VerbilizationActionResourceGathering : VerbilizationAction
     public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
         base.Verbilize(actor, feature, presentTense, includeSubject);
-
-        return this.actor + " " + this.verb + " at " + this.feature;
+        if (includeSubject)
+            return this.actor + " " + this.verb + " at " + this.feature;
+        else
+            return this.verb + " at " + this.feature;
     }
 }
 
@@ -80,8 +83,10 @@ public class VerbilizationActionSocial : VerbilizationAction
     public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
         base.Verbilize(actor, feature, presentTense, includeSubject);
-
-        return this.actor + " " + this.verb + " " + this.feature;
+        if (includeSubject)
+            return this.actor + " " + this.verb + " " + this.feature;
+        else
+            return this.verb + " " + this.feature; 
     }
 }
 
@@ -102,7 +107,9 @@ public class VerbilizationActionItem : VerbilizationAction
     //Bob gave Alicia a cake
     public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
-        return base.Verbilize(actor, feature, presentTense);
+        itemBinding = VerbalizationDictionary.Replace(itemBinding, VerbalizationDictionary.Form.singular);
+
+        return base.Verbilize(actor, feature, presentTense, includeSubject);
     }
 }
 
@@ -120,7 +127,10 @@ public class VerbilizationActionItemAskFor : VerbilizationActionItem
         base.Verbilize(actor, feature, presentTense, includeSubject);
         string item = VerbalizationDictionary.Replace(itemBinding);
 
-        return this.actor + " " + this.verb + " " + this.feature + " for a " + item;
+        if(includeSubject)
+            return this.actor + " " + this.verb + " " + this.feature + " for a " + item;
+        else
+            return this.verb + " " + this.feature + " for a " + item;
     }
 }
 
@@ -153,7 +163,30 @@ public class VerbalizationActionFeatureAt : VerbilizationAction
     public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
         base.Verbilize(actor, feature, presentTense, includeSubject);
+        if(includeSubject)  
+            return this.actor + " " + this.verb+ " at "+ this.feature;
+        else
+            return this.verb + " at " + this.feature; ;
+    }
+}
 
-        return this.actor + " " + this.verb+ " at "+ this.feature;
+public class VerbalizationActionCooking : VerbilizationActionItem
+{
+
+    public VerbalizationActionCooking(string verbPresent, string verbPast, string item) : base(verbPresent, verbPast,  item) { }
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
+
+    //I made trout stew in Bob's Kitchen
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
+    {
+        base.Verbilize(actor, feature, presentTense, includeSubject);
+        if (includeSubject)
+            return this.actor + " " + this.verb + " "+ itemBinding + " at " + this.feature;
+        else
+            return this.verb + " " + itemBinding + " at " + this.feature; ;
     }
 }

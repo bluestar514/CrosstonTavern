@@ -156,3 +156,18 @@ public class GM_Precondition_Now: GM_Precondition
         return new GM_Precondition_Time(start, end);
     }
 }
+
+public class GM_Precondition_State: GM_Precondition
+{
+    public State state;
+
+    public GM_Precondition_State(State state)
+    {
+        this.state = state;
+    }
+
+    public override bool Satisfied(WorldState ws)
+    {
+        return state.InEffect(ws, new BoundBindingCollection(), new FeatureResources());
+    }
+}

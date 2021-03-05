@@ -8,6 +8,10 @@ public class BoundBindingCollection
 
     public int Count { get => bindings.Count;}
 
+    public BoundBindingCollection()
+    {
+        bindings = new List<BoundBindingPort>();
+    }
     public BoundBindingCollection(List<BoundBindingPort> bindings)
     {
         this.bindings = bindings;

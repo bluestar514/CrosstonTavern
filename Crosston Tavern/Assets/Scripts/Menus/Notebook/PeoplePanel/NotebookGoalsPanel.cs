@@ -15,6 +15,27 @@ public class NotebookGoalsPanel : MainNotebookTab
     public GameObject PeopleNameButtonPrefab;
 
 
+    public void AddMany(List<WorldFact> facts)
+    {
+
+
+        Dictionary<string, List<WorldFact>> sortedFacts = new Dictionary<string, List<WorldFact>>();
+
+        foreach(WorldFact fact in facts) {
+            Debug.Log(fact);
+            if(fact is WorldFactRelation factRelation) {
+                if (!sortedFacts.ContainsKey(factRelation.owner))
+                    sortedFacts.Add(factRelation.owner, new List<WorldFact>());
+                sortedFacts[factRelation.owner].Add(fact);
+            }
+        }
+
+        foreach(string owner in sortedFacts.Keys) {
+            GetPersonContentPanel(owner).allRelationships.AddRelations(sortedFacts[owner]);
+        }
+    }
+
+
     public override bool AddWorldFact(WorldFact fact)
     {
         PeopleContentPanel panel = GetPanelFromFact(fact);
@@ -34,7 +55,6 @@ public class NotebookGoalsPanel : MainNotebookTab
     PeopleContentPanel GetPanelFromFact(WorldFact fact)
     {
         string owner;
-        PeopleContentPanel panel;
 
         if (fact is WorldFactGoal) {
             WorldFactGoal goalFact = (WorldFactGoal)fact;

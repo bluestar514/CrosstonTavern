@@ -48,7 +48,24 @@ public class Verbalizer
         actionLocation = VerbalizationDictionary.Replace(actionLocation);
 
         string verbilization = action.verbilizationInfo.Verbilize(actionActor, actionLocation, presentTense, includeSubject);
-        verbilization = action.Bindings.BindString(verbilization);
+
+
+        BoundBindingCollection bindings = action.Bindings;
+        List<BoundBindingPort> newBindings = new List<BoundBindingPort>();
+        foreach (BoundBindingPort bindingPort in bindings.bindings) {
+            if (bindingPort.Value == speakerId) {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag, "I"));
+            } else if (bindingPort.Value == listenerId) {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag, "you"));
+            } else {
+                newBindings.Add(new BoundBindingPort(bindingPort.tag,
+                    VerbalizationDictionary.Replace(bindingPort.Value)));
+            }
+        }
+
+        BoundBindingCollection newCollection = new BoundBindingCollection(newBindings);
+
+        verbilization = newCollection.BindString(verbilization);
 
         return verbilization;
     }

@@ -175,9 +175,7 @@ public class BarSpaceController : MonoBehaviour
 
     void AddAllFacts(List<WorldFact> facts)
     {
-        foreach(WorldFact fact in facts) {
-            nc.AddElement(fact);
-        }
+        nc.AddManyElements(facts);
     }
 
 

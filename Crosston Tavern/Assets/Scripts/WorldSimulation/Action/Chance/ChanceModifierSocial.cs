@@ -17,19 +17,19 @@ public class ChanceModifierSocial : ChanceModifier
     {
         Person source = ws.map.GetPerson(socialState.sourceId);
         string target = socialState.targetId;
-        Relationship.RelationType type = socialState.axis;
+        Relationship.Axis type = socialState.axis;
 
         float currentRelValue = source.relationships.Get(target, type);
 
         //Account for Emotion:
         StatusEffectSummary emotionState = source.statusEffectTable.CalculateStatus(target);
         switch (type) {
-            case Relationship.RelationType.friendly:
+            case Relationship.Axis.friendly:
                 currentRelValue += emotionState[EntityStatusEffectType.happy];
                 currentRelValue -= emotionState[EntityStatusEffectType.angry];
                 currentRelValue -= emotionState[EntityStatusEffectType.sad];
                 break;
-            case Relationship.RelationType.romantic:
+            case Relationship.Axis.romantic:
                 currentRelValue -= emotionState[EntityStatusEffectType.angry];
                 break;
         }
@@ -63,7 +63,7 @@ public class ChanceModifierSocial : ChanceModifier
     {
         string source = socialState.sourceId;
         string target = socialState.targetId;
-        Relationship.RelationType axis = socialState.axis;
+        Relationship.Axis axis = socialState.axis;
         int min = socialState.min;
         int max = socialState.max;
 

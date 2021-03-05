@@ -238,8 +238,8 @@ public class SocialMoveFactory
 
     static SocialMove MakeTellRelation(Townie speaker, string target)
     {
-        List<WorldFact> facts = GetInterRelationship(speaker.townieInformation, target);
-        facts.AddRange(GetInterRelationship(speaker.ws.map.GetPerson(target), speaker.Id));
+        List<WorldFact> facts = GetInterRelationship(speaker.townieInformation, target, speaker.Id);
+        facts.AddRange(GetInterRelationship(speaker.ws.map.GetPerson(target), speaker.Id, speaker.Id));
 
         return new SocialMove("tellRelationWith#", arguements: new List<string>() { target }, mentionedFacts: facts);
     }
@@ -416,20 +416,20 @@ public class SocialMoveFactory
     }
 
 
-    static List<WorldFact> GetInterRelationship(Person subject, string target)
+    static List<WorldFact> GetInterRelationship(Person subject, string target, string owner)
     {
         List<WorldFact> facts = new List<WorldFact>();
 
-        foreach (Relationship.RelationType axis in
-                        new List<Relationship.RelationType>() {
-                            Relationship.RelationType.friendly,
-                            Relationship.RelationType.romantic}) {
+        foreach (Relationship.Axis axis in
+                        new List<Relationship.Axis>() {
+                            Relationship.Axis.friendly,
+                            Relationship.Axis.romantic}) {
             int value = subject.relationships.Get(target, axis);
             facts.Add(new WorldFactState(new StateSocial(subject.id, target, axis, value, value)));
         }
 
         facts.AddRange(from tag in subject.relationships.GetTag(target)
-                       select new WorldFactState(new StateRelation(subject.id, target, tag)));
+                       select new WorldFactRelation(new StateRelation(subject.id, target, tag), owner));
 
         return facts;
     }

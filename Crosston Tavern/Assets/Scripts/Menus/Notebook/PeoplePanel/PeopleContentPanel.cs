@@ -11,6 +11,7 @@ public class PeopleContentPanel : MonoBehaviour
     public Text dislikedText;
     public Text hatedText;
     public Transform goalHolder;
+    public AllRelationshipsPanel allRelationships;
 
     GameObject goalPrefab;
 
@@ -39,6 +40,14 @@ public class PeopleContentPanel : MonoBehaviour
 
             text.text = level + ": Unknown";
         }
+
+
+        allRelationships.Init(name);
+    }
+
+    public void AddMany(List<WorldFact> facts)
+    {
+        allRelationships.AddRelations(facts);
     }
 
     public bool AddWorldFact(WorldFact fact)

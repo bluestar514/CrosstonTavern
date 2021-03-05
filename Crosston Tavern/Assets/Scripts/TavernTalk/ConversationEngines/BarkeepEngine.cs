@@ -70,15 +70,25 @@ public class BarkeepEngine : ConversationEngine
                 case "tellAboutDayEvents":
                 case "tellAbout#Event":
                 case "tellWhyAction#":
+                    if (prompt.mentionedFacts.Count > 0) {
+                        moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
+                        moves.AddRange(GenAskWhyGoal(prompt.mentionedFacts));
+                    }
+
+                    moves.Add(new SocialMove("nice"));
+                    break;
+
                 case "tellAboutGoals":
                     if (prompt.mentionedFacts.Count > 0) {
                         moves.AddRange(GenAskWhyAction(prompt.mentionedFacts));
                         moves.AddRange(GenAskWhyGoal(prompt.mentionedFacts));
                     }
+                    moves.Add(new SocialMove("askAboutGoalFrustration"));
                     moves.Add(new SocialMove("nice"));
                     break;
 
 
+                case "frustratedByGoals":
                 case "tellWhyGoal#":
                     List<BoundAction> suggestedActions = GenSuggestedAction(prompt.mentionedFacts[0]);
                     menuOptions = new List<SocialMove>(
@@ -100,6 +110,10 @@ public class BarkeepEngine : ConversationEngine
                     break;
 
 
+                case "askHowToDo#":
+                    moves.Add(new SocialMove("tellHowToDo#", prompt.arguements, prompt.mentionedFacts));
+                    moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                    break;
                 case "askConfirmSuggestion#":
                     moves.Add(new SocialMove("confirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
                     moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
@@ -113,6 +127,10 @@ public class BarkeepEngine : ConversationEngine
                     moves.Add(new SocialMove("nice"));
                     subMenu.AddPreviousContext(new SocialMenu("nevermind", moves));
                     break;
+
+                
+
+
                 case "askForRecipe#":
                     moves.Add(new SocialMove("giveRecipe#", arguements: prompt.arguements));
                     moves.Add(new SocialMove("refuseRecipe#", arguements: prompt.arguements));
@@ -125,13 +143,13 @@ public class BarkeepEngine : ConversationEngine
                 default:
                     List<SocialMove> barkeeperMoves = new List<SocialMove>() {
                     new SocialMove("askAboutGoals"),
-                    //new SocialMove("askAboutGoalFrustration"),
+                    new SocialMove("askAboutGoalFrustration"),
                     //new SocialMove("askAboutDayFull"),
+                    
                     new SocialMove("askAboutDayHighlights", arguements: new List<string>(){ patronGeneralMood }),
                     //new SocialMove("askAboutObservation"),
                     //new SocialMove("askAboutExcitement"),
                     //new SocialMove("askAboutDisapointment"),
-                    //new SocialMove("askWhyGoal"),
                     //new SocialMove("askAboutPreferencesLike"),
                     //new SocialMove("askAboutPreferencesHate")
                 };
@@ -152,7 +170,14 @@ public class BarkeepEngine : ConversationEngine
                     AddSubmenu("tellActionMenu", GenTellAction(), moves, menus);
                     AddSubmenu("tellPreferenceMenu", GenTellPreference(), moves, menus);
                     AddSubmenu("confirmGoalMenu", GenConfirmGoal(facts), moves, menus);
-
+                    AddSubmenu("suggest", new List<SocialMove>(
+                                                                from action in GenSuggestedAction()
+                                                                select new SocialMove(
+                                                                    "suggest#",
+                                                                    arguements: new List<string>() { action.ToString() },
+                                                                    mentionedFacts: new List<WorldFact>() { new WorldFactPotentialAction(action) })
+                                            ), 
+                                            moves, menus);
 
 
                     //moves.AddRange(GenSuggestedAction());
@@ -236,7 +261,7 @@ public class BarkeepEngine : ConversationEngine
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
-    List<BoundAction> GenSuggestedAction(WorldFact fact)
+    List<BoundAction> GenSuggestedAction(WorldFact fact = null)
     {
         ActionBuilder ab = new ActionBuilder(speaker.ws, patron);
 
@@ -244,7 +269,7 @@ public class BarkeepEngine : ConversationEngine
 
         System.Func<BoundAction, bool> filter = action => true;
 
-        if (fact is WorldFactGoal factGoal) {
+        if(fact is WorldFactGoal factGoal) {
             Goal goal = factGoal.goal;
 
             if (goal is GoalAction) return new List<BoundAction>() { };
@@ -295,7 +320,7 @@ public class BarkeepEngine : ConversationEngine
                                     select new SocialMove("tell#Relation#",
                                                             arguements: new List<string>() { target, relation.ToString() },
                                                             mentionedFacts: new List<WorldFact>() {
-                                                                new WorldFactRelation(new StateRelation(target, patronId, relation))
+                                                                new WorldFactRelation(new StateRelation(target, patronId, relation), patronId)
                                                             })
                                     );
     }

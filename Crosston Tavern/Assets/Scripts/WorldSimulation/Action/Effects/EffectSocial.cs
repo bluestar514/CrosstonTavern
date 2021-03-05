@@ -6,7 +6,7 @@ public class EffectSocial : Effect
 {
     public string sourceId;
     public string targetId;
-    public Relationship.RelationType axis;
+    public Relationship.Axis axis;
 
     public virtual int delta { get; protected set; }
     public override string ToString()
@@ -23,11 +23,11 @@ public class EffectSocial : Effect
 
             string source = bindings.BindString(sourceId);
             string target = bindings.BindString(targetId);
-            Relationship.RelationType axis = this.axis;
+            Relationship.Axis axis = this.axis;
 
             string goalSource = state.sourceId;
             string goalTarget = state.targetId;
-            Relationship.RelationType goalAxis = state.axis;
+            Relationship.Axis goalAxis = state.axis;
 
             if (source != goalSource ||
                 target != goalTarget ||
@@ -88,7 +88,7 @@ public class EffectSocialVariable : EffectSocial
         get => Mathf.RoundToInt((UnityEngine.Random.value * (max - min)) + min);
     }
 
-    public EffectSocialVariable(string sourceId, string targetId, Relationship.RelationType axis, int min, int max, VerbilizationEffect verbilizationEffect = null)
+    public EffectSocialVariable(string sourceId, string targetId, Relationship.Axis axis, int min, int max, VerbilizationEffect verbilizationEffect = null)
     {
         this.sourceId = sourceId;
         this.targetId = targetId;
@@ -117,7 +117,7 @@ public class EffectSocialVariable : EffectSocial
 public class EffectSocialStatic : EffectSocial
 {
 
-    public EffectSocialStatic(string sourceId, string targetId, Relationship.RelationType axis, int delta, VerbilizationEffect verbilizationEffect = null)
+    public EffectSocialStatic(string sourceId, string targetId, Relationship.Axis axis, int delta, VerbilizationEffect verbilizationEffect = null)
     {
         this.sourceId = sourceId;
         this.targetId = targetId;

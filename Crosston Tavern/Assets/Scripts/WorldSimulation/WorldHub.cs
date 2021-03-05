@@ -109,7 +109,7 @@ public class WorldHub : MonoBehaviour
         foreach(string other in from p in ws.map.GetPeople()
                                 where p.location == person.location
                                 select p.id) {
-            person.relationships.Increase(other, Relationship.RelationType.friendly, UnityEngine.Random.Range(0, .3f));
+            person.relationships.Increase(other, Relationship.Axis.friendly, UnityEngine.Random.Range(0, .3f));
         }
     }
 

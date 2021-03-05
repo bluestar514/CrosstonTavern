@@ -34,6 +34,22 @@ public class Condition_NotYou : Condition
         return actor.id != bindings.BindString(featureId);
     }
 }
+public class Condition_IsYou : Condition
+{
+    public string featureId;
+
+    public Condition_IsYou(string featureId)
+    {
+        this.featureId = featureId;
+
+        name = "Condition:OnlyTargetSelf(" + featureId + ")";
+    }
+
+    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+        return actor.id == bindings.BindString(featureId);
+    }
+}
 
 public class Condition_SpaceAtFeature: Condition
 {
@@ -71,4 +87,29 @@ public class Condition_IsState: Condition
         
         return inEffect == isTrue;
     }
+}
+
+public class Condition_IsItemClass : Condition
+{
+    public string itemId;
+    public ItemInitializer.ItemClass itemClass;
+
+    public bool isTrue;
+
+    public Condition_IsItemClass(string itemId, ItemInitializer.ItemClass itemClass, bool isTrue=true)
+    {
+        this.itemId = itemId;
+        this.itemClass = itemClass;
+        this.isTrue = isTrue;
+
+        name = "Condition:" + itemId+ " is "+ itemClass + "-" + isTrue;
+    }
+
+    public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
+    {
+
+        string item = bindings.BindString(itemId);
+        return ItemInitializer.IsItem(itemId, itemClass) == isTrue;
+    }
+
 }

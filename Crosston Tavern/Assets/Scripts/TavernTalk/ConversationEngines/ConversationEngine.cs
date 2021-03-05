@@ -120,4 +120,10 @@ public class ConversationEngine
         return null;
     }
 
+    protected List<WorldFact> GoalsToFacts(List<Goal> goals, string owner)
+    {
+        return new List<WorldFact>(from goal in goals
+                                   select new WorldFactGoal(goal, owner));
+    }
+
 }

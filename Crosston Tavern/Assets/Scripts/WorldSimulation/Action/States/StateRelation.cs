@@ -6,9 +6,9 @@ public class StateRelation : State
 {
     public string source;
     public string target;
-    public Relationship.RelationshipTag tag;
+    public Relationship.Tag tag;
 
-    public StateRelation(string source, string target, Relationship.RelationshipTag tag)
+    public StateRelation(string source, string target, Relationship.Tag tag)
     {
         this.source = source;
         this.target = target;
@@ -54,16 +54,16 @@ public class StateRelation : State
 
         if (goal) {
             switch (this.tag) {
-                case Relationship.RelationshipTag.dating:
+                case Relationship.Tag.dating:
                     if (source == "I") return "to date " + target;
 
                     return source + " to date " + target;
-                case Relationship.RelationshipTag.liked:
+                case Relationship.Tag.liked:
                     if (source == "I")
                         return "to like " + target + " some";
                     else
                         return source + " will like " + target + " some";
-                case Relationship.RelationshipTag.disliked:
+                case Relationship.Tag.disliked:
                     if (source == "I")
                         return "to dislike " + target + " some";
                     else
@@ -77,13 +77,13 @@ public class StateRelation : State
 
         } else {
             switch (this.tag) {
-                case Relationship.RelationshipTag.dating:
+                case Relationship.Tag.dating:
                     if (source == "I") return "I can date " + target;
 
                     return source + " will date " + target;
-                case Relationship.RelationshipTag.liked:
+                case Relationship.Tag.liked:
                     return source + " will like " + target + " some";
-                case Relationship.RelationshipTag.disliked:
+                case Relationship.Tag.disliked:
                     return source + " will dislike " + target + " some";
                 default:
                     return source + " will be " + tag + "s with " + target;

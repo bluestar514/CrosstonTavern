@@ -19,6 +19,11 @@ public class Goal
 
     public List<string> parentGoals = new List<string>();
     protected List<Goal> parentGoalObj = new List<Goal>();
+
+    
+    /// These are the actions completing this goal unlocks,
+    /// not the actions which complete this goal.
+    /// In other words, these are the actions that the character wanted to do which prompted the creation on this goal.
     public List<BoundAction> unlockedActionsOnGoalCompletion = new List<BoundAction>();
 
     public virtual List<Goal> Combine(Goal goal)
@@ -58,11 +63,7 @@ public class GoalState : Goal
 
     public State state;
     
-    /// <summary>
-    /// These are the actions completing this goal unlocks,
-    /// not the actions which complete this goal.
-    /// In other words, these are the actions that the character wanted to do which prompted the creation on this goal.
-    /// </summary>
+    
     
 
     public GoalState(State state, float priority)

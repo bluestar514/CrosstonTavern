@@ -14,6 +14,14 @@ public class GoalManager
 
     int lookAhead = 7;
 
+    public enum GoalPriority
+    {
+        low = 1,
+        medium = 3,
+        high = 5,
+        imperitive = 10
+    }
+
     public GoalManager(WorldState ws, Person actor)
     {
         this.ws = ws;
@@ -107,6 +115,36 @@ public class GoalManager
         return allGoals;
     }
 
+    public List<Goal> GetStuckGoals()
+    {
+        
+        List<BoundAction> allActions = GetAllActions();
+        // Get all outcomes
+        List<OutcomeRestraints> allOutcomes = new List<OutcomeRestraints>();
+        foreach (BoundAction action in allActions) {
+            allOutcomes.AddRange(DecomposeActionToOutcomes(action));
+        }
+
+        
+        List<Goal> goals = lastSetOfGoals;
+
+        List<Goal> stuckGoals = new List<Goal>();
+        foreach(Goal goal in goals) {
+            List<OutcomeRestraints> positiveOutcomes = new List<OutcomeRestraints>();
+            if (goal is GoalState) {
+                positiveOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
+                
+            } else if (goal is GoalAction goalAction) {
+                positiveOutcomes.AddRange(OutcomeRestraints.MakeFromAction(goalAction.action, ws));
+            }
+
+            //mark goals which have no known actions 
+            if (positiveOutcomes.Count == 0) stuckGoals.Add(goal);
+        }
+
+        return stuckGoals;
+    }
+
     class OutcomeRestraints
     {
         public List<Effect> effects;
@@ -133,6 +171,17 @@ public class GoalManager
             this.resources = resources;
             this.parentAction = parentAction;
             fullfillsGoal = new List<Goal>();
+        }
+
+        public static List<OutcomeRestraints> MakeFromAction(BoundAction parentAction, WorldState ws)
+        {
+            return new List<OutcomeRestraints>(from outcome in parentAction.potentialOutcomes
+                                               select new OutcomeRestraints(outcome.effects,
+                                                                            outcome.chanceModifier,
+                                                                            parentAction.preconditions.conditions,
+                                                                            parentAction.Bindings,
+                                                                            ws.map.GetFeature(parentAction.FeatureId).relevantResources,
+                                                                            parentAction));
         }
     }
 
@@ -181,7 +230,8 @@ public class GoalManager
     bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings)
     {
         return ContainsConditionNotYou(preconditions, bindings) ||
-                ContainsOthersInventoryState(preconditions, bindings);
+                ContainsOthersInventoryState(preconditions, bindings) ||
+                ContainsConditionItemClass(preconditions, bindings);
 
     }
 
@@ -213,6 +263,21 @@ public class GoalManager
                 Condition_NotYou condition_NotYou = (Condition_NotYou)condition;
                 
                 if (bindings.BindString(condition_NotYou.featureId) == actor.id) { //this can never change, so we should just discard this action
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool ContainsConditionItemClass(List<Condition> preconditions, BoundBindingCollection bindings)
+    {
+        foreach (Condition condition in preconditions) {
+            if (condition is Condition_IsItemClass) {
+                Condition_IsItemClass condition_ItemClass = (Condition_IsItemClass)condition;
+                string itemId = bindings.BindString(condition_ItemClass.itemId);
+                if (!ItemInitializer.IsItem(itemId, condition_ItemClass.itemClass) ) {
                     return true;
                 }
             }

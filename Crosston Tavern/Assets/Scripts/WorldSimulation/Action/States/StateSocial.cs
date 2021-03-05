@@ -6,11 +6,11 @@ public class StateSocial : State
 {
     public string sourceId;
     public string targetId;
-    public Relationship.RelationType axis;
+    public Relationship.Axis axis;
     public int min;
     public int max;
 
-    public StateSocial(string sourceId, string targetId, Relationship.RelationType axis, int min, int max)
+    public StateSocial(string sourceId, string targetId, Relationship.Axis axis, int min, int max)
     {
         this.sourceId = sourceId;
         this.targetId = targetId;

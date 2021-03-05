@@ -6,6 +6,15 @@ public class NotebookController : SideMenuController<WorldFact>
 {
     public MainNotebookController notebook;
 
+    public void AddManyElements(List<WorldFact> facts)
+    {
+        notebook.AddMany(facts);
+
+        foreach (WorldFact fact in facts) {
+            AddElement(fact);
+        }
+    }
+
     public override void AddElement(WorldFact element)
     {
         bool addToSideNotebook = notebook.AddWorldFact(element);

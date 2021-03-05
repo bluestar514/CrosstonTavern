@@ -8,6 +8,10 @@ public class FeatureResources
 {
     public StringStringListDictionary resources;
 
+    public FeatureResources()
+    {
+        resources = new StringStringListDictionary();
+    }
     public FeatureResources(StringStringListDictionary resources)
     {
         this.resources = resources;

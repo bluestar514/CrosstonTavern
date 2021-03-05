@@ -16,6 +16,15 @@ public class MainNotebookController : MonoBehaviour
         openTab.SetActive(true);
     }
 
+    public void AddMany(List<WorldFact> facts)
+    {
+        foreach(MainNotebookTab tab in tabs) {
+            if(tab is NotebookGoalsPanel goalsPanel) {
+                goalsPanel.AddMany(facts);
+            }
+        }
+    }
+
     public bool AddWorldFact(WorldFact fact)
     {
         bool addedSuccessfully = false;

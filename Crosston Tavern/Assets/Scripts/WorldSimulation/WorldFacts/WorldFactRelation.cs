@@ -6,20 +6,22 @@ using UnityEngine;
 public class WorldFactRelation : WorldFact
 {
     public StateRelation relation;
+    public string owner;
 
-    public WorldFactRelation(StateRelation relation)
+    public WorldFactRelation(StateRelation relation, string owner)
     {
         this.relation = relation;
+        this.owner = owner;
     }
 
     public override string ToString()
     {
-        return "{" + relation.ToString() + "}";
+        return "{"+owner + ":" + relation.ToString() + "}";
     }
 
     public override WorldFact Bind(BoundBindingCollection bindings, FeatureResources resources)
     {
-        return new WorldFactRelation((StateRelation)relation.Bind(bindings, resources));
+        return new WorldFactRelation((StateRelation)relation.Bind(bindings, resources), bindings.BindString(owner));
     }
 
     public override List<WorldFact> UpdateWorldState(WorldState ws)

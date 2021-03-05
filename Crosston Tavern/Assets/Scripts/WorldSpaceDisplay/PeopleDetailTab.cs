@@ -65,10 +65,10 @@ public class PeopleDetailTab : DetailTab
 
             Instantiate(entryPrefab, relationsHolder)
                 .GetComponent<DisplayEntry>().Init(people + ":("+ 
-                                                    rel.Get(people, Relationship.RelationType.friendly) +","+
-                                                    rel.Get(people, Relationship.RelationType.romantic) + ") - ("+
-                                                    reverseRel.Get(displayedTownie.Id, Relationship.RelationType.friendly)+","+
-                                                    reverseRel.Get(displayedTownie.Id, Relationship.RelationType.romantic) + ") - {"+
+                                                    rel.Get(people, Relationship.Axis.friendly) +","+
+                                                    rel.Get(people, Relationship.Axis.romantic) + ") - ("+
+                                                    reverseRel.Get(displayedTownie.Id, Relationship.Axis.friendly)+","+
+                                                    reverseRel.Get(displayedTownie.Id, Relationship.Axis.romantic) + ") - {"+
                                                     string.Join(", ", relTags)+"}");
         }
     }

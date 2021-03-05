@@ -44,4 +44,14 @@ public class Townie: MonoBehaviour
     {
         return townieInformation.ToString();
     }
+
+
+    public bool KnowsAboutAction(BoundAction potentialAction)
+    {
+        ActionBuilder ab = new ActionBuilder(ws, townieInformation);
+
+        List<BoundAction> allActions = ab.GetAllActions(respectLocation: false);
+
+        return allActions.Contains(potentialAction);
+    }
 }

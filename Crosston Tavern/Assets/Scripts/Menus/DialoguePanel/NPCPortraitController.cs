@@ -11,7 +11,7 @@ public class NPCPortraitController : MonoBehaviour
 
     Dictionary<string, Dictionary<NPCPortrait.State, Image>> portraitDict;
 
-    private void Awake()
+    public void Awake()
     {
         portraitDict = new Dictionary<string, Dictionary<NPCPortrait.State, Image>>();
 

@@ -38,6 +38,10 @@ public class WorldStateInitializer
         int avery = 1;
         int finley = 3;
 
+        foreach(Townie townie in townies) {
+            //AddGeneralGoals(townie);
+        }
+
 
         townies[sammy].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
@@ -47,35 +51,32 @@ public class WorldStateInitializer
                                     },
                                     "I want to be a better fisher."
                                 )) ;
-        //townies[sammy].gm.AddModule(new GoalModule(
-        //                            new List<GM_Precondition>(),
-        //                            new List<Goal>() {
-        //                                new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "trout", 20, 100), 1)
-        //                            },
-        //                            "I want to be a better fisher."
-        //                        ));
+        townies[sammy].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "strawberry_cake", 1,100), 1)
+                                    },
+                                    "I love cake."
+                                ));
 
+
+        townies[avery].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>() {
+                                    },
+                                    new List<Goal>() {
+                                        new GoalState(new StateRelation("avery", "sammy", Relationship.Tag.dating), 3)
+                                    },
+                                    name: "Avery Loves Sammy"
+                                )
+                            ) ;
         townies[avery].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
-                                        new GoalState(new StateRelation("avery", "sammy", Relationship.RelationshipTag.dating), 1)
+                                        new GoalState(new StateInventoryStatic(townies[avery].townieInformation.id, "blackberry_tart", 1,100), 1)
                                     },
-                                    "I think they're so cool!"
+                                    "I love tarts."
                                 ));
-        //townies[avery].gm.AddModule(new GoalModule(
-        //                            new List<GM_Precondition>(),
-        //                            new List<Goal>() {
-        //                                new GoalState(new StateInventoryStatic(townies[avery].townieInformation.id, "flour", 5, 100), 1),
-        //                            }
-        //                        ));
 
-
-        /*townies[clara].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new Goal(new StateSocial("clara", "alicia", Relationship.RelationType.friendly, -100, -5), 1)
-                                    }
-                                ));*/
         townies[finley].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
                                     new List<Goal>() {
@@ -83,7 +84,23 @@ public class WorldStateInitializer
                                     },
                                     "I like eating blackberries."
                                 ));
+        townies[finley].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>(),
+                                    new List<Goal>() {
+                                        new GoalState(new StateInventoryStatic(townies[finley].townieInformation.id, "blackberry_tart", 1,100), 1)
+                                    },
+                                    "I love tarts."
+                                ));
 
+        townies[finley].gm.AddModule(new GoalModule(
+                                    new List<GM_Precondition>() {
+                                    },
+                                    new List<Goal>() {
+                                        new GoalState(new StateRelation("finely", "avery", Relationship.Tag.dating), 1)
+                                    },
+                                    name: "Finely Loves Avery"
+                                )
+                            );
 
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[sammy].ws);
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_field", "common_fish", "trout"), townies[sammy].ws);
@@ -95,6 +112,59 @@ public class WorldStateInitializer
         townies[finley].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "common_forage", "blackberry"), townies[finley].ws);
 
         return townies;
+    }
+
+
+    static void AddGeneralGoals(Townie townie)
+    {
+        GoalManager gm = townie.gm;
+        string name = townie.Id;
+
+        Dictionary<Relationship.Tag, GoalManager.GoalPriority> datingStatePriority =
+            new Dictionary<Relationship.Tag, GoalManager.GoalPriority>() {
+                {Relationship.Tag.crushing_on, GoalManager.GoalPriority.low },
+                {Relationship.Tag.in_love_with, GoalManager.GoalPriority.medium },
+                {Relationship.Tag.head_over_heels, GoalManager.GoalPriority.high },
+            };
+
+        foreach(string otherPerson in townie.townieInformation.relationships.GetKnownPeople()) {
+            foreach(KeyValuePair<Relationship.Tag, GoalManager.GoalPriority> pair in datingStatePriority) {
+                gm.AddModule(
+                    new GoalModule(
+                        new List<GM_Precondition>() {
+                            new GM_Precondition_State(new StateRelation(name, otherPerson, pair.Key))
+                        },
+                        new List<Goal>() {
+                            new GoalState(new StateRelation(name, otherPerson, Relationship.Tag.dating), (int)pair.Value)
+                        },
+                        name: pair.Key + otherPerson
+                    )
+                );
+            }
+        }
+
+        foreach (string item in townie.townieInformation.preference.preferences[PreferenceLevel.loved]) {
+            GenericAction eat = ActionInitializer.GetAllActions()["eat_#item#"];
+            gm.AddModule(
+                new GoalModule(
+                    new List<GM_Precondition>() {
+                    },
+                    new List<Goal>() {
+                        new GoalAction(new BoundAction(eat, name, name, "", 
+                                                            new BoundBindingCollection( new List<BoundBindingPort>() {
+                                                                new BoundBindingPort("item", item)
+                                                            }),
+                                                            eat.verbilizationInfo
+                                                       ),
+                                        (int)GoalManager.GoalPriority.low
+                        )
+                    },
+                    name: "loves to eat " + item
+                )
+            );
+        }
+
+        
     }
 }
 

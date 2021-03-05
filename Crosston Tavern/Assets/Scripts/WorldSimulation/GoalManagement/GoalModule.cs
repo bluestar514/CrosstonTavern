@@ -16,7 +16,8 @@ public class GoalModule
 
     public int timer;
 
-    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals, string reason, string name = "GENERIC GOAL",  int timer = -1)
+    public GoalModule(List<GM_Precondition> preconditions, List<Goal> goals, 
+        string reason="I just do", string name = "GENERIC GOAL",  int timer = -1)
     {
         this.preconditions = preconditions;
         this.goals = goals;

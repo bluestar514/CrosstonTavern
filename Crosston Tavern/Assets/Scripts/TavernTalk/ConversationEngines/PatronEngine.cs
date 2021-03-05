@@ -109,6 +109,10 @@ public class PatronEngine :ConversationEngine
             case "askAboutObservation":
                 return SocialMoveFactory.MakeMove("tellAboutDayObservedEvents", speaker, prompt);
 
+            case "askAboutGoalFrustration":
+                return new SocialMove("frustratedByGoals", mentionedFacts: GoalsToFacts(GetStuckGoals(), speaker.Id));
+
+
             case "askWhyAction#":
                 return SocialMoveFactory.MakeMove("tellWhyAction#", speaker, prompt);
             case "askAboutExcitement":
@@ -142,23 +146,45 @@ public class PatronEngine :ConversationEngine
 
             case "suggest#":
                 AskQuestion();
+                
+                if(prompt.mentionedFacts[0] is WorldFactPotentialAction factAction &&
+                    !speaker.KnowsAboutAction(factAction.action)) {
+                    return new SocialMove("askHowToDo#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+                } 
+
                 return new SocialMove("askConfirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            case "tellHowToDo#":
+                if(prompt.mentionedFacts[0] is WorldFactPotentialAction factPotentialAction) {
+                    BoundAction boundAction = factPotentialAction.action;
+
+                    TellAction(boundAction.FeatureId, boundAction.Id);
+                }
+
+                goto case "confirmSuggestion#";
             case "confirmSuggestion#":
+
+
                 if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
                     BoundAction suggestedAction = potentialAction.action;
 
+                    Goal goal = new GoalAction(suggestedAction, 5);
                     speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>(),
                                                         new List<Goal>() {
-                                                            new GoalAction(suggestedAction, 5)
+                                                            goal
                                                         },
                                                         "You told me it was a good idea.",
                                                         name: "suggested action",
                                                         timer: 3
                                                         )
                         );
+
+                    return new SocialMove("acceptSuggestion#",
+                                        arguements: new List<string> { goal.ToString() },
+                                        mentionedFacts: new List<WorldFact>() { new WorldFactGoal(goal, speaker.Id) });
                 }
 
-                return new SocialMove("acceptSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+                throw new System.Exception("1st mentioned fact (" + prompt.mentionedFacts[0] + ") was not a potentialAction");
 
             case "cancelSuggestion#":
                 return new SocialMove("acceptCancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
@@ -169,7 +195,10 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
 
             case "tell#Relation#":
-                return new SocialMove("acknowledge");
+                SocialMove move = SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
+                move.verb = "acceptRelationshipView";
+
+                return move;
 
             case "askWhyGoal":
                 return new SocialMove("passOpenAskWhyGoal");
@@ -192,12 +221,7 @@ public class PatronEngine :ConversationEngine
 
                 return new SocialMove("goodbye");
             case "giveRecipe#":
-                Feature homeKitchen = speaker.ws.map.GetFeature("kitchen_" + speaker.homeLocation);
-                if (homeKitchen == null) homeKitchen = speaker.ws.map.GetFeature("kitchen_inn");
-
-                GenericAction recipe = ActionInitializer.GetAllActions()[foodItem.verb.verbPresent + "_" + foodItem.name];
-
-                homeKitchen.providedActions.Add(recipe);
+                TellAction("kitchen_" + speaker.homeLocation, foodItem.verb.verbPresent + "_" + foodItem.name);
 
                 return new SocialMove("goodbyeThank");
             case "refuseRecipe#":
@@ -213,4 +237,21 @@ public class PatronEngine :ConversationEngine
                 return new SocialMove("DEFAULT");
         }
     }
-}
+
+    List<Goal> GetStuckGoals()
+    {
+        Debug.Log(speaker.gm.GetStuckGoals().Count);
+        return speaker.gm.GetStuckGoals();
+    }
+
+    void TellAction(string featureName, string actionName )
+    {
+        Feature feature = speaker.ws.map.GetFeature(featureName);
+        if (feature == null) throw new System.Exception("no feature with name " + featureName);
+
+        GenericAction action = ActionInitializer.GetAllActions()[actionName];
+
+        feature.providedActions.Add(action);
+    }
+
+} 

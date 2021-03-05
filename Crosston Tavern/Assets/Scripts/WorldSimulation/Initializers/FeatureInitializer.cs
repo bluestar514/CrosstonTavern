@@ -54,7 +54,7 @@ public class FeatureInitializer
                                     },
                                     new Dictionary<string, List<string>>() {
                                         {"common_forage", new List<string>(){"tulip", "rose"} },
-                                        {"rare_forage", new List<string>(){"morning_rose", "evening_tulip"} }
+                                        {"rare_forage", new List<string>(){"morning_rose", "evening_tulip", "herb"} }
                                     })
             },
             {"cow", new Feature("cow", Feature.FeatureType.animal, UNSET, 2,
