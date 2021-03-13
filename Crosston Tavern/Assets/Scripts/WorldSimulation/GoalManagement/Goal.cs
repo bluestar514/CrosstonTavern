@@ -55,6 +55,16 @@ public class Goal
 
         unlockedActionsOnGoalCompletion.Add(action);
     }
+
+    public override bool Equals(object obj)
+    {
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return 363513814 + EqualityComparer<string>.Default.GetHashCode(name);
+    }
 }
 
 [System.Serializable]
@@ -62,10 +72,6 @@ public class GoalState : Goal
 {
 
     public State state;
-    
-    
-    
-
     public GoalState(State state, float priority)
     {
         this.state = state;
@@ -118,7 +124,18 @@ public class GoalState : Goal
     }
 
 
+    public override bool Equals(object obj)
+    {
+        if (obj is GoalState goal) {
+            return state.Equals( goal.state );
+        
+        } else return false;
+    }
 
+    public override int GetHashCode()
+    {
+        return 259708774 + EqualityComparer<State>.Default.GetHashCode(state);
+    }
 }
 
 public class GoalAction : Goal
@@ -165,6 +182,19 @@ public class GoalAction : Goal
     public override string ToString()
     {
         return action.ToString() + ":" + priority;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is GoalAction goal) {
+            return action.Equals(goal.action);
+
+        } else return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return -1387187753 + EqualityComparer<BoundAction>.Default.GetHashCode(action);
     }
 }
 

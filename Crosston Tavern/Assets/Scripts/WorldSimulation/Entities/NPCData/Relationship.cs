@@ -181,7 +181,7 @@ public class Relationship
         }
 
         relationships[target][(int)axis] += value;
-
+        relationships[target][(int)axis] = Mathf.Clamp(relationships[target][(int)axis], -maxValue, maxValue);
 
         UpdateTags(target);
     }

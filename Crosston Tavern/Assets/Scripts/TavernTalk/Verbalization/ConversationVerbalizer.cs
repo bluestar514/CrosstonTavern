@@ -120,22 +120,8 @@ public class ConversationVerbalizer
 
 
             case "askAboutDayHighlights":
-                string patronGeneralMood = socialMove.arguements[0];
 
-                switch (patronGeneralMood) {
-                    case "happy":
-                        verbalization = "So, what happened today that's got you in such a good mood?";
-                        break;
-                    case "sad":
-                        verbalization = "You want to talk about what's got you so upset today?";
-                        break;
-                    case "angry":
-                        verbalization = "You want to tell me what's got you in such a bed mood today?";
-                        break;
-                    default:
-                        verbalization = "Anything interesting happen today?";
-                        break;
-                }
+                verbalization = "Anything interesting happen today?";
 
 
                 break;
@@ -143,10 +129,24 @@ public class ConversationVerbalizer
                 verbalization = "Did you see anything interesting today?";
                 break;
             case "askAboutExcitement":
-                verbalization = "Did anything good happen today?";
+                verbalization = "So, what happened today that's got you in such a good mood?";
                 break;
             case "askAboutDisapointment":
-                verbalization = "Did anything disapointing happen today?";
+                string patronGeneralMood = socialMove.arguements[0];
+
+                switch (patronGeneralMood) {
+                    case "sad":
+                        verbalization = "You want to talk about what's got you so upset today?";
+                        socialMove.verb = "askAboutDisapointment";
+                        break;
+                    case "angry":
+                        verbalization = "You want to tell me what's got you in such a bed mood today?";
+                        socialMove.verb = "askAboutDisapointment";
+                        break;
+                    default:
+                        verbalization = "Anything interesting happen today?";
+                        break;
+                }
                 break;
             case "askAboutGoals":
                 verbalization = "What have you been trying to do lately?";
@@ -197,13 +197,40 @@ public class ConversationVerbalizer
                 }
 
                 break;
-            
+            case "tellWhyGoal#TopLevel":
+                if (facts.Count <= 1) {
+                    verbalization = "I just do.";
+                    break;
+                } else {
+                    if (facts[0] is WorldFactGoal subjectGoalFact) {
+
+                        List<WorldFact> reasonsForSubjectGoal = facts;
+                        reasonsForSubjectGoal.RemoveAt(0);
+
+                        verbalization = "";
+
+                        List<string> reasons = new List<string>();
+                        foreach (WorldFact fact in reasonsForSubjectGoal) {
+                            if (fact is WorldFactGoalModulePrecondition factPre) {
+                                GM_Precondition precondition = factPre.precondition;
+
+                                reasons.Add(precondition.Verbalize(townie.Id, partner, townie.ws));
+                            }
+                        }
+
+                        verbalization += " " + Verbalizer.MakeNiceList(reasons);
+                    }
+
+
+                }
+
+                break;
             case "tellWhyGoal#":
                 /*mentionedFacts:   0 - goal we are talking about,
                                     1 - an action unlocked by completing this goal, 
                                     2 + reasons for goal
                 */
-                if (facts.Count <= 2) {
+                if (facts.Count <= 1) {
                     verbalization = "I just do.";
                     break;
                 } else {

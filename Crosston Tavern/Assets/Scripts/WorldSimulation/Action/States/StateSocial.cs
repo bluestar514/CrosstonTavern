@@ -65,12 +65,12 @@ public class StateSocial : State
         };
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
     {
-        return Verbalize(speakerId, listenerId, goal, null);
+        return Verbalize(speakerId, listenerId, goal, null, futureTense);
     }
 
-    public string Verbalize(string speakerId, string listenerId, bool goal, WorldState ws)
+    public string Verbalize(string speakerId, string listenerId, bool goal, WorldState ws, bool futureTense = false)
     {
         string subject = this.sourceId;
         subject = Verbalizer.VerbalizeSubject(subject, speakerId, listenerId);
@@ -91,9 +91,37 @@ public class StateSocial : State
             if (subject == "I")
                 return " to feel " + axisDirection + " " + axis + " toward " + target;
             else
-                return subject + " to feel "+ axisDirection+" " + axis + " toward " + target;
+                return subject + " to feel " + axisDirection + " " + axis + " toward " + target;
 
-        } else
-            return (subject + " will feel "+axisDirection+ " " + axis + " toward " + target);
+        } else {
+            if (futureTense) {
+                return (subject + " will feel " + axisDirection + " " + axis + " toward " + target);
+            } else {
+                return (subject + " feels " + axisDirection + " " + axis + " toward " + target);
+            }
+        }
+            
+        
+            
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is StateSocial state) {
+            return sourceId == state.sourceId &&
+                    targetId == state.targetId &&
+                    axis == state.axis;
+        } else return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = -164353396;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(sourceId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(targetId);
+        hashCode = hashCode * -1521134295 + axis.GetHashCode();
+        return hashCode;
     }
 }

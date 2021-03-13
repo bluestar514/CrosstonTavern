@@ -201,6 +201,7 @@ public class PatronEngine :ConversationEngine
                 return move;
 
             case "askWhyGoal":
+                Debug.LogWarning("This is an out of date pattern, consider removing");
                 return new SocialMove("passOpenAskWhyGoal");
             case "askWhyGoal#":
                 return SocialMoveFactory.MakeMove("tellWhyGoal#", speaker, prompt);
@@ -215,7 +216,8 @@ public class PatronEngine :ConversationEngine
                     foodItem != null &&
                     goals.Any(goal => goal is GoalState goalState &&
                                    goalState.state is StateInventory invState &&
-                                   invState.itemId == foodItem.name)) {
+                                   invState.itemId == foodItem.name) &&
+                    !HasRecipe(foodItem) ) {
                     return new SocialMove("askForRecipe#", arguements: new List<string>() { foodItem.name });
                 }
 
@@ -254,4 +256,12 @@ public class PatronEngine :ConversationEngine
         feature.providedActions.Add(action);
     }
 
+
+    bool HasRecipe(FoodItem foodItem)
+    {
+        Feature feature = speaker.ws.map.GetFeature("kitchen_" + speaker.homeLocation);
+        if (feature == null) throw new System.Exception("no feature with name: " + "kitchen_" + speaker.homeLocation);
+
+        return feature.providedActions.Any(action => action.Id == foodItem.verb.verbPresent + "_" + foodItem.name);
+    }
 } 

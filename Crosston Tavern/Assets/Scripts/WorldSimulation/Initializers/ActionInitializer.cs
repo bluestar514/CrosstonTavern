@@ -99,7 +99,7 @@ public class ActionInitializer
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), true),
                     new List<Effect>() {
                         new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, 1, 3),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, 1, 3, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, 1, 3,
                                             new VerbilizationEffectSocialThreshold("we had a good time", 0, true))
                     }
                 ),
@@ -107,7 +107,7 @@ public class ActionInitializer
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), false),
                     new List<Effect>() {
                         new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -3, -1),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1,
                                             new VerbilizationEffectSocialThreshold("it was frustrating", 0, false))
                     }
                 ),
@@ -144,7 +144,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.loved, ChanceModifierItemOpinion.OpinionLevel.max),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, 10, 15, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, 10, 15,
                                                                         new VerbilizationEffect("#b# loved it")),
                         new EffectInventoryStatic("#b#", "#item#", 1),
                         new EffectInventoryStatic("#a#", "#item#", -1),
@@ -177,7 +177,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -30, -15, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -30, -15,
                                                                 new VerbilizationEffect("#b# didn't like it at all")),
                         new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -20, -10),
                         new EffectInventoryStatic("#b#", "#item#", 1),
@@ -220,7 +220,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifier(),
                     new List<Effect>() {
-                        new EffectSocialStatic("#a#", "#b#", Relationship.Axis.friendly, -2, 
+                        new EffectSocialStatic("#a#", "#b#", Relationship.Axis.friendly, -2,
                                                     new VerbilizationEffect("#b# wouldn't give it to #a#")),
                         new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -2)
                     }
@@ -259,7 +259,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1,
                                             new VerbilizationEffectSocialThreshold("#b# got real mad",  0, false)),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
@@ -267,7 +267,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -2, 1, 
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -2, 1,
                                                 new VerbilizationEffectSocialThreshold("#b# ignored it", 0, true))
                     }
                 ),
@@ -303,7 +303,7 @@ public class ActionInitializer
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
                     new List<Effect>() {
                         new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -3),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, -3, 
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, -3,
                                             new VerbilizationEffectSocialThreshold("#b# didn't believe it",  0, false))
                     }
                 ),
@@ -346,7 +346,7 @@ public class ActionInitializer
             // why did you ask out alicia?
             new VerbilizationActionSocial("ask out", "asked out")
         ) },
-        {"ask_if_friends", new GenericAction("ask_if_friends", 1,
+/*        {"ask_if_friends", new GenericAction("ask_if_friends", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#")
             }),
@@ -372,7 +372,7 @@ public class ActionInitializer
             // I asked out alicia. 
             // why did you ask out alicia?
             new VerbilizationActionSocial("ask if they are friends", "asked if they were friends")
-        ) },
+        ) },*/
         { "tend_crops" , new GenericAction("tend_crops", 1,
             new Precondition(new List<Condition>(){
             }),
@@ -468,6 +468,7 @@ public class ActionInitializer
         ) },
         {"eat_#item#", new GenericAction("eat_#item#", 1,
             new Precondition(new List<Condition>() {
+                new Condition_IsYou("#b#"),
                 new Condition_IsState(new StateInventoryStatic("#a#", "#item#", 1, INF)),
                 new Condition_IsItemClass("#item#", ItemInitializer.ItemClass.food)
             }),
@@ -477,7 +478,7 @@ public class ActionInitializer
                                                         ChanceModifierItemOpinion.OpinionLevel.min,
                                                         ChanceModifierItemOpinion.OpinionLevel.neutral),
                     new List<Effect>() {
-                        new EffectInventoryStatic("#a#", "#item#", -1, 
+                        new EffectInventoryStatic("#a#", "#item#", -1,
                                 new VerbilizationEffect("#a# ate it grudgingly"))
                     }
                 ),
@@ -486,19 +487,20 @@ public class ActionInitializer
                                                         ChanceModifierItemOpinion.OpinionLevel.liked,
                                                         ChanceModifierItemOpinion.OpinionLevel.max),
                     new List<Effect>() {
-                        new EffectInventoryStatic("#a#", "#item#", -1, 
+                        new EffectInventoryStatic("#a#", "#item#", -1,
                                 new VerbilizationEffect("#a# ate it happily")),
-                        new EffectStatusEffect("#a#", 
-                            new EntityStatusEffect("ate_something_delicious", EntityStatusEffectType.happy, 
+                        new EffectStatusEffect("#a#",
+                            new EntityStatusEffect("ate_something_delicious", EntityStatusEffectType.happy,
                                                             stepsInDay, 1, new List<string>(){ }))
                     }
                 )
             },
             new List<BindingPort>() {
                 new BindingPortEntity("a", ActionRole.initiator),
+                new BindingPortEntity("b", ActionRole.recipient),
                 new BindingPortInventoryItem("item", "a")
             },
-            new VerbilizationActionItem("eat", "ate", "#item#")
+            new VerbalizationActionItemConsume("eat", "ate", "#item#")
         ) },
     };
 
@@ -509,7 +511,7 @@ public class ActionInitializer
 
         //GeneratePlantingActions().ToList().ForEach(x => allActions.Add(x.Key, x.Value));
         GenerateRecipes().ToList().ForEach(x => allActions.Add(x.Key, x.Value));
-        GenerateRelationStatusActions().ToList().ForEach(x => allActions.Add(x.Key, x.Value));
+        //GenerateRelationStatusActions().ToList().ForEach(x => allActions.Add(x.Key, x.Value));
 
         return allActions;
     }
@@ -546,59 +548,6 @@ public class ActionInitializer
         }
 
         return cookingActions;
-    }
-
-    static Dictionary<string, GenericAction> GeneratePlantingActions()
-    {
-        Dictionary<string, GenericAction> plantingActions = new Dictionary<string, GenericAction>();
-
-        foreach(string plant in ItemInitializer.plantableCrops) {
-            plantingActions.Add("plant_" + plant, new GenericAction("plant_" + plant, 1,
-                new Precondition(new List<Condition>() {
-                    new Condition_IsState(new StateInventoryStatic("#a#", "seed_"+plant, 1, INF)),
-                    new Condition_SpaceAtFeature("#b#")
-                }),
-                new List<Outcome>() {
-                    new Outcome(
-                        new ChanceModifierSimple(1),
-                        new List<Effect>() {
-                            new EffectInventoryStatic("#a#", "seed_"+plant, -1),
-                            new EffectResourceChange("#b#", "#planted#", plant, true)
-                        }
-                     )
-                },
-                new List<BindingPort>() {
-                    new BindingPortEntity("a", ActionRole.initiator),
-                    new BindingPortEntity("b", ActionRole.recipient)
-                },
-                new VerbilizationActionResourceGathering("plant", "planted")
-                )
-            );
-
-            plantingActions.Add("make_seed_" + plant, new GenericAction("make_seed_" + plant, 1,
-                new Precondition(new List<Condition>() {
-                    new Condition_IsState(new StateInventoryStatic("#a#", plant, 1, INF)),
-                    new Condition_SpaceAtFeature("#b#")
-                }),
-                new List<Outcome>() {
-                    new Outcome(
-                        new ChanceModifierSimple(1),
-                        new List<Effect>() {
-                            new EffectInventoryStatic("#a#", "seed_"+plant, 1),
-                            new EffectInventoryStatic("#a#", plant, -1)
-                        }
-                        )
-                },
-                new List<BindingPort>() {
-                    new BindingPortEntity("a", ActionRole.initiator),
-                    new BindingPortEntity("b", ActionRole.recipient)
-                },
-                new VerbilizationActionResourceGathering("plant", "planted")
-                )
-            );
-        }
-
-        return plantingActions;
     }
 
     static Dictionary<string, GenericAction> GenerateRelationStatusActions()
@@ -667,19 +616,6 @@ public class ActionInitializer
         return items;
     }
 
-    public static List<GenericAction> GetAllFieldActions()
-    {
-        List<GenericAction> actions = new List<GenericAction>();
-
-        foreach(KeyValuePair<string, GenericAction> pair in GetAllActions()) {
-            if (pair.Key == "harvest_crops" ||
-                pair.Key.StartsWith("plant_") ||
-                pair.Key.StartsWith("make_seed_"))
-                    actions.Add(pair.Value);
-        }
-
-        return actions;
-    }
 
     public static List<GenericAction> GetAllPeopleActions()
     {
@@ -692,11 +628,11 @@ public class ActionInitializer
             actions["ask_#item#"],
             actions["eat_#item#"]
         };
-
+/*
         foreach(KeyValuePair<string, GenericAction> pair in GetAllActions()) {
             if (pair.Key.StartsWith( "ask_if_"))
                 peopleActions.Add(pair.Value);
-        }
+        }*/
 
         return peopleActions;
     }

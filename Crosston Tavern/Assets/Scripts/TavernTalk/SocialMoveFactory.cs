@@ -126,27 +126,43 @@ public class SocialMoveFactory
     /// <param name="speaker"></param>
     /// <param name="goalFact">Uses the goalFact from the conversation so 
     /// it is possible to veiw the rational at the time the goal was recorded</param>
-    /// <returns> mentionedFacts: 0-goal we are talking about, 1- an action unlocked by completing this goal, 2+ reasons for goal </returns>
+    /// <returns> mentionedFacts: 0 - goal we are talking about, 
+    ///                           1 - an action unlocked by completing this goal, 
+    ///                           2+  reasons for goal
+    /// if a top level goal: 0 - goal we are talking about
+    ///                      1+ preconditions for parent module 
+    /// </returns>
     public static SocialMove MakeTellWhyGoal(Townie speaker, WorldFactGoal goalFact)
     {
         Goal goal = goalFact.goal;
         
         List<WorldFact> facts = new List<WorldFact>() { goalFact };
-        if (goal.unlockedActionsOnGoalCompletion.Count > 0) {
-            int rand = Random.Range(0, goal.unlockedActionsOnGoalCompletion.Count);
-
-            BoundAction potentialAction = goal.unlockedActionsOnGoalCompletion[rand];
-
-            WorldFact fact = new WorldFactPotentialAction(potentialAction);
-            facts.Add(fact);
-        } 
 
         List<Goal> parentGoals = goal.GetParentGoals();
 
+        if (parentGoals.Count != 0) {
+            if (goal.unlockedActionsOnGoalCompletion.Count > 0) {
+                int rand = Random.Range(0, goal.unlockedActionsOnGoalCompletion.Count);
 
-        facts.AddRange(MakeGoalsFacts(speaker, parentGoals));
+                BoundAction potentialAction = goal.unlockedActionsOnGoalCompletion[rand];
 
-        return new SocialMove("tellWhyGoal#", new List<string>() { goal.name }, mentionedFacts: facts);
+                WorldFact fact = new WorldFactPotentialAction(potentialAction);
+                facts.Add(fact);
+            } 
+            facts.AddRange(MakeGoalsFacts(speaker, parentGoals));
+
+            return new SocialMove("tellWhyGoal#", new List<string>() { goal.name }, mentionedFacts: facts);
+        } else {
+            List<GoalModule> modules = speaker.gm.GetParentModule(goal);
+
+            foreach(GoalModule module in modules) {
+                foreach(GM_Precondition precondition in module.preconditions) {
+                    facts.Add(new WorldFactGoalModulePrecondition(precondition));
+                }
+            }
+
+            return new SocialMove("tellWhyGoal#TopLevel", new List<string> { goal.name }, mentionedFacts: facts);
+        }
     }
 
     //TODO: make this not reliant on a "prompt" but rather the action in question

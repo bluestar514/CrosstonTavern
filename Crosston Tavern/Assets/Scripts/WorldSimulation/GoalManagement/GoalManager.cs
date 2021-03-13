@@ -115,6 +115,21 @@ public class GoalManager
         return allGoals;
     }
 
+    public List<GoalModule> GetParentModule(Goal childGoal)
+    {
+        List<GoalModule> parentModules = new List<GoalModule>();
+
+        foreach(GoalModule module in modules) {
+            if (!module.Precondtion(ws)) continue;
+
+            foreach(Goal goal in module.goals) {
+                if (goal.Equals(childGoal)) parentModules.Add( module);
+            }
+        }
+
+        return parentModules;
+    }
+
     public List<Goal> GetStuckGoals()
     {
         
@@ -216,7 +231,7 @@ public class GoalManager
     {
         List<OutcomeRestraints> relevantOutcomes = new List<OutcomeRestraints>();
         foreach(OutcomeRestraints outcome in outcomes) {
-            if (ContainsNonActionableConditions(outcome.preconditions, outcome.bindings)) continue; 
+            if (ContainsNonActionableConditions(outcome.preconditions, outcome.bindings, actor.id)) continue; 
 
             if (OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal)) {
                 outcome.fullfillsGoal.Add(goal);
@@ -227,15 +242,16 @@ public class GoalManager
         return relevantOutcomes;
     }
 
-    bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings)
+    static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
-        return ContainsConditionNotYou(preconditions, bindings) ||
-                ContainsOthersInventoryState(preconditions, bindings) ||
-                ContainsConditionItemClass(preconditions, bindings);
+        return ContainsConditionNotYou(preconditions, bindings, actor) ||
+                ContainsOthersInventoryState(preconditions, bindings, actor) ||
+                ContainsConditionItemClass(preconditions, bindings) ||
+                ContainsConditionIsYou(preconditions, bindings, actor);
 
     }
 
-    bool ContainsOthersInventoryState(List<Condition> preconditions, BoundBindingCollection bindings)
+    static bool ContainsOthersInventoryState(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
         foreach (Condition condition in preconditions) {
             if (condition is Condition_IsState) {
@@ -246,7 +262,7 @@ public class GoalManager
                     StateInventory stateInventory = (StateInventory)state;
                     string owner = bindings.BindString(stateInventory.ownerId);
 
-                    if (owner != actor.id) { 
+                    if (owner != actor) { 
                         return true;
                     }
                 }
@@ -256,13 +272,13 @@ public class GoalManager
         return false;
     }
 
-    bool ContainsConditionNotYou(List<Condition> preconditions, BoundBindingCollection bindings)
+    static bool ContainsConditionNotYou(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
         foreach (Condition condition in preconditions) {
             if (condition is Condition_NotYou) {
                 Condition_NotYou condition_NotYou = (Condition_NotYou)condition;
                 
-                if (bindings.BindString(condition_NotYou.featureId) == actor.id) { //this can never change, so we should just discard this action
+                if (bindings.BindString(condition_NotYou.featureId) == actor) { //this can never change, so we should just discard this action
                     return true;
                 }
             }
@@ -271,7 +287,21 @@ public class GoalManager
         return false;
     }
 
-    bool ContainsConditionItemClass(List<Condition> preconditions, BoundBindingCollection bindings)
+    static bool ContainsConditionIsYou(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
+    {
+        foreach (Condition condition in preconditions) {
+            if (condition is Condition_IsYou) {
+                Condition_IsYou condition_IsYou = (Condition_IsYou)condition;
+                if (bindings.BindString(condition_IsYou.featureId) != actor) { //this can never change, so we should just discard this action
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    static bool ContainsConditionItemClass(List<Condition> preconditions, BoundBindingCollection bindings)
     {
         foreach (Condition condition in preconditions) {
             if (condition is Condition_IsItemClass) {

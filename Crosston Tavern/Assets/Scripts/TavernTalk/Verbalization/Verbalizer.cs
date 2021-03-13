@@ -20,7 +20,7 @@ public class Verbalizer
     {
 
         if (goalState is StateSocial stateSocial) {
-            return stateSocial.Verbalize(speakerId, listenerId, false, ws);
+            return stateSocial.Verbalize(speakerId, listenerId, false, ws, false);
         
         } else {
             return  goalState.Verbalize(speakerId, listenerId, false);

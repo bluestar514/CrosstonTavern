@@ -7,6 +7,26 @@ public class StateInventory : State
 {
     public string ownerId;
     public string itemId;
+
+
+    public override bool Equals(object obj)
+    {
+        if(obj is StateInventory state) {
+            return ownerId == state.ownerId &&
+                    itemId == state.itemId;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = -1745517166;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ownerId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(itemId);
+        return hashCode;
+    }
 }
 
 public class StateInventoryStatic : StateInventory
@@ -77,7 +97,7 @@ public class StateInventoryStatic : StateInventory
         };
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
     {
         string subject = ownerId;
         if (subject == speakerId) subject = "I";

@@ -74,7 +74,10 @@ public class FeatureInitializer
                                     })
             },
             {"field", new Feature("field", Feature.FeatureType.field, UNSET, 2,
-                                    new List<GenericAction>( ActionInitializer.GetAllFieldActions() ),
+                                    new List<GenericAction>( ){
+                                        actions["harvest_crops"],
+                                        actions["tend_crops"]
+                                    },
                                     new Dictionary<string, List<string>>(){
                                         {"planted", ItemInitializer.plantableCrops}
                                     } )

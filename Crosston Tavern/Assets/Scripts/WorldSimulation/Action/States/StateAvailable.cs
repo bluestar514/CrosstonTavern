@@ -45,6 +45,27 @@ public class StateAvailable : State
     {
         return "<StateAvailable(" + actor + ", " + start + "," + end + ")>";
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is StateAvailable state) {
+            return actor == state.actor &&
+                    start == state.start &&
+                    end == state.end;
+
+        } else return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = -196685823;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(actor);
+        hashCode = hashCode * -1521134295 + EqualityComparer<WorldTime>.Default.GetHashCode(start);
+        hashCode = hashCode * -1521134295 + EqualityComparer<WorldTime>.Default.GetHashCode(end);
+        return hashCode;
+    }
 }
 
 public class StateAvailableNow: State
@@ -86,5 +107,23 @@ public class StateAvailableNow: State
     public override string ToString()
     {
         return "<StateAvailableNow(" + actor + ", " + length + ")>";
+    }
+    public override bool Equals(object obj)
+    {
+        if (obj is StateAvailableNow state) {
+            return actor == state.actor &&
+                    length == state.length;
+
+        } else return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = 2143278261;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(actor);
+        hashCode = hashCode * -1521134295 + EqualityComparer<WorldTime>.Default.GetHashCode(length);
+        return hashCode;
     }
 }

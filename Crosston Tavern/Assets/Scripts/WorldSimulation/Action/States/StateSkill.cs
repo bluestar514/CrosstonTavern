@@ -61,7 +61,7 @@ public class StateSkill : State
     }
 
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
     {
 
         string owner = ownerId;
@@ -83,4 +83,21 @@ public class StateSkill : State
         }
     }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is StateSkill state) {
+            return ownerId == state.ownerId &&
+                    skillId == state.skillId;
+        } else return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = -483002654;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ownerId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(skillId);
+        return hashCode;
+    }
 }

@@ -39,7 +39,7 @@ public class StateRelation : State
             + "," + tag + ")>"; 
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
     {
         
 
@@ -76,18 +76,63 @@ public class StateRelation : State
             }
 
         } else {
-            switch (this.tag) {
-                case Relationship.Tag.dating:
-                    if (source == "I") return "I can date " + target;
+            if (futureTense) {
+                switch (this.tag) {
+                    case Relationship.Tag.dating:
+                        if (source == "I") return "I can date " + target;
 
-                    return source + " will date " + target;
-                case Relationship.Tag.liked:
-                    return source + " will like " + target + " some";
-                case Relationship.Tag.disliked:
-                    return source + " will dislike " + target + " some";
-                default:
-                    return source + " will be " + tag + "s with " + target;
+                        return source + " will date " + target;
+                    case Relationship.Tag.liked:
+                        return source + " will like " + target + " some";
+                    case Relationship.Tag.disliked:
+                        return source + " will dislike " + target + " some";
+                    default:
+                        return source + " will be " + tag + "s with " + target;
+                }
+            } else {
+                switch (this.tag) {
+                    case Relationship.Tag.dating:
+                        if (source == "I") return "I am dating " + target;
+
+                        return source + " is dating " + target;
+                    case Relationship.Tag.liked:
+                        return source + " likes " + target + " some";
+                    case Relationship.Tag.disliked:
+                        return source + " dislikes " + target + " some";
+                    default:
+                        return source + " is " + tag + "s with " + target;
+                }
             }
         }
+    }
+
+    public override List<State> Combine(State state)
+    {
+        if (state is StateRelation relation &&
+            this.Equals(relation)) {
+            return new List<State>() { this };
+        } else
+            return new List<State>() { this, state };
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is StateRelation state) {
+            return source == state.source &&
+                    target == state.target &&
+                    tag == state.tag;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = 243036089;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(source);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(target);
+        hashCode = hashCode * -1521134295 + tag.GetHashCode();
+        return hashCode;
     }
 }

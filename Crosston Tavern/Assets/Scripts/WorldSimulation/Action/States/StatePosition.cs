@@ -60,7 +60,7 @@ public class StatePosition : State
         };
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
     {
         string location = VerbalizationDictionary.Replace(locationId);
 
@@ -79,5 +79,24 @@ public class StatePosition : State
             else 
                 return subject + " was at " + location;
         }
+    }
+
+    public override bool Equals(object obj)
+    {
+        if(obj is StatePosition state) {
+            return moverId == state.moverId &&
+                    locationId == state.locationId;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        int hashCode = 471105928;
+        hashCode = hashCode * -1521134295 + base.GetHashCode();
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(id);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(moverId);
+        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(locationId);
+        return hashCode;
     }
 }

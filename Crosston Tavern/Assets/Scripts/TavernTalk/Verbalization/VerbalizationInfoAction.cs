@@ -119,9 +119,6 @@ public class VerbilizationActionItemAskFor : VerbilizationActionItem
     {
     }
 
-    //I gave Alicia a strawberry
-    //you asked Alicia for a rose
-    //Bob gave Alicia a cake
     public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
     {
         base.Verbilize(actor, feature, presentTense, includeSubject);
@@ -148,6 +145,21 @@ public class VerbilizationActionItemGive : VerbilizationActionItem
         string item = VerbalizationDictionary.Replace(itemBinding);
 
         return this.actor + " " + this.verb + " " + this.feature + " a " + item;
+    }
+}
+
+public class VerbalizationActionItemConsume : VerbilizationActionItem
+{
+    public VerbalizationActionItemConsume(string verbPresent, string verbPast, string itemBinding) : base(verbPresent, verbPast, itemBinding)
+    {
+    }
+
+    public override string Verbilize(string actor, string feature, bool presentTense, bool includeSubject = true)
+    {
+        base.Verbilize(actor, feature, presentTense, includeSubject);
+        string item = VerbalizationDictionary.Replace(itemBinding);
+
+        return this.actor + " " + this.verb + " a " + item;
     }
 }
 

@@ -22,8 +22,21 @@ public class State
         return new List<State>() { this, state };
     }
 
-    public virtual string Verbalize(string speakerId, string listenerId, bool goal)
+    public virtual string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = true)
     {
         return id;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is State state) {
+            return id == state.id;
+
+        } else return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return 1877310944 + EqualityComparer<string>.Default.GetHashCode(id);
     }
 }
