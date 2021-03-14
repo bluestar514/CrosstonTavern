@@ -25,7 +25,6 @@ public class BarkeepEngine : ConversationEngine
         
         List<SocialMove> moves = new List<SocialMove>();
         SocialMenu subMenu;
-        List<SocialMove> menuOptions;
         if (prompt is SocialMenu menu) {
             moves.AddRange(menu.menuOptions);
         } else {
@@ -90,23 +89,11 @@ public class BarkeepEngine : ConversationEngine
 
                 case "frustratedByGoals":
                 case "tellWhyGoal#":
-                    List<BoundAction> suggestedActions = GenSuggestedAction(prompt.mentionedFacts[0]);
-                    menuOptions = new List<SocialMove>(
-                                        from action in suggestedActions
-                                        select new SocialMove(
-                                            "suggest#",
-                                            arguements: new List<string>() { action.ToString() },
-                                            mentionedFacts: new List<WorldFact>() { new WorldFactPotentialAction(action) })
-                                    );
-
-                    subMenu = new SocialMenu("suggest", menuOptions, arguements: prompt.arguements);
-                    if (suggestedActions.Count > 0) {
-                        moves.Add(subMenu);
-                    }
+                    SocialMenu suggestionMenu = GenSuggestMoves();
+                    moves.Add(suggestionMenu);
+                    suggestionMenu.AddPreviousContext(new SocialMenu("nevermind", moves));
 
                     moves.Add(new SocialMove("nice"));
-
-                    subMenu.AddPreviousContext(new SocialMenu("nevermind", moves));
                     break;
 
 
@@ -377,50 +364,6 @@ public class BarkeepEngine : ConversationEngine
 
         submenus.Add(submenu);
 
-    }
-
-    List<BoundAction> GenSuggestedAction(WorldFact fact = null)
-    {
-        ActionBuilder ab = new ActionBuilder(speaker.ws, patron);
-
-        List<BoundAction> possibleActions = ab.GetAllActions(respectLocation: false);
-
-        System.Func<BoundAction, bool> filter = action => true;
-
-        if(fact is WorldFactGoal factGoal) {
-            Goal goal = factGoal.goal;
-
-            if (goal is GoalAction) return new List<BoundAction>() { };
-
-            GoalState goalState = (GoalState)goal;
-
-            State state = goalState.state;
-
-            if (state is StateInventory stateInv) {
-                filter = action => {
-                    return (speaker.ws.map.GetFeature(action.FeatureId).type != Feature.FeatureType.person &&
-                            speaker.ws.map.GetFeature(action.FeatureId).type != Feature.FeatureType.door) ||
-                            (action.Id.StartsWith("ask_") && action.Id.Contains(stateInv.itemId));
-                };
-            }
-            if (state is StateSocial stateSocial) {
-                filter = action => {
-                    return
-                            action.FeatureId == stateSocial.targetId;
-                };
-            }
-            if (state is StateRelation stateRelation) {
-                filter = action => {
-                    return
-                            action.FeatureId == stateRelation.target;
-                };
-            }
-        }
-
-        return new List<BoundAction>(from action in possibleActions
-                                     where filter(action)
-                                     select action
-                                    );
     }
 
     List<SocialMove> GenAskOpinionOfPerson(List<string> people = null)

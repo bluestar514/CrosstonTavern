@@ -86,6 +86,7 @@ public class WorldStateInitializer
 
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[sammy].ws);
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_field", "common_fish", "trout"), townies[sammy].ws);
+
         townies[avery].ws.knownFacts.AddFact(new WorldFactResource("chicken_farm", "produce", "egg"), townies[avery].ws);
         townies[avery].ws.knownFacts.AddFact(new WorldFactResource("cow_farm", "produce", "milk"), townies[avery].ws);
         foreach(string item in ItemInitializer.plantableCrops) {
