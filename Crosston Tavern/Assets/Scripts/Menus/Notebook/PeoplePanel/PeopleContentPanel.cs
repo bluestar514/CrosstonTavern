@@ -55,13 +55,18 @@ public class PeopleContentPanel : MonoBehaviour
 
         if (fact is WorldFactGoal) {
             WorldFactGoal goalFact = (WorldFactGoal)fact;
-            AddGoal(goalFact);
-            return true;
+
+            if (FindFact(fact) == null) {
+                AddGoal(goalFact);
+                return true;
+            } else {
+                return false;
+            }
         } else if (fact is WorldFactPreference) {
             WorldFactPreference preferenceFact = (WorldFactPreference)fact;
 
-            AddPreference(preferenceFact.level, preferenceFact.item);
-            return true;
+            return AddPreference(preferenceFact.level, preferenceFact.item);
+            
         } else {
             return false;
         }
@@ -104,14 +109,34 @@ public class PeopleContentPanel : MonoBehaviour
         }
     }
 
-    void AddPreference(PreferenceLevel level, string item) {
-        if (level == PreferenceLevel.neutral) return;
+    bool AddPreference(PreferenceLevel level, string item) {
+        if (level == PreferenceLevel.neutral) return false;
 
         if (!preferences.ContainsKey(level)) {
             preferences.Add(level, new HashSet<string>());
         }
 
+        if (preferences[level].Contains(item)) return false;
+
         preferences[level].Add(item);
         preferenceText[level].text = level + ": " + Verbalizer.MakeNiceList(new List<string>(preferences[level]));
+
+        return true;
+    }
+
+
+    WorldFactDisplayObj FindFact(WorldFact fact)
+    {
+        WorldFactDisplayObj matchingFact = null;
+        if (fact is WorldFactGoal goalFact) {
+            foreach (WorldFactDisplayObj panel in knownGoals) {
+                if (panel.fact.Equals(goalFact)) {
+                    matchingFact = panel;
+                    break;
+                }
+            }
+        }
+
+        return matchingFact;
     }
 }

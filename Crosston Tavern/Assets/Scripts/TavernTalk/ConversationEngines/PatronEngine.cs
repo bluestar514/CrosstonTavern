@@ -169,11 +169,12 @@ public class PatronEngine :ConversationEngine
                     BoundAction suggestedAction = potentialAction.action;
 
                     Goal goal = new GoalAction(suggestedAction, 5);
-                    speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>(),
+                    speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>() {
+                                                            new GM_Precondition_PlayerInstructed("barkeep", speaker.Id)
+                                                        },
                                                         new List<Goal>() {
                                                             goal
                                                         },
-                                                        "You told me it was a good idea.",
                                                         name: "suggested action",
                                                         timer: 3
                                                         )

@@ -406,6 +406,7 @@ public class GoalManager
 
                 OutcomeRestraints outcome = new OutcomeRestraints(new List<Effect>(), new ChanceModifierSimple(1),
                                                                    action.preconditions.conditions, bindings, resources, action);
+                outcome.fullfillsGoal.Add(parentGoal);
 
                 newGoals.AddRange(MakePreconditionsGoal(outcome, parentGoal.priority ));
             }

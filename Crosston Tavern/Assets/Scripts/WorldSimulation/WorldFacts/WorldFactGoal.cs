@@ -17,7 +17,7 @@ public class WorldFactGoal: WorldFact
         if (!(obj is WorldFactGoal)) return false;
         WorldFactGoal other = (WorldFactGoal)obj;
 
-        return goal == other.goal;
+        return goal.Equals(other.goal);
     }
 
     public override int GetHashCode()

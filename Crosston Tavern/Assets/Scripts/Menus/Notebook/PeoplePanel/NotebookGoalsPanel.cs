@@ -15,6 +15,10 @@ public class NotebookGoalsPanel : MainNotebookTab
     public GameObject PeopleNameButtonPrefab;
 
 
+    /// <summary>
+    /// Used for adding relationship data at once
+    /// </summary>
+    /// <param name="facts">Should be WorldFactRelations</param>
     public void AddMany(List<WorldFact> facts)
     {
 
