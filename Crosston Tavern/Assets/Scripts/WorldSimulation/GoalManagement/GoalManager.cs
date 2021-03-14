@@ -447,14 +447,25 @@ public class GoalManager
 
         return effectStrength;
     }
+    float CalculateChanceOccuring(Outcome outcome, BoundAction action, BoundBindingCollection bindings, FeatureResources resources)
+    {
+        if (outcome == null) return 1;
+
+        ChanceModifier chance = outcome.chanceModifier.MakeBound(bindings, resources);
+        float value = chance.Chance(ws);
+        float total = ActionExecutionManager.GetTotalChance(action, bindings, resources, ws);
+
+        return value / total;
+    }
 
     List<Goal> MakePreconditionsGoal(Outcome outcome, BoundAction action, BoundBindingCollection bindings, FeatureResources resources, Goal parentGoal)
     {
         List<Goal> newGoals = new List<Goal>();
 
-        if(parentGoal.priority == 0) return newGoals;
-
         float effectStrength = CalculateEffectStrength(outcome, bindings, resources, parentGoal);
+        float chance = CalculateChanceOccuring(outcome, action, bindings, resources);
+
+        if (parentGoal.priority * effectStrength * chance == 0) return newGoals;
 
         foreach (Condition condition in action.preconditions.conditions) {
             if (condition.InEffect(actor, ws, bindings, resources)) continue;
@@ -462,7 +473,8 @@ public class GoalManager
             if (condition is Condition_IsState) {
                 Condition_IsState stateCondition = (Condition_IsState)condition;
 
-                GoalState g = new GoalState(stateCondition.state.Bind(bindings, resources), parentGoal.priority *effectStrength);
+                GoalState g = new GoalState(stateCondition.state.Bind(bindings, resources), 
+                                                parentGoal.priority *effectStrength*chance);
                 g.AddUnlockedAction(action);
 
                 g.AddParentGoal(parentGoal);
@@ -479,15 +491,16 @@ public class GoalManager
         List<Goal> newGoals = new List<Goal>();
         if (parentGoal.priority == 0) return newGoals;
 
-        ChanceModifier chance = outcome.chanceModifier.MakeBound(bindings, resources);
+        
+        float chance = CalculateChanceOccuring(outcome, action, bindings, resources);
 
-        if (chance.Chance(ws) >= ActionExecutionManager.GetTotalChance(action, bindings, resources, ws)) 
+        if (chance >= 1) 
             return newGoals;
 
         float effectStrength = CalculateEffectStrength(outcome, bindings, resources, parentGoal);
         
 
-        List<Goal> goals = chance.MakeGoal(ws, parentGoal.priority*effectStrength);
+        List<Goal> goals = outcome.chanceModifier.MakeGoal(ws, parentGoal.priority*effectStrength);
 
         if (goals != null) {
             foreach (Goal goal in goals) {

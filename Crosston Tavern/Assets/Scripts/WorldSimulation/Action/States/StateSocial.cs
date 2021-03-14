@@ -79,7 +79,8 @@ public class StateSocial : State
         if (target == "I") target = "me";
 
         string axisDirection = "";
-        if (ws != null) {
+        if (ws != null && ws.GetRelationshipsFor(this.sourceId) != null) {
+
             if (this.max > ws.GetRelationshipsFor(this.sourceId).Get(this.sourceId, this.axis)) 
                 axisDirection = "more";
             else 
