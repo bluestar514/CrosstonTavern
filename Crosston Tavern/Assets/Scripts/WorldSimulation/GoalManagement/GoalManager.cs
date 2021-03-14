@@ -59,60 +59,63 @@ public class GoalManager
 
     public List<Goal> GetGoalsList()
     {
-        // Get all actions
-        List<BoundAction> allActions = GetAllActions();
-        // Get all outcomes
-        List<OutcomeRestraints> allOutcomes = new List<OutcomeRestraints>();
-        foreach(BoundAction action in allActions) {
-            allOutcomes.AddRange(DecomposeActionToOutcomes(action));
-        }
+        //Get all top level goals from modules
+        //For a given number of steps
+        //Foreach goal
+        //   find actions which help
+        //   make subgoals from:
+        //hard prereqs.
+        //chance
 
-        // Get High level goals:
-        List<Goal> initialGoals = new List<Goal>();
-
-        List<GoalModule> allModules = new List<GoalModule>(modules);
-        foreach(Obligation ob in actor.schedule.obligations) {
-
-            allModules.Add(ob.gMod);
-        }
-
-        foreach (GoalModule module in allModules) {
+        List<Goal> topLevelGoals = new List<Goal>();
+        foreach(GoalModule module in modules) {
             if (module.Precondtion(ws)) {
-                initialGoals.AddRange(module.goals);
+                topLevelGoals.AddRange(module.goals);
             }
         }
 
-        // For x iterations:
-        List<Goal> allGoals = new List<Goal>(initialGoals);
-        List<Goal> previousIterationGoals = new List<Goal>(initialGoals);
+        ActionBuilder ab = new ActionBuilder(ws, actor);
+        List<BoundAction> potentialActions = ab.GetAllActions(respectLocation: false);
+
+
+        List<Goal> currentGoals = new List<Goal>(topLevelGoals);
+        currentGoals = CondenseGoals(currentGoals);
+
+        List<Goal> goals = new List<Goal>();
         List<Goal> newGoals = new List<Goal>();
 
+        for(int i = 0; i < lookAhead; i++) {
+            if (currentGoals.Count == 0) break;
 
-        for (int i= 0; i<lookAhead; i++) {
-            
-            // Foreach goal, grab relevant set of outcomes and their restraints
-            foreach (Goal goal in previousIterationGoals) {
-                if (goal is GoalState) {
-                    List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
-                    newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
-                }else if(goal is GoalAction goalAction) {
-                    newGoals.AddRange(MakeGoalFromAction(goalAction, allActions));
+            foreach(Goal goal in currentGoals) {
+                foreach(BoundAction action in potentialActions) {
+                    if (goal is GoalState goalState) {
+                        newGoals.AddRange(MakeGoalsFromOutcome(action, goalState));
+
+
+                    } else if(goal is GoalAction goalAction) {
+                        if (goalAction.action.Equals(action)) {
+                            newGoals.AddRange(MakeGoalFromAction(action, goalAction));
+                        }
+                    }
                 }
             }
 
-            List<Goal> condensedGoals = CondenseGoals(newGoals);
-
-            allGoals.AddRange(condensedGoals);
-            previousIterationGoals = new List<Goal>(condensedGoals);
+            goals.AddRange(currentGoals);
+            currentGoals = newGoals;
             newGoals = new List<Goal>();
+
+            goals = CondenseGoals(goals);
+            currentGoals = CondenseGoals(currentGoals);
+
         }
 
-        allGoals = CondenseGoals(allGoals);
-        allGoals = FindLocations(allGoals);
-        allGoals = CondenseGoals(allGoals);
+        goals.AddRange(FindLocations(goals));
+        goals = CondenseGoals(goals);
 
-        lastSetOfGoals = allGoals;
-        return allGoals;
+        lastSetOfGoals = goals;
+        return goals;
+
     }
 
     public List<GoalModule> GetParentModule(Goal childGoal)
@@ -242,6 +245,11 @@ public class GoalManager
         return relevantOutcomes;
     }
 
+    bool ContainsNonActionableConditions(BoundAction action)
+    {
+        return ContainsNonActionableConditions(action.preconditions.conditions, action.Bindings, action.ActorId);
+    }
+
     static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
         return ContainsConditionNotYou(preconditions, bindings, actor) ||
@@ -332,6 +340,34 @@ public class GoalManager
         //return goal.GetParentGoals().All(parent => !OutcomeHurtsGoal(outcome, parent));
     }
 
+    bool OutcomeHurtsParentGoals(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        bool hurtful = OutcomeHurtsGoal(outcome, bindings, resources, goal);
+
+        if (goal.parentGoals.Count > 0) {
+            foreach (Goal parent in goal.GetParentGoals()) {
+                if (hurtful == true) break;
+                hurtful = OutcomeHurtsParentGoals(outcome, bindings, resources, parent);
+            }
+        }
+
+        return hurtful;
+
+        //return goal.GetParentGoals().All(parent => !OutcomeHurtsGoal(outcome, parent));
+    }
+
+    bool OutcomeHurtsGoal(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
+    {
+        foreach (Effect effect in outcome.effects) {
+
+            if (effect.WeighAgainstGoal(ws, bindings, resources, goal) < 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     bool OutcomeHurtsGoal(OutcomeRestraints outcome, Goal goal)
     {
         foreach (Effect effect in outcome.effects) {
@@ -356,108 +392,109 @@ public class GoalManager
         return false;
     }
 
-    List<Goal> MakeGoalsFromOutcome(Goal parentGoal, List<OutcomeRestraints> outcomesFillingParentGoal)
+    bool OutcomeProgressesGoal(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        List<Goal> newGoals = new List<Goal>();
-        foreach (OutcomeRestraints outcome in outcomesFillingParentGoal) {
-            if (parentGoal.unlockedActionsOnGoalCompletion.Contains(outcome.parentAction)) continue;
+        foreach (Effect effect in outcome.effects) {
 
-            float effectStrength = outcome.effects.Sum(effect => effect.WeighAgainstGoal(ws,
-                                                                                        outcome.bindings,
-                                                                                        outcome.resources,
-                                                                                        parentGoal));
-            effectStrength /= outcome.effects.Count;
-
-            newGoals.AddRange(MakePreconditionsGoal(outcome,
-                                                    parentGoal.priority *
-                                                        outcome.chanceModifier.MakeBound(outcome.bindings, outcome.resources).Chance(ws) *
-                                                        effectStrength
-                                                    ));
-            newGoals.AddRange(MakeChanceModifierGoal(outcome, parentGoal.priority * effectStrength));
+            if (effect.WeighAgainstGoal(ws, bindings, resources, goal) > 0) {
+                return true;
+            }
         }
 
-        //List<Goal> unloopingGoals = new List<Goal>();
-        //foreach(Goal goal in newGoals) {
-        //    bool looping = false;
-        //    foreach(string parent in goal.parentGoals) {
-        //        if (goal.state.ToString() == parent.Split(':')[0]) {
-        //            looping = true;
-        //        } 
-        //    }
-
-        //    if (!looping) {
-        //        unloopingGoals.Add(goal);
-        //    }
-
-        //}
-
-        return newGoals; //unloopingGoals;
+        return false;
     }
 
-    List<Goal> MakeGoalFromAction(GoalAction parentGoal, List<BoundAction> actions)
+    List<Goal> MakeGoalsFromOutcome(BoundAction action, GoalState goalState)
     {
         List<Goal> newGoals = new List<Goal>();
-        foreach (BoundAction action in actions) {
 
-            if (parentGoal.action.Equals(action)){
+        if (ContainsNonActionableConditions(action)) return newGoals;
 
-                BoundBindingCollection bindings = action.Bindings;
-                FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+        FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
 
-                OutcomeRestraints outcome = new OutcomeRestraints(new List<Effect>(), new ChanceModifierSimple(1),
-                                                                   action.preconditions.conditions, bindings, resources, action);
+        foreach (Outcome outcome in action.potentialOutcomes) {
+            if (OutcomeProgressesGoal(outcome, action.Bindings, resources, goalState) &&
+                !OutcomeHurtsParentGoals(outcome, action.Bindings, resources, goalState)) {
 
-                newGoals.AddRange(MakePreconditionsGoal(outcome, parentGoal.priority ));
+                newGoals.AddRange(MakePreconditionsGoal(outcome, action, action.Bindings, resources, goalState));
+                newGoals.AddRange(MakeChanceModifierGoal(outcome, action, action.Bindings, resources, goalState));
+
             }
+
         }
 
         return newGoals;
     }
 
-    List<Goal> MakePreconditionsGoal(OutcomeRestraints outcome, float parentPriority)
+    List<Goal> MakeGoalFromAction(BoundAction action, GoalAction goalAction)
+    {
+        List<Goal> newGoals = new List<Goal>();
+        FeatureResources resources = ws.map.GetFeature(action.FeatureId).relevantResources;
+        newGoals.AddRange(MakePreconditionsGoal(null, action, action.Bindings, resources, goalAction));
+
+        return newGoals;
+    }
+
+    float CalculateEffectStrength(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, Goal parentGoal)
+    {
+        if (outcome == null) return 1;
+
+        float effectStrength = outcome.effects.Sum(effect => effect.WeighAgainstGoal(ws,
+                                                                                     bindings,
+                                                                                     resources,
+                                                                                     parentGoal));
+        //effectStrength /= outcome.effects.Count;
+
+        return effectStrength;
+    }
+
+    List<Goal> MakePreconditionsGoal(Outcome outcome, BoundAction action, BoundBindingCollection bindings, FeatureResources resources, Goal parentGoal)
     {
         List<Goal> newGoals = new List<Goal>();
 
-        if (parentPriority == 0) return newGoals;
+        if(parentGoal.priority == 0) return newGoals;
 
-        foreach (Condition condition in outcome.preconditions) {
-            if (condition.InEffect(actor, ws, outcome.bindings, outcome.resources)) continue;
+        float effectStrength = CalculateEffectStrength(outcome, bindings, resources, parentGoal);
+
+        foreach (Condition condition in action.preconditions.conditions) {
+            if (condition.InEffect(actor, ws, bindings, resources)) continue;
 
             if (condition is Condition_IsState) {
                 Condition_IsState stateCondition = (Condition_IsState)condition;
 
-                GoalState g = new GoalState(stateCondition.state.Bind(outcome.bindings, outcome.resources), parentPriority);
-                g.AddUnlockedAction(outcome.parentAction);
+                GoalState g = new GoalState(stateCondition.state.Bind(bindings, resources), parentGoal.priority *effectStrength);
+                g.AddUnlockedAction(action);
 
-                foreach(Goal parentGoal in outcome.fullfillsGoal) {
-                    g.AddParentGoal(parentGoal);
-                }
+                g.AddParentGoal(parentGoal);
 
                 newGoals.Add(g);
             }
         }
 
         return newGoals;
-        
-    }
 
-    List<Goal> MakeChanceModifierGoal(OutcomeRestraints outcome, float parentPriority)
+    }
+    List<Goal> MakeChanceModifierGoal(Outcome outcome, BoundAction action, BoundBindingCollection bindings, FeatureResources resources, Goal parentGoal)
     {
         List<Goal> newGoals = new List<Goal>();
+        if (parentGoal.priority == 0) return newGoals;
 
-        ChanceModifier chance = outcome.chanceModifier.MakeBound(outcome.bindings, outcome.resources);
+        ChanceModifier chance = outcome.chanceModifier.MakeBound(bindings, resources);
 
-        if (chance.Chance(ws) >= 1) return newGoals;
+        if (chance.Chance(ws) >= ActionExecutionManager.GetTotalChance(action, bindings, resources, ws)) 
+            return newGoals;
 
-        List<Goal> goals = chance.MakeGoal(ws, parentPriority);
+        float effectStrength = CalculateEffectStrength(outcome, bindings, resources, parentGoal);
+        
+
+        List<Goal> goals = chance.MakeGoal(ws, parentGoal.priority*effectStrength);
 
         if (goals != null) {
             foreach (Goal goal in goals) {
                 newGoals.Add(goal);
-                goal.AddUnlockedAction(outcome.parentAction);
-                foreach (Goal g in outcome.fullfillsGoal) {
-                    goal.AddParentGoal(g);
-                }
+                goal.AddUnlockedAction(action);
+                goal.AddParentGoal(parentGoal);
+                
             }
         }
 

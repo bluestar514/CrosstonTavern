@@ -19,6 +19,14 @@ public class ActionBuilder
         this.actor = actor;
     }
 
+    /// <summary>
+    /// Get Actions that the previously specified actor is aware of given the previously specified world state
+    /// </summary>
+    /// <param name="locationId">if specified, the actions available given the actor is in that location. 
+    /// Will look up the actors current location if left empty</param>
+    /// <param name="respectLocation">if true will only return actions available in the previously specified location,
+    /// other wise will return all actions anywhere across the known world</param>
+    /// <returns></returns>
     public List<BoundAction> GetAllActions(string locationId="", bool respectLocation = true)
     {
 

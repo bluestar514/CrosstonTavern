@@ -28,6 +28,13 @@ public class BoundAction : WorldAction
         this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings, verbilizationInfo)
     { }
 
+    public BoundAction(BoundAction action):base(action.Id, 
+                                                action.executionTime, 
+                               new Precondition(action.preconditions.conditions),
+                              new List<Outcome>(action.potentialOutcomes),
+                                                action.verbilizationInfo)
+    { }
+
     public override string ToString()
     {
         string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";

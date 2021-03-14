@@ -61,13 +61,29 @@ public class ActionExecutionManager : ActionManager
 
     }
 
+    /// <summary>
+    /// As a rule the cumlitive total of all a given actions chances should add up to 1, but in practice that is not the case.
+    /// This calculates what that denominator actually is.
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="bindings"></param>
+    /// <param name="resources"></param>
+    /// <param name="ws"></param>
+    /// <returns></returns>
+    public static float  GetTotalChance(BoundAction action, BoundBindingCollection bindings, FeatureResources resources, WorldState ws)
+    {
+        return action.potentialOutcomes.Sum(outcome => 
+                                            outcome.chanceModifier
+                                            .MakeBound(bindings, resources)
+                                            .Chance(ws));
+    }
 
     Outcome ChooseOutcome(WeightedAction action)
     {
         BoundBindingCollection bindings = action.Bindings;
         FeatureResources featureResources = globalWs.map.GetFeature(action.FeatureId).relevantResources;
 
-        float totalChance = action.potentialOutcomes.Sum(outcome => outcome.chanceModifier.MakeBound(bindings, featureResources).Chance(globalWs));
+        float totalChance = GetTotalChance(action, bindings, featureResources, globalWs);
         float rand = UnityEngine.Random.value * totalChance;
 
         foreach(Outcome outcome in action.potentialOutcomes) {
