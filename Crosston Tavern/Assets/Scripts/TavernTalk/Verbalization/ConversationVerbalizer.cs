@@ -404,9 +404,15 @@ public class ConversationVerbalizer
                         factGoal.goal is GoalState goalState)
                         frustrations.Add( goalState.state.Verbalize(townie.Id, partner, true));
                 }
-                verbalization += Verbalizer.MakeNiceList(frustrations);
 
-                verbalization += " but I can't figure out how.";
+                if (frustrations.Count > 0) {
+                    verbalization += Verbalizer.MakeNiceList(frustrations);
+
+                    verbalization += " but I can't figure out how.";
+                } else {
+                    verbalization = "I'm doing just fine!";
+                    emotion = NPCPortrait.State.happy;
+                }
                 break;
             case "askRelationWith":
                 verbalization = "What do you think about...";

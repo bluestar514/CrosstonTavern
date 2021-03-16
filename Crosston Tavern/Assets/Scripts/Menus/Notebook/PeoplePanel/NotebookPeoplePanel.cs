@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NotebookGoalsPanel : MainNotebookTab
+public class NotebookPeoplePanel : MainNotebookTab
 {
     public Transform peopleButtonHolder;
     public Transform peopleContentHolder;
@@ -17,28 +18,69 @@ public class NotebookGoalsPanel : MainNotebookTab
 
     /// <summary>
     /// Used for adding relationship data at once
+    /// And marking all goals we are having trouble with
     /// </summary>
     /// <param name="facts">Should be WorldFactRelations</param>
     public void AddMany(List<WorldFact> facts)
     {
-
-
         Dictionary<string, List<WorldFact>> sortedFacts = new Dictionary<string, List<WorldFact>>();
 
-        foreach(WorldFact fact in facts) {
-            Debug.Log(fact);
-            if(fact is WorldFactRelation factRelation) {
-                if (!sortedFacts.ContainsKey(factRelation.owner))
-                    sortedFacts.Add(factRelation.owner, new List<WorldFact>());
-                sortedFacts[factRelation.owner].Add(fact);
+        foreach (WorldFact fact in facts) {
+            string owner = "";
+
+            if (fact is WorldFactRelation factRelation) {
+                owner = factRelation.owner;
+            }
+            if(fact is WorldFactGoal goalFact) {
+                owner = goalFact.owner;
+            }
+
+
+            if (owner != "") {
+                if (!sortedFacts.ContainsKey(owner))
+                    sortedFacts.Add(owner, new List<WorldFact>());
+                sortedFacts[owner].Add(fact);
             }
         }
 
-        foreach(string owner in sortedFacts.Keys) {
+
+        UpdateRelations(sortedFacts);
+        UpdateStuckGoals(sortedFacts);
+        UpdatePlayerDefinedGoals(sortedFacts);
+    }
+
+
+    void UpdateRelations(Dictionary<string, List<WorldFact>> sortedFacts)
+    {
+        foreach (string owner in sortedFacts.Keys) {
             GetPersonContentPanel(owner).allRelationships.AddRelations(sortedFacts[owner]);
         }
     }
 
+    void UpdateStuckGoals(Dictionary<string, List<WorldFact>> sortedFacts)
+    {
+        foreach (string owner in sortedFacts.Keys) {
+            if (ContainsMarkedGoal(sortedFacts[owner], "stuck")){
+                GetPersonContentPanel(owner).MarkStuckGoals(sortedFacts[owner]);
+            }
+        }
+    }
+    void UpdatePlayerDefinedGoals(Dictionary<string, List<WorldFact>> sortedFacts)
+    {
+        foreach (string owner in sortedFacts.Keys) {
+            if (ContainsMarkedGoal(sortedFacts[owner], "player")) {
+                GetPersonContentPanel(owner).MarkPlayerSpecifiedGoals(sortedFacts[owner]);
+            }
+        }
+    }
+    bool ContainsMarkedGoal(List<WorldFact> facts, string mark)
+    {
+        return facts.Any(fact => {
+            if (fact is WorldFactGoal factGoal) {
+                return factGoal.modifier.Contains(mark);
+            } else return false;
+        });
+    }
 
     public override bool AddWorldFact(WorldFact fact)
     {

@@ -70,7 +70,8 @@ public class Opinion
 
         IEnumerable<EntityStatusEffectType> statusEffects = from effect in executedAction.executedEffect
                                                             where effect is EffectStatusEffect statusEffect &&
-                                                                    StatusEffectTable.emotions.Contains(statusEffect.status.type)
+                                                                    StatusEffectTable.emotions.Contains(statusEffect.status.type) &&
+                                                                    statusEffect.targetId == townie.id
                                                             select ((EffectStatusEffect)effect).status.type;
 
         if (statusEffects.Contains(EntityStatusEffectType.happy)) tags.Add(Tag.excited);

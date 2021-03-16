@@ -8,11 +8,12 @@ public class NotebookController : SideMenuController<WorldFact>
 
     public void AddManyElements(List<WorldFact> facts)
     {
-        notebook.AddMany(facts);
-
         foreach (WorldFact fact in facts) {
+            //Debug.Log(fact);
             AddElement(fact);
         }
+
+        notebook.AddMany(facts);
     }
 
     public override void AddElement(WorldFact element)

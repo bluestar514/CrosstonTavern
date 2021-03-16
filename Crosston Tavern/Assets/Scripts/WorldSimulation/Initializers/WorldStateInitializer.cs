@@ -51,22 +51,6 @@ public class WorldStateInitializer
                                     },
                                     "I want to be a better fisher."
                                 )) ;
-        //townies[sammy].gm.AddModule(new GoalModule(
-        //                            new List<GM_Precondition>(),
-        //                            new List<Goal>() {
-        //                                new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "strawberry_cake", 1,100), 1)
-        //                            },
-        //                            "I love cake."
-        //                        ));
-
-
-        //townies[avery].gm.AddModule(new GoalModule(
-        //                            new List<GM_Precondition>(),
-        //                            new List<Goal>() {
-        //                                new GoalState(new StateInventoryStatic(townies[avery].townieInformation.id, "blackberry_tart", 1,100), 1)
-        //                            },
-        //                            "I love tarts."
-        //                        ));
 
         townies[finley].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
@@ -75,13 +59,6 @@ public class WorldStateInitializer
                                     },
                                     "I like eating blackberries."
                                 ));
-        //townies[finley].gm.AddModule(new GoalModule(
-        //                            new List<GM_Precondition>(),
-        //                            new List<Goal>() {
-        //                                new GoalState(new StateInventoryStatic(townies[finley].townieInformation.id, "blackberry_tart", 1,100), 1)
-        //                            },
-        //                            "I love tarts."
-        //                        ));
 
 
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[sammy].ws);
@@ -115,6 +92,9 @@ public class WorldStateInitializer
                 {Relationship.Tag.liked, GoalManager.GoalPriority.low },
                 {Relationship.Tag.friend, GoalManager.GoalPriority.low },
                 {Relationship.Tag.bestFriend, GoalManager.GoalPriority.medium },
+                {Relationship.Tag.disliked, GoalManager.GoalPriority.low },
+                {Relationship.Tag.enemy, GoalManager.GoalPriority.low },
+                {Relationship.Tag.nemisis, GoalManager.GoalPriority.medium },
             };
 
 
@@ -124,7 +104,8 @@ public class WorldStateInitializer
                     new GoalModule(
                         new List<GM_Precondition>() {
                             new GM_Precondition_State(new StateRelation(name, otherPerson, pair.Key)),
-                            new GM_Precondition_TopRelationAxis(Relationship.Axis.romantic, name, otherPerson)
+                            new GM_Precondition_TopRelationAxis(Relationship.Axis.romantic, name, otherPerson),
+                            new GM_Precondition_State(new StateRelation(name, otherPerson, Relationship.Tag.dating), false)
                         },
                         new List<Goal>() {
                             new GoalState(new StateRelation(name, otherPerson, Relationship.Tag.dating), (int)pair.Value)
@@ -139,7 +120,8 @@ public class WorldStateInitializer
                 gm.AddModule(
                     new GoalModule(
                         new List<GM_Precondition>() {
-                            new GM_Precondition_State(new StateRelation(name, otherPerson, pair.Key))
+                            new GM_Precondition_State(new StateRelation(name, otherPerson, pair.Key)),
+                            new GM_Precondition_State(new StateRelation( otherPerson, name, pair.Key), false),
                         },
                         new List<Goal>() {
                             new GoalState(new StateRelation( otherPerson, name, pair.Key), (int)pair.Value)

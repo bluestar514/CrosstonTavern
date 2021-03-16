@@ -10,6 +10,10 @@ public class ActionInitializer
 
     static int stepsInDay = 28;
 
+    static int smallIncrease = 1;
+    static int mediumIncrease = 5;
+    static int largeIncrease = 10;
+
     public static Dictionary<string, GenericAction> actions = new Dictionary<string, GenericAction>() {
         {"fish", new GenericAction("fish", 1,
             new Precondition( new List<Condition>() {
@@ -96,18 +100,18 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -20, 20), true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, 1, 3),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, 1, 3,
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, smallIncrease, mediumIncrease),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, smallIncrease, mediumIncrease,
                                             new VerbilizationEffectSocialThreshold("we had a good time", 0, true))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -10, 10), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, -20, 20), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -3, -1),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1,
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, -smallIncrease),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -mediumIncrease, -smallIncrease,
                                             new VerbilizationEffectSocialThreshold("it was frustrating", 0, false))
                     }
                 ),
@@ -257,18 +261,26 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.disliked][Relationship.Axis.friendly][1],
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.friend][Relationship.Axis.friendly][0]), 
+                                            false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -3, -1,
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -largeIncrease, -mediumIncrease,
                                             new VerbilizationEffectSocialThreshold("#b# got real mad",  0, false)),
+                        //new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, -smallIncrease),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("angry_from_being_insulted", EntityStatusEffectType.angry, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly,
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.disliked][Relationship.Axis.friendly][1],
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.friend][Relationship.Axis.friendly][0]),
+                                            true),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -2, 1,
-                                                new VerbilizationEffectSocialThreshold("#b# ignored it", 0, true))
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -smallIncrease, smallIncrease,
+                                                new VerbilizationEffectSocialThreshold("#b# ignored it", 0, true)),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, smallIncrease)
                     }
                 ),
             },
@@ -284,26 +296,37 @@ public class ActionInitializer
             }),
             new List<Outcome>() {
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 3, 10), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.crushing_on][Relationship.Axis.romantic][0],
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.head_over_heels][Relationship.Axis.romantic][0]), 
+                                             true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, 2,
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, mediumIncrease,
                                             new VerbilizationEffectSocialThreshold("#b# blushed bright red",  0, true)),
+                        //new EffectSocialStatic("#a#", "#b#", Relationship.Axis.romantic, mediumIncrease/2),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.friend][Relationship.Axis.friendly][0], 
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.bestFriend][Relationship.Axis.friendly][0]), 
+                                            true),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, 1,
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, smallIncrease,
                                         new VerbilizationEffectSocialThreshold("#b# seemed pleased", 0, true)),
+                        //new EffectSocialStatic("#a#", "#b#", Relationship.Axis.friendly, mediumIncrease),
                         new EffectStatusEffect("#b#", new EntityStatusEffect("pleased_from_a_compliment", EntityStatusEffectType.happy, stepsInDay, 3, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly, 3, 20), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.friendly,
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.friend][Relationship.Axis.friendly][0],
+                                                (int)Relationship.codifiedRelationRanges[Relationship.Tag.bestFriend][Relationship.Axis.friendly][0]), 
+                                            false),
                     new List<Effect>() {
-                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -3),
-                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, -3,
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.friendly, -smallIncrease),
+                        new EffectSocialStatic("#b#", "#a#", Relationship.Axis.romantic, -mediumIncrease,
                                             new VerbilizationEffectSocialThreshold("#b# didn't believe it",  0, false))
                     }
                 ),
@@ -330,10 +353,10 @@ public class ActionInitializer
                 new Outcome( //failure:
                     new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 60, 100), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -10, -5),
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -15, -5),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.romantic, -5, 0),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -5, 0)
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -largeIncrease, -mediumIncrease),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -largeIncrease*2, -largeIncrease),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.romantic, -mediumIncrease, 0),
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, 0)
                     }
                 ),
             },

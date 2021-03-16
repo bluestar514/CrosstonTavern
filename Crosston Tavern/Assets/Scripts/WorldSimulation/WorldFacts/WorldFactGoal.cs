@@ -1,8 +1,14 @@
-﻿[System.Serializable]
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+[System.Serializable]
 public class WorldFactGoal: WorldFact
 {
     public Goal goal;
     public string owner;
+    public List<string> modifier = new List<string>();
 
     public WorldFactGoal(Goal goal, string owner)
     {

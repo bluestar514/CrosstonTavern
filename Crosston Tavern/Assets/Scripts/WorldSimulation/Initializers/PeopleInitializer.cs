@@ -53,13 +53,15 @@ public class PeopleInitializer
     static Dictionary<string, Dictionary<string, Dictionary<Relationship.Axis, relationPair>>> initialRelations =
         new Dictionary<string, Dictionary<string, Dictionary<Relationship.Axis, relationPair>>>() {
             {"avery", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                //has a crush on sammy
                     {"sammy", new Dictionary<Relationship.Axis, relationPair>() {
-                        {Relationship.Axis.friendly, new relationPair(20,15) },
+                        {Relationship.Axis.friendly, new relationPair(20, 15) },
                         {Relationship.Axis.romantic, new relationPair(40, 10) }  }
                     },
+                // good friends with finely
                     {"finley", new Dictionary<Relationship.Axis, relationPair>() {
                         {Relationship.Axis.friendly, new relationPair(40, 45) },
-                        {Relationship.Axis.romantic, new relationPair(5, 0) }  }
+                        {Relationship.Axis.romantic, new relationPair(5, 5) }  }
                     },
                     {"barkeep", new Dictionary<Relationship.Axis, relationPair>() {
                         {Relationship.Axis.friendly, new relationPair(5, 5) },
@@ -68,10 +70,12 @@ public class PeopleInitializer
                 }
             },
             {"sammy", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                // thinks favorably of avery, but isn't in love with them at all
                     {"avery", new Dictionary<Relationship.Axis, relationPair>() {
                         {Relationship.Axis.friendly, new relationPair(20, 25) },
                         {Relationship.Axis.romantic, new relationPair(-5, 5) }  }
                     },
+                //Has a crush on finely, but doesn't think they like them at all
                     {"finley", new Dictionary<Relationship.Axis, relationPair>() {
                         {Relationship.Axis.friendly, new relationPair(10, -15) },
                         {Relationship.Axis.romantic, new relationPair(30, -5) }  }
@@ -83,12 +87,14 @@ public class PeopleInitializer
                 }
             },
             {"finley", new Dictionary<string, Dictionary<Relationship.Axis, relationPair>>(){
+                // good friends with Avery and has a secret crush they think is completely not reciprocated
                     {"avery", new Dictionary<Relationship.Axis, relationPair>() {
                         {Relationship.Axis.friendly, new relationPair(40, 45) },
                         {Relationship.Axis.romantic, new relationPair(20, -10) }  }
                     },
+                // really doesn't like sammy at all
                     {"sammy", new Dictionary<Relationship.Axis, relationPair>() {
-                        {Relationship.Axis.friendly, new relationPair(-10, -10) },
+                        {Relationship.Axis.friendly, new relationPair(-20, -20) },
                         {Relationship.Axis.romantic, new relationPair(0, 0) }  }
                     },
                     {"barkeep", new Dictionary<Relationship.Axis, relationPair>() {

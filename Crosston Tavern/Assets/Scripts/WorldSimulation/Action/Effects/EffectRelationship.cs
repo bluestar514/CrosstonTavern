@@ -27,6 +27,7 @@ public class EffectRelationship : Effect
         if (goal is GoalState goalState) {
             string sourceId = bindings.BindString(source);
             string targetId = bindings.BindString(target);
+            float weight = 0;
 
             if (goalState.state is StateRelation state) {
                 if (state.source != sourceId ||
@@ -36,7 +37,7 @@ public class EffectRelationship : Effect
                 Relationship relA = ws.GetRelationshipsFor(sourceId);
                 Relationship relB = ws.GetRelationshipsFor(targetId);
 
-                float weight = 0;
+                
                 if (!relA.RelationTagged(target, tag) && add) weight += 1;
                 if (relA.RelationTagged(target, tag) && !add) weight += 1;
 
@@ -48,18 +49,6 @@ public class EffectRelationship : Effect
                 }
 
                 return weight;
-            //} else if (goalState.state is StateSocial social) {
-            //    if (social.sourceId != sourceId ||
-            //        social.targetId != targetId) return 0;
-
-
-
-            //    if ((social.axis == Relationship.RelationType.friendly &&
-            //                        Relationship.friendlyTags.Contains(tag)) ||
-            //        (social.axis == Relationship.RelationType.romantic &&
-            //                        Relationship.romanticTags.Contains(tag))) {
-            //        return .25f;
-            //    }
             }
         }
 

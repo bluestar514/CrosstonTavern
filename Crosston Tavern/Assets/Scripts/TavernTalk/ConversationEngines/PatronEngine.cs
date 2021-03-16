@@ -110,7 +110,15 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellAboutDayObservedEvents", speaker, prompt);
 
             case "askAboutGoalFrustration":
-                return new SocialMove("frustratedByGoals", mentionedFacts: GoalsToFacts(GetStuckGoals(), speaker.Id));
+                facts = GoalsToFacts(GetStuckGoals(), speaker.Id);
+                foreach(WorldFact stuckFact in facts) {
+                    if(stuckFact is WorldFactGoal goalFact) {
+                        goalFact.modifier.Add("stuck");
+                    }
+                }
+
+
+                return new SocialMove("frustratedByGoals", mentionedFacts: facts);
 
 
             case "askWhyAction#":
@@ -180,9 +188,12 @@ public class PatronEngine :ConversationEngine
                                                         )
                         );
 
+                    WorldFactGoal goalFact = new WorldFactGoal(goal, speaker.Id);
+                    goalFact.modifier.Add("player");
+
                     return new SocialMove("acceptSuggestion#",
                                         arguements: new List<string> { goal.ToString() },
-                                        mentionedFacts: new List<WorldFact>() { new WorldFactGoal(goal, speaker.Id) });
+                                        mentionedFacts: new List<WorldFact>() { goalFact });
                 }
 
                 throw new System.Exception("1st mentioned fact (" + prompt.mentionedFacts[0] + ") was not a potentialAction");
@@ -243,7 +254,6 @@ public class PatronEngine :ConversationEngine
 
     List<Goal> GetStuckGoals()
     {
-        Debug.Log(speaker.gm.GetStuckGoals().Count);
         return speaker.gm.GetStuckGoals();
     }
 

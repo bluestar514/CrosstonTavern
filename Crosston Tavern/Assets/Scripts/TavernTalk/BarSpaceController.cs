@@ -122,7 +122,7 @@ public class BarSpaceController : MonoBehaviour
         lc.AddElement(npcDialogue);
 
         List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
-        AddAllFacts(newFacts);
+        AddAllFacts(npcDialogue.facts);
         RemoveRetractedFacts(move.retractedFacts);
     }
 

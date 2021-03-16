@@ -7,15 +7,7 @@ using UnityEngine;
 public class Goal
 {
     public string name;
-
     public float priority;
-
-    public int priTimer;
-    protected int priTimerCurrent;
-
-    public int timeOut = PERMINATE;
-
-    public static int PERMINATE = -1;
 
     public List<string> parentGoals = new List<string>();
     protected List<Goal> parentGoalObj = new List<Goal>();
@@ -80,11 +72,6 @@ public class GoalState : Goal
         name = state.ToString();
     }
 
-    public GoalState(State state, float priority, int timeOut): this(state, priority)
-    {
-        this.timeOut = timeOut; 
-    }
-
     public override string ToString()
     {
         return state.ToString() + ":" + priority; 
@@ -103,7 +90,7 @@ public class GoalState : Goal
     {
         List<State> states = this.state.Combine(goal.state);
         if (states.Count == 1) {
-            GoalState newGoal = new GoalState(states[0], this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
+            GoalState newGoal = new GoalState(states[0], this.priority + goal.priority);
             newGoal.unlockedActionsOnGoalCompletion.AddRange(unlockedActionsOnGoalCompletion);
             newGoal.unlockedActionsOnGoalCompletion.AddRange(goal.unlockedActionsOnGoalCompletion);
 
@@ -150,18 +137,13 @@ public class GoalAction : Goal
         name = action.ToString();
     }
 
-    public GoalAction(BoundAction action, float priority, int timeOut) : this(action, priority)
-    {
-        this.timeOut = timeOut;
-    }
-
     public override List<Goal> Combine(Goal goal)
     {
         if (goal is GoalAction goalAction) {
             BoundAction otherAction = goalAction.action;
 
             if (action == otherAction) {
-                Goal newGoal = new GoalAction(action, this.priority + goal.priority, Mathf.Min(this.timeOut, goal.timeOut));
+                Goal newGoal = new GoalAction(action, this.priority + goal.priority);
                 return new List<Goal>() { newGoal };
             }
         }

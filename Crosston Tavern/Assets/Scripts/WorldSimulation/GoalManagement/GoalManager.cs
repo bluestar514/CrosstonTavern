@@ -92,9 +92,12 @@ public class GoalManager
             
             // Foreach goal, grab relevant set of outcomes and their restraints
             foreach (Goal goal in previousIterationGoals) {
-                if (goal is GoalState) {
+                if (goal is GoalState goalState) {
+                    
                     List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
                     newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
+
+                    newGoals.AddRange(MakeRelationGoalsSocialGoals(goal));
                 }else if(goal is GoalAction goalAction) {
                     newGoals.AddRange(MakeGoalFromAction(goalAction, allActions));
                 }
@@ -148,6 +151,7 @@ public class GoalManager
             List<OutcomeRestraints> positiveOutcomes = new List<OutcomeRestraints>();
             if (goal is GoalState) {
                 positiveOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
+                if (MakeRelationGoalsSocialGoals(goal).Count > 0) positiveOutcomes.Add(new OutcomeRestraints());
                 
             } else if (goal is GoalAction goalAction) {
                 positiveOutcomes.AddRange(OutcomeRestraints.MakeFromAction(goalAction.action, ws));
@@ -176,6 +180,18 @@ public class GoalManager
         {
             return "<"+parentAction+"{"+string.Join(",", effects)+"} {" +bindings+ ", "+ resources+"} "+chanceModifier+" {"+string.Join(",", preconditions)+"}>";
         }
+
+        public OutcomeRestraints() {
+            this.effects = new List<Effect>();
+            this.chanceModifier = new ChanceModifier();
+            this.preconditions = new List<Condition>();
+
+            this.bindings = new BoundBindingCollection();
+            this.resources = new FeatureResources();
+            this.parentAction = new BoundAction("ERROR", 0, new Precondition(new List<Condition>()), new List<Outcome>(), "ERROR", "ERROR", "ERROR", new BoundBindingCollection(), new VerbilizationAction("ERROR", "ERROR"));
+            fullfillsGoal = new List<Goal>();
+        }
+
         public OutcomeRestraints(List<Effect> effects, ChanceModifier chanceModifier, List<Condition> preconditions, BoundBindingCollection bindings, FeatureResources resources, BoundAction parentAction)
         {
             this.effects = effects;
@@ -200,6 +216,40 @@ public class GoalManager
         }
     }
 
+    List<Goal> MakeRelationGoalsSocialGoals(Goal goal)
+    {
+        List<Goal> newGoals = new List<Goal>();
+
+        if (goal is GoalState goalState &&
+            goalState.state is StateRelation relation &&
+                        Relationship.codifiedRelationRanges.ContainsKey(relation.tag)) {
+
+            Relationship.Tag tag = relation.tag;
+            string sourceId = relation.source;
+            string targetId = relation.target;
+
+            Dictionary<Relationship.Axis, float[]> codifiedRelation = Relationship.codifiedRelationRanges[relation.tag];
+
+            foreach (Relationship.Axis axis in codifiedRelation.Keys) {
+                int min = (int)codifiedRelation[axis][0];
+                int max = (int)codifiedRelation[axis][1];
+
+                if (!(min == -Relationship.maxValue && max == Relationship.maxValue)) {
+                    Goal socialGoal = new GoalState(
+                                        new StateSocial(sourceId, targetId, axis, min, max),
+                                        goal.priority);
+                    Debug.Log("Manually adding subgoal(" + socialGoal + ") for relationship goal(" + goal + ")");
+
+                    socialGoal.AddParentGoal(goal);
+                    newGoals.Add(socialGoal);
+                }
+
+
+            }
+        }
+
+        return newGoals;
+    }
 
     List<BoundAction> GetAllActions()
     {

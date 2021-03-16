@@ -45,11 +45,6 @@ public class PeopleContentPanel : MonoBehaviour
         allRelationships.Init(name);
     }
 
-    public void AddMany(List<WorldFact> facts)
-    {
-        allRelationships.AddRelations(facts);
-    }
-
     public bool AddWorldFact(WorldFact fact)
     {
 
@@ -124,6 +119,48 @@ public class PeopleContentPanel : MonoBehaviour
         return true;
     }
 
+    public void MarkStuckGoals(List<WorldFact> facts)
+    {
+        foreach(WorldFactDisplayObj obj in knownGoals) {
+            if(obj.GetComponent<Image>().color == Color.red)
+                ColorFact(obj, goalPrefab.GetComponent<Image>().color);
+        }
+
+        foreach (WorldFact fact in facts) {
+            if (fact is WorldFactGoal factGoal &&
+                factGoal.modifier.Contains("stuck")) {
+                //Debug.Log("Marking fact(" + fact + ") as stuck");
+                ColorFact(fact, Color.red);
+            }
+        }
+    }
+
+    public void MarkPlayerSpecifiedGoals(List<WorldFact> facts)
+    {
+        foreach (WorldFact fact in facts) {
+            if (fact is WorldFactGoal factGoal &&
+                factGoal.modifier.Contains("player")) {
+                ColorFact(fact, Color.yellow);
+            }
+        }
+    }
+
+    void ColorFact(WorldFact fact, Color color)
+    {
+        WorldFactDisplayObj obj = FindFact(fact);
+
+        ColorFact(obj, color);
+    }
+
+    void ColorFact(WorldFactDisplayObj obj, Color color)
+    {
+        if (obj == null) {
+            Debug.LogWarning("Couldn't find a WorldFactDisplayObject to change its color.");
+            return;
+        }
+
+        obj.GetComponent<Image>().color = color;
+    }
 
     WorldFactDisplayObj FindFact(WorldFact fact)
     {

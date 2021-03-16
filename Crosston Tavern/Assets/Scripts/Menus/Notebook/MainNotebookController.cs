@@ -19,7 +19,7 @@ public class MainNotebookController : MonoBehaviour
     public void AddMany(List<WorldFact> facts)
     {
         foreach(MainNotebookTab tab in tabs) {
-            if(tab is NotebookGoalsPanel goalsPanel) {
+            if(tab is NotebookPeoplePanel goalsPanel) {
                 goalsPanel.AddMany(facts);
             }
         }

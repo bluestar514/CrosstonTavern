@@ -150,7 +150,7 @@ public class BarkeepEngine : ConversationEngine
                             barkeeperMoves.Add(new SocialMove("askAboutDisapointment", arguements: new List<string>() { patronGeneralMood }));
                             break;
                     default:
-                            new SocialMove("askAboutDayHighlights");
+                            barkeeperMoves.Add(new SocialMove("askAboutDayHighlights"));
                         break;
                 }
 

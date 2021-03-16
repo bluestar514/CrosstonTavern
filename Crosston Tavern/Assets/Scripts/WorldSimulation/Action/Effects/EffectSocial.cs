@@ -16,27 +16,28 @@ public class EffectSocial : Effect
 
     public override float WeighAgainstGoal(WorldState ws, BoundBindingCollection bindings, FeatureResources resources, Goal goal)
     {
-        if (goal is GoalState goalState &&
-            goalState.state is StateSocial state) {
+        if (goal is GoalState goalState) {
+            if (goalState.state is StateSocial state) {
 
 
 
-            string source = bindings.BindString(sourceId);
-            string target = bindings.BindString(targetId);
-            Relationship.Axis axis = this.axis;
+                string source = bindings.BindString(sourceId);
+                string target = bindings.BindString(targetId);
+                Relationship.Axis axis = this.axis;
 
-            string goalSource = state.sourceId;
-            string goalTarget = state.targetId;
-            Relationship.Axis goalAxis = state.axis;
+                string goalSource = state.sourceId;
+                string goalTarget = state.targetId;
+                Relationship.Axis goalAxis = state.axis;
 
-            if (source != goalSource ||
-                target != goalTarget ||
-                axis != goalAxis) return 0;
+                if (source != goalSource ||
+                    target != goalTarget ||
+                    axis != goalAxis) return 0;
 
-            Relationship rel = ws.GetRelationshipsFor(source);
-            int value = rel.Get(target, axis);
+                Relationship rel = ws.GetRelationshipsFor(source);
+                int value = rel.Get(target, axis);
 
-            return FinishWeighing(value, state.min, state.max);
+                return FinishWeighing(value, state.min, state.max);
+            }
         }
         return 0;
     }
