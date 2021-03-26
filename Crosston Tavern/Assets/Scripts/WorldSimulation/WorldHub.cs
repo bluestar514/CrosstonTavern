@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 public class WorldHub : MonoBehaviour
 {
@@ -19,6 +20,10 @@ public class WorldHub : MonoBehaviour
     Dictionary<Townie, ChosenAction> chosenActions = new Dictionary<Townie, ChosenAction>();
 
     public bool ready = false;
+
+    public int progress = 0;
+    public int total = 1;
+
     private void Awake()
     {
         ws = WorldStateInitializer.GetWorldState();
@@ -40,21 +45,30 @@ public class WorldHub : MonoBehaviour
 
         }
 
+        StartCoroutine(SimulateInitialDays());
+    }
+
+    IEnumerator SimulateInitialDays()
+    {
+
+        progress = 0;
+
+        total = GetTimeOfNextBarScene( new WorldTime(1, 1, simulatedInitialDays, 0, 0)).ConvertToMinuteCount() 
+                - ws.Time.ConvertToMinuteCount();
+
         for (int i = 0; i < simulatedInitialDays; i++) {
-            DayStep();
+            yield return DayStepAsync();
         }
 
 
         ready = true;
     }
 
-
-
-    public void TimeStep()
+    IEnumerator TimeStep()
     {
+        
         if (ws.Time > WorldTime.Night) {
             NewDay();
-            
         }
 
         int i = timeStep.Count;
@@ -83,7 +97,6 @@ public class WorldHub : MonoBehaviour
                 executedActions.Add(executedAction);
 
                 chosenActions[person] = null;
-
             }
 
             //person.ws.Tick(30);
@@ -100,7 +113,8 @@ public class WorldHub : MonoBehaviour
             wsdm.AddEvent(action, i);
         }
         ws.Tick(30);
-
+        progress += 30;
+        yield return new WaitForEndOfFrame();
     }
 
 
@@ -121,25 +135,56 @@ public class WorldHub : MonoBehaviour
 
     public void DayStep()
     {
+        int CurrentMinute = ws.Time.ConvertToMinuteCount();
+        int TargetMinute = GetTimeOfNextBarScene(ws.Time).ConvertToMinuteCount();
+
+        progress = 0;
+        total = TargetMinute - CurrentMinute;
+
+        StartCoroutine(DayStepAsync());
+    }
+
+    IEnumerator DayStepAsync()
+    {
         if (ws.Time >= WorldTime.Night) {
-            TimeStep();
+            yield return TimeStep();
         }
 
         int x = 0;
         while(ws.Time <= WorldTime.Night) {
-            TimeStep();
+            yield return TimeStep();
+
+            x++;
+            if (x > 1000) throw new Exception("Time is not advancing correctly during TimeStep, so we never leave this loop.");
+        }
+    }
+
+    WorldTime GetTimeOfNextBarScene(WorldTime initialTime)
+    {
+
+        WorldTime time = new WorldTime(initialTime); 
+
+        if (time >= WorldTime.Night) {
+            time.AdvanceToStartOfDay();
+        }
+
+        int x = 0;
+        while (time <= WorldTime.Night) {
+            time.Tick(30);
 
             x++;
             if (x > 1000) throw new Exception("Time is not advancing correctly during TimeStep, so we never leave this loop.");
         }
 
-        
+        return time;
     }
 
     public void NewDay()
     {
-        ws.NewDay();
+        int advancedMin = ws.NewDay();
+        progress += advancedMin;
         ws.Tick(60 * 8);
+        progress += (60 * 8);
 
         foreach (Townie person in allPeople) {
             if (person.townieInformation.id == "barkeep") continue;

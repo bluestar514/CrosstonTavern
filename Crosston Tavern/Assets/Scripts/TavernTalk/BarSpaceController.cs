@@ -11,6 +11,8 @@ public class BarSpaceController : MonoBehaviour
     public PatronPicker pp;
     public WorldHub worldHub;
     public BarPatronSelector bps;
+    public DayLoading dayLoader;
+
 
     public List<string> validPatronNames = new List<string>();
 
@@ -39,7 +41,8 @@ public class BarSpaceController : MonoBehaviour
 
         bps = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
 
-        
+        dayLoader.LoadNextDay();
+
 
         SetNextPatron();
     }
@@ -60,6 +63,8 @@ public class BarSpaceController : MonoBehaviour
     public void AdvanceDay()
     {
         worldHub.DayStep();
+        dayLoader.LoadNextDay();
+
         AddDaySeperator();
         bps.NewNight();
         SetNextPatron();

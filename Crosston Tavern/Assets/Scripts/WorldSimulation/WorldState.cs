@@ -47,9 +47,9 @@ public class WorldState
         time.Tick(t);
     }
 
-    public void NewDay()
+    public int NewDay()
     {
-        time.AdvanceToStartOfDay();
+        return time.AdvanceToStartOfDay();
     }
 
     public Inventory GetInventory(string id)

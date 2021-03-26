@@ -112,13 +112,14 @@ public class WorldTime : IComparable
         AdvanceMonth(MonthInYear*y);
     }
 
-    public void AdvanceToStartOfHour(int h = 1)
+    public int AdvanceToStartOfHour(int h = 1)
     {
         Tick((MinInHour * h) - minute);
+        return (MinInHour * h) - minute;
     }
-    public void AdvanceToStartOfDay(int d = 1)
+    public int AdvanceToStartOfDay(int d = 1)
     {
-        AdvanceToStartOfHour((HourInDay * d) - hour);
+        return AdvanceToStartOfHour((HourInDay * d) - hour);
     }
 
     public int CompareTo(object obj)
@@ -201,6 +202,17 @@ public class WorldTime : IComparable
         count += month;
         count *= DayInMonth;
         count += day;
+
+        return count;
+    }
+
+    public int ConvertToMinuteCount()
+    {
+        int count = ConvertToDayCount();
+        count *= HourInDay;
+        count += hour;
+        count *= MinInHour;
+        count += minute;
 
         return count;
     }
