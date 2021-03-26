@@ -171,6 +171,8 @@ public class BarkeepEngine : ConversationEngine
                     AddSubmenu("tellActionMenu", GenTellAction(), moves, menus);
                     AddSubmenu("tellPreferenceMenu", GenTellPreference(), moves, menus);
                     AddSubmenu("confirmGoalMenu", GenConfirmGoal(facts), moves, menus);
+                    AddSubmenu("stopPlayerGivenGoal", GenStopGoal(), moves, menus);
+
 
                     SocialMenu suggestMenu = GenSuggestMoves();
                     menus.Add(suggestMenu);
@@ -255,6 +257,21 @@ public class BarkeepEngine : ConversationEngine
                                     where fact is WorldFactGoal
                                     where ((WorldFactGoal)fact).owner == patronId
                                     select new SocialMove("confirmGoal#", new List<string> { ((WorldFactGoal)fact).goal.name },
+                                                                        mentionedFacts: new List<WorldFact>() { fact }));
+    }
+
+    List<SocialMove> GenStopGoal()
+    {
+        List<WorldFact> facts = speaker.ws.knownFacts.GetFacts().FindAll(fact => {
+            return fact is WorldFactGoal goalFact &&
+                goalFact.modifier.Contains("player");
+        });
+
+
+        return new List<SocialMove>(from fact in facts
+                                    where fact is WorldFactGoal
+                                    where ((WorldFactGoal)fact).owner == patronId
+                                    select new SocialMove("stopPlayerGivenGoal#", new List<string> { ((WorldFactGoal)fact).goal.name },
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 

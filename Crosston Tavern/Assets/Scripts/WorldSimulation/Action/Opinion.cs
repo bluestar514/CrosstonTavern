@@ -11,7 +11,7 @@ public class Opinion
     public List<WeightedAction.WeightRational> reality;
     float realityWeight;
 
-    Person townie;
+    Townie townie;
 
     public List<Tag> tags;
 
@@ -21,21 +21,20 @@ public class Opinion
         disapointed,
         surprised,
         aboutPersonOfInterest,
-        noteworthy
+        noteworthy,
+        directed
     }
 
     public Opinion(ExecutedAction executedAction, Townie townie)
     {
-        List<Effect> realizedEffects = executedAction.executedEffect;
         BoundAction boundAction = executedAction.Action;
 
-        Outcome outcome = new Outcome(new ChanceModifier(), realizedEffects);
         WorldState ws = townie.ws;
         ActionHeuristicManager ahm = new ActionHeuristicManager(townie.townieInformation, ws);
-        this.townie = townie.townieInformation;
+        this.townie = townie;
 
         SetExpectation(ahm, boundAction);
-        SetReality(ahm, outcome);
+        SetReality(ahm, executedAction);
 
         SetTags(executedAction, ws);
     }
@@ -54,11 +53,11 @@ public class Opinion
         expectationWeight = weightedAction.weight;
     }
 
-    void SetReality(ActionHeuristicManager ahm, Outcome outcome)
+    void SetReality(ActionHeuristicManager ahm, ExecutedAction action)
     {
-        
-        KeyValuePair<float, List<WeightedAction.WeightRational>> realizedRational = ahm.GetWeightOfOutcome(outcome,
-            new BoundBindingCollection(new List<BoundBindingPort>()), new FeatureResources(new StringStringListDictionary()), townie.knownGoals);
+
+        KeyValuePair<float, List<WeightedAction.WeightRational>> realizedRational = 
+                                ahm.GetWeightOfExecutedAction(action, townie.townieInformation.knownGoals);
 
         reality = realizedRational.Value;
         realityWeight = realizedRational.Key;
@@ -71,12 +70,12 @@ public class Opinion
         IEnumerable<EntityStatusEffectType> statusEffects = from effect in executedAction.executedEffect
                                                             where effect is EffectStatusEffect statusEffect &&
                                                                     StatusEffectTable.emotions.Contains(statusEffect.status.type) &&
-                                                                    statusEffect.targetId == townie.id
+                                                                    statusEffect.targetId == townie.Id
                                                             select ((EffectStatusEffect)effect).status.type;
 
         if (statusEffects.Contains(EntityStatusEffectType.happy)) tags.Add(Tag.excited);
         if (statusEffects.Contains(EntityStatusEffectType.sad) || 
-            statusEffects.Contains(EntityStatusEffectType.sad)) tags.Add(Tag.disapointed);
+            statusEffects.Contains(EntityStatusEffectType.angry)) tags.Add(Tag.disapointed);
 
         if (tags.Count <= 0) {
             if (realityWeight > expectationWeight) tags.Add(Tag.excited);
@@ -85,29 +84,36 @@ public class Opinion
 
         if (realityWeight > 0 && expectationWeight == 0) tags.Add(Tag.surprised);
 
+        if(reality.Any(rational => {
+            Goal goal = rational.goal;
+            return townie.gm.IsPlayerDerived(goal);
+        })) {
+            tags.Add(Tag.directed);
+        }
+
 
         //MarkIfDoneByPeopleIfInterest(executedAction, ws);
     }
 
     void MarkIfDoneByPeopleIfInterest(ExecutedAction executedAction, WorldState ws)
     {
-        List<string> peopleOfInterest = new List<string>(from goal in townie.knownGoals
+        List<string> peopleOfInterest = new List<string>(from goal in townie.townieInformation.knownGoals
                                                          where goal is GoalState goalState && goalState.state is StateRelation
                                                          select ((StateRelation)((GoalState)goal).state).source);
-        peopleOfInterest.AddRange(from goal in townie.knownGoals
+        peopleOfInterest.AddRange(from goal in townie.townieInformation.knownGoals
                                   where goal is GoalState goalState && goalState.state is StateRelation
                                   select ((StateRelation)((GoalState)goal).state).target);
 
-        peopleOfInterest.AddRange(from goal in townie.knownGoals
+        peopleOfInterest.AddRange(from goal in townie.townieInformation.knownGoals
                                   where goal is GoalState goalState && goalState.state is StateSocial
                                   select ((StateSocial)((GoalState)goal).state).sourceId);
-        peopleOfInterest.AddRange(from goal in townie.knownGoals
+        peopleOfInterest.AddRange(from goal in townie.townieInformation.knownGoals
                                   where goal is GoalState goalState && goalState.state is StateSocial
                                   select ((StateSocial)((GoalState)goal).state).targetId);
 
         peopleOfInterest = new List<string>(peopleOfInterest.Distinct());
 
-        if (peopleOfInterest.Contains(townie.id)) peopleOfInterest.Remove(townie.id);
+        if (peopleOfInterest.Contains(townie.Id)) peopleOfInterest.Remove(townie.Id);
 
         foreach (Feature feature in ws.map.GetAllFeatures()) {
             if (feature.type != Feature.FeatureType.person && peopleOfInterest.Contains(feature.id)) {

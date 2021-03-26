@@ -109,7 +109,9 @@ public class BarSpaceController : MonoBehaviour
             NPCSpeak(lastSocialMove);
         }
 
-        Debug.Log(patronEngine.speaker + ":"+ lastSocialMove + "(" + lastSocialMove.verb + ")");
+        Debug.Log(patronEngine.speaker + ":"+ lastSocialMove + 
+                    "(" + lastSocialMove.verb + ") + [" + string.Join(",",lastSocialMove.mentionedFacts) + "] " +
+                    " - ["+ string.Join(",", lastSocialMove.retractedFacts) + "]");
 
         PlayerPhase();
     }

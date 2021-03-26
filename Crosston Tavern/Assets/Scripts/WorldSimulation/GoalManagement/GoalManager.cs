@@ -33,6 +33,11 @@ public class GoalManager
         modules.Add(goalModule);
     }
 
+    public void RemoveModule(GoalModule goalModule)
+    {
+        modules.Remove(goalModule);
+    }
+
     public void DecrementModuleTimers()
     {
 
@@ -44,7 +49,7 @@ public class GoalManager
         }
 
         foreach(GoalModule gm in deactivatedModules) {
-            modules.Remove(gm);
+            RemoveModule(gm);
         }
     }
 
@@ -131,6 +136,28 @@ public class GoalManager
         }
 
         return parentModules;
+    }
+
+    public bool IsPlayerDerived(Goal goal)
+    {
+        foreach(GoalModule module in GetParentModule(goal)) {
+            if(module.preconditions.Any(
+                precondition=> {
+                    return (precondition is GM_Precondition_PlayerInstructed);
+                })
+            ) {
+                return true;
+            }
+        }
+
+
+        foreach(Goal parentGoal in goal.GetParentGoals()) {
+            if (IsPlayerDerived(parentGoal)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<Goal> GetStuckGoals()
@@ -238,7 +265,7 @@ public class GoalManager
                     Goal socialGoal = new GoalState(
                                         new StateSocial(sourceId, targetId, axis, min, max),
                                         goal.priority);
-                    Debug.Log("Manually adding subgoal(" + socialGoal + ") for relationship goal(" + goal + ")");
+                    //Debug.Log("Manually adding subgoal(" + socialGoal + ") for relationship goal(" + goal + ")");
 
                     socialGoal.AddParentGoal(goal);
                     newGoals.Add(socialGoal);

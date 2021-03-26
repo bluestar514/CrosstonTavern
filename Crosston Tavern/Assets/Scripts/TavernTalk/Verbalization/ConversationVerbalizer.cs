@@ -520,7 +520,7 @@ public class ConversationVerbalizer
 
         Dictionary<PreferenceLevel, List<string>> prefDict = new Dictionary<PreferenceLevel, List<string>>();
 
-        foreach (WorldFact fact in socialMove.mentionedFacts) {
+        foreach (WorldFact fact in facts) {
 
             if (fact is WorldFactPreference) {
                 WorldFactPreference preference = (WorldFactPreference)fact;

@@ -176,7 +176,7 @@ public class PatronEngine :ConversationEngine
                 if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
                     BoundAction suggestedAction = potentialAction.action;
 
-                    Goal goal = new GoalAction(suggestedAction, 5);
+                    Goal goal = new GoalAction(suggestedAction, (int)GoalManager.GoalPriority.high);
                     speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>() {
                                                             new GM_Precondition_PlayerInstructed("barkeep", speaker.Id)
                                                         },
@@ -200,6 +200,18 @@ public class PatronEngine :ConversationEngine
 
             case "cancelSuggestion#":
                 return new SocialMove("acceptCancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            case "stopPlayerGivenGoal#":
+
+                if(prompt.mentionedFacts[0] is WorldFactGoal gf) {
+                    if (gf.modifier.Contains("player")) {
+                        speaker.gm.GetParentModule(gf.goal).ForEach(module => {
+                            speaker.gm.RemoveModule(module);
+                        });
+                    }
+                }
+
+                return new SocialMove("acceptStopGoal#", arguements: prompt.arguements, retractedFacts: prompt.mentionedFacts);
 
             case "askRelationWith":
                 return new SocialMove("passOpenAskRelationWith");

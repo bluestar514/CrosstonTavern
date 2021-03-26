@@ -99,8 +99,10 @@ public class PeopleContentPanel : MonoBehaviour
         }
 
         if (matchingFact != null) {
+            matchingFact.name = "DestroyThisONE!!!";
             knownGoals.Remove(matchingFact);
-            Destroy(matchingFact);
+            Debug.Log("Removing goal");
+            Destroy(matchingFact.gameObject);
         }
     }
 

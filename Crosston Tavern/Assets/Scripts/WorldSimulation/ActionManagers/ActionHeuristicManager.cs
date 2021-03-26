@@ -133,6 +133,21 @@ public class ActionHeuristicManager : ActionManager
         return new WeightedAction(boundAction, weight, rationals);
     }
 
+    public KeyValuePair<float, List<WeightedAction.WeightRational>> GetWeightOfExecutedAction(ExecutedAction executedAction, List<Goal> goals)
+    {
+        List<Effect> realizedEffects = executedAction.executedEffect;
+        BoundAction boundAction = executedAction.ShallowCopy().Action;
+
+        boundAction.potentialOutcomes = new List<Outcome>() { new Outcome(new ChanceModifier(), realizedEffects) };
+
+        WeightedAction weighedResult = GetWeightOfBoundAction(boundAction, goals);
+
+        return new KeyValuePair<float, List<WeightedAction.WeightRational>>(
+                        weighedResult.weight,
+                        weighedResult.weightRationals
+                        );
+    }
+
     public KeyValuePair<float, List<WeightedAction.WeightRational>> 
         GetWeightOfOutcome(Outcome outcome, BoundBindingCollection bindings, FeatureResources resources, List<Goal> goals=null)
     {
