@@ -154,7 +154,6 @@ public class BarkeepEngine : ConversationEngine
                         break;
                 }
 
-
                     moves = new List<SocialMove>(barkeeperMoves);
                     List<SocialMenu> menus = new List<SocialMenu>();
                     
@@ -172,6 +171,7 @@ public class BarkeepEngine : ConversationEngine
                     AddSubmenu("tellPreferenceMenu", GenTellPreference(), moves, menus);
                     AddSubmenu("confirmGoalMenu", GenConfirmGoal(facts), moves, menus);
                     AddSubmenu("stopPlayerGivenGoal", GenStopGoal(), moves, menus);
+                    AddSubmenu("askAboutPlayerGivenGoal", GenAskAboutPlayerGivenGoal(), moves, menus);
 
 
                     SocialMenu suggestMenu = GenSuggestMoves();
@@ -275,6 +275,21 @@ public class BarkeepEngine : ConversationEngine
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
+    List<SocialMove> GenAskAboutPlayerGivenGoal()
+    {
+        List<WorldFact> facts = speaker.ws.knownFacts.GetFacts().FindAll(fact => {
+            return fact is WorldFactGoal goalFact &&
+                goalFact.modifier.Contains("player");
+        });
+
+
+        return new List<SocialMove>(from fact in facts
+                                    where fact is WorldFactGoal
+                                    where ((WorldFactGoal)fact).owner == patronId
+                                    select new SocialMove("askAboutPlayerGivenGoal#", new List<string> { ((WorldFactGoal)fact).goal.name },
+                                                                        mentionedFacts: new List<WorldFact>() { fact }));
+    }
+
     SocialMenu GenSuggestMoves(List<WorldFact> fact = null)
     {
         ActionBuilder ab = new ActionBuilder(speaker.ws, patron);
@@ -293,7 +308,7 @@ public class BarkeepEngine : ConversationEngine
 
                 key = "cook";
             }
-            if (GoalManager.ContainsNonActionableConditions(
+            if (GoalManager.ContainsStaticConditions(
                     possibleAction.preconditions.conditions, possibleAction.Bindings, patronId)) continue;
 
             if (!verbToAllActions.ContainsKey(key)) {
@@ -330,11 +345,19 @@ public class BarkeepEngine : ConversationEngine
                         MakeSubmenu(targetToActions[personName], "suggest" + personName, individualPersonOptions, peopleSubMenus);
                     }
 
-
-                    SocialMenu submenu = new SocialMenu("suggest" + verb, peopleSubMenus);
+                    BoundAction anAction = verbToAllActions[verb][0];
+                    BoundAction untargetedAction = new BoundAction(anAction, anAction.ActorId, "...", "...", new BoundBindingCollection(), anAction.verbilizationInfo);
+                    SocialMenu submenu = new SocialMenu("suggestSubmenu#",  peopleSubMenus, arguements: new List<string>() { verb },
+                                            mentionedFacts: new List<WorldFact>() { new WorldFactPotentialAction(untargetedAction) });
+                    
                     peopleSubMenus.ForEach(option => {
                             if (option is SocialMenu personSubmenu) {
                                 personSubmenu.AddPreviousContext(new SocialMenu("nevermind", peopleSubMenus));
+                                BoundAction unspecifiedAction = 
+                                        new BoundAction(anAction, anAction.ActorId, anAction.FeatureId, 
+                                                        anAction.LocationId, new BoundBindingCollection(), anAction.verbilizationInfo);
+                                personSubmenu.mentionedFacts = 
+                                        new List<WorldFact>() { new WorldFactPotentialAction(unspecifiedAction) };
                             }
                         }
                     );

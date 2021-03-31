@@ -8,6 +8,8 @@ public class AutoChoosePlayerOption : DialogueBoxController
 
     Coroutine activePlayerOption;
 
+    public float choiceDelayTime;
+
     public override void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
         base.DisplayPlayerActions(dialogueUnits);
@@ -15,6 +17,10 @@ public class AutoChoosePlayerOption : DialogueBoxController
         int rand = Random.Range(0, dialogueUnits.Count);
 
         activePlayerOption = StartCoroutine(PushInASec(dialogueUnits[rand]));
+
+
+        //MUST PUT THIS IN A COROUTINE BECAUSE OTHERWISE THIS BECOMES AN INFINITE LOOP!!!!!!!!
+        //bsc.PlayerChoiceButtonPush(dialogueUnits[rand]); 
     }
 
     public override void DisplayNPCAction(DialogueUnit dialogueUnit)
@@ -33,7 +39,7 @@ public class AutoChoosePlayerOption : DialogueBoxController
 
     IEnumerator PushInASec(DialogueUnit dialogueUnit)
     {
-        yield return new WaitForSeconds(.25f);
+        yield return new WaitForSeconds(choiceDelayTime);
         bsc.PlayerChoiceButtonPush(dialogueUnit);
     }
 }

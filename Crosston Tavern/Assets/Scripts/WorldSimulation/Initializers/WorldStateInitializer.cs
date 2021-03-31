@@ -43,14 +43,14 @@ public class WorldStateInitializer
         }
 
 
-        townies[sammy].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        //new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "trout", 20, 100), 1),
-                                        new GoalState(new StateSkill(townies[sammy].townieInformation.id, "fishing", 90, 100), (float)GoalManager.GoalPriority.medium)
-                                    },
-                                    "I want to be a better fisher."
-                                )) ;
+        //townies[sammy].gm.AddModule(new GoalModule(
+        //                            new List<GM_Precondition>(),
+        //                            new List<Goal>() {
+        //                                //new GoalState(new StateInventoryStatic(townies[sammy].townieInformation.id, "trout", 20, 100), 1),
+        //                                new GoalState(new StateSkill(townies[sammy].townieInformation.id, "fishing", 90, 100), (float)GoalManager.GoalPriority.medium)
+        //                            },
+        //                            "I want to be a better fisher."
+        //                        )) ;
 
         townies[finley].gm.AddModule(new GoalModule(
                                     new List<GM_Precondition>(),
@@ -153,13 +153,33 @@ public class WorldStateInitializer
             );
         }
 
-       
-        
 
-        
-        
+        gm.AddModule(
+            new GoalModule(
+                new List<GM_Precondition>() {
+                    new GM_Precondition_State(new StateProfession(name, "farmer"))
+                },
+                new List<Goal>() {
+                    new GoalState(new StateSkill(name, "farming", 90, 100), (float)GoalManager.GoalPriority.medium)
+                },
+                name: "is a farmer"
+             )
+        );
 
-        
+        gm.AddModule(
+            new GoalModule(
+                new List<GM_Precondition>() {
+                    new GM_Precondition_State(new StateProfession(name, "fisher"))
+                },
+                new List<Goal>() {
+                    new GoalState(new StateSkill(name, "fishing", 90, 100), (float)GoalManager.GoalPriority.medium)
+                },
+                name: "is a fisher"
+             )
+        );
+
+
+
     }
 }
 

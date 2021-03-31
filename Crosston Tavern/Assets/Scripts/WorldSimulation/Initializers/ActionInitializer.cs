@@ -179,7 +179,17 @@ public class ActionInitializer
                     }
                 ),
                 new Outcome(
-                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.neutral),
+                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.neutral, ChanceModifierItemOpinion.OpinionLevel.neutral),
+                    new List<Effect>() {
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -5, 5,
+                                                            new VerbilizationEffect("#b# didn't seem impressed")),
+                        new EffectInventoryStatic("#b#", "#item#", 1),
+                        new EffectInventoryStatic("#a#", "#item#", -1),
+                        new EffectKnowledge(new WorldFactPreference("#b#", PreferenceLevel.neutral, "#item#"))
+                    }
+                ),
+                new Outcome(
+                    new ChanceModifierItemOpinion("#item#", "#b#", ChanceModifierItemOpinion.OpinionLevel.min, ChanceModifierItemOpinion.OpinionLevel.disliked),
                     new List<Effect>() {
                         new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -30, -15,
                                                                 new VerbilizationEffect("#b# didn't like it at all")),
@@ -488,6 +498,25 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator)
             },
             new VerbalizationActionFeatureAt("sell trout", "sold trout")
+        ) },
+        { "sell_crop_at_market" , new GenericAction("sell_crop_at_market", 1,
+            new Precondition(new List<Condition>(){
+                new Condition_IsState(new StateInventoryStatic("#a#", "flour", 10, INF), true)
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectSkill("#a#", "farming", 10),
+                        new EffectInventoryStatic("#a#", "flour", -10)
+
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator)
+            },
+            new VerbalizationActionFeatureAt("sell flour", "sold flour")
         ) },
         {"eat_#item#", new GenericAction("eat_#item#", 1,
             new Precondition(new List<Condition>() {

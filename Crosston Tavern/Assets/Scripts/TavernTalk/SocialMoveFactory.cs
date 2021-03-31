@@ -32,6 +32,39 @@ public class SocialMoveFactory
                 return MakeTellAboutInterestingEvents(speaker, Opinion.Tag.excited);
             case "tellAboutDISAPOINTEDEvent":
                 return MakeTellAboutInterestingEvents(speaker, Opinion.Tag.disapointed);
+
+            case "tellAboutPlayerDirectedEvent":
+                List<SocialMove> moves = new List<SocialMove>();
+
+                
+                WorldFact playerDirectedGoalFact = prompt.mentionedFacts[0];
+                if (playerDirectedGoalFact is WorldFactGoal factGoal) {
+                    Goal goal = factGoal.goal;
+
+                    //Get actions already taken to achieve goal
+                    moves.Add(ReportActionsTowardGoal(speaker, goal));
+
+                    //Get subgoals that still need to be completed and mark the ones they are stuck on
+                    List<Goal> childGoals = speaker.gm.GetChildGoals(goal);
+                    List<Goal> stuckGoals = speaker.gm.GetStuckGoals();
+
+                    List<WorldFact> facts = new List<WorldFact>();
+                    foreach(Goal child in childGoals) {
+                        if (child is GoalState goalState &&
+                            goalState.state.InEffect(speaker.ws, new BoundBindingCollection(), new FeatureResources()))
+                            continue;
+
+                        WorldFactGoal fact = new WorldFactGoal(child, speaker.Id);
+
+                        if (stuckGoals.Contains(child)) fact.modifier.Add("stuck");
+
+                        facts.Add(fact);
+                    }
+
+                    moves.Add(new SocialMove("tellToDo", mentionedFacts: facts));
+
+                }
+                return new CompoundSocialMove("tellAboutPlayerDirectedEvent", socialMoves: moves);
             case "tellAboutDayObservedEvents":
                 return MakeTellAboutObservedEvents(speaker);
             case "tellWhyGoal#":
@@ -50,6 +83,10 @@ public class SocialMoveFactory
                 string subject = prompt.arguements[0];
 
                 return MakeTellRelation(speaker, subject);
+
+            case "tellFrustration":
+                return MakeTellFrustrations(speaker);
+
 
             case "acknowledge":
                 return new SocialMove("acknowledge", mentionedFacts: prompt.mentionedFacts);
@@ -91,13 +128,15 @@ public class SocialMoveFactory
         switch (tag) {
             case Opinion.Tag.disapointed:
             case Opinion.Tag.excited:
+            case Opinion.Tag.directed:
                 history = new List<ExecutedAction>(from e in history
                                                    where e.opinion.tags.Contains(tag)
                                                    select e);
                 break;
             case Opinion.Tag.noteworthy:
                 history = new List<ExecutedAction>(from e in history
-                                                   where e.opinion.tags.Count > 0
+                                                   where e.opinion.tags.Count > 1 ||
+                                                        (e.opinion.tags.Count > 0 && !e.opinion.tags.Contains(Opinion.Tag.directed))
                                                    select e);
                 //history.AddRange(GetMostCommonEvents(GetDayEvents(speaker), speaker.Id));
                 break;
@@ -141,14 +180,23 @@ public class SocialMoveFactory
         List<Goal> parentGoals = goal.GetParentGoals();
 
         if (parentGoals.Count != 0) {
+            BoundAction potentialAction = null;
             if (goal.unlockedActionsOnGoalCompletion.Count > 0) {
                 int rand = Random.Range(0, goal.unlockedActionsOnGoalCompletion.Count);
 
-                BoundAction potentialAction = goal.unlockedActionsOnGoalCompletion[rand];
+                potentialAction = goal.unlockedActionsOnGoalCompletion[rand];
 
                 WorldFact fact = new WorldFactPotentialAction(potentialAction);
                 facts.Add(fact);
-            } 
+            }
+
+            Goal duplicateAction = parentGoals.Find(parentGoal => {
+                return (parentGoal is GoalAction actionGoal) && actionGoal.action.Equals(potentialAction);
+            });
+            if (duplicateAction != null) {
+                parentGoals.Remove(duplicateAction);
+            }
+
             facts.AddRange(MakeGoalsFacts(speaker, parentGoals));
 
             return new SocialMove("tellWhyGoal#", new List<string>() { goal.name }, mentionedFacts: facts);
@@ -260,6 +308,62 @@ public class SocialMoveFactory
         return new SocialMove("tellRelationWith#", arguements: new List<string>() { target }, mentionedFacts: facts);
     }
 
+    //started to revise so it also told you what the high priority are, but that isn't actually used yet
+    static SocialMove MakeTellFrustrations(Townie speaker)
+    {
+        List<Goal> highPriority = GetHighPriorityGoals(speaker);
+        List<Goal> stuckGoals = GetStuckGoals(speaker);
+
+        HashSet<Goal> allGoals = new HashSet<Goal>(stuckGoals);
+        List<Goal> goalList = allGoals.Union(highPriority).ToList();
+
+        List<WorldFact> facts = GoalsToFacts(stuckGoals, speaker.Id);
+
+        foreach (WorldFact generalFact in facts) {
+            if (generalFact is WorldFactGoal goalFact) {
+                if (stuckGoals.Contains(goalFact.goal)) {
+                    goalFact.modifier.Add("stuck");
+                }
+                if (highPriority.Contains(goalFact.goal)) {
+                    goalFact.modifier.Add("highPriority");
+                }
+            }
+
+        }
+
+
+        return new SocialMove("frustratedByGoals", mentionedFacts: facts);
+    }
+
+    static SocialMove ReportActionsTowardGoal(Townie speaker, Goal goal)
+    {
+        List<ExecutedAction> events = GetDayEvents(speaker);//MakeTellAboutInterestingEvents(speaker, Opinion.Tag.directed);
+        List<ExecutedAction> relevanthistory = new List<ExecutedAction>();
+
+        
+
+        List<string> args = new List<string>();
+        
+            
+
+        foreach (ExecutedAction executedAction in events) {
+            List<WeightedAction.WeightRational> rationals = executedAction.Action.weightRationals;
+
+            if (rationals.Any(item => { return speaker.gm.IsDerivedFromGoal(item.goal, goal); })) {
+                relevanthistory.Add(executedAction);
+            }
+            if (rationals.Any(item => { return item.goal.Equals(goal); })) {
+                args.Add("completed");
+            }
+        }
+        
+        relevanthistory = CondenseEvents(relevanthistory);
+
+        List<WorldFact> relevantFacts = new List<WorldFact>(from history in relevanthistory
+                                                            select new WorldFactEvent(history));
+
+        return new SocialMove("listActionsTaken", args, mentionedFacts: relevantFacts);
+    }
 
     // Helpers:
     static List<ExecutedAction> GetDayEvents(Townie speaker)
@@ -450,7 +554,21 @@ public class SocialMoveFactory
         return facts;
     }
 
+    static List<Goal> GetStuckGoals(Townie speaker)
+    {
+        return speaker.gm.GetStuckGoals();
+    }
 
+    static List<Goal> GetHighPriorityGoals(Townie speaker)
+    {
+        return speaker.gm.GetHighPriorityGoals(.1f);
+    }
+
+    static List<WorldFact> GoalsToFacts(List<Goal> goals, string owner)
+    {
+        return new List<WorldFact>(from goal in goals
+                                   select new WorldFactGoal(goal, owner));
+    }
     class VerbActorFeature
     {
         public string verb;

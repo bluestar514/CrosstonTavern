@@ -8,13 +8,14 @@ public class Person: Feature
 {
     public Relationship relationships;
     public ItemPreference preference;
-    
+
+    public string profession;
 
     public List<Goal> knownGoals;
     public Schedule schedule;
 
     public Person(string id, string location, int maxUsers,
-            List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources,
+            List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources, string profession,
             Dictionary<string, int> stockTable = null) :
     base(id, FeatureType.person, location, maxUsers, providedActions, relevantResources, stockTable)
     {
@@ -22,7 +23,7 @@ public class Person: Feature
         this.relationships = new Relationship();
 
         preference = new ItemPreference();
-        
+        this.profession = profession;
 
         schedule = new Schedule();
     }
@@ -52,6 +53,7 @@ public class Person: Feature
         p.preference = preference.Copy(perfect);
         
         p.relationships = relationships.Copy(perfect);
+        p.profession = profession;
 
 
         return p;

@@ -28,6 +28,8 @@ public class DialogueBoxController : MonoBehaviour
 
     public virtual void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
+//        Debug.Log("DialogueBoxController: Displaying Player Options");
+
         CloseAll();
         speakerTagPanel.Open();
 

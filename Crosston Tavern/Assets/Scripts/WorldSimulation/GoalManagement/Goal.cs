@@ -38,7 +38,7 @@ public class Goal
     }
     public List<Goal> GetParentGoals()
     {
-        return parentGoalObj;
+        return new List<Goal> (parentGoalObj);
     }
 
     public void AddUnlockedAction(BoundAction action)

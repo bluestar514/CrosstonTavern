@@ -33,10 +33,10 @@ public class AllRelationshipsPanel : MonoBehaviour
     {
         Dictionary<string, List<StateRelation>> sortedRelations = new Dictionary<string, List<StateRelation>>();
 
-        Debug.Log("Adding Relations:");
+//        Debug.Log("Adding Relations:");
 
         foreach(StateRelation relation in relations) {
-            Debug.Log(relation);
+//            Debug.Log(relation);
             
 
             string partner;

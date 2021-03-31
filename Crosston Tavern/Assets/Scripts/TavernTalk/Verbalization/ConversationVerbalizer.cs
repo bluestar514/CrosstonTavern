@@ -140,7 +140,7 @@ public class ConversationVerbalizer
                         socialMove.verb = "askAboutDisapointment";
                         break;
                     case "angry":
-                        verbalization = "You want to tell me what's got you in such a bed mood today?";
+                        verbalization = "You want to tell me what's got you in such a bad mood today?";
                         socialMove.verb = "askAboutDisapointment";
                         break;
                     default:
@@ -197,6 +197,19 @@ public class ConversationVerbalizer
                 }
 
                 break;
+
+            case "tellAboutPlayerDirectedEvent":
+                //Today I did X, Y, and Z. I'm still having trouble with A, B, and C.
+                //I didn't get to it today, but its still on my todo list!
+
+                if (socialMove is CompoundSocialMove cSocialMove)
+                    verbalization = TalkAboutPlayerDirectedGoal(cSocialMove);
+                else throw new System.Exception("Unexpected input!");
+
+
+
+                break;
+
             case "tellWhyGoal#TopLevel":
                 if (facts.Count <= 1) {
                     verbalization = "I just do.";
@@ -245,7 +258,7 @@ public class ConversationVerbalizer
                         
 
 
-                        verbalization = "I want to" + v.VerbalizeAction(potentialDesirableAction.action, true, false);
+                        verbalization = "I want to " + v.VerbalizeAction(potentialDesirableAction.action, true, false);
 
                         List<string> reasons = new List<string>();
                         foreach(WorldFact fact in reasonsForSubjectGoal) {
@@ -255,8 +268,10 @@ public class ConversationVerbalizer
                                 reasons.Add(v.VerbalizeGoal(parentGoal));
                             }
                         }
-
-                        verbalization += " " + Verbalizer.MakeNiceList(reasons)+".";
+                        if (reasons.Count != 0)
+                            verbalization += " " + Verbalizer.MakeNiceList(reasons);
+ 
+                        verbalization += ".";
                     }
 
                    
@@ -296,7 +311,7 @@ public class ConversationVerbalizer
                     }
                 }
 
-                verbalization = string.Join(", and so I wanted ", goals);
+                verbalization = Verbalizer.MakeNiceList(goals);
                 verbalization = "I wanted " + verbalization;
                 break;
             case "askWhyGoal#":
@@ -373,6 +388,7 @@ public class ConversationVerbalizer
             case "suggest":
                 verbalization = "Suggest...";
                 break;
+
             case "suggest#":
                 if(socialMove.mentionedFacts[0] is WorldFactPotentialAction factAction) {
                     BoundAction action = factAction.action;
@@ -397,18 +413,11 @@ public class ConversationVerbalizer
                 break;
 
             case "frustratedByGoals":
-                verbalization = "I want ";
-                List<string> frustrations = new List<string>();
-                foreach(WorldFact fact in socialMove.mentionedFacts) {
-                    if(fact is WorldFactGoal factGoal &&
-                        factGoal.goal is GoalState goalState)
-                        frustrations.Add( goalState.state.Verbalize(townie.Id, partner, true));
-                }
+                //I want X, Y, and Z but I can't figure out how!
 
-                if (frustrations.Count > 0) {
-                    verbalization += Verbalizer.MakeNiceList(frustrations);
-
-                    verbalization += " but I can't figure out how.";
+                verbalization =  VerbalizeFrustrations(socialMove.mentionedFacts);
+                if (verbalization != "") {
+                    verbalization = "I want " + verbalization;
                 } else {
                     verbalization = "I'm doing just fine!";
                     emotion = NPCPortrait.State.happy;
@@ -784,57 +793,66 @@ public class ConversationVerbalizer
 
     }
 
-    List<string> UnrollGoalChain(Goal initGoal)
+    string VerbalizeFrustrations(List<WorldFact> facts) {
+        string verbalization = "";
+        List<string> frustrations = new List<string>();
+        foreach (WorldFact fact in facts) {
+            if (fact is WorldFactGoal factGoal &&
+                factGoal.goal is GoalState goalState)
+                frustrations.Add(goalState.state.Verbalize(townie.Id, partner, true));
+        }
+
+        if (frustrations.Count > 0) {
+            verbalization += Verbalizer.MakeNiceList(frustrations);
+
+            verbalization += " but I can't figure out how.";
+        }
+
+        return verbalization;
+    }
+
+
+    string TalkAboutPlayerDirectedGoal(CompoundSocialMove socialMove)
     {
-        List<Goal> goalChain = new List<Goal>() { initGoal };
+        //I did X, Y, and Z. 
+        //I still need A, B, C. 
+        //But I can't figure out how to B or C. 
+        //But I can't figure out how to do any of that.
 
-        int x = 0;
-        //List<Goal> backlog = new List<Goal>() { initGoal };
-
-        //while (backlog.Count > 0) {
-        //    Goal goal = backlog[0];
-        //    backlog.RemoveAt(0);
-
-        //    goalChain.AddRange(goal.GetParentGoals());
-        //    backlog.AddRange(goal.GetParentGoals());
-        //    Debug.Log("goal: " + goal + " parents: " + goal.GetParentGoals().Count);
-        //    x++;
-        //    if (x > 1000) throw new System.Exception("Infinite Loop detected!");
-        //}
-
-        Goal currentGoal = initGoal;
-        while(currentGoal.GetParentGoals().Count > 0) {
-            Goal maxPri = currentGoal.GetParentGoals()[0];
-            foreach(Goal parent in currentGoal.GetParentGoals()) {
-                Debug.Log("goal:" + currentGoal + " parent:" + parent);
-                if (parent.priority > maxPri.priority) maxPri = parent;
+        string completedActions = "";
+        string todoGoals = "";
+        string stuckGoals = "";
+        foreach(SocialMove move in socialMove.socialMoves) {
+            if(move.verb == "listActionsTaken" && move.mentionedFacts.Count > 0) {
+                completedActions = VerbalizeAllEvents(move.mentionedFacts);
             }
+            if(move.verb == "tellToDo" && move.mentionedFacts.Count > 0) {
 
-            goalChain.Add(maxPri);
-            currentGoal = maxPri;
+                List<string> goals = new List<string>();
+                List<string> stuck = new List<string>();
+                foreach (WorldFact fact in move.mentionedFacts) {
+                    if (fact is WorldFactGoal goalFact) {
+                        string goalVerbalization = v.VerbalizeGoal(goalFact.goal);
 
-            x++;
-            if (x > 1000) throw new System.Exception("Infinite Loop detected!");
-        }
+                        goals.Add(goalVerbalization);
 
-        goalChain.Reverse();
+                        if (goalFact.modifier.Contains("stuck")) {
+                            stuck.Add(goalVerbalization);
+                        }
+                    }
+                }
 
-        List<Goal> noDups = new List<Goal>();
-        HashSet<Goal> seen = new HashSet<Goal>();
-        foreach (Goal g in goalChain) {
-            if (!seen.Contains(g)) {
-                noDups.Add(g);
-                seen.Add(g);
+                if(goals.Count > 0)
+                    todoGoals = "I still need " + Verbalizer.MakeNiceList(goals) + ".";
+
+                if (goals.Count == stuck.Count) {
+                    stuckGoals = "But I can't figure out how to do any of that.";
+                } else if(stuck.Count > 0) {
+                    stuckGoals = "But I can't figure out how " + Verbalizer.MakeNiceList(stuck) + ".";
+                }
             }
-
         }
 
-        List<string> subVerbilizations = new List<string>();
-        foreach (Goal goal in noDups) {
-            subVerbilizations.Add(v.VerbalizeGoal(goal));
-        }
-
-        return subVerbilizations;
-
+        return completedActions + todoGoals + stuckGoals; 
     }
 }

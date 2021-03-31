@@ -138,6 +138,16 @@ public class GoalManager
         return parentModules;
     }
 
+    public List<Goal> GetChildGoals(Goal parentGoal)
+    {
+        List<Goal> children = new List<Goal>();
+        foreach(Goal goal in lastSetOfGoals) {
+            if (IsDerivedFromGoal(goal, parentGoal, false)) children.Add(goal);
+        }
+
+        return children;
+    }
+
     public bool IsPlayerDerived(Goal goal)
     {
         foreach(GoalModule module in GetParentModule(goal)) {
@@ -155,6 +165,20 @@ public class GoalManager
             if (IsPlayerDerived(parentGoal)) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public bool IsDerivedFromGoal(Goal goal, Goal potentialParent, bool includeSelf = true)
+    {
+//        Debug.Log(goal + "?=" + potentialParent + ":" + goal.Equals(potentialParent));
+
+        if (includeSelf && goal.Equals(potentialParent)) return true;
+        foreach(Goal parent in goal.GetParentGoals()) {
+            if (parent.Equals(potentialParent)) return true;
+            if (IsDerivedFromGoal(parent, potentialParent))
+                return true;
         }
 
         return false;
@@ -189,6 +213,24 @@ public class GoalManager
         }
 
         return stuckGoals;
+    }
+
+    public List<Goal> GetHighPriorityGoals(float percentage, bool includeLocationGoals = false)
+    {
+        IEnumerable<Goal> orderedPriority = lastSetOfGoals.OrderByDescending(goal => goal.priority);
+
+        if(!includeLocationGoals)
+            orderedPriority = from goal in orderedPriority
+                              where !(goal is GoalState goalState && goalState.state is StatePosition)
+                              select goal;
+
+        float topPriorityValue = orderedPriority.First().priority;
+
+        orderedPriority = from goal in orderedPriority
+                          where goal.priority >= (1 - percentage) * topPriorityValue
+                          select goal;
+
+        return new List<Goal>(orderedPriority);
     }
 
     class OutcomeRestraints
@@ -319,12 +361,18 @@ public class GoalManager
         return relevantOutcomes;
     }
 
-    static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
+    static public bool ContainsStaticConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
         return ContainsConditionNotYou(preconditions, bindings, actor) ||
-                ContainsOthersInventoryState(preconditions, bindings, actor) ||
                 ContainsConditionItemClass(preconditions, bindings) ||
                 ContainsConditionIsYou(preconditions, bindings, actor);
+
+    }
+
+    static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
+    {
+        return ContainsStaticConditions(preconditions, bindings, actor) ||
+                ContainsOthersInventoryState(preconditions, bindings, actor);
 
     }
 

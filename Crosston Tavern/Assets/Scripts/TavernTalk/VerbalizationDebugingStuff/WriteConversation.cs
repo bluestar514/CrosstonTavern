@@ -28,8 +28,13 @@ public class WriteConversation : LogController
     {
         base.AddElement(element);
 
-        WriteString("\t" + element.speakerName + " (" + element.emotion + "):\t" +
-                    element.underpinningSocialMove + "\n\n" +
+        SocialMove move = element.underpinningSocialMove;
+
+        WriteString("\t" + element.speakerName + " (" + element.emotion + "):\t" + move+ "\n" +
+                    "\t\t(" + move.verb + ")\n" +
+                    "\t\t\t+\t" + string.Join("\n\t\t\t\t ", move.mentionedFacts) + "\n" +
+                    "\t\t\t-\t" + string.Join("\n\t\t\t\t ", move.retractedFacts) + "\n\n" +
+
                     "\t\t" + element.verbalization);
     }
 

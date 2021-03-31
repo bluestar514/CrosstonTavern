@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class BarSpaceController : MonoBehaviour
 {
-    public DialogueBoxController dbc;
-    public NotebookController nc;
-    public LogController lc;
-    public PatronPicker pp;
+    public DialogueBoxController dialogueBoxController;
+    public NotebookController sideNotebookController;
+    public LogController logController;
+    public PatronPicker patronPicker;
     public WorldHub worldHub;
-    public BarPatronSelector bps;
+    public BarPatronSelector barPatronSelector;
     public DayLoading dayLoader;
 
 
@@ -30,19 +30,25 @@ public class BarSpaceController : MonoBehaviour
 
     public virtual void Start()
     {
+//        Debug.Log("BarSpaceController: Starting");
+        StartCoroutine(WaitForDayLoad());
+    }
+
+    IEnumerator WaitForDayLoad()
+    {
+        yield return dayLoader.LoadNextDay();
+
         Init();
     }
 
-    protected  void Init()
+    protected void Init()
     {
-        dbc.Initialize(this);
-        nc.Initialize(new List<WorldFact>());
-        lc.Initialize(new List<DialogueUnit>());
+        Debug.Log("BarSpaceController: Initialization");
+        dialogueBoxController.Initialize(this);
+        sideNotebookController.Initialize(new List<WorldFact>());
+        logController.Initialize(new List<DialogueUnit>());
 
-        bps = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
-
-        dayLoader.LoadNextDay();
-
+        barPatronSelector = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
 
         SetNextPatron();
     }
@@ -50,23 +56,29 @@ public class BarSpaceController : MonoBehaviour
 
     public void SetNextPatron()
     {
-
-        Townie patron = bps.PickRandomPatron();
+//        Debug.Log("BarSpaceController: Set Next Patron");
+        Townie patron = barPatronSelector.PickRandomPatron();
 
         if(patron != null) 
             SetPatron(patron);
         else {
-            AdvanceDay();
+            StartCoroutine(AdvanceDay());
         }    
     }
 
-    public void AdvanceDay()
+    public void ButtonPushAdvanceDay()
+    {
+        StartCoroutine(AdvanceDay());
+    }
+
+    public IEnumerator AdvanceDay()
     {
         worldHub.DayStep();
-        dayLoader.LoadNextDay();
+        yield return StartCoroutine(dayLoader.LoadingScreenAscyn());
 
+//        Debug.Log("BarSpaceController: Begining Evening");
         AddDaySeperator();
-        bps.NewNight();
+        barPatronSelector.NewNight();
         SetNextPatron();
     }
 
@@ -75,7 +87,7 @@ public class BarSpaceController : MonoBehaviour
         AddConvSeperator();
 
         Person partner = townie.townieInformation;
-        bps.Visit(partner.id);
+        barPatronSelector.Visit(partner.id);
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
         barkeepEngine = new BarkeepEngine(barkeepTownie, partner, barMenu);
@@ -83,7 +95,9 @@ public class BarSpaceController : MonoBehaviour
         barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner.id);
         patronVerbalizer = new ConversationVerbalizer(townie, "barkeep");
 
-        pp.gameObject.SetActive(false);
+        patronPicker.gameObject.SetActive(false);
+
+//        Debug.Log("BarSpaceController: Set "+townie.Id);
 
         NPCPhase(new SocialMove("start"));
 
@@ -92,41 +106,46 @@ public class BarSpaceController : MonoBehaviour
 
     public void AddDaySeperator()
     {
-        lc.AddDaySeperator(worldHub.ws.Time);
+        logController.AddDaySeperator(worldHub.ws.Time);
     }
 
     public void AddConvSeperator()
     {
-        lc.AddConversationSeperator();
+        logController.AddConversationSeperator();
     }
 
     public void NPCPhase(SocialMove prompt)
     {
-        
+//        Debug.Log("BarSpaceController: NPC reacting to "+prompt);
         patronEngine.LearnFromInput(prompt.mentionedFacts);
 
         lastSocialMove = patronEngine.GiveResponse(prompt);
         patronEngine.DecrementTurns();
 
-        if (lastSocialMove.verb.Contains( "pass" ) || lastSocialMove.verb.Contains("ENDCONVERSATION")) {
-            AdvanceNPCDialogue();
-        }else { 
+        if (lastSocialMove.verb.Contains("pass")) {
+//           Debug.Log("BarSpaceController: Detecting a pass, handing controll back to player");
+            PlayerPhase();
+
+        } else if (lastSocialMove.verb.Contains("ENDCONVERSATION")) {
+//            Debug.Log("BarSpaceController: Detecting a Conversation end");
+            
+            SetNextPatron();
+            
+        } else {
             NPCSpeak(lastSocialMove);
+            PlayerPhase();
         }
 
-        Debug.Log(patronEngine.speaker + ":"+ lastSocialMove + 
-                    "(" + lastSocialMove.verb + ") + [" + string.Join(",",lastSocialMove.mentionedFacts) + "] " +
-                    " - ["+ string.Join(",", lastSocialMove.retractedFacts) + "]");
+        PrintResponse(patronEngine.speaker.Id);
 
-        PlayerPhase();
     }
 
     void NPCSpeak(SocialMove move)
     {
         DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(move);
 
-        dbc.DisplayNPCAction(npcDialogue);
-        lc.AddElement(npcDialogue);
+        dialogueBoxController.DisplayNPCAction(npcDialogue);
+        logController.AddElement(npcDialogue);
 
         List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
         AddAllFacts(npcDialogue.facts);
@@ -137,18 +156,21 @@ public class BarSpaceController : MonoBehaviour
     {
 
         if ( patronEngine.MaxTurns <= 0) {
+//            Debug.Log("BarSpaceController: Patron out of turns, moving to end of conversation");
+
             lastSocialMove = new SocialMove("turnsUp");
 
             NPCPhase(lastSocialMove);
             
         } else {
+//            Debug.Log("BarSpaceController: Opening player options");
 
             List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
             List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
             foreach (SocialMove socialMove in bestSocialMoves) {
                 dialogueUnits.Add(barkeepVerbalizer.ExpressSocialMove(socialMove));
             }
-            dbc.DisplayPlayerActions(dialogueUnits);
+            dialogueBoxController.DisplayPlayerActions(dialogueUnits);
 
 
             
@@ -157,39 +179,43 @@ public class BarSpaceController : MonoBehaviour
 
     public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
-        Debug.Log("Barkeep: " + dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
+        //        Debug.Log("BarSpaceController: player picked:"+dialogueUnit);
+        //Debug.Log("Barkeep: " + dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
+        PrintResponse("barkeep");
 
-        lc.AddElement(dialogueUnit);
+
+        logController.AddElement(dialogueUnit);
 
         if(dialogueUnit.underpinningSocialMove is SocialMenu menu) {
+//            Debug.Log("BarSpaceController: Detecting Additional Choice, looping back to player turn");
             lastSocialMove = menu;
             PlayerPhase();
         } else {
+//            Debug.Log("BarSpaceController: Logging player choice in barkeepEngine");
             barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
             NPCPhase(dialogueUnit.underpinningSocialMove);
-        }
-    }
-
-    public void AdvanceNPCDialogue()
-    {
-        if (lastSocialMove.verb.Contains("ENDCONVERSATION")) {
-            SetNextPatron();
-        } else {
-            PlayerPhase();
         }
     }
 
 
     void AddAllFacts(List<WorldFact> facts)
     {
-        nc.AddManyElements(facts);
+        sideNotebookController.AddManyElements(facts);
     }
 
 
     void RemoveRetractedFacts(List<WorldFact> facts)
     {
         foreach(WorldFact fact in facts) {
-            nc.RemoveElement(fact);
+            sideNotebookController.RemoveElement(fact);
         }
+    }
+
+
+    void PrintResponse(string speaker)
+    {
+        Debug.Log(speaker + ":" + lastSocialMove +
+            "(" + lastSocialMove.verb + ") + [" + string.Join(",", lastSocialMove.mentionedFacts) + "] " +
+            " - [" + string.Join(",", lastSocialMove.retractedFacts) + "]");
     }
 }

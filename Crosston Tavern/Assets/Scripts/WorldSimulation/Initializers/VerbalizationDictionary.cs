@@ -63,6 +63,9 @@ public class VerbalizationDictionary
         {"meadow_field", new EntityVerbalization("meadow_field", "the meadow") },
 
         {"kitchen_inn", new EntityVerbalization("kitchen_inn", "the inn") },
+        {"kitchen_sammysHouse", new EntityVerbalization("kitchen_sammysHouse", "Sammy's house") },
+        {"kitchen_averysHouse", new EntityVerbalization("kitchen_averysHouse", "Avery's house") },
+        {"kitchen_finleysHouse", new EntityVerbalization("kitchen_finleysHouse", "Finely's house") },
 
         {"tackle_shop_town", new EntityVerbalization("tackle_shop_town", "the tackle shop") },
 

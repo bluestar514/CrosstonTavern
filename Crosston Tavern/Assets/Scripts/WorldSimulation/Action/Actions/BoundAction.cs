@@ -28,6 +28,10 @@ public class BoundAction : WorldAction
         this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings, verbilizationInfo)
     { }
 
+    public BoundAction(BoundAction action, string actorId, string featureId, string locationId, BoundBindingCollection bindings, VerbilizationAction verbilizationInfo) :
+        this(action.Id, action.executionTime, action.preconditions, action.potentialOutcomes, actorId, featureId, locationId, bindings, verbilizationInfo)
+    { }
+
     public override string ToString()
     {
         string n = "<" + Id + "(" + ActorId + ", " + FeatureId + ")>";

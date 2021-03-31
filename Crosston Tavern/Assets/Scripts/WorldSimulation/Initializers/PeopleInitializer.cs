@@ -12,6 +12,7 @@ public class PeopleInitializer
         new Dictionary<string, List<string>>() {
             {"name", new List<string>(){"avery"}},
             {"home", new List<string>(){"averysHouse"} },
+            {"profession", new List<string>(){ "farmer" } },
             {"loves", new List<string>(){"stewed_trout"} },
             {"likes", new List<string>(){"blackberry", "trout", "blackberry_tart", "strawberry_cake"} },
             {"dislikes", new List<string>(){"carrot", "bell_pepper"} },
@@ -21,6 +22,7 @@ public class PeopleInitializer
         new Dictionary<string, List<string>>() {
             {"name", new List<string>(){"sammy"}},
             {"home", new List<string>(){"sammysHouse"} },
+            {"profession", new List<string>(){ "fisher" } },
             {"loves", new List<string>(){"strawberry_cake"} },
             {"likes", new List<string>(){"strawberry", "salmon", "fried_salmon"} },
             {"dislikes", new List<string>(){"blackberry", "trout"} },
@@ -30,6 +32,7 @@ public class PeopleInitializer
         new Dictionary<string, List<string>>() {
             {"name", new List<string>(){"finley"}},
             {"home", new List<string>(){"finleysHouse"} },
+            {"profession", new List<string>(){ "unemployed" } },
             {"loves", new List<string>(){"blackberry_tart"} },
             {"likes", new List<string>(){"blackberry", "salmon", "fried_salmon"} },
             {"dislikes", new List<string>(){"bell_pepper"} },
@@ -123,11 +126,17 @@ public class PeopleInitializer
     public static Dictionary<string, Person> GetAllPeople() {
 
         Dictionary<string, Person> allPeople = new Dictionary<string, Person>() {
-            {"barkeep",   new Person("barkeep",     "SYSTEM", 2, peopleActions, new Dictionary<string, List<string>>())}, 
+            {"barkeep",   new Person("barkeep",     "SYSTEM", 2, peopleActions, new Dictionary<string, List<string>>(), "barkeep")}, 
         };
 
         foreach(Dictionary<string, List<string>> personData in peopleData) {
-            Person person = new Person(personData["name"][0], personData["home"][0], 2, peopleActions, new Dictionary<string, List<string>>());
+            Person person = new Person(personData["name"][0], 
+                                        personData["home"][0], 
+                                        2, 
+                                        peopleActions, 
+                                        new Dictionary<string, List<string>>(),
+                                        personData["profession"][0]);
+
             foreach(KeyValuePair<string, PreferenceLevel> catagory in 
                 new List<KeyValuePair<string, PreferenceLevel>> {
                     new KeyValuePair<string, PreferenceLevel>("loves", PreferenceLevel.loved),

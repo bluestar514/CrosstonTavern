@@ -110,16 +110,7 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellAboutDayObservedEvents", speaker, prompt);
 
             case "askAboutGoalFrustration":
-                facts = GoalsToFacts(GetStuckGoals(), speaker.Id);
-                foreach(WorldFact stuckFact in facts) {
-                    if(stuckFact is WorldFactGoal goalFact) {
-                        goalFact.modifier.Add("stuck");
-                    }
-                }
-
-
-                return new SocialMove("frustratedByGoals", mentionedFacts: facts);
-
+                return SocialMoveFactory.MakeMove("tellFrustration", speaker, prompt);
 
             case "askWhyAction#":
                 return SocialMoveFactory.MakeMove("tellWhyAction#", speaker, prompt);
@@ -127,6 +118,11 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellAboutEXCITEDEvent", speaker, prompt);
             case "askAboutDisapointment":
                 return SocialMoveFactory.MakeMove("tellAboutDISAPOINTEDEvent", speaker, prompt);
+            case "askAboutPlayerGivenGoal#":
+                return SocialMoveFactory.MakeMove("tellAboutPlayerDirectedEvent", speaker, prompt);
+
+
+
             case "askAboutPreferencesLike":
                 return SocialMoveFactory.MakeMove("tellPreferenceLike", speaker, prompt);
             case "askAboutPreferencesHate":
@@ -176,15 +172,15 @@ public class PatronEngine :ConversationEngine
                 if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
                     BoundAction suggestedAction = potentialAction.action;
 
-                    Goal goal = new GoalAction(suggestedAction, (int)GoalManager.GoalPriority.high);
+                    Goal goal = new GoalAction(suggestedAction, (int)GoalManager.GoalPriority.imperitive);
                     speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>() {
                                                             new GM_Precondition_PlayerInstructed("barkeep", speaker.Id)
                                                         },
                                                         new List<Goal>() {
                                                             goal
                                                         },
-                                                        name: "suggested action",
-                                                        timer: 3
+                                                        name: "suggested action"
+                                                        //timer: 3
                                                         )
                         );
 
@@ -264,10 +260,7 @@ public class PatronEngine :ConversationEngine
         }
     }
 
-    List<Goal> GetStuckGoals()
-    {
-        return speaker.gm.GetStuckGoals();
-    }
+
 
     void TellAction(string featureName, string actionName )
     {

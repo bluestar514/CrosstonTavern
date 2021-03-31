@@ -94,7 +94,7 @@ public class FeatureInitializer
     }
 
     static Dictionary<string, List<string>> featuresInRoom = new Dictionary<string, List<string>>() {
-        {"farm", new List<string>(){"river", "chicken", "cow", "field"} },
+        {"farm", new List<string>(){"river", "chicken", "cow", "field" } },
         {"field", new List<string>(){ "river", "meadow"} },
         {"forest", new List<string>(){"brush" } },
         {"inn", new List<string>(){"kitchen"} },
@@ -145,23 +145,11 @@ public class FeatureInitializer
         }
 
 
-        Feature shop = MakeFeatures()["shop"];
-        shop.id = "tackle_shop_town";
-        shop.location = "town";
+        List<Feature> uniqueFetures = MakeUniqueShops();
 
-
-        shop.providedActions.Add(ActionInitializer.actions["buy_fishing_rod"]);
-        shop.providedActions.Add(ActionInitializer.actions["sell_fish_at_market"]);
-        shop.stockTable = new StringIntDictionary() {
-            {"fishing_rod", 5 },
-            {"bass", 2},
-            {"trout", 2},
-            {"salmon", 4}
-        };
-        shop.inventory.ChangeInventoryContents(10, "fishing_rod");
-        shop.inventory.ChangeInventoryContents(20, "bass");
-
-        allFeatures.Add("tackle_shop_town", shop);
+        foreach(Feature feature in uniqueFetures) {
+            allFeatures.Add(feature.id, feature);
+        }
 
 
         foreach (KeyValuePair<string, string> connection in roomConnections) {
@@ -208,5 +196,34 @@ public class FeatureInitializer
         }
 
         return allLocations;
+    }
+
+    static Feature MakeShop(string id, string location, List<string> actions)
+    {
+        Feature shop = MakeFeatures()["shop"];
+        shop.id = id;
+        shop.location = location;
+
+        foreach(string actionId in actions) {
+            shop.providedActions.Add(ActionInitializer.actions[actionId]);
+        }
+
+        return shop;
+    }
+
+    static List<Feature> MakeUniqueShops()
+    {
+        List<Feature> features = new List<Feature>() {
+            MakeShop("tackle_shop_town", "town", new List<string>() {
+                "buy_fishing_rod",
+                "sell_fish_at_market"
+            }),
+            MakeShop("farmers_market_town", "town", new List<string>() {
+                "sell_crop_at_market"
+            }),
+        };
+
+
+        return features;
     }
 }

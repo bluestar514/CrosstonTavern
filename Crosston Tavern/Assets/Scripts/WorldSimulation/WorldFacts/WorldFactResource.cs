@@ -45,6 +45,8 @@ public class WorldFactResource: WorldFact {
     {
         Feature feature = ws.map.GetFeature(featureId);
 
+        if (feature == null) throw new System.Exception("No feature (" + featureId + ") found in world state(" + ws.id + ")");
+
         feature.relevantResources.Add(resourceId, potentialBinding);
 
         return base.UpdateWorldState(ws);

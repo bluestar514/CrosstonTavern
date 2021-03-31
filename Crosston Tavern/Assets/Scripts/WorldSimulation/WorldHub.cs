@@ -35,6 +35,7 @@ public class WorldHub : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("WorldHub: Initializing");
         wsdm.AddPeople(allPeople);
 
         foreach (Townie person in allPeople) {
@@ -50,7 +51,7 @@ public class WorldHub : MonoBehaviour
 
     IEnumerator SimulateInitialDays()
     {
-
+        Debug.Log("WorldHub: Begining Initial Simulation");
         progress = 0;
 
         total = GetTimeOfNextBarScene( new WorldTime(1, 1, simulatedInitialDays, 0, 0)).ConvertToMinuteCount() 
@@ -62,6 +63,7 @@ public class WorldHub : MonoBehaviour
 
 
         ready = true;
+        Debug.Log("WorldHub: Ready");
     }
 
     IEnumerator TimeStep()
@@ -146,6 +148,8 @@ public class WorldHub : MonoBehaviour
 
     IEnumerator DayStepAsync()
     {
+        Debug.Log("WorldHub: Begining Day Step");
+
         if (ws.Time >= WorldTime.Night) {
             yield return TimeStep();
         }
@@ -157,6 +161,8 @@ public class WorldHub : MonoBehaviour
             x++;
             if (x > 1000) throw new Exception("Time is not advancing correctly during TimeStep, so we never leave this loop.");
         }
+
+        Debug.Log("WorldHub: Ending Day Step");
     }
 
     WorldTime GetTimeOfNextBarScene(WorldTime initialTime)
