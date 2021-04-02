@@ -9,6 +9,9 @@
 **/[Bb]uilds/
 **/[Ll]ogs/
 **/[Mm]emoryCaptures/
+#These are currently just logging files, and that doesn't need to get committed
+#Should probably reroute them to their own folder, but for the moment I'm not using Resources for anything else
+**/[Rr]esources/
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta

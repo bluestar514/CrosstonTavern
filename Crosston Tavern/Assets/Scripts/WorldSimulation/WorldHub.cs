@@ -16,6 +16,7 @@ public class WorldHub : MonoBehaviour
     public List<List<ExecutedAction>> timeStep = new List<List<ExecutedAction>>();
 
     public WorldSpaceDisplayManager wsdm;
+    public WriteSimulationLog logger;
 
     Dictionary<Townie, ChosenAction> chosenActions = new Dictionary<Townie, ChosenAction>();
 
@@ -45,6 +46,9 @@ public class WorldHub : MonoBehaviour
             person.townieInformation.knownGoals = person.gm.GetGoalsList();
 
         }
+
+        logger.Init(new List<string>(from person in allPeople
+                                     select person.Id));
 
         StartCoroutine(SimulateInitialDays());
     }
@@ -101,6 +105,9 @@ public class WorldHub : MonoBehaviour
                 chosenActions[person] = null;
             }
 
+            logger.WriteEvent(executedAction);
+            logger.WriteCharacterState(person);
+
             //person.ws.Tick(30);
         }
 
@@ -113,6 +120,7 @@ public class WorldHub : MonoBehaviour
 
         foreach (ExecutedAction action in executedActions) {
             wsdm.AddEvent(action, i);
+            
         }
         ws.Tick(30);
         progress += 30;
