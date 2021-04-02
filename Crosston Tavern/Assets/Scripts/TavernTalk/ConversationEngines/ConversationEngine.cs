@@ -17,12 +17,16 @@ public class ConversationEngine
         executedMoves.Add(move);
     }
 
-    public List<WorldFact> LearnFromInput(List<WorldFact> facts)
+    public List<WorldFact> LearnFromInput(List<WorldFact> mentionedFacts, List<WorldFact> retractedFacts )
     {
         List<WorldFact> learnedFacts = new List<WorldFact>();
 
-        foreach(WorldFact fact in facts) {
+        foreach(WorldFact fact in mentionedFacts) {
             learnedFacts.AddRange(speaker.ws.LearnFact(fact));
+        }
+
+        foreach (WorldFact fact in retractedFacts) {
+            speaker.ws.ForgetFact(fact);
         }
 
         return learnedFacts;

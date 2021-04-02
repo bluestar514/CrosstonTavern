@@ -117,7 +117,7 @@ public class BarSpaceController : MonoBehaviour
     public void NPCPhase(SocialMove prompt)
     {
 //        Debug.Log("BarSpaceController: NPC reacting to "+prompt);
-        patronEngine.LearnFromInput(prompt.mentionedFacts);
+        patronEngine.LearnFromInput(prompt.mentionedFacts, prompt.retractedFacts);
 
         lastSocialMove = patronEngine.GiveResponse(prompt);
         patronEngine.DecrementTurns();
@@ -147,7 +147,7 @@ public class BarSpaceController : MonoBehaviour
         dialogueBoxController.DisplayNPCAction(npcDialogue);
         logController.AddElement(npcDialogue);
 
-        List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts);
+        List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts, move.retractedFacts);
         AddAllFacts(npcDialogue.facts);
         RemoveRetractedFacts(move.retractedFacts);
     }

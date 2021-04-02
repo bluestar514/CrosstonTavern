@@ -47,6 +47,11 @@ public class KnownFacts
         return new List<WorldFact>();
     }
 
+    public void RemoveFact(WorldFact fact)
+    {
+        knownFacts.Remove(fact);
+    }
+
 
     public bool KnowFact(WorldFact fact)
     {

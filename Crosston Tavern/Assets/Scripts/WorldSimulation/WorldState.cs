@@ -108,6 +108,10 @@ public class WorldState
         return knownFacts.AddFact(fact, this);
     }
 
+    public void ForgetFact(WorldFact fact)
+    {
+        knownFacts.RemoveFact(fact);
+    }
 
     private List<string> GenerateFullItemList()
     {
