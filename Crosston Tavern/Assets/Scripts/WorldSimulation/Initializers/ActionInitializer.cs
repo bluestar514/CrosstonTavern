@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class ActionInitializer
 {
-    static int INF = 100000000;
-    static int NEG_INF = -100000000;
+    public static int INF = 100;
 
     static int stepsInDay = 28;
 
@@ -96,7 +95,10 @@ public class ActionInitializer
         ) },
         {"talk", new GenericAction("talk", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(
+                    new StateRecentActivity("talk", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:3, true,
+                                                    actorId: "#a#", featureId: "#b#"))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -142,7 +144,19 @@ public class ActionInitializer
         {"give_#item#", new GenericAction("give_#item#", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateInventoryStatic("#a#", "#item#", 1, INF))
+                new Condition_IsState(new StateInventoryStatic("#a#", "#item#", 1, INF)),
+                //DOn't return gifts
+                new Condition_IsState(
+                    new StateRecentActivity("give_#item#", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#b#", featureId: "#a#")),
+                //Don't spam gifts
+                new Condition_IsState(
+                    new StateRecentActivity("give_#item#", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#a#", featureId: "#b#")),
+                //Don't ask for gifts back
+                new Condition_IsState(
+                    new StateRecentActivity("ask_#item#", new WorldTime(0, 0, 1, 0, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#a#", featureId: "#b#"))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -216,7 +230,19 @@ public class ActionInitializer
         {"ask_#item#", new GenericAction("ask_#item#", 1,
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
-                new Condition_IsState(new StateInventoryStatic("#b#", "#item#", 1, INF))
+                new Condition_IsState(new StateInventoryStatic("#b#", "#item#", 1, INF)),
+                //Don't ask for things you gave them
+                new Condition_IsState(
+                    new StateRecentActivity("give_#item#", new WorldTime(0, 0, 1, 0, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#a#", featureId: "#b#")),
+                //Don't spam requests
+                new Condition_IsState(
+                    new StateRecentActivity("ask_#item#", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#a#", featureId: "#b#")),
+                //Don't ask for things they asked from you
+                new Condition_IsState(
+                    new StateRecentActivity("ask_#item#", new WorldTime(0, 0, 1, 0, 0), countMin: 0, countMax:0, true,
+                                                    actorId: "#b#", featureId: "#a#"))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -267,7 +293,10 @@ public class ActionInitializer
         )},
         {"insult", new GenericAction("insult", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(
+                    new StateRecentActivity("insult", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:1, true,
+                                                    actorId: "#a#", featureId: "#b#"))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -302,7 +331,10 @@ public class ActionInitializer
         ) },
         {"compliment", new GenericAction("compliment", 1,
             new Precondition(new List<Condition>() {
-                new Condition_NotYou("#b#")
+                new Condition_NotYou("#b#"),
+                new Condition_IsState(
+                    new StateRecentActivity("compliment", new WorldTime(0, 0, 0, 8, 0), countMin: 0, countMax:1, true,
+                                                    actorId: "#a#", featureId: "#b#"))
             }),
             new List<Outcome>() {
                 new Outcome(
@@ -425,6 +457,12 @@ public class ActionInitializer
         )},
         { "harvest_crops" , new GenericAction("harvest_crops", 1,
             new Precondition(new List<Condition>(){
+                //new Condition_IsState(
+                //    new StateRecentActivity("tend_crops", new WorldTime(0, 0, 0, 4, 0), countMin: 0, countMax:2, false,
+                //                                        featureId: "#b#")),
+                new Condition_IsState(
+                    new StateRecentActivity("harvest_crops", new WorldTime(0, 0, 0, 4, 0), countMin: 0, countMax:0, true,
+                                                        featureId:"#b#"))
             }),
             new List<Outcome>() {
                 new Outcome(

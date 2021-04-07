@@ -16,12 +16,7 @@ public class LogController: MonoBehaviour
 
     public virtual void Initialize(List<DialogueUnit> records)
     {
-        GenerateFactPanels(records);
-    }
-
-    protected virtual void GenerateFactPanels(List<DialogueUnit> knownRecords)
-    {
-        foreach (DialogueUnit record in knownRecords) {
+        foreach (DialogueUnit record in records) {
             AddElement(record);
         }
     }
@@ -48,7 +43,6 @@ public class LogController: MonoBehaviour
         Instantiate(conversationSeperatorPrefab, contentPanel.transform);
         ScrollToBottom();
     }
-
 
     protected virtual void ScrollToBottom()
     {

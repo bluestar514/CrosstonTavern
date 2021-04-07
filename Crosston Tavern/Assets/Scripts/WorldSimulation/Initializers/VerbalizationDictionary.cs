@@ -77,7 +77,7 @@ public class VerbalizationDictionary
 
     public static string Replace(string id, Form form = Form.singular)
     {
-        if (verbalizationData.ContainsKey(id)) {
+        if (id != null && verbalizationData.ContainsKey(id)) {
             switch (form) {
                 case Form.singular:
                     return verbalizationData[id].singularNoun;

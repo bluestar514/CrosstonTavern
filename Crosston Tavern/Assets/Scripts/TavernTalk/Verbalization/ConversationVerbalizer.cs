@@ -320,7 +320,12 @@ public class ConversationVerbalizer
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
 
+                        Debug.Log(goalFact);
+                        Debug.Log(goalFact.goal);
+                        Debug.Log(v);
                         string snippet = v.VerbalizeGoal(goalFact.goal);
+                        Debug.Log(snippet);
+
                         if(snippet.StartsWith("you ")) {
                             snippet = snippet.Remove(0, 4);
                         }

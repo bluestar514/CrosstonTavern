@@ -41,16 +41,16 @@ public class GoalManager
     public void DecrementModuleTimers()
     {
 
-        List<GoalModule> deactivatedModules = new List<GoalModule>();
-        foreach(GoalModule gm in modules) {
-            gm.DecrementTimer();
+        //List<GoalModule> deactivatedModules = new List<GoalModule>();
+        //foreach(GoalModule gm in modules) {
+        //    gm.DecrementTimer();
 
-            if (gm.timer == 0) deactivatedModules.Add(gm);
-        }
+        //    if (gm.timer == 0) deactivatedModules.Add(gm);
+        //}
 
-        foreach(GoalModule gm in deactivatedModules) {
-            RemoveModule(gm);
-        }
+        //foreach(GoalModule gm in deactivatedModules) {
+        //    RemoveModule(gm);
+        //}
     }
 
     public Goal GetGoalFromName(string name)
@@ -99,10 +99,11 @@ public class GoalManager
             foreach (Goal goal in previousIterationGoals) {
                 if (goal is GoalState goalState) {
                     
-                    List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
+                    List<OutcomeRestraints> relevantOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes, true);
                     newGoals.AddRange(MakeGoalsFromOutcome(goal, relevantOutcomes));
 
                     newGoals.AddRange(MakeRelationGoalsSocialGoals(goal));
+                    newGoals.AddRange(MakeRecentActivityActionGoals(goal));
                 }else if(goal is GoalAction goalAction) {
                     newGoals.AddRange(MakeGoalFromAction(goalAction, allActions));
                 }
@@ -200,8 +201,10 @@ public class GoalManager
         List<Goal> stuckGoals = new List<Goal>();
         foreach(Goal goal in goals) {
             List<OutcomeRestraints> positiveOutcomes = new List<OutcomeRestraints>();
-            if (goal is GoalState) {
-                positiveOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes);
+            if (goal is GoalState goalState) {
+                if (goalState.state.InEffect(ws, new BoundBindingCollection(), new FeatureResources())) continue;
+
+                positiveOutcomes = FilterOutcomesThatFullfillGoal(goal, allOutcomes, false);
                 if (MakeRelationGoalsSocialGoals(goal).Count > 0) positiveOutcomes.Add(new OutcomeRestraints());
                 
             } else if (goal is GoalAction goalAction) {
@@ -320,6 +323,46 @@ public class GoalManager
         return newGoals;
     }
 
+    List<Goal> MakeRecentActivityActionGoals(Goal goal)
+    {
+        List<Goal> newGoals = new List<Goal>();
+
+        if (goal is GoalState goalState &&
+            goalState.state is StateRecentActivity recentActivity &&
+            !recentActivity.InEffect(ws, null, null)) {
+
+            if (ws == null) throw new System.Exception("World State not set?");
+            if (ws.knownFacts == null) throw new System.Exception("No known facts?");
+
+            IEnumerable<ExecutedAction> relevantActions = recentActivity.GetRelevantHistory(ws, ws.knownFacts.GetHistory(), null);
+
+            GenericAction genericAction;
+            Dictionary<string, GenericAction> allActions = ActionInitializer.GetAllActions();
+            if (!allActions.ContainsKey(recentActivity.genericActionId)) {
+                Debug.LogWarning("No action with ID " + recentActivity.genericActionId);
+                return newGoals;
+            }
+
+            genericAction = allActions[recentActivity.genericActionId];
+
+            BoundAction boundAction = new BoundAction(genericAction,
+                                                        recentActivity.actorId,
+                                                        recentActivity.featureId,
+                                                        recentActivity.featureId,
+                                                        recentActivity.otherBindings,
+                                                        genericAction.verbilizationInfo);
+
+            if ((relevantActions.Count() < recentActivity.countMin && recentActivity.want) ||
+                (!recentActivity.want && recentActivity.countMax < ActionInitializer.INF && relevantActions.Count() < recentActivity.countMax)) {
+                newGoals.Add(new GoalAction(boundAction, goal.priority));
+            }
+                
+
+        }
+
+        return newGoals;
+    }
+
     List<BoundAction> GetAllActions()
     {
         ActionBuilder ab = new ActionBuilder(ws, actor);
@@ -346,11 +389,11 @@ public class GoalManager
         return outcomeRestraints;
     }
 
-    List<OutcomeRestraints> FilterOutcomesThatFullfillGoal(Goal goal, List<OutcomeRestraints> outcomes)
+    List<OutcomeRestraints> FilterOutcomesThatFullfillGoal(Goal goal, List<OutcomeRestraints> outcomes, bool temporary)
     {
         List<OutcomeRestraints> relevantOutcomes = new List<OutcomeRestraints>();
         foreach(OutcomeRestraints outcome in outcomes) {
-            if (ContainsNonActionableConditions(outcome.preconditions, outcome.bindings, actor.id)) continue; 
+            if (ContainsNonActionableConditions(outcome.preconditions, outcome.bindings, actor.id, ws, temporary)) continue; 
 
             if (OutcomeProgressesGoal(outcome, goal) && !OutcomeHurtsParentGoals(outcome, goal)) {
                 outcome.fullfillsGoal.Add(goal);
@@ -369,10 +412,11 @@ public class GoalManager
 
     }
 
-    static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
+    static public bool ContainsNonActionableConditions(List<Condition> preconditions, BoundBindingCollection bindings, string actor, WorldState ws, bool temporary)
     {
         return ContainsStaticConditions(preconditions, bindings, actor) ||
-                ContainsOthersInventoryState(preconditions, bindings, actor);
+                ContainsOthersInventoryState(preconditions, bindings, actor) ||
+                (temporary && ContainsNonActionableConditionRecentActivity(preconditions, bindings, ws)); 
 
     }
 
@@ -435,6 +479,32 @@ public class GoalManager
                 if (!ItemInitializer.IsItem(itemId, condition_ItemClass.itemClass) ) {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+
+    static bool ContainsNonActionableConditionRecentActivity(List<Condition> preconditions, BoundBindingCollection bindings, WorldState ws)
+    {
+        foreach (Condition condition in preconditions) {
+            if (condition is Condition_IsState conditionState &&
+                conditionState.state is StateRecentActivity recentActivity) {
+
+                IEnumerable<ExecutedAction> history = recentActivity.GetRelevantHistory(ws, ws.knownFacts.GetHistory(), bindings);
+
+                int count = history.Count();
+                bool boundedAbove = recentActivity.countMax < ActionInitializer.INF;
+                bool withinBounds = count >= recentActivity.countMin && count <= recentActivity.countMax;
+
+                
+
+                if( (recentActivity.want && count > recentActivity.countMax) ||
+                    (!recentActivity.want && !boundedAbove && count >=recentActivity.countMin )) {
+                    return true;
+                }
+                
             }
         }
 

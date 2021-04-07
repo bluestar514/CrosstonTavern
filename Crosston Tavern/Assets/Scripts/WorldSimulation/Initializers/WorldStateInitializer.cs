@@ -132,8 +132,8 @@ public class WorldStateInitializer
             }
         }
 
+        GenericAction eat = ActionInitializer.GetAllActions()["eat_#item#"];
         foreach (string item in townie.townieInformation.preference.preferences[PreferenceLevel.loved]) {
-            GenericAction eat = ActionInitializer.GetAllActions()["eat_#item#"];
             gm.AddModule(
                 new GoalModule(
                     new List<GM_Precondition>() {
@@ -178,8 +178,23 @@ public class WorldStateInitializer
              )
         );
 
-
-
+        //GenericAction action = ActionInitializer.GetAllActions()["give_#item#"];
+        //gm.AddModule(
+        //    new GoalModule(
+        //        new List<GM_Precondition>() {
+        //        },
+        //        new List<Goal>() {
+        //            new GoalAction(new BoundAction(action, name, "sammy", "",
+        //                                                    new BoundBindingCollection( new List<BoundBindingPort>() {
+        //                                                        new BoundBindingPort("item", "strawberry")
+        //                                                    }),
+        //                                                    eat.verbilizationInfo
+        //                                               ),
+        //                                (int)GoalManager.GoalPriority.imperitive)
+        //        },
+        //        name: "TEST"
+        //     )
+        //);
     }
 }
 

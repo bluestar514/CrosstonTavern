@@ -40,3 +40,4 @@ public class State
         return 1877310944 + EqualityComparer<string>.Default.GetHashCode(id);
     }
 }
+

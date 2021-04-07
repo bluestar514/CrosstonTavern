@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5278441447386372984}
   - component: {fileID: 1856775780618100403}
   m_Layer: 5
-  m_Name: Entry Panel
+  m_Name: DisplayEntryPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,10 +141,10 @@ RectTransform:
   m_Father: {fileID: 8435144876063894149}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0015106, y: 0}
-  m_SizeDelta: {x: 723.16, y: 30}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0.040008545, y: 0}
+  m_SizeDelta: {x: 0.099975586, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2026966737886560352
 CanvasRenderer:

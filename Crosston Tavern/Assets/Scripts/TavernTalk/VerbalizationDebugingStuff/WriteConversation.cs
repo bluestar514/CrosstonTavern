@@ -56,11 +56,6 @@ public class WriteConversation : LogController
         writer.Close();
     }
 
-    protected override void GenerateFactPanels(List<DialogueUnit> knownRecords)
-    {
-        base.GenerateFactPanels(knownRecords);
-    }
-
     protected override void ScrollToBottom()
     {
         base.ScrollToBottom();

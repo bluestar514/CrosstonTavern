@@ -24,6 +24,19 @@ public class GenericAction: WorldAction {
         return "<"+Id+"(generic)>";
     }
 
+
+    public override bool Equals(object obj)
+    {
+        if (obj is GenericAction genericAction) {
+            return ToString() == genericAction.ToString();
+        }else if(obj is BoundAction boundAction) {
+            return boundAction.Id == Id;
+        }else if(obj is ExecutedAction executedAction) {
+            return executedAction.Action.Id == Id;
+        }
+
+        return false;
+    }
 }
 
 

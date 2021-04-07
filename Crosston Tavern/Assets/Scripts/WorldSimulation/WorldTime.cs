@@ -237,6 +237,23 @@ public class WorldTime : IComparable
 
         return CasualTimeBlocks.future;
     }
+
+    public bool InTimeInterval(WorldTime currentTime, WorldTime interval)
+    {
+        WorldTime eventTime = this;
+
+        int curTime = currentTime.ConvertToMinuteCount();
+        int evTime = eventTime.ConvertToMinuteCount();
+        int intervalTime = interval.ConvertToMinuteCount();
+
+        int minTimePoint = curTime - intervalTime;
+        int maxTimePoint = curTime + intervalTime;
+
+        //Debug.Log((curTime - intervalTime) + " <?= " + evTime);
+
+        return  maxTimePoint >= evTime &&
+                minTimePoint <= evTime;
+    }
 }
 
 

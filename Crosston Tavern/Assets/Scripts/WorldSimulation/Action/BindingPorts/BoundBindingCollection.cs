@@ -26,7 +26,7 @@ public class BoundBindingCollection
 
     public string BindString(string str)
     {
-        if (bindings == null) return str;
+        if (bindings == null || str == null) return str;
 
         foreach (BoundBindingPort binding in bindings) {
             str = str.Replace("#" + binding.tag + "#", binding.Value);

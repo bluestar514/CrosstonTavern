@@ -148,6 +148,8 @@ public class PeopleInitializer
                 }
             }
 
+            //TODO: Things added to a character's initial inventory don't seem to actually get added. 
+            //Should track this down when I get a chance
             foreach(string item in personData["inventory"]) {
                 person.inventory.ChangeInventoryContents(1, item);
             }
