@@ -17,17 +17,22 @@ public class LogController: MonoBehaviour
     public virtual void Initialize(List<DialogueUnit> records)
     {
         foreach (DialogueUnit record in records) {
-            AddElement(record);
+            StartCoroutine(AddElement(record));
         }
     }
 
-    public virtual void AddElement(DialogueUnit element)
+    public virtual IEnumerator AddElement(DialogueUnit element)
     {
         RecordDisplay panel = Instantiate(p_DisplayPanel, contentPanel.transform).GetComponent<RecordDisplay>();
 
         panel.Fill(element);
 
         displayPanels.Add(panel);
+
+        while (!panel.ready) {
+            yield return new WaitForEndOfFrame();
+            ScrollToBottom();
+        }
 
         ScrollToBottom();
     }

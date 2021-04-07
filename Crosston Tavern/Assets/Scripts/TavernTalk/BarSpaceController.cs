@@ -132,24 +132,26 @@ public class BarSpaceController : MonoBehaviour
             SetNextPatron();
             
         } else {
-            NPCSpeak(lastSocialMove);
-            PlayerPhase();
+            StartCoroutine( NPCSpeak(lastSocialMove) );
+            
         }
 
         PrintResponse(patronEngine.speaker.Id);
 
     }
 
-    void NPCSpeak(SocialMove move)
+    IEnumerator NPCSpeak(SocialMove move)
     {
         DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(move);
 
         dialogueBoxController.DisplayNPCAction(npcDialogue);
-        logController.AddElement(npcDialogue);
+        yield return logController.AddElement(npcDialogue);
 
         List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts, move.retractedFacts);
         AddAllFacts(npcDialogue.facts);
         RemoveRetractedFacts(move.retractedFacts);
+
+        PlayerPhase();
     }
 
     public void PlayerPhase()
@@ -177,14 +179,14 @@ public class BarSpaceController : MonoBehaviour
         }
     }
 
-    public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
+    public IEnumerator PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
     {
         //        Debug.Log("BarSpaceController: player picked:"+dialogueUnit);
         //Debug.Log("Barkeep: " + dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
         PrintResponse("barkeep");
 
 
-        logController.AddElement(dialogueUnit);
+        yield return logController.AddElement(dialogueUnit);
 
         if(dialogueUnit.underpinningSocialMove is SocialMenu menu) {
 //            Debug.Log("BarSpaceController: Detecting Additional Choice, looping back to player turn");

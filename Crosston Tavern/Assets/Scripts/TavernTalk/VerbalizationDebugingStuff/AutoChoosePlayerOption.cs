@@ -40,6 +40,6 @@ public class AutoChoosePlayerOption : DialogueBoxController
     IEnumerator PushInASec(DialogueUnit dialogueUnit)
     {
         yield return new WaitForSeconds(choiceDelayTime);
-        bsc.PlayerChoiceButtonPush(dialogueUnit);
+        yield return bsc.PlayerChoiceButtonPush(dialogueUnit);
     }
 }

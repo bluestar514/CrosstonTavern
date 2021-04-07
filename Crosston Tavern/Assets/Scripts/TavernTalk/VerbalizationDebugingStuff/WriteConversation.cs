@@ -26,9 +26,9 @@ public class WriteConversation : LogController
         WriteString("----DAY START "+date.GetDate()+"----\n");
     }
 
-    public override void AddElement(DialogueUnit element)
+    public override IEnumerator AddElement(DialogueUnit element)
     {
-        base.AddElement(element);
+        yield return base.AddElement(element);
 
         SocialMove move = element.underpinningSocialMove;
 

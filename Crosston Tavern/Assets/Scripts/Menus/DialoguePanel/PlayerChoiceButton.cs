@@ -21,6 +21,6 @@ public class PlayerChoiceButton : MonoBehaviour
 
     public void OnClick()
     {
-        supervisor.PlayerChoiceButtonPush(dialogueUnit);
+        StartCoroutine( supervisor.PlayerChoiceButtonPush(dialogueUnit));
     }
 }
