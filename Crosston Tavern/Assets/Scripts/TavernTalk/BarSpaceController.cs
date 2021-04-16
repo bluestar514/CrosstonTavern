@@ -27,21 +27,17 @@ public class BarSpaceController : MonoBehaviour
     List<FoodItem> barMenu = new List<FoodItem>(from food in  ItemInitializer.menu.Values
                                                 select food);
 
+    static SocialMove convStart = new SocialMove("start");
+
+
 
     public virtual void Start()
     {
         Debug.Log("BarSpaceController: Starting");
-        StartCoroutine(WaitForDayLoad());
+        StartCoroutine(WaitUntilDayLoaded(Init));
     }
 
-    IEnumerator WaitForDayLoad()
-    {
-        yield return dayLoader.LoadingScreenAscyn();
-
-        Init();
-    }
-
-    protected void Init()
+    protected bool Init()
     {
         Debug.Log("BarSpaceController: Initialization");
         dialogueBoxController.Initialize(this);
@@ -50,44 +46,55 @@ public class BarSpaceController : MonoBehaviour
 
         barPatronSelector = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
 
-        PushForNextPatron();
+        NextConversation();
+
+        return true;
     }
 
-    public void PushForNextPatron()
+    public void ButtonPushNextPatron()
     {
-        SetNextPatron();
+        NextConversation();
     }
 
-    public void ButtonPushAdvanceDay()
+    public void ButtonPushNextDay()
     {
-        StartCoroutine(AdvanceDay());
+        AdvanceDay();
     }
 
-
-
-    public void SetNextPatron()
+    public void ButtonPushPlayerChoice(DialogueUnit dialogueUnit)
     {
-        Debug.Log("BarSpaceController: Set Next Patron");
+        PrintResponse("barkeep", dialogueUnit.underpinningSocialMove);
+
+        StartCoroutine(WaitUntilDisplayed(dialogueUnit, PlayerChoice));
+        
+    }
+
+    bool PlayerChoice(SocialMove dialogueUnit)
+    {
+        if (dialogueUnit is SocialMenu menu) {
+            Debug.Log("BarSpaceController: Detecting Additional Choice, looping back to player turn");
+            lastSocialMove = menu;
+            PlayerPhase(dialogueUnit);
+        } else {
+            Debug.Log("BarSpaceController: Logging player choice in barkeepEngine");
+            barkeepEngine.DoMove(dialogueUnit);
+            NPCPhase(dialogueUnit);
+        }
+
+        return true;
+    }
+
+    void NextConversation()
+    {
         Townie patron = barPatronSelector.PickRandomPatron();
 
-        if (patron != null) {
-            Debug.Log("BarSpaceController: Setting " + patron);
+        //check if there is a patron left
+        if(patron != null) {
             SetPatron(patron);
         } else {
-            StartCoroutine(AdvanceDay());
-        }    
-    }
-
-    public IEnumerator AdvanceDay()
-    {
-        worldHub.DayStep();
-        yield return dayLoader.LoadingScreenAscyn();
-
-        Debug.Log("BarSpaceController: Begining Evening");
-        AddDaySeperator();
-        barPatronSelector.NewNight();
-        sideNotebookController.UpdateDaily();
-        SetNextPatron();
+            //the day must be over so go start another day
+            AdvanceDay();
+        }
     }
 
     public void SetPatron(Townie townie)
@@ -99,75 +106,52 @@ public class BarSpaceController : MonoBehaviour
 
         Townie barkeepTownie = worldHub.GetTownies().Single(x => x.townieInformation.id == "barkeep");
         barkeepEngine = new BarkeepEngine(barkeepTownie, partner, barMenu);
-        patronEngine = new PatronEngine(townie, barMenu); 
+        patronEngine = new PatronEngine(townie, barMenu);
         barkeepVerbalizer = new ConversationVerbalizer(barkeepTownie, partner.id);
         patronVerbalizer = new ConversationVerbalizer(townie, "barkeep");
 
         patronPicker.gameObject.SetActive(false);
 
-        Debug.Log("BarSpaceController: Set "+townie.Id);
+        NPCPhase(convStart);
+    }
 
-        StartCoroutine(NPCPhase(new SocialMove("start")));
+    void AdvanceDay()
+    {
+        StartCoroutine(WaitUntilDayLoaded(StartNewDay));
+
+        //should run:
+        // - dayloadiner.LoadingScreenAscyn
+        // - StartNewDay()
+        //      - SetPatron(nextPatron)
+        //          -NPCPhase(convStart)
+    }
+
+    bool StartNewDay()
+    {
+        AddDaySeperator();
+        barPatronSelector.NewNight();
+        sideNotebookController.UpdateDaily();
+
+        Townie patron = barPatronSelector.PickRandomPatron();
+        SetPatron(patron);
+        return true;
     }
 
 
-    public IEnumerator NPCPhase(SocialMove prompt)
+
+    bool PlayerPhase(SocialMove prompt)
     {
-        Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") reacting to " + prompt);
-        patronEngine.LearnFromInput(prompt.mentionedFacts, prompt.retractedFacts);
-
-        lastSocialMove = patronEngine.GiveResponse(prompt);
-        patronEngine.DecrementTurns();
-
-        PrintResponse(patronEngine.speaker.Id);
-
-        if (lastSocialMove.verb.Contains("pass")) {
-           Debug.Log("BarSpaceController: Detecting a pass, handing controll back to player");
-           PlayerPhase();
-
-        } else if (lastSocialMove.verb.Contains("ENDCONVERSATION")) {
-            Debug.Log("BarSpaceController: Detecting a Conversation end");
-
-            SetNextPatron();
-            
-        } else {
-            Debug.Log("BarSpaceController: NPC("+patronEngine.speaker+") responding with " + lastSocialMove);
-
-            SocialMove move = lastSocialMove;
-
-            DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(move);
-
-            dialogueBoxController.DisplayNPCAction(npcDialogue);
-
-            yield return logController.AddElement(npcDialogue);
-
-            Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") done speaking: " + npcDialogue);
-
-            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts, move.retractedFacts);
-            AddAllFacts(npcDialogue.facts);
-            RemoveRetractedFacts(move.retractedFacts);
-
-            PlayerPhase();
-
-        }
-    }
-
-    public void PlayerPhase()
-    {
-        Debug.Log("BarSpaceController: starting player phase");
-
-
-        if ( patronEngine.MaxTurns <= 0) {
+        if (patronEngine.MaxTurns <= 0) {
             Debug.Log("BarSpaceController: Patron out of turns, moving to end of conversation");
 
-            lastSocialMove = new SocialMove("turnsUp");
+            prompt = new SocialMove("turnsUp");
 
-            StartCoroutine(NPCPhase(lastSocialMove));
-            
+            NPCPhase(prompt);
+
         } else {
             Debug.Log("BarSpaceController: Opening player options");
 
-            List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(lastSocialMove);
+            List<SocialMove> bestSocialMoves = barkeepEngine.GetSocialMoves(prompt);
             List<DialogueUnit> dialogueUnits = new List<DialogueUnit>();
             foreach (SocialMove socialMove in bestSocialMoves) {
                 dialogueUnits.Add(barkeepVerbalizer.ExpressSocialMove(socialMove));
@@ -175,53 +159,74 @@ public class BarSpaceController : MonoBehaviour
             dialogueBoxController.DisplayPlayerActions(dialogueUnits);
 
         }
+
+        return true;
     }
 
-    public void PlayerChoiceButtonPush(DialogueUnit dialogueUnit)
+    void NPCPhase(SocialMove prompt)
     {
-        StartCoroutine(OnPlayerChoiceButtonPush(dialogueUnit));
-    }
+        patronEngine.LearnFromInput(prompt.mentionedFacts, prompt.retractedFacts);
 
-    public IEnumerator OnPlayerChoiceButtonPush(DialogueUnit dialogueUnit)
-    {
-        Debug.Log("BarSpaceController: player picked:" + dialogueUnit);
-        Debug.Log("Barkeep: " + dialogueUnit.underpinningSocialMove + "(" + dialogueUnit.underpinningSocialMove.verb + ")");
-        PrintResponse("barkeep");
+        SocialMove response = patronEngine.GiveResponse(prompt);
+        patronEngine.DecrementTurns();
 
+        PrintResponse(patronEngine.speaker.Id, response);
 
-        yield return logController.AddElement(dialogueUnit);
+        if (response.verb.Contains("pass")) {
+            Debug.Log("BarSpaceController: Detecting a pass, handing controll back to player");
+            PlayerPhase(response);
 
-        if (dialogueUnit.underpinningSocialMove is SocialMenu menu) {
-            Debug.Log("BarSpaceController: Detecting Additional Choice, looping back to player turn");
-            lastSocialMove = menu;
-            PlayerPhase();
+        } else if (response.verb.Contains("ENDCONVERSATION")) {
+            Debug.Log("BarSpaceController: Detecting a Conversation end");
+
+            NextConversation();
+
         } else {
-            Debug.Log("BarSpaceController: Logging player choice in barkeepEngine");
-            barkeepEngine.DoMove(dialogueUnit.underpinningSocialMove);
-            StartCoroutine(NPCPhase(dialogueUnit.underpinningSocialMove));
+            Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") responding with " + response);
+
+            DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(response);
+
+            dialogueBoxController.DisplayNPCAction(npcDialogue);
+
+            Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") done speaking: " + npcDialogue);
+
+            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts, response.retractedFacts);
+            AddAllFacts(npcDialogue.facts);
+            RemoveRetractedFacts(response.retractedFacts);
+
+
+            StartCoroutine(WaitUntilDisplayed(npcDialogue, PlayerPhase));
+            // should run:
+            // - logController.AddElement(npcDialogue)
+            // - PlayerPhase(npcDialogue.underpinningSocialMove)
+
         }
     }
 
 
-    void AddAllFacts(List<WorldFact> facts)
+
+    IEnumerator WaitUntilDayLoaded(System.Func<bool> toDoAfterDayLoad)
     {
-        sideNotebookController.AddManyElements(facts);
+        worldHub.DayStep();
+        yield return dayLoader.LoadingScreenAscyn();
+
+        toDoAfterDayLoad();
     }
 
 
-    void RemoveRetractedFacts(List<WorldFact> facts)
+    IEnumerator WaitUntilDisplayed(DialogueUnit npcDialogue, System.Func<SocialMove, bool> toDoAfterDisplay)
     {
-        foreach(WorldFact fact in facts) {
-            sideNotebookController.RemoveElement(fact);
-        }
+        yield return logController.AddElement(npcDialogue);
+
+        toDoAfterDisplay(npcDialogue.underpinningSocialMove);
     }
 
 
-    void PrintResponse(string speaker)
+    void PrintResponse(string speaker, SocialMove move)
     {
-        Debug.Log(speaker + ":" + lastSocialMove +
-            "(" + lastSocialMove.verb + ") + [" + string.Join(",", lastSocialMove.mentionedFacts) + "] " +
-            " - [" + string.Join(",", lastSocialMove.retractedFacts) + "]");
+        Debug.Log(speaker + ":" + move +
+            "(" + move.verb + ") + [" + string.Join(",", move.mentionedFacts) + "] " +
+            " - [" + string.Join(",", move.retractedFacts) + "]");
     }
 
 
@@ -233,5 +238,18 @@ public class BarSpaceController : MonoBehaviour
     public void AddConvSeperator()
     {
         logController.AddConversationSeperator();
+    }
+
+    void AddAllFacts(List<WorldFact> facts)
+    {
+        sideNotebookController.AddManyElements(facts);
+    }
+
+
+    void RemoveRetractedFacts(List<WorldFact> facts)
+    {
+        foreach (WorldFact fact in facts) {
+            sideNotebookController.RemoveElement(fact);
+        }
     }
 }
