@@ -83,7 +83,7 @@ public class WorldHub : MonoBehaviour
         List<ExecutedAction> executedActions = new List<ExecutedAction>();
         foreach (Townie person in allPeople) {
             if (person.name == "barkeep") continue;
-            
+
             if (chosenActions[person] == null) {
                 person.townieInformation.knownGoals = person.gm.GetGoalsList();
                 ActionHeuristicManager ahm = new ActionHeuristicManager(person.townieInformation, person.ws);

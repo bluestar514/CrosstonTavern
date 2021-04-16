@@ -3835,7 +3835,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -3866,7 +3866,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 687690324}
-        m_MethodName: PushForNextPatron
+        m_MethodName: ButtonPushNextPatron
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4582,8 +4582,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 379978011}
   m_HandleRect: {fileID: 379978009}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 0.00000007978453
+  m_Size: 0.5192308
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6024,7 +6024,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -6055,7 +6055,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 687690324}
-        m_MethodName: ButtonPushAdvanceDay
+        m_MethodName: ButtonPushNextDay
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9001,7 +9001,7 @@ PrefabInstance:
     - target: {fileID: 4156570787677331912, guid: b420ad376a8c971418ce58e1c79c8231,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -21
+      value: -20.99997
       objectReference: {fileID: 0}
     - target: {fileID: 4156570787677331912, guid: b420ad376a8c971418ce58e1c79c8231,
         type: 3}
@@ -10310,7 +10310,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000030517578, y: 382.49994}
+  m_AnchoredPosition: {x: 0.000030517578, y: 382.49997}
   m_SizeDelta: {x: 1044.5, y: 795.6}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1302237389
@@ -10647,7 +10647,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000010463032, y: 0.000045776367}
+  m_AnchoredPosition: {x: -0.000010463032, y: -0.000015258789}
   m_SizeDelta: {x: 152.4, y: 353.1}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1437252594

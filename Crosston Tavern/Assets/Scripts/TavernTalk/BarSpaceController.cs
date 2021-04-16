@@ -53,11 +53,13 @@ public class BarSpaceController : MonoBehaviour
 
     public void ButtonPushNextPatron()
     {
+        Debug.Log("Pressing Next Patron");
         NextConversation();
     }
 
     public void ButtonPushNextDay()
     {
+        Debug.Log("Pressing Next Day");
         AdvanceDay();
     }
 
@@ -99,6 +101,8 @@ public class BarSpaceController : MonoBehaviour
 
     public void SetPatron(Townie townie)
     {
+        Debug.Log("Setting patron");
+
         AddConvSeperator();
 
         Person partner = townie.townieInformation;
@@ -117,6 +121,7 @@ public class BarSpaceController : MonoBehaviour
 
     void AdvanceDay()
     {
+        worldHub.DayStep();
         StartCoroutine(WaitUntilDayLoaded(StartNewDay));
 
         //should run:
@@ -207,8 +212,13 @@ public class BarSpaceController : MonoBehaviour
 
     IEnumerator WaitUntilDayLoaded(System.Func<bool> toDoAfterDayLoad)
     {
-        worldHub.DayStep();
+        
+        
+        
         yield return dayLoader.LoadingScreenAscyn();
+        yield return new WaitForEndOfFrame();
+
+        Debug.Log("finished loading day");
 
         toDoAfterDayLoad();
     }
