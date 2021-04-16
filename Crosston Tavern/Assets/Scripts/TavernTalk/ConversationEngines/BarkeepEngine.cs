@@ -264,7 +264,7 @@ public class BarkeepEngine : ConversationEngine
     {
         List<WorldFact> facts = speaker.ws.knownFacts.GetFacts().FindAll(fact => {
             return fact is WorldFactGoal goalFact &&
-                goalFact.modifier.Contains("player");
+                goalFact.modifier.Contains(WorldFactGoal.Modifier.player);
         });
 
 
@@ -279,7 +279,7 @@ public class BarkeepEngine : ConversationEngine
     {
         List<WorldFact> facts = speaker.ws.knownFacts.GetFacts().FindAll(fact => {
             return fact is WorldFactGoal goalFact &&
-                goalFact.modifier.Contains("player");
+                goalFact.modifier.Contains(WorldFactGoal.Modifier.player);
         });
 
 

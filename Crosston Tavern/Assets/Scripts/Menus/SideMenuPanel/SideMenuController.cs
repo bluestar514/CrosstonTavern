@@ -25,7 +25,7 @@ public class SideMenuController<T> : ToggleableMenuElement
     {
         DisplayPanel<T> panel = Instantiate(p_DisplayPanel, contentPanel.transform).GetComponent<DisplayPanel<T>>();
 
-        panel.Fill(element);
+        StartCoroutine(panel.Fill(element));
 
         displayPanels.Add(panel);
     }

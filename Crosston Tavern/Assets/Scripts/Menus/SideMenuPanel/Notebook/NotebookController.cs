@@ -6,6 +6,11 @@ public class NotebookController : SideMenuController<WorldFact>
 {
     public MainNotebookController notebook;
 
+    public void UpdateDaily()
+    {
+        notebook.UpdateDaily();
+    }
+
     public void AddManyElements(List<WorldFact> facts)
     {
         foreach (WorldFact fact in facts) {

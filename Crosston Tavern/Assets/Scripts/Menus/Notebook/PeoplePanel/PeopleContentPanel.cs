@@ -55,6 +55,8 @@ public class PeopleContentPanel : MonoBehaviour
                 AddGoal(goalFact);
                 return true;
             } else {
+                MarkGoal(goalFact);
+
                 return false;
             }
         } else if (fact is WorldFactPreference) {
@@ -106,6 +108,14 @@ public class PeopleContentPanel : MonoBehaviour
         }
     }
 
+    public void FadeOutOfDateGoals()
+    {
+        foreach(WorldFactDisplayObj panel in knownGoals) {
+            panel.MultiplyFadeLevel(2f / 3);
+        }
+    }
+
+
     bool AddPreference(PreferenceLevel level, string item) {
         if (level == PreferenceLevel.neutral) return false;
 
@@ -121,47 +131,45 @@ public class PeopleContentPanel : MonoBehaviour
         return true;
     }
 
+    void MarkGoal(WorldFact fact)
+    {
+        if (fact is WorldFactGoal goalFact) {
+            WorldFactDisplayObj obj = FindFact(fact);
+
+            obj.ResetFadeLevel();
+            
+        }
+    }
+
     public void MarkStuckGoals(List<WorldFact> facts)
     {
         foreach(WorldFactDisplayObj obj in knownGoals) {
-            if(obj.GetComponent<Image>().color == Color.red)
-                ColorFact(obj, goalPrefab.GetComponent<Image>().color);
+            obj.RemoveModifier(WorldFactGoal.Modifier.stuck);
         }
 
         foreach (WorldFact fact in facts) {
+            WorldFactDisplayObj panel = FindFact(fact);
+
             if (fact is WorldFactGoal factGoal &&
-                factGoal.modifier.Contains("stuck")) {
-                //Debug.Log("Marking fact(" + fact + ") as stuck");
-                ColorFact(fact, Color.red);
+                factGoal.modifier.Contains(WorldFactGoal.Modifier.stuck) &&
+                panel != null){
+                panel.AddModifier(WorldFactGoal.Modifier.stuck);
             }
         }
     }
 
     public void MarkPlayerSpecifiedGoals(List<WorldFact> facts)
     {
+        foreach (WorldFactDisplayObj obj in knownGoals) {
+            obj.RemoveModifier(WorldFactGoal.Modifier.player);
+        }
+
         foreach (WorldFact fact in facts) {
             if (fact is WorldFactGoal factGoal &&
-                factGoal.modifier.Contains("player")) {
-                ColorFact(fact, Color.yellow);
+                factGoal.modifier.Contains(WorldFactGoal.Modifier.player)) {
+                FindFact(fact).AddModifier(WorldFactGoal.Modifier.player);
             }
         }
-    }
-
-    void ColorFact(WorldFact fact, Color color)
-    {
-        WorldFactDisplayObj obj = FindFact(fact);
-
-        ColorFact(obj, color);
-    }
-
-    void ColorFact(WorldFactDisplayObj obj, Color color)
-    {
-        if (obj == null) {
-            Debug.LogWarning("Couldn't find a WorldFactDisplayObject to change its color.");
-            return;
-        }
-
-        obj.GetComponent<Image>().color = color;
     }
 
     WorldFactDisplayObj FindFact(WorldFact fact)

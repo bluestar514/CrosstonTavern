@@ -56,7 +56,7 @@ public class SocialMoveFactory
 
                         WorldFactGoal fact = new WorldFactGoal(child, speaker.Id);
 
-                        if (stuckGoals.Contains(child)) fact.modifier.Add("stuck");
+                        if (stuckGoals.Contains(child)) fact.modifier.Add(WorldFactGoal.Modifier.stuck);
 
                         facts.Add(fact);
                     }
@@ -106,9 +106,27 @@ public class SocialMoveFactory
 
     public static SocialMove MakeTellAboutGoals(Townie speaker)
     {
-        List<WorldFact> facts = MakeGoalsFacts(speaker, speaker.gm.GetGoalsList());
+        List<Goal> topGoals = speaker.gm.GetTopLevelGoals();
 
-        return new SocialMove("tellAboutGoals", mentionedFacts: facts);
+
+        List<SocialMove> moves = new List<SocialMove>();
+        foreach(Goal goal in topGoals) {
+            List<Goal> subGoals = speaker.gm.GetChildGoals(goal);
+            subGoals =new List<Goal>( from g in subGoals
+                                 where !(g is GoalState state &&
+                                        state.state is StatePosition)
+                                 select g);
+
+            subGoals.Insert(0, goal);
+
+            moves.Add(new SocialMove("tellAboutGoal#",
+                                        arguements: new List<string>() { goal.ToString() },
+                                        mentionedFacts: MakeGoalsFacts(speaker, subGoals)));
+        }
+
+        
+
+        return new CompoundSocialMove("tellAboutGoals", socialMoves: moves);
     }
 
     public static SocialMove MakeTellAboutDayEvents(Townie speaker)
@@ -322,10 +340,10 @@ public class SocialMoveFactory
         foreach (WorldFact generalFact in facts) {
             if (generalFact is WorldFactGoal goalFact) {
                 if (stuckGoals.Contains(goalFact.goal)) {
-                    goalFact.modifier.Add("stuck");
+                    goalFact.modifier.Add(WorldFactGoal.Modifier.stuck);
                 }
                 if (highPriority.Contains(goalFact.goal)) {
-                    goalFact.modifier.Add("highPriority");
+                    goalFact.modifier.Add(WorldFactGoal.Modifier.highPriority);
                 }
             }
 

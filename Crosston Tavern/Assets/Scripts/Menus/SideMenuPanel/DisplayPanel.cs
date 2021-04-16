@@ -9,11 +9,13 @@ public class DisplayPanel<T> : MonoBehaviour
 
     protected T fact;
 
-    public virtual void Fill(T fact)
+    public virtual IEnumerator Fill(T fact)
     {
         this.fact = fact;
 
         factText.text = fact.ToString();
+
+        yield break;
     }
 
     public bool Matches(T fact)

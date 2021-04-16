@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class FactDisplay : DisplayPanel<WorldFact>
 {
 
-    public override void Fill(WorldFact fact)
+    public override IEnumerator Fill(WorldFact fact)
     {
-        base.Fill(fact);
+        yield return base.Fill(fact);
 
         factText.text = fact.Verbalize("barkeeper", "none");
     }

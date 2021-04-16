@@ -14,52 +14,57 @@ public class LogController: MonoBehaviour
 
     List<RecordDisplay> displayPanels = new List<RecordDisplay>();
 
-    public virtual void Initialize(List<DialogueUnit> records)
+    Coroutine scrollFunction;
+
+    public virtual void Initialize()
     {
-        foreach (DialogueUnit record in records) {
-            StartCoroutine(AddElement(record));
-        }
+        
     }
 
     public virtual IEnumerator AddElement(DialogueUnit element)
     {
+        Debug.Log("LogController: Adding new dialogue unit element: " + element);
+
         RecordDisplay panel = Instantiate(p_DisplayPanel, contentPanel.transform).GetComponent<RecordDisplay>();
 
-        panel.Fill(element);
+        ScrollToBottom();
+
+        yield return panel.Fill(element);
 
         displayPanels.Add(panel);
 
-        while (!panel.ready) {
-            yield return new WaitForEndOfFrame();
-            ScrollToBottom();
-        }
+        StopCoroutine(scrollFunction);
+        Debug.Log("LogController: stopping auto scroll");
 
-        ScrollToBottom();
     }
 
     public virtual void AddDaySeperator(WorldTime date)
     {
         Instantiate(daySeperatorPrefab, contentPanel.transform).GetComponent<DaySeperator>().Initialize(date);
-        ScrollToBottom();
+        //ScrollToBottom();
     }
 
     public virtual void AddConversationSeperator()
     {
         Instantiate(conversationSeperatorPrefab, contentPanel.transform);
-        ScrollToBottom();
+        //ScrollToBottom();
     }
 
     protected virtual void ScrollToBottom()
     {
 
-        StartCoroutine(Scroll());
+        scrollFunction = StartCoroutine(Scroll());
     }
 
     IEnumerator Scroll()
     {
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        //Canvas.ForceUpdateCanvases();
-        scrollRect.verticalNormalizedPosition = 0;
+        Debug.Log("LogController: Starting scroll down");
+
+        while (true) {
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            //Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 0;
+        }
     }
 }

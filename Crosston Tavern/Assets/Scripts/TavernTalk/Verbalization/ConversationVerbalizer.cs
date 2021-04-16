@@ -279,30 +279,51 @@ public class ConversationVerbalizer
 
                 break;
             case "tellAboutGoals":
-                List<string> motivations = new List<string>();
 
-                //I want to have 3 to 1000 trout
-                //I want to be friendlier with Alicia
-                //I want to be dating Alicia
-                //I want Alicia to have 4 to 5 strawberry
-                foreach (WorldFact fact in facts) {
-                    if(fact is WorldFactPotentialAction) {
-                        actionFact = (WorldFactPotentialAction)fact;
-                        motivations.Add(v.VerbalizeAction(actionFact.action, true, false));
+
+                if(socialMove is CompoundSocialMove compound) {
+
+                    
+                    List<string> segments = new List<string>(); 
+                    foreach (SocialMove move in compound.socialMoves) {
+                        List<string> motivations = new List<string>();
+
+                        //I want to have 3 to 1000 trout
+                        //I want to be friendlier with Alicia
+                        //I want to be dating Alicia
+                        //I want Alicia to have 4 to 5 strawberry
+
+                        goals = new List<string>();
+                        foreach (WorldFact fact in move.mentionedFacts) {
+                            if (fact is WorldFactPotentialAction) {
+                                actionFact = (WorldFactPotentialAction)fact;
+                                motivations.Add(v.VerbalizeAction(actionFact.action, true, false));
+                            }
+                            if (fact is WorldFactGoal) {
+                                goalFact = (WorldFactGoal)fact;
+                                goals.Add(v.VerbalizeGoal(goalFact.goal));
+                            }
+                        }
+
+                        verbalization = "";
+                        if (motivations.Count > 0) {
+                            verbalization = "I want " + Verbalizer.MakeNiceList(motivations);
+                            verbalization += ", so I can " + Verbalizer.MakeNiceList(goals) + ".";
+                        } else {
+                            verbalization = verbalization + "I want " + string.Join(". I want ", goals) + ". ";
+                        }
+
+                        segments.Add(verbalization);
+                        
                     }
-                    if (fact is WorldFactGoal) {
-                        goalFact = (WorldFactGoal)fact;
-                        goals.Add(v.VerbalizeGoal(goalFact.goal));
-                    }
+
+                    verbalization = string.Join("\n", segments);
                 }
-                verbalization = "";
-                if (motivations.Count > 0) {
-                    verbalization = "I want " + Verbalizer.MakeNiceList(motivations);
-                    verbalization += ", so I can " + Verbalizer.MakeNiceList(goals)+".";
-                } else {
-                    verbalization = verbalization + "I want " + string.Join(". I want ", goals) + ". ";
-                }
+
+
                 break;
+
+
             case "tellWhyAction#":
                 foreach (WorldFact fact in facts) {
                     if (fact is WorldFactGoal) {
@@ -320,9 +341,6 @@ public class ConversationVerbalizer
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
 
-                        Debug.Log(goalFact);
-                        Debug.Log(goalFact.goal);
-                        Debug.Log(v);
                         string snippet = v.VerbalizeGoal(goalFact.goal);
                         Debug.Log(snippet);
 
@@ -841,7 +859,7 @@ public class ConversationVerbalizer
 
                         goals.Add(goalVerbalization);
 
-                        if (goalFact.modifier.Contains("stuck")) {
+                        if (goalFact.modifier.Contains(WorldFactGoal.Modifier.stuck)) {
                             stuck.Add(goalVerbalization);
                         }
                     }

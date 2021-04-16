@@ -14,13 +14,13 @@ public class BarSpaceControllerDebug : BarSpaceController
     {
         InitialSettings();
 
-        dayLoader.LoadNextDay();
+        
         StartCoroutine(DoWhenReady());
     }
 
     IEnumerator DoWhenReady()
     {
-        yield return new WaitUntil(() => worldHub.ready);
+        yield return dayLoader.LoadingScreenAscyn();
         Init();
 
     }

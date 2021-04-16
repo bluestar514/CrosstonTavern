@@ -9,9 +9,7 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
     public VerticalLayoutGroup namePositioner;
     public VerticalLayoutGroup contentPositioner;
 
-    public bool ready = false;
-
-    public override void Fill(DialogueUnit fact)
+    public override IEnumerator Fill(DialogueUnit fact)
     {
         this.fact = fact;
 
@@ -27,21 +25,31 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
             contentPositioner.padding.left = 0;
             contentPositioner.padding.right = 50;
 
-            ready = true;
+            yield break;
         } else {
-            StartCoroutine(TypeWriter(fact.verbalization, .05f));
+            yield return TypeWriter(fact.verbalization, .05f);
         }
     }
 
 
     IEnumerator TypeWriter(string content, float textSpeed)
     {
+        Debug.Log("RecordDisplay: Starting TypeWriter");
+
         factText.text = "";
         foreach(char c in content) {
             factText.text += c;
+
+            if (Input.GetKey(KeyCode.Space)) {
+                Debug.Log("RecordDisplay: Detecting Typewriter skip");
+                factText.text = content;
+                break;
+            }
+
+
             yield return new WaitForSeconds(textSpeed);
         }
 
-        ready = true;
+        Debug.Log("RecordDisplay: Ending TypeWriter");
     }
 }

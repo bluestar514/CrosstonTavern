@@ -7,13 +7,20 @@ public class MainNotebookController : MonoBehaviour
     public List<MainNotebookTab> tabs;
     public NotebookLocationsPanel locationsTab;
 
+    public void UpdateDaily()
+    {
+        foreach (MainNotebookTab tab in tabs) {
+            tab.UpdateDaily();
+        }
+    }
+
     public void OpenTab(GameObject openTab)
     {
         foreach(MainNotebookTab tab in tabs) {
             tab.gameObject.SetActive(false);
         }
 
-        openTab.SetActive(true);
+        openTab.GetComponent<MainNotebookTab>().OpenTab();
     }
 
     public void AddMany(List<WorldFact> facts)

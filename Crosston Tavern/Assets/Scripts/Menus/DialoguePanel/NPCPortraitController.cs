@@ -33,7 +33,10 @@ public class NPCPortraitController : MonoBehaviour
             portrait.image.gameObject.SetActive(false);
         }
 
-        portraitDict[speaker][emotion].gameObject.SetActive(true);
+        if (speaker != "") {
+            portraitDict[speaker][emotion].gameObject.SetActive(true);
+        }
+        
     }
 
 }

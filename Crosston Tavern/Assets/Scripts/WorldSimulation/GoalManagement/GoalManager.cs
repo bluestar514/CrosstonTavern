@@ -73,19 +73,7 @@ public class GoalManager
         }
 
         // Get High level goals:
-        List<Goal> initialGoals = new List<Goal>();
-
-        List<GoalModule> allModules = new List<GoalModule>(modules);
-        foreach(Obligation ob in actor.schedule.obligations) {
-
-            allModules.Add(ob.gMod);
-        }
-
-        foreach (GoalModule module in allModules) {
-            if (module.Precondtion(ws)) {
-                initialGoals.AddRange(module.goals);
-            }
-        }
+        List<Goal> initialGoals = GetTopLevelGoals();
 
         // For x iterations:
         List<Goal> allGoals = new List<Goal>(initialGoals);
@@ -234,6 +222,25 @@ public class GoalManager
                           select goal;
 
         return new List<Goal>(orderedPriority);
+    }
+
+    public List<Goal> GetTopLevelGoals()
+    {
+        List<Goal> initialGoals = new List<Goal>();
+
+        List<GoalModule> allModules = new List<GoalModule>(modules);
+        foreach (Obligation ob in actor.schedule.obligations) {
+
+            allModules.Add(ob.gMod);
+        }
+
+        foreach (GoalModule module in allModules) {
+            if (module.Precondtion(ws)) {
+                initialGoals.AddRange(module.goals);
+            }
+        }
+
+        return initialGoals;
     }
 
     class OutcomeRestraints

@@ -9,18 +9,12 @@ public class DayLoading : MonoBehaviour
 
     public WorldHub hub;
 
-
-    public IEnumerator LoadNextDay()
-    {
-        yield return StartCoroutine(LoadingScreenAscyn());
-    }
-
     public IEnumerator LoadingScreenAscyn()
     {
         Debug.Log("DayLoading: Starting Animation");
         background.SetActive(true);
 
-        while(hub.progress < hub.total) {
+        while(hub.progress < hub.total || !hub.ready) {
             loadingBar.SetProgress((float)hub.progress /(float) hub.total);
             yield return new WaitForEndOfFrame();
         }

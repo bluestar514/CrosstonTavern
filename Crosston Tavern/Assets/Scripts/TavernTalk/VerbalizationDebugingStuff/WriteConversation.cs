@@ -23,8 +23,6 @@ public class WriteConversation : LogController
 
     public override IEnumerator AddElement(DialogueUnit element)
     {
-        yield return base.AddElement(element);
-
         SocialMove move = element.underpinningSocialMove;
 
         fh.WriteString("\t" + element.speakerName + " (" + element.emotion + "):\t" + move+ "\n" +
@@ -33,20 +31,19 @@ public class WriteConversation : LogController
                     "\t\t\t-\t" + string.Join("\n\t\t\t \t", move.retractedFacts) + "\n\n" +
 
                     "\t\t" + element.verbalization);
+
+        fh.WriteString("\n");
+
+        yield return base.AddElement(element);
     }
 
-    public override void Initialize(List<DialogueUnit> records)
+    public override void Initialize()
     {
-        base.Initialize(records);
+        base.Initialize();
 
         fh.NewFile();
     }
 
-    protected override void ScrollToBottom()
-    {
-        base.ScrollToBottom();
-        fh.WriteString("\n");
-    }
 
 
 

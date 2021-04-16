@@ -185,7 +185,7 @@ public class PatronEngine :ConversationEngine
                         );
 
                     WorldFactGoal goalFact = new WorldFactGoal(goal, speaker.Id);
-                    goalFact.modifier.Add("player");
+                    goalFact.modifier.Add(WorldFactGoal.Modifier.player);
 
                     return new SocialMove("acceptSuggestion#",
                                         arguements: new List<string> { goal.ToString() },
@@ -200,7 +200,7 @@ public class PatronEngine :ConversationEngine
             case "stopPlayerGivenGoal#":
 
                 if(prompt.mentionedFacts[0] is WorldFactGoal gf) {
-                    if (gf.modifier.Contains("player")) {
+                    if (gf.modifier.Contains(WorldFactGoal.Modifier.player)) {
                         speaker.gm.GetParentModule(gf.goal).ForEach(module => {
                             speaker.gm.RemoveModule(module);
                         });

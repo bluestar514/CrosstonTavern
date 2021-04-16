@@ -15,6 +15,16 @@ public class NotebookPeoplePanel : MainNotebookTab
     public GameObject GoalPanelPrefab;
     public GameObject PeopleNameButtonPrefab;
 
+    public NPCPortraitController portraitController;
+
+
+    public override void UpdateDaily()
+    {
+        foreach(PeopleContentPanel panel in peopleToContentDict.Values) {
+            panel.FadeOutOfDateGoals();
+        }
+    }
+
 
     /// <summary>
     /// Used for adding relationship data at once
@@ -60,7 +70,7 @@ public class NotebookPeoplePanel : MainNotebookTab
     void UpdateStuckGoals(Dictionary<string, List<WorldFact>> sortedFacts)
     {
         foreach (string owner in sortedFacts.Keys) {
-            if (ContainsMarkedGoal(sortedFacts[owner], "stuck")){
+            if (ContainsMarkedGoal(sortedFacts[owner],WorldFactGoal.Modifier.stuck)){
                 GetPersonContentPanel(owner).MarkStuckGoals(sortedFacts[owner]);
             }
         }
@@ -68,12 +78,12 @@ public class NotebookPeoplePanel : MainNotebookTab
     void UpdatePlayerDefinedGoals(Dictionary<string, List<WorldFact>> sortedFacts)
     {
         foreach (string owner in sortedFacts.Keys) {
-            if (ContainsMarkedGoal(sortedFacts[owner], "player")) {
+            if (ContainsMarkedGoal(sortedFacts[owner], WorldFactGoal.Modifier.player)) {
                 GetPersonContentPanel(owner).MarkPlayerSpecifiedGoals(sortedFacts[owner]);
             }
         }
     }
-    bool ContainsMarkedGoal(List<WorldFact> facts, string mark)
+    bool ContainsMarkedGoal(List<WorldFact> facts, WorldFactGoal.Modifier mark)
     {
         return facts.Any(fact => {
             if (fact is WorldFactGoal factGoal) {
@@ -132,6 +142,14 @@ public class NotebookPeoplePanel : MainNotebookTab
         }
     }
 
+    public override void OpenTab()
+    {
+        base.OpenTab();
+
+        SetPortait("");
+        
+    }
+
     public override void OpenSubTab(string person)
     {
         foreach(PeopleContentPanel panel in peopleToContentDict.Values) {
@@ -139,6 +157,15 @@ public class NotebookPeoplePanel : MainNotebookTab
         }
 
         peopleToContentDict[person].gameObject.SetActive(true);
+
+        SetPortait(person);
     }
 
+
+    void SetPortait(string name)
+    {
+        portraitController.SetPortrait(name, NPCPortrait.State.happy);
+
+        portraitController.GetComponent<SetText>().Set(name);
+    }
 }

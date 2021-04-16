@@ -8,7 +8,15 @@ public class WorldFactGoal: WorldFact
 {
     public Goal goal;
     public string owner;
-    public List<string> modifier = new List<string>();
+    public List<Modifier> modifier = new List<Modifier>();
+
+    public enum Modifier
+    {
+        player,
+        stuck,
+        highPriority,
+        error
+    }
 
     public WorldFactGoal(Goal goal, string owner)
     {
@@ -33,7 +41,7 @@ public class WorldFactGoal: WorldFact
 
     public override string ToString()
     {
-        return "{Goal:"+ owner+ " - " + goal.ToString()+"}";
+        return "{Goal:"+ owner+ " - " + goal.ToString()+ "["+ string.Join(",",modifier) + "]}";
     }
 
     public override string Verbalize(string speaker, string listener, WorldState ws = null)
