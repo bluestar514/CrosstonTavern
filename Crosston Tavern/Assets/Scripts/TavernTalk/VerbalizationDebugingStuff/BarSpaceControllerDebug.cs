@@ -27,10 +27,10 @@ public class BarSpaceControllerDebug : BarSpaceController
 
     void InitialSettings()
     {
-        if (dialogueBoxController != null)
-            Debug.LogError("dialogueBoxController in BarSpaceControllerDebugger should not be set" +
-                " as it is overriden with the autoPlayer setting");
-        dialogueBoxController = autoPlayer;
+        //if (dialogueboxcontroller != null)
+        //    debug.logerror("dialogueboxcontroller in barspacecontrollerdebugger should not be set" +
+        //        " as it is overriden with the autoplayer setting");
+        //dialogueboxcontroller = autoplayer;
 
         if (sideNotebookController != null)
             Debug.LogError("sideNotebookController in BarSpaceControllerDebugger should not be set" +

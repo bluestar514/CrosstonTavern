@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BarSpaceController : MonoBehaviour
 {
-    public DialogueBoxController dialogueBoxController;
+    
     public NotebookController sideNotebookController;
     public LogController logController;
     public PatronPicker patronPicker;
@@ -40,9 +40,8 @@ public class BarSpaceController : MonoBehaviour
     protected bool Init()
     {
         Debug.Log("BarSpaceController: Initialization");
-        dialogueBoxController.Initialize(this);
         sideNotebookController.Initialize(new List<WorldFact>());
-        logController.Initialize();
+        logController.Initialize(this);
 
         barPatronSelector = new BarPatronSelector(worldHub.GetTownies(), worldHub.ws, validPatronNames);
 
@@ -161,7 +160,7 @@ public class BarSpaceController : MonoBehaviour
             foreach (SocialMove socialMove in bestSocialMoves) {
                 dialogueUnits.Add(barkeepVerbalizer.ExpressSocialMove(socialMove));
             }
-            dialogueBoxController.DisplayPlayerActions(dialogueUnits);
+            logController.DisplayPlayerActions(dialogueUnits);
 
         }
 
@@ -191,7 +190,7 @@ public class BarSpaceController : MonoBehaviour
 
             DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(response);
 
-            dialogueBoxController.DisplayNPCAction(npcDialogue);
+            logController.DisplayNPCAction(npcDialogue);
 
             Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") done speaking: " + npcDialogue);
 

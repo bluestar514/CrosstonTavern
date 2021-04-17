@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DialogueBoxController : MonoBehaviour
 {
-    public NPCTextBoxController speachPanelMenu;
     public PlayerTextBoxController playerResponseMenu;
     public SpeakerTagController speakerTagPanel;
     public NPCPortraitController portraitController;

@@ -37,9 +37,9 @@ public class WriteConversation : LogController
         yield return base.AddElement(element);
     }
 
-    public override void Initialize()
+    public override void Initialize(BarSpaceController bsc)
     {
-        base.Initialize();
+        base.Initialize(bsc);
 
         fh.NewFile();
     }
