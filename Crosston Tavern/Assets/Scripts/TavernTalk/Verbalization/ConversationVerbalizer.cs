@@ -279,50 +279,15 @@ public class ConversationVerbalizer
 
                 break;
             case "tellAboutGoals":
+                if (socialMove is CompoundSocialMove compound) {
 
-
-                if(socialMove is CompoundSocialMove compound) {
-
-                    
-                    List<string> segments = new List<string>(); 
-                    foreach (SocialMove move in compound.socialMoves) {
-                        List<string> motivations = new List<string>();
-
-                        //I want to have 3 to 1000 trout
-                        //I want to be friendlier with Alicia
-                        //I want to be dating Alicia
-                        //I want Alicia to have 4 to 5 strawberry
-
-                        goals = new List<string>();
-                        foreach (WorldFact fact in move.mentionedFacts) {
-                            if (fact is WorldFactPotentialAction) {
-                                actionFact = (WorldFactPotentialAction)fact;
-                                motivations.Add(v.VerbalizeAction(actionFact.action, true, false));
-                            }
-                            if (fact is WorldFactGoal) {
-                                goalFact = (WorldFactGoal)fact;
-                                goals.Add(v.VerbalizeGoal(goalFact.goal));
-                            }
-                        }
-
-                        verbalization = "";
-                        if (motivations.Count > 0) {
-                            verbalization = "I want " + Verbalizer.MakeNiceList(motivations);
-                            verbalization += ", so I can " + Verbalizer.MakeNiceList(goals) + ".";
-                        } else {
-                            verbalization = verbalization + "I want " + string.Join(". I want ", goals) + ". ";
-                        }
-
-                        segments.Add(verbalization);
-                        
-                    }
-
-                    verbalization = string.Join("\n", segments);
+                    verbalization = VerbalizeGoalTrees(compound);
+                } else {
+                    throw new System.Exception("Incorrect kind of SocialMove created and passed as a <tellAboutGoals>");
                 }
 
 
                 break;
-
 
             case "tellWhyAction#":
                 foreach (WorldFact fact in facts) {
@@ -877,5 +842,90 @@ public class ConversationVerbalizer
         }
 
         return completedActions + todoGoals + stuckGoals; 
+    }
+
+
+    string VerbalizeGoalTrees(CompoundSocialMove compoundSocialMove)
+    {
+        List<string> initialStarts = new List<string>() {
+            "I really want #"
+        };
+
+        List<string> starts = new List<string>() {
+            "Also, I want #",
+            "I also want #"
+        };
+        
+        List<string> continuations = new List<string>() {
+            ". To do that, #",
+            ". For that to happen, #",
+            ", so #",
+            " and so #"
+        };
+
+        List<SocialMove> socialMoves = compoundSocialMove.socialMoves;
+        List<string> completeVerbalization = new List<string>() {
+                VerbalizeGoalBranch(socialMoves[0],
+                                    PickRandom(initialStarts),
+                                    PickRandom(continuations))
+        };
+        socialMoves.RemoveAt(0);
+
+        List<string> alsos = new List<string>() { "Also" };
+        foreach(SocialMove move in socialMoves) {
+
+            string start = PickRandom(starts);
+            if(start == null) {
+                alsos.Add("also");
+                start = string.Join(", ", alsos);
+                start += ", #";
+            }
+
+            string continuation = "";
+            if (move.mentionedFacts.Count > 1) {
+                continuation = PickRandom(continuations, false);
+            }
+
+            string partialVerbalization = VerbalizeGoalBranch(move, start, continuation);
+
+            completeVerbalization.Add(partialVerbalization);
+
+        }
+
+        return string.Join(".\n", completeVerbalization) + ".";
+    }
+
+    string PickRandom(List<string> lst, bool removeAfter = true)
+    {
+        if (lst.Count == 0) return null;
+
+        int index = Random.Range(0, lst.Count);
+        string value = lst[index];
+        if(removeAfter) lst.RemoveAt(index);
+
+        return value;
+    }
+
+    string VerbalizeGoalBranch(SocialMove move, string start, string continuation)
+    {
+        string verbalization = start;
+
+        List<string> goals = new List<string>();
+        foreach (WorldFact fact in move.mentionedFacts) {
+            
+            if (fact is WorldFactGoal goalFact) {
+                goals.Add(v.VerbalizeGoal(goalFact.goal));
+            }
+        }
+
+        verbalization = verbalization.Replace("#", goals[0]);
+        goals.RemoveAt(0);
+
+        if(continuation != "" && goals.Count > 0) {
+            verbalization += continuation;
+            verbalization = verbalization.Replace("#", "I want "+ Verbalizer.MakeNiceList(goals));
+        }
+
+        return verbalization;
     }
 }

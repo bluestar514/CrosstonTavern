@@ -219,7 +219,8 @@ public class FeatureInitializer
                 "sell_fish_at_market"
             }),
             MakeShop("farmers_market_town", "town", new List<string>() {
-                "sell_crop_at_market"
+                "sell_crop_at_market",
+                "sell_berries_at_market"
             }),
         };
 

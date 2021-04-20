@@ -62,25 +62,25 @@ public class GM_Precondition_TopRelationAxis: GM_Precondition
         string owner = Verbalizer.VerbalizeSubject(this.owner, speaker, listener);
         string target = Verbalizer.VerbalizeSubject(this.target, speaker, listener);
 
-        string others = "the most";
+        string others = "more than anyone";
         if (top > 1) others = "more than almost anyone else";
 
         string opinion = "";
         if(axis == Relationship.Axis.friendly) {
             if (reverse) {
-                opinion = "dislikes";
+                opinion = "dislike";
             } else {
-                opinion = "likes";
+                opinion = "like";
             }
         } else {
             if (reverse) {
-                opinion = "hates";
+                opinion = "hate";
             } else {
-                opinion = "loves";
+                opinion = "love";
             }
         }
 
 
-        return string.Join(" ", new List<string>() { owner, opinion, target, others, "." });
+        return string.Join(" ", new List<string>() { owner, opinion, target, others });
     }
 }

@@ -25,4 +25,10 @@
         return "It was the right time";
     }
 
+
+    public override string ToString()
+    {
+        return "{GoalModule Precondition: Time - (" +
+                        startTime + "~" + endTime + ")}";
+    }
 }

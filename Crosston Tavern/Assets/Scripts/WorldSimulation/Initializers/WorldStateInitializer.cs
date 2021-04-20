@@ -52,13 +52,13 @@ public class WorldStateInitializer
         //                            "I want to be a better fisher."
         //                        )) ;
 
-        townies[finley].gm.AddModule(new GoalModule(
-                                    new List<GM_Precondition>(),
-                                    new List<Goal>() {
-                                        new GoalState(new StateInventoryStatic(townies[finley].townieInformation.id, "blackberry", 20, 100), 1)
-                                    },
-                                    "I like eating blackberries."
-                                ));
+        //townies[finley].gm.AddModule(new GoalModule(
+        //                            new List<GM_Precondition>(),
+        //                            new List<Goal>() {
+        //                                new GoalState(new StateInventoryStatic(townies[finley].townieInformation.id, "blackberry", 20, 100), 1)
+        //                            },
+        //                            "I like eating blackberries."
+        //                        ));
 
 
         townies[sammy].ws.knownFacts.AddFact(new WorldFactResource("river_farm", "common_fish", "trout"), townies[sammy].ws);
@@ -137,6 +137,8 @@ public class WorldStateInitializer
             gm.AddModule(
                 new GoalModule(
                     new List<GM_Precondition>() {
+                        new GM_Precondition_Verbalize_Preference(new WorldFactPreference(townie.Id, PreferenceLevel.loved, item)),
+                        new GM_Precondition_State(new StateInventoryStatic(townie.Id, item, 1, ActionInitializer.INF))
                     },
                     new List<Goal>() {
                         new GoalAction(new BoundAction(eat, name, name, "",
@@ -145,7 +147,7 @@ public class WorldStateInitializer
                                                             }),
                                                             eat.verbilizationInfo
                                                        ),
-                                        (int)GoalManager.GoalPriority.medium
+                                        (int)GoalManager.GoalPriority.high
                         )
                     },
                     name: "loves to eat " + item
@@ -175,6 +177,18 @@ public class WorldStateInitializer
                     new GoalState(new StateSkill(name, "fishing", 90, 100), (float)GoalManager.GoalPriority.medium)
                 },
                 name: "is a fisher"
+             )
+        );
+
+        gm.AddModule(
+            new GoalModule(
+                new List<GM_Precondition>() {
+                    new GM_Precondition_State(new StateProfession(name, "forager"))
+                },
+                new List<Goal>() {
+                    new GoalState(new StateSkill(name, "foraging", 90, 100), (float)GoalManager.GoalPriority.medium)
+                },
+                name: "is a forager"
              )
         );
 

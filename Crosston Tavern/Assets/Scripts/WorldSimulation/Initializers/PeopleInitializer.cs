@@ -32,7 +32,7 @@ public class PeopleInitializer
         new Dictionary<string, List<string>>() {
             {"name", new List<string>(){"finley"}},
             {"home", new List<string>(){"finleysHouse"} },
-            {"profession", new List<string>(){ "unemployed" } },
+            {"profession", new List<string>(){ "forager" } },
             {"loves", new List<string>(){"blackberry_tart"} },
             {"likes", new List<string>(){"blackberry", "salmon", "fried_salmon"} },
             {"dislikes", new List<string>(){"bell_pepper"} },

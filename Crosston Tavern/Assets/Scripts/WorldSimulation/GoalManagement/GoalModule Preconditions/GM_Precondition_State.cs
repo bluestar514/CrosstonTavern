@@ -1,4 +1,8 @@
-﻿public class GM_Precondition_State: GM_Precondition
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GM_Precondition_State: GM_Precondition
 {
     public State state;
     public bool want;
@@ -17,8 +21,32 @@
     public override string Verbalize(string speaker, string listener, WorldState ws = null)
     {
         if (want)
-            return state.Verbalize(speaker, listener, false);
-        else
-            return "NOT " + state.Verbalize(speaker, listener, false);
+            return state.Verbalize(speaker, listener, goal: false, futureTense: false);
+        else {
+            string statement = state.Verbalize(speaker, listener, goal: false, futureTense: false);
+
+            List<string> replace = new List<string>() {
+                "am",
+                "is",
+                "are",
+                "have",
+                "has",
+                "will",
+                "can"
+            };
+
+            foreach(string pos in replace) {
+                statement = statement.Replace(" "+pos+" ", " "+pos+" not ");
+            }
+
+
+            return statement; 
+        }
+    }
+
+    public override string ToString()
+    {
+        return "{GoalModule Precondition: State - " +
+                        state.ToString() + ":" + want + "}";
     }
 }

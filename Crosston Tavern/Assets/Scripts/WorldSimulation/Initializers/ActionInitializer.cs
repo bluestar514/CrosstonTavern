@@ -38,7 +38,7 @@ public class ActionInitializer
                 new Outcome(
                     new ChanceModifierSimple(.19f),
                     new List<Effect>() {
-                        new EffectInventoryVariable("#a#", new List<string>(){"algee" }, 1, 5, new VerbilizationEffectItemGather("caught")),
+                        new EffectInventoryVariable("#a#", new List<string>(){"algae" }, 1, 5, new VerbilizationEffectItemGather("caught")),
                         new EffectSkill("#a#", "fishing", 1)
                     }
                 ),
@@ -75,7 +75,8 @@ public class ActionInitializer
                     new ChanceModifierSimple(.35f),
                     new List<Effect>() {
                         new EffectInventoryVariable("#a#", new List<string>(){"#r_forage#"}, 1, 1, new VerbilizationEffectItemGather("found")),
-                        new EffectKnowledge(new WorldFactResource("#feature#", "rare_forage", "#r_forage#"))
+                        new EffectKnowledge(new WorldFactResource("#feature#", "rare_forage", "#r_forage#")),
+                        new EffectSkill("#a#", "foraging", 1)
                     }
                 ),
                 new Outcome(
@@ -555,6 +556,25 @@ public class ActionInitializer
                 new BindingPortEntity("a", ActionRole.initiator)
             },
             new VerbalizationActionFeatureAt("sell flour", "sold flour")
+        ) },
+        { "sell_berries_at_market" , new GenericAction("sell_berries_at_market", 1,
+            new Precondition(new List<Condition>(){
+                new Condition_IsState(new StateInventoryStatic("#a#", "blackberry", 10, INF), true)
+            }),
+            new List<Outcome>() {
+                new Outcome(
+                    new ChanceModifierSimple(1),
+                    new List<Effect>() {
+                        new EffectSkill("#a#", "foraging", 10),
+                        new EffectInventoryStatic("#a#", "blackberry", -10)
+
+                    }
+                )
+            },
+            new List<BindingPort>() {
+                new BindingPortEntity("a", ActionRole.initiator)
+            },
+            new VerbalizationActionFeatureAt("sell blackberries", "sold blackberries")
         ) },
         {"eat_#item#", new GenericAction("eat_#item#", 1,
             new Precondition(new List<Condition>() {

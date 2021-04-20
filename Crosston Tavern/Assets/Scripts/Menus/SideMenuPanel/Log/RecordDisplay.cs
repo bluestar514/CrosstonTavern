@@ -22,8 +22,9 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
             factText.text = fact.verbalization;
 
             namePositioner.childAlignment = TextAnchor.UpperRight;
-            contentPositioner.padding.left = 0;
-            contentPositioner.padding.right = 50;
+            contentPositioner.childAlignment = TextAnchor.UpperRight;
+            //contentPositioner.padding.left = 0;
+            //contentPositioner.padding.right = 50;
 
             yield break;
         } else {
@@ -40,7 +41,7 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
         foreach(char c in content) {
             factText.text += c;
 
-            if (Input.GetKey(KeyCode.Space)) {
+            if (DetectSkip()) {
                 Debug.Log("RecordDisplay: Detecting Typewriter skip");
                 factText.text = content;
                 break;
@@ -51,5 +52,11 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
         }
 
         Debug.Log("RecordDisplay: Ending TypeWriter");
+    }
+
+    bool DetectSkip()
+    {
+        if (Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0)) return true;
+        else return false;
     }
 }

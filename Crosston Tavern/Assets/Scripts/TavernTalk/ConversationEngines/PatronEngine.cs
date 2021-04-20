@@ -60,31 +60,29 @@ public class PatronEngine :ConversationEngine
 
                 if (scoreOfRecomended >= Mathf.Abs(scoreOfFavorite / 4)) {
                     return new SocialMove("order#OnRecomendation", new List<string>() { recomendedFood.name });
-                } else return new SocialMove("order#OffRecomendation", new List<string>() { favoriteFood.name });
+                } else {
+
+                    KeyValuePair<PreferenceLevel, List<WorldFact>> opReason = GetOpinionOnDish(recomendedFood);
+                    facts = opReason.Value;
+                    PreferenceLevel opinion = opReason.Key;
+
+                    return new SocialMove("order#OffRecomendation",
+                                                new List<string>() { favoriteFood.name },
+                                                mentionedFacts:facts);
+
+                }
             case "serveOrder#":
                 FoodItem servedFood = GetFromMenu(prompt.arguements[0]);
 
-                Dictionary<PreferenceLevel, List<string>> ingredientOpinions = GetOpinionIngredients(servedFood);
-                PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
-
-
-
-                if (opinionOfDish != PreferenceLevel.neutral)
-                    facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
-                foreach (PreferenceLevel level in ingredientOpinions.Keys) {
-                    foreach (string ingredient in ingredientOpinions[level]) {
-                        facts.Add(new WorldFactPreference(speaker.Id, level, ingredient));
-                    }
-                }
-
+                KeyValuePair<PreferenceLevel, List<WorldFact>> opinionReason = GetOpinionOnDish(servedFood);
+                facts = opinionReason.Value;
+                PreferenceLevel opinionOfDish = opinionReason.Key;
 
                 scoreOfRecomended = ScoreFood(servedFood);
 
                 if (scoreOfRecomended < 0) MaxTurns = 3;
                 else if (scoreOfRecomended < 3) MaxTurns = 5;
                 else MaxTurns = 7;
-
-
 
 
                 hasOrdered = true;
@@ -279,5 +277,24 @@ public class PatronEngine :ConversationEngine
         if (feature == null) throw new System.Exception("no feature with name: " + "kitchen_" + speaker.homeLocation);
 
         return feature.providedActions.Any(action => action.Id == foodItem.verb.verbPresent + "_" + foodItem.name);
+    }
+
+
+    KeyValuePair<PreferenceLevel, List<WorldFact>> GetOpinionOnDish(FoodItem servedFood)
+    {
+        List<WorldFact> facts = new List<WorldFact>();
+
+        Dictionary<PreferenceLevel, List<string>> ingredientOpinions = GetOpinionIngredients(servedFood);
+        PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
+
+        if (opinionOfDish != PreferenceLevel.neutral)
+            facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
+        foreach (PreferenceLevel level in ingredientOpinions.Keys) {
+            foreach (string ingredient in ingredientOpinions[level]) {
+                facts.Add(new WorldFactPreference(speaker.Id, level, ingredient));
+            }
+        }
+
+        return new KeyValuePair<PreferenceLevel, List<WorldFact>>(opinionOfDish, facts);
     }
 } 

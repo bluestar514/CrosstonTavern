@@ -29,4 +29,10 @@ public class GM_Precondition_PlayerInstructed : GM_Precondition
         return director + " told " + directed + " to.";
 
     }
+
+    public override string ToString()
+    {
+        return "{GoalModule Precondition: Directed - (" +
+                        director + "->" +  directed + ")}";
+    }
 }

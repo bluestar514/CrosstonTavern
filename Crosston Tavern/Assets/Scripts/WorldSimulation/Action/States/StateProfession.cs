@@ -65,6 +65,14 @@ public class StateProfession: State
 
     public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = true)
     {
-        return townieId + " is a " + professionId;
+        string subject = townieId;
+        if (subject == speakerId) subject = "I";
+        if (subject == listenerId) subject = "you";
+        subject = VerbalizationDictionary.Replace(subject);
+
+        if (subject == "I")
+            return subject + " am a " + professionId;
+        else 
+            return subject + " is a " + professionId;
     }
 }

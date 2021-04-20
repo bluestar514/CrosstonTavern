@@ -39,7 +39,7 @@ public class StateRelation : State
             + "," + tag + ")>"; 
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense)
     {
         
 
@@ -99,11 +99,40 @@ public class StateRelation : State
                         return source + " likes " + target + " some";
                     case Relationship.Tag.disliked:
                         return source + " dislikes " + target + " some";
+
+                    case Relationship.Tag.crushing_on:
+                        return sourceHasTarget(source, "a crush on", target);
+                    case Relationship.Tag.in_love_with:
+                        return sourceIsTarget(source, "in love with", target);
+                    case Relationship.Tag.head_over_heels:
+                        return sourceIsTarget(source, "in deeply love with", target);
+
+                    case Relationship.Tag.friend:
+                        return sourceIsTarget(source, "friends with", target);
+                    case Relationship.Tag.bestFriend:
+                        return sourceIsTarget(source, "best friends with", target);
+
                     default:
                         return source + " is " + tag + "s with " + target;
                 }
             }
         }
+    }
+
+    string sourceIsTarget(string source, string state, string target)
+    {
+        string IS = "is";
+        if (source == "I") IS = "am";
+
+        return string.Join(" ", new List<string>() { source, IS, state, target });
+    }
+
+    string sourceHasTarget(string source, string state, string target)
+    {
+        string has = "has";
+        if (source == "I") has = "have";
+
+        return string.Join(" ", new List<string>() { source, has, state, target });
     }
 
     public override List<State> Combine(State state)

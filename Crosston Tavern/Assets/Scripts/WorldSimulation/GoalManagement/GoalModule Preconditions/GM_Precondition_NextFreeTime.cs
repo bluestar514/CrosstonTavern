@@ -43,6 +43,12 @@ public class GM_Precondition_NextFreeTime: GM_Precondition
         return new GM_Precondition_Time(start, end);
     }
 
+    public override string ToString()
+    {
+        return "{GoalModule Precondition: NextFree - [" +
+                        string.Join(",", participants) + "], " + bufferTime + ", "+ length + "}";
+    }
+
     List<TimeObligation> CondenseTimeObligations(List<TimeObligation> a, List<TimeObligation> b)
     {
         if (a.Count == 0) return b;

@@ -68,6 +68,7 @@ public class VerbalizationDictionary
         {"kitchen_finleysHouse", new EntityVerbalization("kitchen_finleysHouse", "Finely's house") },
 
         {"tackle_shop_town", new EntityVerbalization("tackle_shop_town", "the tackle shop") },
+        {"farmers_market_town", new EntityVerbalization("farmers_market_town", "the farmer's market") },
 
         {"brush_forest", new EntityVerbalization("brush_forest", "the forest") },
         

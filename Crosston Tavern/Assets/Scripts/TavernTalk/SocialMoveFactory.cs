@@ -194,6 +194,7 @@ public class SocialMoveFactory
         Goal goal = goalFact.goal;
         
         List<WorldFact> facts = new List<WorldFact>() { goalFact };
+        List<WorldFact> retracted = new List<WorldFact>();
 
         List<Goal> parentGoals = goal.GetParentGoals();
 
@@ -224,10 +225,29 @@ public class SocialMoveFactory
             foreach(GoalModule module in modules) {
                 foreach(GM_Precondition precondition in module.preconditions) {
                     facts.Add(new WorldFactGoalModulePrecondition(precondition));
+
+
+                    if (precondition is GM_Precondition_State preState) {
+                        WorldFact fact;
+
+                        if (preState.state is StateRelation rel) {
+                            fact = new WorldFactRelation(rel, speaker.Id);
+                        } else {
+                            fact = new WorldFactState(preState.state);
+                        }
+
+                        if (preState.want)
+                            facts.Add(fact);
+                        else
+                            retracted.Add(fact);
+                    }
                 }
             }
 
-            return new SocialMove("tellWhyGoal#TopLevel", new List<string> { goal.name }, mentionedFacts: facts);
+            return new SocialMove("tellWhyGoal#TopLevel", 
+                                    new List<string> { goal.name }, 
+                                    mentionedFacts: facts, 
+                                    retractedFacts: retracted);
         }
     }
 
