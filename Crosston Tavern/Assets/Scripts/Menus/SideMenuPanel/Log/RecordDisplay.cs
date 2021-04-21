@@ -9,11 +9,15 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
     public VerticalLayoutGroup namePositioner;
     public VerticalLayoutGroup contentPositioner;
 
+    float textSpeed = .05f;
+    public void Init(float textSpeed)
+    {
+        this.textSpeed = textSpeed;
+    }
+
     public override IEnumerator Fill(DialogueUnit fact)
     {
         this.fact = fact;
-
-        
 
         nameTag.text = VerbalizationDictionary.Replace( fact.speakerName);
 
@@ -23,26 +27,22 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
 
             namePositioner.childAlignment = TextAnchor.UpperRight;
             contentPositioner.childAlignment = TextAnchor.UpperRight;
-            //contentPositioner.padding.left = 0;
-            //contentPositioner.padding.right = 50;
 
             yield break;
         } else {
-            yield return TypeWriter(fact.verbalization, .05f);
+            yield return TypeWriter(fact.verbalization, textSpeed);
         }
     }
 
 
     IEnumerator TypeWriter(string content, float textSpeed)
     {
-        Debug.Log("RecordDisplay: Starting TypeWriter");
 
         factText.text = "";
         foreach(char c in content) {
             factText.text += c;
 
-            if (DetectSkip()) {
-                Debug.Log("RecordDisplay: Detecting Typewriter skip");
+            if (DetectSkip() || textSpeed <= 0) {
                 factText.text = content;
                 break;
             }
@@ -51,7 +51,6 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
             yield return new WaitForSeconds(textSpeed);
         }
 
-        Debug.Log("RecordDisplay: Ending TypeWriter");
     }
 
     bool DetectSkip()

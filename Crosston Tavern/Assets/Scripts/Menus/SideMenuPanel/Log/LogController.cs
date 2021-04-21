@@ -19,6 +19,7 @@ public class LogController: MonoBehaviour
     Coroutine scrollFunction;
 
     bool scrollDown = false;
+    public float dialogueDefaultTextSpeed;
 
     public virtual void Initialize(BarSpaceController bsc)
     {
@@ -40,6 +41,7 @@ public class LogController: MonoBehaviour
 
         scrollDown = true;
 
+        panel.Init(dialogueDefaultTextSpeed);
         yield return panel.Fill(element);
 
         displayPanels.Add(panel);

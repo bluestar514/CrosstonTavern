@@ -30,7 +30,7 @@ public class WriteConversation : LogController
                     "\t\t\t+\t" + string.Join("\n\t\t\t \t", move.mentionedFacts) + "\n" +
                     "\t\t\t-\t" + string.Join("\n\t\t\t \t", move.retractedFacts) + "\n\n" +
 
-                    "\t\t" + element.verbalization);
+                    "\t\t" + element.verbalization.Replace("\n", "\n\t\t"));
 
         fh.WriteString("\n");
 

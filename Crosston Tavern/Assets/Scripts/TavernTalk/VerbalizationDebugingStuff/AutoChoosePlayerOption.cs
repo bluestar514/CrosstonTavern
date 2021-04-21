@@ -12,6 +12,7 @@ public class AutoChoosePlayerOption : DialogueBoxController
 
     public override void DisplayPlayerActions(List<DialogueUnit> dialogueUnits)
     {
+        Debug.Log("AutoChoosePlayerOption: Displaying PlayerActions");
         base.DisplayPlayerActions(dialogueUnits);
 
         int rand = Random.Range(0, dialogueUnits.Count);
@@ -40,6 +41,8 @@ public class AutoChoosePlayerOption : DialogueBoxController
     IEnumerator PushInASec(DialogueUnit dialogueUnit)
     {
         yield return new WaitForSeconds(choiceDelayTime);
+
+        Debug.Log("AutoChoosePlayerOption: Choosing PlayerAction");
         bsc.ButtonPushPlayerChoice(dialogueUnit);
     }
 }
