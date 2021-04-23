@@ -123,6 +123,8 @@ public class BarSpaceController : MonoBehaviour
         worldHub.DayStep();
         StartCoroutine(WaitUntilDayLoaded(StartNewDay));
 
+        logController.ClearLog();
+
         //should run:
         // - dayloadiner.LoadingScreenAscyn
         // - StartNewDay()
@@ -186,34 +188,43 @@ public class BarSpaceController : MonoBehaviour
             NextConversation();
 
         } else {
-            Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") responding with " + response);
+            
+            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(response.mentionedFacts, response.retractedFacts);
+            AddAllFacts(response.mentionedFacts);
+            RemoveRetractedFacts(response.retractedFacts);
 
+            Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") responding with " + response);
             DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(response);
 
+            StartCoroutine(DisplayNPCText(npcDialogue));
+        }
+    }
+
+    IEnumerator DisplayNPCText(DialogueUnit npcDialogue)
+    {
+        if (npcDialogue is CompoundDialogueUnit compoundResponse) {
+            foreach(DialogueUnit unit in compoundResponse.components) {
+                logController.DisplayNPCAction(unit);
+
+                Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") done speaking: " + unit);
+
+                yield return logController.AddElement(unit);
+            }
+
+            PlayerPhase(compoundResponse.components.Last().underpinningSocialMove);
+        } else {
             logController.DisplayNPCAction(npcDialogue);
 
             Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") done speaking: " + npcDialogue);
 
-            List<WorldFact> newFacts = barkeepEngine.LearnFromInput(npcDialogue.facts, response.retractedFacts);
-            AddAllFacts(npcDialogue.facts);
-            RemoveRetractedFacts(response.retractedFacts);
+            yield return logController.AddElement(npcDialogue);
 
-
-            StartCoroutine(WaitUntilDisplayed(npcDialogue, PlayerPhase));
-            // should run:
-            // - logController.AddElement(npcDialogue)
-            // - PlayerPhase(npcDialogue.underpinningSocialMove)
-
+            PlayerPhase(npcDialogue.underpinningSocialMove);
         }
     }
 
-
-
     IEnumerator WaitUntilDayLoaded(System.Func<bool> toDoAfterDayLoad)
     {
-        
-        
-        
         yield return dayLoader.LoadingScreenAscyn();
         yield return new WaitForEndOfFrame();
 

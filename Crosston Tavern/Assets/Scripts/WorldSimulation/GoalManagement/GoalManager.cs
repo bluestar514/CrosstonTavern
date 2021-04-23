@@ -243,6 +243,23 @@ public class GoalManager
         return initialGoals;
     }
 
+    public List<GoalModule> GetPlayerSpecifiedGoals()
+    {
+        List<GoalModule> playerSpecified = new List<GoalModule>();
+
+        foreach (GoalModule module in modules) {
+            if (module.preconditions.Any(
+                precondition => {
+                    return (precondition is GM_Precondition_PlayerInstructed);
+                })
+            ) {
+                playerSpecified.Add(module);
+            }
+        }
+
+        return playerSpecified;
+    }
+
     class OutcomeRestraints
     {
         public List<Effect> effects;

@@ -17,6 +17,11 @@ public class AutoChoosePlayerOption : DialogueBoxController
 
         int rand = Random.Range(0, dialogueUnits.Count);
 
+        while(dialogueUnits.Count > 1 && dialogueUnits[rand].underpinningSocialMove.verb == "nevermind") {
+            dialogueUnits.RemoveAt(rand);
+            rand = Random.Range(0, dialogueUnits.Count);
+        }
+
         activePlayerOption = StartCoroutine(PushInASec(dialogueUnits[rand]));
 
 

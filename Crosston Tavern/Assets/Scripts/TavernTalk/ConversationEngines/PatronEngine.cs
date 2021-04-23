@@ -147,14 +147,23 @@ public class PatronEngine :ConversationEngine
                 throw new System.Exception("Fact included in confirmGoal# SocialMove was not a WorldFactGoal or no fact was provided.");
 
             case "suggest#":
+            case "suggest_#":
                 AskQuestion();
                 
+                if(speaker.gm.GetPlayerSpecifiedGoals().Count >= 3) {
+                    return new SocialMove("makeRoomForPlayerGoal#",
+                                            arguements: prompt.arguements,
+                                            mentionedFacts: prompt.mentionedFacts);
+                }
+
                 if(prompt.mentionedFacts[0] is WorldFactPotentialAction factAction &&
                     !speaker.KnowsAboutAction(factAction.action)) {
                     return new SocialMove("askHowToDo#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
                 } 
 
                 return new SocialMove("askConfirmSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            
 
             case "tellHowToDo#":
                 if(prompt.mentionedFacts[0] is WorldFactPotentialAction factPotentialAction) {
@@ -166,34 +175,29 @@ public class PatronEngine :ConversationEngine
                 goto case "confirmSuggestion#";
             case "confirmSuggestion#":
 
+                return AddGoal(prompt);
 
-                if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
-                    BoundAction suggestedAction = potentialAction.action;
-
-                    Goal goal = new GoalAction(suggestedAction, (int)GoalManager.GoalPriority.imperitive);
-                    speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>() {
-                                                            new GM_Precondition_PlayerInstructed("barkeep", speaker.Id)
-                                                        },
-                                                        new List<Goal>() {
-                                                            goal
-                                                        },
-                                                        name: "suggested action"
-                                                        //timer: 3
-                                                        )
-                        );
-
-                    WorldFactGoal goalFact = new WorldFactGoal(goal, speaker.Id);
-                    goalFact.modifier.Add(WorldFactGoal.Modifier.player);
-
-                    return new SocialMove("acceptSuggestion#",
-                                        arguements: new List<string> { goal.ToString() },
-                                        mentionedFacts: new List<WorldFact>() { goalFact });
-                }
-
-                throw new System.Exception("1st mentioned fact (" + prompt.mentionedFacts[0] + ") was not a potentialAction");
 
             case "cancelSuggestion#":
                 return new SocialMove("acceptCancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts);
+
+            case "changeGoal#->#":
+                if(prompt is CompoundSocialMove compoundPrompt) {
+                    List<SocialMove> moves = new List<SocialMove>();
+                    foreach(SocialMove submove in compoundPrompt.socialMoves) {
+                        SocialMove newMove = GiveResponse(submove);
+                        if(newMove.verb == "askConfirmSuggestion#") {
+                            newMove = AddGoal(newMove);
+                        }
+
+                        moves.Add(newMove);
+                    }
+
+                    return new CompoundSocialMove("acceptChangeGoal#->#",
+                                                    arguements: prompt.arguements,
+                                                    socialMoves: moves);
+                }
+                throw new System.Exception("Incorrect input format for \"changeGoal#->#\" (" + prompt + ")");
 
             case "stopPlayerGivenGoal#":
 
@@ -296,5 +300,35 @@ public class PatronEngine :ConversationEngine
         }
 
         return new KeyValuePair<PreferenceLevel, List<WorldFact>>(opinionOfDish, facts);
+    }
+
+
+    SocialMove AddGoal(SocialMove prompt)
+    {
+        if (prompt.mentionedFacts[0] is WorldFactPotentialAction potentialAction) {
+            BoundAction suggestedAction = potentialAction.action;
+
+            Goal goal = new GoalAction(suggestedAction, (int)GoalManager.GoalPriority.imperitive);
+            speaker.gm.AddModule(new GoalModule(new List<GM_Precondition>() {
+                                                            new GM_Precondition_PlayerInstructed("barkeep", speaker.Id)
+                                                        },
+                                                new List<Goal>() {
+                                                            goal
+                                                },
+                                                name: "suggested action"
+                                                //timer: 3
+                                                )
+                );
+
+            WorldFactGoal goalFact = new WorldFactGoal(goal, speaker.Id);
+            goalFact.modifier.Add(WorldFactGoal.Modifier.player);
+
+            return new SocialMove("acceptSuggestion#",
+                                arguements: new List<string> { goal.ToString() },
+                                mentionedFacts: new List<WorldFact>() { goalFact });
+        }
+
+        throw new System.Exception("1st mentioned fact (" + prompt.mentionedFacts[0] + ") was not a potentialAction");
+
     }
 } 

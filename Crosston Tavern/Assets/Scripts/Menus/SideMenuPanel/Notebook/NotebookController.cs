@@ -9,6 +9,7 @@ public class NotebookController : SideMenuController<WorldFact>
     public void UpdateDaily()
     {
         notebook.UpdateDaily();
+        Clear();
     }
 
     public void AddManyElements(List<WorldFact> facts)
@@ -46,5 +47,14 @@ public class NotebookController : SideMenuController<WorldFact>
         notebook.RemoveWorldFact(fact);
 
 
+    }
+
+    void Clear()
+    {
+        foreach(Transform child in contentPanel.transform) {
+            Destroy(child.gameObject);
+        }
+
+        displayPanels = new List<DisplayPanel<WorldFact>>();
     }
 }

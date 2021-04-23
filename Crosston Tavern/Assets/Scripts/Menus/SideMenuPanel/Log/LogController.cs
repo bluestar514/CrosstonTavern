@@ -62,6 +62,16 @@ public class LogController: MonoBehaviour
         ScrollToBottom();
     }
 
+
+    public void ClearLog()
+    {
+        foreach(Transform display in contentPanel.transform) {
+            Destroy(display.gameObject);
+        }
+
+        displayPanels = new List<RecordDisplay>();
+    }
+
     protected virtual void ScrollToBottom()
     {
 

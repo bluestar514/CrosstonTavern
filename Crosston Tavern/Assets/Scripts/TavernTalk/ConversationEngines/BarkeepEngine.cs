@@ -96,6 +96,25 @@ public class BarkeepEngine : ConversationEngine
                     moves.Add(new SocialMove("nice"));
                     break;
 
+                case "makeRoomForPlayerGoal#":
+                    List<SocialMove> previousGoals = GenStopGoal();
+
+                    moves.AddRange( from goal in previousGoals
+                                    select new CompoundSocialMove("changeGoal#->#", 
+                                                                    arguements: new List<string>(){
+                                                                        goal.arguements[0],
+                                                                        prompt.arguements[0]
+                                                                    }, 
+                                                                    socialMoves: new List<SocialMove>() {
+                                                                        goal, 
+                                                                        new SocialMove("suggest_#", prompt.arguements, prompt.mentionedFacts)
+                                                                    }
+                                                                  )
+                                    );
+                    moves.Add(new SocialMove("cancelSuggestion#", arguements: prompt.arguements, mentionedFacts: prompt.mentionedFacts));
+                    break;
+
+
 
                 case "askHowToDo#":
                     moves.Add(new SocialMove("tellHowToDo#", prompt.arguements, prompt.mentionedFacts));
@@ -188,6 +207,7 @@ public class BarkeepEngine : ConversationEngine
                     foreach(SocialMenu submenu in menus) {
                         submenu.AddPreviousContext(nevermind);
                     }
+                    
 
                     break;
             }
@@ -260,7 +280,7 @@ public class BarkeepEngine : ConversationEngine
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
-    List<SocialMove> GenStopGoal()
+    List<SocialMove> GenStopGoal(string tag = "stopPlayerGivenGoal#")
     {
         List<WorldFact> facts = speaker.ws.knownFacts.GetFacts().FindAll(fact => {
             return fact is WorldFactGoal goalFact &&
@@ -271,7 +291,7 @@ public class BarkeepEngine : ConversationEngine
         return new List<SocialMove>(from fact in facts
                                     where fact is WorldFactGoal
                                     where ((WorldFactGoal)fact).owner == patronId
-                                    select new SocialMove("stopPlayerGivenGoal#", new List<string> { ((WorldFactGoal)fact).goal.name },
+                                    select new SocialMove(tag, new List<string> { ((WorldFactGoal)fact).goal.name },
                                                                         mentionedFacts: new List<WorldFact>() { fact }));
     }
 
@@ -319,7 +339,7 @@ public class BarkeepEngine : ConversationEngine
 
         List<SocialMove> submenus = new List<SocialMove>();
         foreach(string verb in verbToAllActions.Keys) {
-            List<SocialMove> subMenuOptions = new List<SocialMove>();
+            
 
 
             if (verbToAllActions[verb].Count > speaker.ws.map.GetPeople().Count() * 3) {
@@ -337,73 +357,94 @@ public class BarkeepEngine : ConversationEngine
                 }
 
                 if (targetToActions.Keys.Count > 1) {
+                    //If verb is something like "give_#item#" with lots of suboptions per person...
 
+                    //Make each person a submenu with all their potential gifts
                     List<SocialMove> peopleSubMenus = new List<SocialMove>();
                     foreach (string personName in targetToActions.Keys) {
-                        List<SocialMove> individualPersonOptions = new List<SocialMove>();
-                        
-                        MakeSubmenu(targetToActions[personName], "suggest" + personName, individualPersonOptions, peopleSubMenus);
+
+                        peopleSubMenus.Add(MakeSubmenu(targetToActions[personName], 
+                                                        MakeSubmenuLable(verbToAllActions[verb][0], personName)));
                     }
 
-                    BoundAction anAction = verbToAllActions[verb][0];
-                    BoundAction untargetedAction = new BoundAction(anAction, anAction.ActorId, "...", "...", new BoundBindingCollection(), anAction.verbilizationInfo);
-                    SocialMenu submenu = new SocialMenu("suggestSubmenu#",  peopleSubMenus, arguements: new List<string>() { verb },
-                                            mentionedFacts: new List<WorldFact>() { new WorldFactPotentialAction(untargetedAction) });
-                    
-                    peopleSubMenus.ForEach(option => {
-                            if (option is SocialMenu personSubmenu) {
-                                personSubmenu.AddPreviousContext(new SocialMenu("nevermind", peopleSubMenus));
-                                BoundAction unspecifiedAction = 
-                                        new BoundAction(anAction, anAction.ActorId, anAction.FeatureId, 
-                                                        anAction.LocationId, new BoundBindingCollection(), anAction.verbilizationInfo);
-                                personSubmenu.mentionedFacts = 
-                                        new List<WorldFact>() { new WorldFactPotentialAction(unspecifiedAction) };
-                            }
-                        }
-                    );
+                    AddNevermind(peopleSubMenus);
 
+                    SocialMenu submenu = new SocialMenu("suggest_#",
+                                            peopleSubMenus,
+                                            mentionedFacts: new List<WorldFact>() { MakeSubmenuLable(verbToAllActions[verb][0]) });
                     submenus.Add(submenu);
+
                 } else {
-                    
-                    MakeSubmenu(verbToAllActions[verb], "suggest" + verb, subMenuOptions, submenus);
+
+                    submenus.Add(MakeSubmenu(verbToAllActions[verb], 
+                                            MakeSubmenuLable(verbToAllActions[verb][0])));
                 }
 
             } else {
 
-                MakeSubmenu(verbToAllActions[verb], "suggest" + verb, subMenuOptions, submenus);
+                submenus.Add(MakeSubmenu(verbToAllActions[verb], 
+                                          MakeSubmenuLable(verbToAllActions[verb][0])));
             }
 
         }
 
 
         SocialMenu suggestMenu = new SocialMenu("suggest", submenus);
-        submenus.ForEach(option => 
+        AddNevermind(submenus);
+
+        return suggestMenu;
+    }
+
+    SocialMenu MakeSubmenu(List<BoundAction> actions, WorldFact menuName)
+    {
+        List<SocialMove> subMenuOptions = new List<SocialMove>();
+
+        //Make Submenu based on Action Verb (ex: fishing) containing 
+        //all actions taking place at any feature that supports it
+        //(ex: fishing at lake, fishing at farm_river)
+        foreach (BoundAction action in actions) {
+            subMenuOptions.Add(new SocialMove("suggest_#",
+                                                arguements: new List<string>() { action.ToString() },
+                                                mentionedFacts: new List<WorldFact>() {
+                                                                    new WorldFactPotentialAction(action) }
+                                              ));
+        }
+        return  new SocialMenu("suggest_#", subMenuOptions,
+                                                mentionedFacts: new List<WorldFact>() { 
+                                                    menuName
+                                                });
+
+
+
+    }
+
+    WorldFact MakeSubmenuLable(BoundAction baseAction, string specifyFeature="...", string specifyLocation = "...")
+    {
+        List<BoundBindingPort> bindings = new List<BoundBindingPort>();
+        foreach(BoundBindingPort port in baseAction.Bindings.bindings) {
+            bindings.Add(new BoundBindingPort(port.tag, "..."));
+        }
+
+        return 
+            new WorldFactPotentialAction(
+                new BoundAction(baseAction,
+                                baseAction.ActorId,
+                                specifyFeature,
+                                specifyLocation,
+                                new BoundBindingCollection(bindings),
+                                baseAction.verbilizationInfo)
+                );
+    }
+
+    void AddNevermind(List<SocialMove> submenus)
+    {
+        submenus.ForEach(option =>
             {
                 if (option is SocialMenu submenu) {
                     submenu.AddPreviousContext(new SocialMenu("nevermind", submenus));
                 }
             }
         );
-
-        return suggestMenu;
-    }
-
-    void MakeSubmenu(List<BoundAction> actions, string menuName, List<SocialMove> subMenuOptions, List<SocialMove> submenus)
-    {
-        //Make Submenu based on Action Verb (ex: fishing) containing 
-        //all actions taking place at any feature that supports it
-        //(ex: fishing at lake, fishing at farm_river)
-        foreach (BoundAction action in actions) {
-            subMenuOptions.Add(new SocialMove("suggest#",
-                                                arguements: new List<string>() { action.ToString() },
-                                                mentionedFacts: new List<WorldFact>() {
-                                                                    new WorldFactPotentialAction(action) }
-                                              ));
-        }
-        SocialMenu submenu = new SocialMenu(menuName, subMenuOptions);
-
-        submenus.Add(submenu);
-
     }
 
     List<SocialMove> GenAskOpinionOfPerson(List<string> people = null)

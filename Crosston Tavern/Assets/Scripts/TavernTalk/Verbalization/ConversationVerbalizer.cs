@@ -377,6 +377,7 @@ public class ConversationVerbalizer
                 verbalization = "Suggest...";
                 break;
 
+            case "suggest_#":
             case "suggest#":
                 if(socialMove.mentionedFacts[0] is WorldFactPotentialAction factAction) {
                     BoundAction action = factAction.action;
@@ -399,6 +400,16 @@ public class ConversationVerbalizer
             case "acceptCancelSuggestion#":
                 verbalization = "Well, alright then.";
                 break;
+
+            case "acceptChangeGoal#->#":
+                if(socialMove is CompoundSocialMove compoundSocialMove) {
+                    IEnumerable<DialogueUnit> verbalizations = from move in compoundSocialMove.socialMoves
+                                                                select ExpressSocialMove(move);
+                    Debug.Log(string.Join(",", verbalizations));
+                    return new CompoundDialogueUnit(new List<DialogueUnit> (verbalizations));
+                }
+
+                throw new System.Exception("Incorrect input format for \"acceptChangeGoal#->#\" (" + socialMove + ")");
 
             case "frustratedByGoals":
                 //I want X, Y, and Z but I can't figure out how!

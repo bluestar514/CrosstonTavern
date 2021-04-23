@@ -9,35 +9,35 @@ public class DialogueUnit
     public string verbalization;
     public string speakerName;
     public SocialMove underpinningSocialMove;
-    public List<WorldFact> facts = new List<WorldFact>();
 
     public NPCPortrait.State emotion;
-    // also probably would hold:
-    //  - speaker's emotion being displayed
 
     public DialogueUnit(string verbalization, string speakerName, SocialMove underpinningSocialMove, NPCPortrait.State emotion)
     {
         this.verbalization = verbalization;
         this.speakerName = speakerName;
         this.underpinningSocialMove = underpinningSocialMove;
-        SocialMoveContentToFacts(underpinningSocialMove);
         this.emotion = emotion;
-    }
-
-    void SocialMoveContentToFacts(SocialMove socialMove)
-    {
-        foreach(WorldFact fact in socialMove.mentionedFacts) {
-            facts.Add(fact);
-        }
-
     }
 
     public override string ToString()
     {
         return "{"+speakerName+"("+underpinningSocialMove+"): \""+verbalization+"\"}";
     }
-
-
-
 }
 
+public class CompoundDialogueUnit : DialogueUnit
+{
+    public List<DialogueUnit> components;
+
+    public CompoundDialogueUnit(List<DialogueUnit> components): 
+        base(string.Join("\n", components),"CompoundDialogueUnit", null, NPCPortrait.State.none)
+    {
+        this.components = components;
+    }
+
+    public override string ToString()
+    {
+        return "[" +string.Join(",", components)+ "]";
+    }
+}
