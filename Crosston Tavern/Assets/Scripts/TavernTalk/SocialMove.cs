@@ -11,9 +11,12 @@ public class SocialMove
 
     public List<WorldFact> mentionedFacts;
     public List<WorldFact> retractedFacts;
+    public List<WorldFact> complexFacts;
 
     public SocialMove(string verb, List<string> arguements = null,
-                         List<WorldFact> mentionedFacts = null, List<WorldFact> retractedFacts = null)
+                         List<WorldFact> mentionedFacts = null, 
+                         List<WorldFact> retractedFacts = null, 
+                         List<WorldFact> complexFacts = null)
     {
         this.verb = verb;
 
@@ -26,6 +29,8 @@ public class SocialMove
 
         if (retractedFacts == null) retractedFacts = new List<WorldFact>();
         this.retractedFacts = retractedFacts;
+        if (complexFacts == null) complexFacts = new List<WorldFact>();
+        this.complexFacts = complexFacts;
     }
 
     public override string ToString()

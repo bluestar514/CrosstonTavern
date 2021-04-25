@@ -40,6 +40,8 @@ public class ConversationVerbalizer
         List<string> goals = new List<string>();
         WorldFactGoal goalFact;
         WorldFactPotentialAction actionFact;
+        string subject = "ERROR";
+
         switch (socialMove.verb) {
             case "greet":
                 verbalization = "Good evening.";
@@ -430,7 +432,7 @@ public class ConversationVerbalizer
                 break;
             case "tellRelationWith#":
 
-                pair = VerbalizePeopleOpinion(facts);
+                pair = VerbalizePeopleOpinion(socialMove.mentionedFacts);
                 verbalization = pair.Key;
                 if (pair.Value != NPCPortrait.State.none) emotion = pair.Value;
                 break;
@@ -438,10 +440,11 @@ public class ConversationVerbalizer
                 verbalization = "I think...";
                 break;
             case "tell#Relation#":
+                facts = socialMove.complexFacts;
 
-                string subject = "ERROR";
+                
                 Relationship.Tag tag = Relationship.Tag.acquantences;
-                if( facts.Count > 0 &&
+                if(facts.Count > 0 &&
                     facts[0] is WorldFactRelation factRelation ) {
                     tag = factRelation.relation.tag;
                     subject = factRelation.relation.source;
@@ -451,7 +454,7 @@ public class ConversationVerbalizer
 
                 switch (tag) {
                     case Relationship.Tag.bestFriend:
-                        verbalization = subject + " thinks of you as a very close friend.";
+                        verbalization = subject + " thinks you are best friends.";
                         break;
                     case Relationship.Tag.friend:
                         verbalization = subject + " thinks of you as a good friend.";
@@ -486,6 +489,144 @@ public class ConversationVerbalizer
                 }
 
                 break;
+
+            case "acceptRelationshipView":
+                if (socialMove.complexFacts.Count != 3) throw new System.Exception("Incorrect format");
+
+                
+                if(socialMove.complexFacts[0] is WorldFactRelation relationFact) {
+                    subject = relationFact.relation.source;
+                }else throw new System.Exception("Incorrect format");
+
+                List<Relationship.Tag> tags = new List<Relationship.Tag>(
+                            from fact in socialMove.complexFacts
+                            where fact is WorldFactRelation relation
+                            select ((WorldFactRelation)fact).relation.tag
+                        );
+
+                if (tags.Count != 3) throw new System.Exception("Incorrect format");
+
+                Relationship.Tag speakerRomanticTag =
+                    townie.townieInformation.relationships.GetStrongestTagOnAxis(subject, Relationship.Axis.romantic);
+                Relationship.Tag speakerFriendlyTag =
+                    townie.townieInformation.relationships.GetStrongestTagOnAxis(subject, Relationship.Axis.friendly);
+
+                Relationship.Tag friendlyTag = tags[0];
+                Relationship.Tag romanticTag = tags[1];
+                Relationship.Tag newTag = tags[2];
+
+                if(friendlyTag == newTag || romanticTag == newTag) {
+                    verbalization = "I think so too.";
+                }
+
+                //if told about someone liking them
+                if(Relationship.romanticTags.Contains(newTag)) {
+                    //if it is more than they thought
+                    if(romanticTag < newTag) {
+                        
+                        //and they like them
+                        if(speakerRomanticTag > Relationship.Tag.no_affection) {
+                            verbalization = "Oh, really? You think so?";
+                            emotion = NPCPortrait.State.blushing;
+                        
+                        // or if they are friends
+                        } else if(speakerFriendlyTag > Relationship.Tag.acquantences) {
+                            verbalization = "Oh. Um... Hm... I don't know how to feel about that.";
+                        } else {
+                            verbalization = "Oh. They do? Um. I didn't know that.";
+                        }
+
+                    //if it is less than they thought
+                    } else if(romanticTag > newTag) {
+
+                        //and they like them
+                        if (speakerRomanticTag > Relationship.Tag.no_affection) {
+                            verbalization = "Oh, you think they like me only that much?";
+                            emotion = NPCPortrait.State.sad;
+
+                            // and they don't like them
+                        } else {
+                            verbalization = "Oh, you think they only ";
+                            switch (newTag) {
+                                case Relationship.Tag.crushing_on:
+                                    verbalization += "have a crush on me?";
+                                    break;
+                                case Relationship.Tag.in_love_with:
+                                    verbalization += "love me?";
+                                    break;
+                                default:
+                                    verbalization += "have a crush on me?";
+                                    break;
+                            }
+
+                            verbalization += " I was afraid they ";
+
+                            switch (romanticTag) {
+                                case Relationship.Tag.crushing_on:
+                                    verbalization += "had a crush on me.";
+                                    break;
+                                case Relationship.Tag.in_love_with:
+                                    verbalization += " were in love with me.";
+                                    break;
+                                case Relationship.Tag.head_over_heels:
+                                    verbalization += " were head over heels in love with me.";
+                                    break;
+                                default:
+                                    verbalization += " were head over heels in love with me.";
+                                    break;
+                            }
+
+                        }
+
+                    } else {
+                        verbalization = "You think so too!";
+                    }
+                }else if (Relationship.friendlyTags.Contains(newTag)) {
+                    //if the new tag is positively friendly
+                    if (newTag > Relationship.Tag.acquantences) {
+                        //if it is more than they thought
+                        if (friendlyTag < newTag) {
+
+                            //and we are friends
+                            if (speakerFriendlyTag > Relationship.Tag.acquantences) {
+                                verbalization = "They really think we are that close? I'm glad!";
+                                emotion = NPCPortrait.State.happy;
+                            } else {
+                                verbalization = "Why do they think that? We aren't friends.";
+                                emotion = NPCPortrait.State.angry;
+                            }
+
+                        } else if (friendlyTag > newTag) {
+
+                            verbalization = "They don't think we're closer than that?";
+                            emotion = NPCPortrait.State.sad;
+                        } else {
+                            verbalization = "I thought so too.";
+                        }
+
+                    //if the new tag is negative
+                    } else {
+                        //if we are friends
+                        if (speakerFriendlyTag > Relationship.Tag.acquantences) {
+                            verbalization = "They don't like me?";
+                            emotion = NPCPortrait.State.sad;
+                        } else {
+                            //if the value higher than they thought
+                            if (newTag > friendlyTag) {
+                                verbalization = "They dislike me only that much huh?";
+                            } else if (newTag < friendlyTag) {
+                                verbalization = "Hmp. That so?";
+                            } else {
+                                verbalization = "I thought so too.";
+                            }
+                        }
+                    }
+                } else {
+                    verbalization = "That so?";
+                }
+
+                break;
+
             case "whyGoalMenu":
                 verbalization = "Why do you...";
                 break;

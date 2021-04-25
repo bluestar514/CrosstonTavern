@@ -217,10 +217,68 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
 
             case "tell#Relation#":
-                SocialMove move = SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
-                move.verb = "acceptRelationshipView";
+                if (prompt.complexFacts.Count == 1) {
+                    Dictionary<string, List<Relationship.Tag>> opinionOnNewInfo = new Dictionary<string, List<Relationship.Tag>>();
 
-                return move;
+                    string source = "";
+                    string target = "";
+                    Relationship rel = new Relationship();
+
+                    WorldFact complexFact = prompt.complexFacts[0];
+                    if (complexFact is WorldFactRelation relationFact) {
+                        StateRelation relation = relationFact.relation;
+
+                        source = relation.source;
+                        target = relation.target;
+
+                        rel = speaker.ws.GetRelationshipsFor(source);
+                        List<Relationship.Tag> knownTags = rel.GetTag(target);
+
+                        if (knownTags.Contains(relation.tag)) {
+                            AddOpinion("known", relation.tag, opinionOnNewInfo);
+                        } else {
+                            AddOpinion("unknown", relation.tag, opinionOnNewInfo);
+                        }
+
+                    }
+
+
+                    AddOpinion("known",
+                                rel.GetStrongestTagOnAxis(target, Relationship.Axis.friendly),
+                                opinionOnNewInfo);
+                    AddOpinion("known",
+                                rel.GetStrongestTagOnAxis(target, Relationship.Axis.romantic),
+                                opinionOnNewInfo);
+
+                    LearnFromInput(prompt.complexFacts, new List<WorldFact>());
+
+                    SocialMove move = SocialMoveFactory.MakeMove("tellRelationWith#", speaker, prompt);
+                    move.verb = "acceptRelationshipView";
+
+
+                    foreach (string catagory in new List<string>() { "known", "unknown" }) { 
+                        if (opinionOnNewInfo.ContainsKey(catagory)) {
+
+                            move.complexFacts.AddRange( 
+                                new List<WorldFact>(from unknown in opinionOnNewInfo[catagory]
+                                                    select new WorldFactRelation(new StateRelation(source, target, unknown), source)));
+                        }
+                    }
+
+                    return move;
+
+                }
+
+                throw new System.Exception("Incorrect input to \"tell#Relation#\"");
+
+                void AddOpinion(string opinion, Relationship.Tag tag, Dictionary<string, List<Relationship.Tag>> opinionOnNewInfo)
+                {
+                    if (!opinionOnNewInfo.ContainsKey(opinion)) {
+                        opinionOnNewInfo.Add(opinion, new List<Relationship.Tag>());
+                    }
+
+                    opinionOnNewInfo[opinion].Add(tag);
+                }
 
             case "askWhyGoal":
                 Debug.LogWarning("This is an out of date pattern, consider removing");

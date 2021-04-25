@@ -28,7 +28,8 @@ public class WriteConversation : LogController
         fh.WriteString("\t" + element.speakerName + " (" + element.emotion + "):\t" + move+ "\n" +
                     "\t\t(" + move.verb + ")\n" +
                     "\t\t\t+\t" + string.Join("\n\t\t\t \t", move.mentionedFacts) + "\n" +
-                    "\t\t\t-\t" + string.Join("\n\t\t\t \t", move.retractedFacts) + "\n\n" +
+                    "\t\t\t-\t" + string.Join("\n\t\t\t \t", move.retractedFacts) + "\n" +
+                    "\t\t\t~\t" + string.Join("\n\t\t\t \t", move.complexFacts) + "\n\n" +
 
                     "\t\t" + element.verbalization.Replace("\n", "\n\t\t"));
 

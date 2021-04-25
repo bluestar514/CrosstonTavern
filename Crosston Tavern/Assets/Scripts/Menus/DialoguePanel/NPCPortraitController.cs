@@ -58,6 +58,7 @@ public class NPCPortrait
         happy,
         angry,
         sad,
+        blushing,
         soup,
         none
     }

@@ -18,21 +18,29 @@ public class Relationship
     }
     static int NUM_AXIS = 2;
 
+    //ordered in order of priority
     public static List<Tag> romanticTags = new List<Tag>() {
-        Tag.dating,
-        Tag.crushing_on,
+        Tag.head_over_heels,
         Tag.in_love_with,
-        Tag.head_over_heels
+        Tag.crushing_on,
+        Tag.no_affection,
+
+        Tag.dating
     };
 
     public static List<Tag>friendlyTags = new List<Tag>() {
-        Tag.rivals,
-        Tag.liked,
-        Tag.friend,
-        Tag.bestFriend,
-        Tag.disliked,
+        Tag.nemisis,
         Tag.enemy,
-        Tag.nemisis
+        Tag.disliked,
+
+        Tag.bestFriend,
+        Tag.friend,
+        Tag.liked,
+
+        Tag.acquantences,
+        
+        Tag.rivals
+        
     };
 
 
@@ -45,6 +53,10 @@ public class Relationship
         rivals,
 
         //passiveStates:
+        nemisis,
+        enemy,
+        disliked,
+
         acquantences,
 
         liked,
@@ -56,9 +68,7 @@ public class Relationship
         in_love_with,
         head_over_heels,
 
-        disliked,
-        enemy,
-        nemisis,
+        
 
         //unused:
         family
@@ -90,7 +100,7 @@ public class Relationship
 
             { Tag.no_affection, new Dictionary<Axis, float[]> {
                 {Axis.friendly, new float[]{-maxValue, maxValue } },
-                {Axis.romantic, new float[]{ -maxValue, 0 } }
+                {Axis.romantic, new float[]{ -maxValue, low } }
             } },
             { Tag.crushing_on, new Dictionary<Axis, float[]> {
                 {Axis.friendly, new float[]{-maxValue, maxValue } },
@@ -198,6 +208,20 @@ public class Relationship
         if (relationships.ContainsKey(target))
             return (int)relationships[target][(int)axis];
         else return 0;
+    }
+
+    public Tag GetStrongestTagOnAxis(string target, Axis axis)
+    {
+        Dictionary<Axis, List<Tag>> tags = new Dictionary<Axis, List<Tag>>() {
+            {Axis.friendly, friendlyTags },
+            {Axis.romantic, romanticTags }
+        };
+
+        foreach(Tag tag in tags[axis]) {
+            if (GetTag(target).Contains(tag)) return tag;
+        }
+
+        return Tag.acquantences;
     }
 
     public void AddRelationTag(string target, Tag tag)

@@ -461,7 +461,7 @@ public class BarkeepEngine : ConversationEngine
         return new List<SocialMove>(from relation in Relationship.codifiedRelationRanges.Keys
                                     select new SocialMove("tell#Relation#",
                                                             arguements: new List<string>() { target, relation.ToString() },
-                                                            mentionedFacts: new List<WorldFact>() {
+                                                            complexFacts: new List<WorldFact>() {
                                                                 new WorldFactRelation(new StateRelation(target, patronId, relation), patronId)
                                                             })
                                     );

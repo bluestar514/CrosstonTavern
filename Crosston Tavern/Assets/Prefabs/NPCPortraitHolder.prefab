@@ -393,7 +393,7 @@ MonoBehaviour:
     state: 3
     image: {fileID: 4156570787604965938}
   - npc: 1
-    state: 4
+    state: 5
     image: {fileID: 4156570786617577923}
   - npc: 0
     state: 0
@@ -408,7 +408,7 @@ MonoBehaviour:
     state: 3
     image: {fileID: 4156570786946539011}
   - npc: 0
-    state: 4
+    state: 5
     image: {fileID: 4156570787304847331}
   - npc: 2
     state: 0
@@ -423,8 +423,17 @@ MonoBehaviour:
     state: 3
     image: {fileID: 4156570787304375368}
   - npc: 2
-    state: 4
+    state: 5
     image: {fileID: 4156570787100251905}
+  - npc: 0
+    state: 4
+    image: {fileID: 4156570787715944146}
+  - npc: 2
+    state: 4
+    image: {fileID: 4156570787818758374}
+  - npc: 1
+    state: 4
+    image: {fileID: 4156570787282995593}
   portraitNames:
   - id: avery
     npc: 0
