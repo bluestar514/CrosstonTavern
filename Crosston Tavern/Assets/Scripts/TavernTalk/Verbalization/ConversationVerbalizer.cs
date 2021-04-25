@@ -637,6 +637,18 @@ public class ConversationVerbalizer
                 verbalization = "Did you hear that...";
                 break;
 
+            case "goodbyeThank":
+                verbalization = "Thanks for the meal! It was delicious as always.";
+                emotion = NPCPortrait.State.happy;
+                break;
+            case "goodbyeThankRecipe":
+                verbalization = "Thank you so much!";
+                emotion = NPCPortrait.State.happy;
+                break;
+            case "goodbyeDejected":
+                verbalization = "Oh, okay. I understand... Thank you for the meal.";
+                emotion = NPCPortrait.State.sad;
+                break;
             case "nice":
                 verbalization = "I see";
                 break;

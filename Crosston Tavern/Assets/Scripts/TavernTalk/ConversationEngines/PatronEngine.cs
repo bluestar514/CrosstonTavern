@@ -301,11 +301,11 @@ public class PatronEngine :ConversationEngine
                     return new SocialMove("askForRecipe#", arguements: new List<string>() { foodItem.name });
                 }
 
-                return new SocialMove("goodbye");
+                return new SocialMove("goodbyeThank");
             case "giveRecipe#":
                 TellAction("kitchen_" + speaker.homeLocation, foodItem.verb.verbPresent + "_" + foodItem.name);
 
-                return new SocialMove("goodbyeThank");
+                return new SocialMove("goodbyeThankRecipe");
             case "refuseRecipe#":
                 return new SocialMove("goodbyeDejected");
 
