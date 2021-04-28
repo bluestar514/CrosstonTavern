@@ -127,8 +127,17 @@ public class PatronEngine :ConversationEngine
                 return SocialMoveFactory.MakeMove("tellPreferenceHate", speaker, prompt);
             case "tellAction#":
             case "tellPreference#":
-                return SocialMoveFactory.MakeMove("acknowledge", speaker, prompt);
+                if(prompt.complexFacts[0] is WorldFactPreference preference) {
 
+                    if(speaker.ws.map.GetPerson(preference.person).preference.GetLevel(preference.item) == preference.level) {
+                        return new SocialMove("alreadyKnew");
+                    } else {
+                        speaker.ws.knownFacts.AddFact(preference, speaker.ws);
+
+                        return new SocialMove("didNotKnow");
+                    }
+                }
+                throw new System.Exception("Incorrect format");
             case "confirmGoal#":
                 WorldFact fact = prompt.mentionedFacts[0];
 
@@ -344,16 +353,22 @@ public class PatronEngine :ConversationEngine
 
     KeyValuePair<PreferenceLevel, List<WorldFact>> GetOpinionOnDish(FoodItem servedFood)
     {
+        Debug.Log(servedFood.name);
+
         List<WorldFact> facts = new List<WorldFact>();
 
         Dictionary<PreferenceLevel, List<string>> ingredientOpinions = GetOpinionIngredients(servedFood);
         PreferenceLevel opinionOfDish = speaker.townieInformation.ItemPreference(servedFood.name);
 
-        if (opinionOfDish != PreferenceLevel.neutral)
+        if (opinionOfDish != PreferenceLevel.neutral) {
             facts.Add(new WorldFactPreference(speaker.Id, opinionOfDish, servedFood.name));
+            Debug.Log(facts.Last());
+        }
+
         foreach (PreferenceLevel level in ingredientOpinions.Keys) {
             foreach (string ingredient in ingredientOpinions[level]) {
                 facts.Add(new WorldFactPreference(speaker.Id, level, ingredient));
+                Debug.Log(facts.Last());
             }
         }
 

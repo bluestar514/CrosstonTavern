@@ -15,7 +15,7 @@ public class ChanceModifierBoolState : ChanceModifier
 
     public override float Chance(WorldState ws)
     {
-        if (state.InEffect(ws, null, null)) {
+        if (state.InEffect(ws, new BoundBindingCollection(), new FeatureResources())) {
             if (match) return 1;
             else return 0;
         } else {

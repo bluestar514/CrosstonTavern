@@ -196,6 +196,7 @@ public class BarSpaceController : MonoBehaviour
             Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") responding with " + response);
             DialogueUnit npcDialogue = patronVerbalizer.ExpressSocialMove(response);
 
+            PrintResponse(patronEngine.speaker.Id, npcDialogue.underpinningSocialMove);
             StartCoroutine(DisplayNPCText(npcDialogue));
         }
     }

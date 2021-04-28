@@ -268,7 +268,7 @@ public class BarkeepEngine : ConversationEngine
                                     where fact is WorldFactPreference
                                     where ((WorldFactPreference)fact).person != patronId
                                     select new SocialMove("tellPreference#", new List<string> { fact.ToString() },
-                                                                         mentionedFacts: new List<WorldFact>() { fact }));
+                                                                         complexFacts: new List<WorldFact>() { fact }));
     }
 
     List<SocialMove> GenConfirmGoal(List<WorldFact> facts)

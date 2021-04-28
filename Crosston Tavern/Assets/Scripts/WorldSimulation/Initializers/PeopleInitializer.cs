@@ -26,7 +26,7 @@ public class PeopleInitializer
             {"loves", new List<string>(){"strawberry_cake"} },
             {"likes", new List<string>(){"strawberry", "salmon", "fried_salmon"} },
             {"dislikes", new List<string>(){"blackberry", "trout"} },
-            {"hates", new List<string>(){"blackberry_trout"} },
+            {"hates", new List<string>(){"blackberry_tart"} },
             {"inventory", new List<string>(){} }
         },
         new Dictionary<string, List<string>>() {

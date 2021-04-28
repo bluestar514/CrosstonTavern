@@ -22,7 +22,7 @@ public class ConversationEngine
         List<WorldFact> learnedFacts = new List<WorldFact>();
 
         foreach(WorldFact fact in mentionedFacts) {
-            learnedFacts.AddRange(speaker.ws.LearnFact(fact));
+            learnedFacts.AddRange(speaker.ws.knownFacts.AddFact(fact, speaker.ws));
         }
 
         foreach (WorldFact fact in retractedFacts) {

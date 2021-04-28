@@ -12,7 +12,7 @@ public class GoalManager
     List<GoalModule> modules = new List<GoalModule>();
     List<Goal> lastSetOfGoals = new List<Goal>(); //only for use in GM, for outside GM use the Townie Information's KnownGoals
 
-    int lookAhead = 7;
+    int lookAhead = 12;
 
     public enum GoalPriority
     {
@@ -447,12 +447,10 @@ public class GoalManager
     static bool ContainsOthersInventoryState(List<Condition> preconditions, BoundBindingCollection bindings, string actor)
     {
         foreach (Condition condition in preconditions) {
-            if (condition is Condition_IsState) {
-                Condition_IsState condition_IsState = (Condition_IsState)condition;
+            if (condition is Condition_IsState condition_IsState) {
 
                 State state = condition_IsState.state;
-                if (state is StateInventory) {
-                    StateInventory stateInventory = (StateInventory)state;
+                if (state is StateInventory stateInventory) {
                     string owner = bindings.BindString(stateInventory.ownerId);
 
                     if (owner != actor) { 

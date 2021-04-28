@@ -65,12 +65,12 @@ public class StateSocial : State
         };
     }
 
-    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense = false)
+    public override string Verbalize(string speakerId, string listenerId, bool goal, bool futureTense)
     {
         return Verbalize(speakerId, listenerId, goal, null, futureTense);
     }
 
-    public string Verbalize(string speakerId, string listenerId, bool goal, WorldState ws, bool futureTense = false)
+    public string Verbalize(string speakerId, string listenerId, bool goal, WorldState ws, bool futureTense)
     {
         string subject = this.sourceId;
         subject = Verbalizer.VerbalizeSubject(subject, speakerId, listenerId);
@@ -86,20 +86,21 @@ public class StateSocial : State
                 axisDirection = "less";
         }
 
-
-        if (goal) {
-            if (subject == "I")
-                return " to feel " + axisDirection + " " + axis + " toward " + target;
-            else
-                return subject + " to feel " + axisDirection + " " + axis + " toward " + target;
-
+        if (futureTense) {
+            return (subject + " will feel " + axisDirection + " " + axis + " toward " + target);
         } else {
-            if (futureTense) {
-                return (subject + " will feel " + axisDirection + " " + axis + " toward " + target);
-            } else {
-                return (subject + " feels " + axisDirection + " " + axis + " toward " + target);
+
+            if (goal) {
+                if (subject == "I")
+                    return " to feel " + axisDirection + " " + axis + " toward " + target;
+                else
+                    return subject + " to feel " + axisDirection + " " + axis + " toward " + target;
+
             }
+
+            return (subject + " feels " + axisDirection + " " + axis + " toward " + target);
         }
+        
             
         
             

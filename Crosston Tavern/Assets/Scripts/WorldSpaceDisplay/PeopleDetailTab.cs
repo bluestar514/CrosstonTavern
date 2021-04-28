@@ -14,6 +14,8 @@ public class PeopleDetailTab : DetailTab
     public Transform itemsHolder;
     public Transform relationsHolder;
 
+    public Transform otherHolder;
+
     public GameObject entryPrefab;
 
     [System.NonSerialized]
@@ -34,7 +36,7 @@ public class PeopleDetailTab : DetailTab
 
     void Clear()
     {
-        foreach (Transform parent in new List<Transform>() { goalsHolder, itemsHolder, relationsHolder }) {
+        foreach (Transform parent in new List<Transform>() { goalsHolder, itemsHolder, relationsHolder, otherHolder }) {
             foreach (Transform child in parent) {
                 if(child.GetComponent<DisplayEntry>() != null)
                     Destroy(child.gameObject);
@@ -70,6 +72,12 @@ public class PeopleDetailTab : DetailTab
                                                     reverseRel.Get(displayedTownie.Id, Relationship.Axis.friendly)+","+
                                                     reverseRel.Get(displayedTownie.Id, Relationship.Axis.romantic) + ") - {"+
                                                     string.Join(", ", relTags)+"}");
+        }
+
+
+        foreach(Person other in displayedTownie.ws.map.GetPeople()) {
+            Instantiate(entryPrefab, otherHolder)
+                .GetComponent<DisplayEntry>().Init(other.id + ":(" + other.preference + ")");
         }
     }
 

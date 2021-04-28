@@ -80,7 +80,7 @@ public class WorldFactPreference: WorldFact
         if (name == listener) name = "you";
 
         name = VerbalizationDictionary.Replace(name);
-        item = VerbalizationDictionary.Replace(item, VerbalizationDictionary.Form.general);
+        string item = VerbalizationDictionary.Replace(this.item, VerbalizationDictionary.Form.general);
 
         return name + " " + level + " " + item;
     }

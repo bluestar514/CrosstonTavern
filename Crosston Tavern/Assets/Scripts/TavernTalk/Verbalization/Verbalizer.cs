@@ -156,11 +156,11 @@ public class Verbalizer
 
     }
 
-    public string VerbalizeGoal(Goal goal)
+    public string VerbalizeGoal(Goal goal, bool forceFutureTense = false)
     {
        if(goal is GoalState goalState) {
             if (goalState.state is StateSocial stateSocial)
-                return stateSocial.Verbalize(speakerId, listenerId, true, ws);
+                return stateSocial.Verbalize(speakerId, listenerId, true, ws, forceFutureTense);
 
             return goalState.state.Verbalize(speakerId, listenerId, true);
         }

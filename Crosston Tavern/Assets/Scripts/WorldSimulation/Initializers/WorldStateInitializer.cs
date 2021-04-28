@@ -23,7 +23,7 @@ public class WorldStateInitializer
             GameObject townieObj = new GameObject(person.id);
             townieObj.transform.parent = townieHolder; 
             Townie townie = townieObj.AddComponent<Townie>();
-            townie.TownieInit(person.id, personalWorldState, new GoalManager(personalWorldState, person));
+            townie.TownieInit(person.id, personalWorldState);
 
             PeopleInitializer.SetAssumedPerceptionsOfOthers(townie);
             PeopleInitializer.SetInitialRelationTags(townie);
@@ -70,6 +70,9 @@ public class WorldStateInitializer
             townies[avery].ws.knownFacts.AddFact(new WorldFactResource("field_farm", "planted", item), townies[avery].ws);
         }
         townies[finley].ws.knownFacts.AddFact(new WorldFactResource("brush_forest", "common_forage", "blackberry"), townies[finley].ws);
+
+
+        townies[finley].ws.knownFacts.AddFact(new WorldFactPreference("avery", PreferenceLevel.loved, "stewed_trout"), townies[finley].ws);
 
         return townies;
     }

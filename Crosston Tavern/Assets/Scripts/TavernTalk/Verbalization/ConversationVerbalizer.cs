@@ -267,11 +267,17 @@ public class ConversationVerbalizer
                             if(fact is WorldFactGoal parentGoalFact) {
                                 Goal parentGoal = parentGoalFact.goal;
 
-                                reasons.Add(v.VerbalizeGoal(parentGoal));
+                                reasons.Add(v.VerbalizeGoal(parentGoal, true));
                             }
                         }
-                        if (reasons.Count != 0)
-                            verbalization += " " + Verbalizer.MakeNiceList(reasons);
+                        if (reasons.Count != 0) {
+
+                            string lst = Verbalizer.MakeNiceList(reasons);
+
+                            if (!lst.StartsWith("to ")) verbalization += " so ";
+
+                            verbalization += lst;
+                        }
  
                         verbalization += ".";
                     }
@@ -348,6 +354,8 @@ public class ConversationVerbalizer
             case "tellPreference#":
                 if (socialMove.arguements.Count > 0) verbalization = "Did you know ";
                 else verbalization = "";
+                facts = new List<WorldFact>(socialMove.mentionedFacts);
+                facts.AddRange(socialMove.complexFacts);
                 foreach (WorldFact fact in facts) {
                     verbalization += fact.Verbalize(townie.Id, partner);
                 }
@@ -412,6 +420,23 @@ public class ConversationVerbalizer
                 }
 
                 throw new System.Exception("Incorrect input format for \"acceptChangeGoal#->#\" (" + socialMove + ")");
+
+            case "askHowToDo#":
+                verbalization = "How do I ";
+                foreach (WorldFact fact in facts) {
+
+                    if (fact is WorldFactPotentialAction potentialAction) {
+
+                        verbalization += v.VerbalizeAction(potentialAction.action, true);
+                    }
+                }
+
+                verbalization += "?";
+                break;
+
+            case "tellHowToDo#":
+                verbalization = "It's not hard. Here, have my recipe.";
+                break;
 
             case "frustratedByGoals":
                 //I want X, Y, and Z but I can't figure out how!
@@ -628,15 +653,24 @@ public class ConversationVerbalizer
                 break;
 
             case "whyGoalMenu":
-                verbalization = "Why do you...";
+                verbalization = "Why do you want...";
+                break;
+            case "whyActionMenu":
+                verbalization = "Why did you do...";
                 break;
             case "confirmGoalMenu":
-                verbalization = "Do you still want to...";
+                verbalization = "Do you still want...";
                 break;
             case "tellActionMenu":
-                verbalization = "Did you hear that...";
+                verbalization = "Did you hear that... did...";
                 break;
 
+            case "tellPreferenceMenu":
+                verbalization = "Did you know that... likes...";
+                break;
+            case "goodbye":
+                verbalization = "Goodbye!";
+                break;
             case "goodbyeThank":
                 verbalization = "Thanks for the meal! It was delicious as always.";
                 emotion = NPCPortrait.State.happy;
@@ -720,7 +754,7 @@ public class ConversationVerbalizer
 
 
         string dishOpinion = "";
-        if (facts.Count > 0)
+        if (opinionOfDish != null)
             dishOpinion = opinionOfDish.Verbalize(townie.Id, partner);
 
         bool loved = opinions.ContainsKey(PreferenceLevel.loved);

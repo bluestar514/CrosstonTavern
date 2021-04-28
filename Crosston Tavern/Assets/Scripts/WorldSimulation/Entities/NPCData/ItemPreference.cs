@@ -6,12 +6,12 @@ using UnityEngine;
 [System.Serializable]
 public class ItemPreference
 {
-    public PreferencesDictionary preferences;
+    public Dictionary<PreferenceLevel, List<string>> preferences;
     public Dictionary<string, PreferenceLevel> itemPreference;
 
     public ItemPreference()
     {
-        this.preferences = new PreferencesDictionary() { };
+        this.preferences = new Dictionary<PreferenceLevel, List<string>>() { };
         foreach (PreferenceLevel level in Enum.GetValues(typeof(PreferenceLevel))) {
             preferences.Add(level, new List<string>());
         }
@@ -25,7 +25,7 @@ public class ItemPreference
         ItemPreference p = new ItemPreference();
 
         if (perfect) {
-            p.preferences.CopyFrom(preferences);
+            p.preferences = new Dictionary<PreferenceLevel, List<string>>(preferences);
             p.itemPreference = new Dictionary<string, PreferenceLevel>(itemPreference);
         }
 
@@ -51,5 +51,19 @@ public class ItemPreference
             return itemPreference[item];
         else
             return PreferenceLevel.neutral;
+    }
+
+    public override string ToString()
+    {
+        List<string> lst = new List<string>();
+
+        Debug.Log(preferences.Keys.Count);
+        foreach(KeyValuePair<PreferenceLevel, List<string>> keyValues in preferences) {
+            lst.Add("{" + keyValues.Key + ":[" + string.Join(",", keyValues.Value) + "]}");
+        }
+
+        return string.Join("\n", lst);
+
+
     }
 }

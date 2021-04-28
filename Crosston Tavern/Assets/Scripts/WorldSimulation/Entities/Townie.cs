@@ -11,17 +11,17 @@ public class Townie: MonoBehaviour
 
     public Person townieInformation { get => ws.map.GetPerson(id);}
 
-    public WorldState ws; //there understanding of the WorldState
+    public WorldState ws; //their understanding of the WorldState
 
     public GoalManager gm;
     
     public string homeLocation;
 
-    public void TownieInit(string id, WorldState ws, GoalManager gm)
+    public void TownieInit(string id, WorldState ws)
     {
         this.id = id;
         this.ws = ws;
-        this.gm = gm;
+        this.gm = new GoalManager(ws, townieInformation);
     }
 
 
