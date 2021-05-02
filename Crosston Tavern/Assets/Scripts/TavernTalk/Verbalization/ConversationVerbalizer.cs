@@ -274,9 +274,9 @@ public class ConversationVerbalizer
 
                             string lst = Verbalizer.MakeNiceList(reasons);
 
-                            if (!lst.StartsWith("to ")) verbalization += " so ";
+                            if (!lst.StartsWith("to ")) verbalization += "so ";
 
-                            verbalization += lst;
+                            verbalization +=" "+ lst;
                         }
  
                         verbalization += ".";
@@ -689,6 +689,48 @@ public class ConversationVerbalizer
             case "nevermind":
                 verbalization = "Nevermind.";
                 break;
+
+            case "didNotKnow":
+                verbalization = "No, I didn't know that.";
+                break;
+            case "alreadyKnew":
+                verbalization = "Ah, yeah, I had heard that.";
+                break;
+
+
+            case "askAboutPlayerGivenGoal":
+                verbalization = "How has ... been going?";
+                break;
+            case "askAboutPlayerGivenGoal#":
+                verbalization = "How has ";
+                foreach (WorldFact fact in facts) {
+
+                    if (fact is WorldFactGoal goal) {
+
+                        verbalization += v.VerbalizeGoal(goal.goal).Replace("you", "try to");
+                    }
+
+                    verbalization += "been going?";
+                }
+                break;
+
+            case "stopPlayerGivenGoal":
+                verbalization = "You should stop...";
+                break;
+            case "stopPlayerGivenGoal#":
+                verbalization = "You should stop ";
+                foreach (WorldFact fact in facts) {
+
+                    if (fact is WorldFactGoal goal) {
+
+                        verbalization += v.VerbalizeGoal(goal.goal).Replace("you", "try to");
+                    }
+
+                    verbalization += ".";
+                }
+                break;
+
+
             case "acknowledge":
                 verbalization = "No, I didn't";
                 Debug.LogWarning("No checking is done as to whether " + townie + " has actually heard " + string.Join(",",socialMove.mentionedFacts));

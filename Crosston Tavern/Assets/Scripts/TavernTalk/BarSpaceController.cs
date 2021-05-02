@@ -31,7 +31,7 @@ public class BarSpaceController : MonoBehaviour
 
 
 
-    public virtual void Start()
+    public virtual void StartSetup()
     {
         Debug.Log("BarSpaceController: Starting");
         StartCoroutine(WaitUntilDayLoaded(Init));

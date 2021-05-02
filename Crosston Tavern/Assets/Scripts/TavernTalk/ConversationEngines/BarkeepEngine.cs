@@ -252,7 +252,7 @@ public class BarkeepEngine : ConversationEngine
                                     where ((WorldFactEvent)fact).action.Action.ActorId != patronId
                                     where ((WorldFactEvent)fact).action.Action.FeatureId != patronId
                                     select new SocialMove("tellAction#", new List<string> { ((WorldFactEvent)fact).action.ToString() },
-                                                                         mentionedFacts: new List<WorldFact>() { fact }));
+                                                                         complexFacts: new List<WorldFact>() { fact }));
     }
     List<SocialMove> GenAskAboutAction()
     {

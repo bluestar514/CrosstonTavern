@@ -25,7 +25,7 @@ public class WorldHub : MonoBehaviour
     public int progress = 0;
     public int total = 1;
 
-    private void Awake()
+    public void Awake()
     {
         ws = WorldStateInitializer.GetWorldState();
         ws.id = "main";
@@ -34,7 +34,7 @@ public class WorldHub : MonoBehaviour
 
     }
 
-    private void Start()
+    public void StartSetup()
     {
         Debug.Log("WorldHub: Initializing");
         wsdm.AddPeople(allPeople);

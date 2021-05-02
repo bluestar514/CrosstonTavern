@@ -68,6 +68,7 @@ public class StateSkill : State
         if (speakerId == ownerId) owner = "I";
         if (listenerId == ownerId) owner = "you";
 
+        owner = VerbalizationDictionary.Replace(owner);
         string skillLevel = SkillDictionary.Replace(skillId, (int)min);
 
         if (goal) {

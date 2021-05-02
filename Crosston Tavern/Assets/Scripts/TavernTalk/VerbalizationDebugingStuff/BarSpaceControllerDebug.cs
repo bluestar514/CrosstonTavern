@@ -10,7 +10,7 @@ public class BarSpaceControllerDebug : BarSpaceController
     public AutoChoosePlayerOption autoPlayer;
 
 
-    public override void Start()
+    public override void StartSetup()
     {
         InitialSettings();
 

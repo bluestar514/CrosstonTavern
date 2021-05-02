@@ -57,7 +57,7 @@ public class VerbalizationDictionary
         {"river_farm", new EntityVerbalization("river_farm", "the river by the farm") },
         {"chicken_farm", new EntityVerbalization("chicken_farm", "chickens") },
         {"cow_farm", new EntityVerbalization("cow_farm", "cows") },
-        {"field_farm", new EntityVerbalization("field_farm", "the field") },
+        {"field_farm", new EntityVerbalization("field_farm", "the farm's field") },
 
         {"river_field", new EntityVerbalization("river_field", "the river running through the meadow") },
         {"meadow_field", new EntityVerbalization("meadow_field", "the meadow") },

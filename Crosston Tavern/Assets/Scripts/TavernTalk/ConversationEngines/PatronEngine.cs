@@ -126,6 +126,17 @@ public class PatronEngine :ConversationEngine
             case "askAboutPreferencesHate":
                 return SocialMoveFactory.MakeMove("tellPreferenceHate", speaker, prompt);
             case "tellAction#":
+                if (prompt.complexFacts[0] is WorldFactEvent e) {
+
+                    if (speaker.ws.knownFacts.KnowFact(e)) {
+                        return new SocialMove("alreadyKnew");
+                    } else {
+                        speaker.ws.LearnFact(e);
+
+                        return new SocialMove("didNotKnow");
+                    }
+                }
+                throw new System.Exception("Incorrect format");
             case "tellPreference#":
                 if(prompt.complexFacts[0] is WorldFactPreference preference) {
 
