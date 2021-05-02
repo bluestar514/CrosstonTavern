@@ -274,8 +274,9 @@ public class ConversationVerbalizer
 
                             string lst = Verbalizer.MakeNiceList(reasons);
 
-                            if (!lst.StartsWith("to ")) verbalization += "so ";
+                            if (!lst.Trim(' ').StartsWith("to ")) verbalization += " so";
 
+                            verbalization.Trim(' ');
                             verbalization +=" "+ lst;
                         }
  
@@ -391,7 +392,7 @@ public class ConversationVerbalizer
             case "suggest#":
                 if(socialMove.mentionedFacts[0] is WorldFactPotentialAction factAction) {
                     BoundAction action = factAction.action;
-                    verbalization = "Why not " + v.VerbalizeAction(action, true, false);
+                    verbalization = "Why not " + v.VerbalizeAction(action, true, false)+"?";
                 }
                 
                 break;
@@ -411,11 +412,27 @@ public class ConversationVerbalizer
                 verbalization = "Well, alright then.";
                 break;
 
+            case "changeGoal#->#":
+                verbalization = "I don't think you need to worry about ";
+
+                foreach(WorldFact fact in socialMove.mentionedFacts) {
+                    if(fact is WorldFactGoal oldGoal) {
+                        verbalization += TryingToGoal(oldGoal);
+                    }
+                }
+
+                verbalization += " any more.";
+                break;
+
             case "acceptChangeGoal#->#":
                 if(socialMove is CompoundSocialMove compoundSocialMove) {
-                    IEnumerable<DialogueUnit> verbalizations = from move in compoundSocialMove.socialMoves
-                                                                select ExpressSocialMove(move);
+                    List<DialogueUnit> verbalizations = new List<DialogueUnit>( from move in compoundSocialMove.socialMoves
+                                                                                select ExpressSocialMove(move));
                     Debug.Log(string.Join(",", verbalizations));
+
+                    DialogueUnit temp = verbalizations[1];
+                    temp.verbalization = temp.verbalization.Replace("Alright, ", "");
+
                     return new CompoundDialogueUnit(new List<DialogueUnit> (verbalizations));
                 }
 
@@ -707,10 +724,10 @@ public class ConversationVerbalizer
 
                     if (fact is WorldFactGoal goal) {
 
-                        verbalization += v.VerbalizeGoal(goal.goal).Replace("you", "try to");
+                        verbalization += TryingToGoal(goal);
                     }
 
-                    verbalization += "been going?";
+                    verbalization += " been going?";
                 }
                 break;
 
@@ -722,14 +739,20 @@ public class ConversationVerbalizer
                 foreach (WorldFact fact in facts) {
 
                     if (fact is WorldFactGoal goal) {
-
-                        verbalization += v.VerbalizeGoal(goal.goal).Replace("you", "try to");
+                        verbalization += TryingToGoal(goal);
                     }
 
                     verbalization += ".";
                 }
                 break;
 
+            case "acceptStopGoal#":
+                verbalization = "Alright, if you say so.";
+                break;
+
+            case "makeRoomForPlayerGoal#":
+                verbalization = "Oh wow, you've suggested I do a lot of things recently. I don't think I have time to do all of them...";
+                break;
 
             case "acknowledge":
                 verbalization = "No, I didn't";
@@ -1118,7 +1141,7 @@ public class ConversationVerbalizer
             if(start == null) {
                 alsos.Add("also");
                 start = string.Join(", ", alsos);
-                start += ", #";
+                start += ", I want #";
             }
 
             string continuation = "";
@@ -1165,6 +1188,26 @@ public class ConversationVerbalizer
             verbalization += continuation;
             verbalization = verbalization.Replace("#", "I want "+ Verbalizer.MakeNiceList(goals));
         }
+
+        return verbalization;
+    }
+
+
+    string TryingToGoal(WorldFactGoal goal)
+    {
+        string verbalization = "trying ";
+
+        string strGoal = v.VerbalizeGoal(goal.goal);
+        if (strGoal.Trim(' ').StartsWith("you ")) {
+            strGoal = strGoal.Trim();
+            strGoal = strGoal.Substring(4);
+        }
+
+        if (!strGoal.StartsWith("to")) {
+            strGoal = "to " + strGoal;
+        }
+
+        verbalization += " " + strGoal;
 
         return verbalization;
     }

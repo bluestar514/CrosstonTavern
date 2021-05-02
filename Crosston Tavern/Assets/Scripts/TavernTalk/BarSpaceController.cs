@@ -245,6 +245,10 @@ public class BarSpaceController : MonoBehaviour
 
     void PrintResponse(string speaker, SocialMove move)
     {
+        if (move == null) return;
+        if (move.mentionedFacts == null) return;
+        if (move.retractedFacts == null) return;
+
         Debug.Log(speaker + ":" + move +
             "(" + move.verb + ") + [" + string.Join(",", move.mentionedFacts) + "] " +
             " - [" + string.Join(",", move.retractedFacts) + "]");

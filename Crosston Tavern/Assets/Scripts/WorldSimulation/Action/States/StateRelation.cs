@@ -68,11 +68,35 @@ public class StateRelation : State
                         return "to dislike " + target + " some";
                     else
                         return source + " to dislike " + target + " some";
+                case Relationship.Tag.crushing_on:
+                    if (source == "I") return "to have a crush on " + target;
+                    else return source + " to have a crush on " + target;
                 default:
+                    switch (this.tag) {
+                        case Relationship.Tag.bestFriend:
+                            tag = "best friends";
+                            break;
+                        case Relationship.Tag.friend:
+                            tag = "friends";
+                            break;
+                        case Relationship.Tag.head_over_heels:
+                            tag = "deeply in love";
+                            break;
+                        case Relationship.Tag.in_love_with:
+                            tag = "in love";
+                            break;
+                        case Relationship.Tag.enemy:
+                            tag = "enemies";
+                            break;
+                        case Relationship.Tag.nemisis:
+                            tag = "mortal enemies";
+                            break;
+                    }
+
                     if (source == "I")
-                        return "to be " + tag + "s with " + target;
+                        return "to be " + tag + " with " + target;
                     else
-                        return source + " to be " + tag + "s with " + target;
+                        return source + " to be " + tag + " with " + target;
             }
 
         } else {
