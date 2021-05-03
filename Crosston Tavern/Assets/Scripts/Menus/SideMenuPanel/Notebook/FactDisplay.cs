@@ -10,6 +10,10 @@ public class FactDisplay : DisplayPanel<WorldFact>
     {
         yield return base.Fill(fact);
 
-        factText.text = fact.Verbalize("barkeeper", "none");
+        string speaker = "barkeeper";
+        string listener = "none";
+
+
+        factText.text = fact.Verbalize(speaker, listener);
     }
 }

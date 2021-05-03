@@ -63,6 +63,7 @@ public class WorldFactResource: WorldFact {
 
     public override string Verbalize(string speaker, string listener, WorldState ws=null)
     {
-        return "There is " + potentialBinding + " at " + featureId;
+        return "There is " + VerbalizationDictionary.Replace(potentialBinding, VerbalizationDictionary.Form.general) 
+                + " at " + VerbalizationDictionary.Replace(featureId);
     }
 }

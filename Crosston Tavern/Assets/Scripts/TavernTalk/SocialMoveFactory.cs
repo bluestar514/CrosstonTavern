@@ -325,9 +325,9 @@ public class SocialMoveFactory
 
             causes = CondenseEvents(causes);
 
-            return new SocialMove("tellState#", 
-                new List<string>() { strongestState.ToString() }, 
-                mentionedFacts: MakeActionFacts(causes));
+            return new SocialMove("tellState#",
+                new List<string>() { strongestState.ToString() });
+                //mentionedFacts: MakeActionFacts(causes));
 
         }
         //check and see if they are having difficulty with goals

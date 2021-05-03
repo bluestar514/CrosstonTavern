@@ -190,7 +190,7 @@ public class BarSpaceController : MonoBehaviour
         } else {
             
             List<WorldFact> newFacts = barkeepEngine.LearnFromInput(response.mentionedFacts, response.retractedFacts);
-            AddAllFacts(response.mentionedFacts);
+            AddAllFacts(newFacts);
             RemoveRetractedFacts(response.retractedFacts);
 
             Debug.Log("BarSpaceController: NPC(" + patronEngine.speaker + ") responding with " + response);

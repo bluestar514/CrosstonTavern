@@ -15,10 +15,14 @@ public class FeatureContentPanel : MonoBehaviour
 
     public void Init(Feature feature)
     {
-        featureName.text = feature.id;
+        featureName.text = VerbalizationDictionary.CapFirstLetter( VerbalizationDictionary.Replace(feature.id));
 
         foreach(GenericAction action in feature.providedActions) {
-            AddAction(action.Id);
+            BoundAction boundAction = new BoundAction(action, "...", feature.id, feature.location, new BoundBindingCollection(), action.verbilizationInfo);
+
+            Verbalizer v = new Verbalizer("barkeeper", "none");
+
+            AddAction(v.VerbalizeAction(boundAction, true));
         }
 
     }

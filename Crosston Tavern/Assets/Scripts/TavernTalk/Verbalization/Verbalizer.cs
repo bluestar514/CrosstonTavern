@@ -16,7 +16,7 @@ public class Verbalizer
         this.ws = ws;
     }
 
-    public string VerbalizeState(State goalState, bool includeSubject = true)
+    public string VerbalizeState(State goalState)
     {
 
         if (goalState is StateSocial stateSocial) {

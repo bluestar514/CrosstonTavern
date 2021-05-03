@@ -12,7 +12,7 @@ public class NotebookButton : MonoBehaviour
     public void Init(string text, MainNotebookTab panel)
     {
         key = text;
-        this.text.text = VerbalizationDictionary.Replace( text );
+        this.text.text = VerbalizationDictionary.CapFirstLetter( VerbalizationDictionary.Replace( text ));
         mainPanel = panel;
     }
 

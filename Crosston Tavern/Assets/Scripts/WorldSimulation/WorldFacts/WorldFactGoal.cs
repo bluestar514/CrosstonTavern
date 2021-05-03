@@ -48,11 +48,9 @@ public class WorldFactGoal: WorldFact
     {
         Verbalizer v = new Verbalizer(speaker, listener, ws);
 
-        if (goal is GoalState goalState) {
-            return owner + " wants " + v.VerbalizeState(goalState.state);
-        } else if (goal is GoalAction goalAction) {
-            return owner + " wants " + v.VerbalizeAction(goalAction.action, true);
-        } else return base.Verbalize(speaker, listener, ws);
-        
+        string o = VerbalizationDictionary.Replace(owner);
+
+
+        return o + " wants " + v.VerbalizeGoal(goal);
     }
 }

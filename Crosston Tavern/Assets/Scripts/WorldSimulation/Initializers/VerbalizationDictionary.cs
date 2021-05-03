@@ -62,7 +62,7 @@ public class VerbalizationDictionary
         {"river_field", new EntityVerbalization("river_field", "the river running through the meadow") },
         {"meadow_field", new EntityVerbalization("meadow_field", "the meadow") },
 
-        {"kitchen_inn", new EntityVerbalization("kitchen_inn", "the inn") },
+        {"kitchen_inn", new EntityVerbalization("kitchen_inn", "the tavern kitchen") },
         {"kitchen_sammysHouse", new EntityVerbalization("kitchen_sammysHouse", "Sammy's house") },
         {"kitchen_averysHouse", new EntityVerbalization("kitchen_averysHouse", "Avery's house") },
         {"kitchen_finleysHouse", new EntityVerbalization("kitchen_finleysHouse", "Finely's house") },
@@ -71,9 +71,12 @@ public class VerbalizationDictionary
         {"farmers_market_town", new EntityVerbalization("farmers_market_town", "the farmer's market") },
 
         {"brush_forest", new EntityVerbalization("brush_forest", "the forest") },
-        
-        
-        
+
+        {"farm", new EntityVerbalization("farm", "Avery's farm") },
+        {"field", new EntityVerbalization("field", "the open field") },
+        {"forest", new EntityVerbalization("forest", "the forest") },
+        {"inn", new EntityVerbalization("inn", "Crosston Tavern") },
+        {"town", new EntityVerbalization("town", "the town center") }
     };
 
     public static string Replace(string id, Form form = Form.singular)
@@ -92,6 +95,31 @@ public class VerbalizationDictionary
         return id;
     }
 
+    public static string CapFirstLetter(string phrase)
+    {
+        if (phrase == "") return phrase;
+
+        List<string> words = new List<string>(phrase.Split(' '));
+
+        List<string> capped = new List<string>();
+        foreach(string word in words) {
+            if (word.Length == 0) continue;
+
+            string firstLetter = word.Substring(0, 1).ToUpper();
+
+            if(word.Length < 2) {
+                capped.Add(firstLetter);
+                continue;
+            }
+
+            string restOfWord = word.Substring(1);
+            capped.Add(firstLetter + restOfWord);
+
+        }
+
+
+        return string.Join(" ", capped);
+    }
 
     public static string VerbalizePreferenceLevel(PreferenceLevel level, bool endInS=false)
     {

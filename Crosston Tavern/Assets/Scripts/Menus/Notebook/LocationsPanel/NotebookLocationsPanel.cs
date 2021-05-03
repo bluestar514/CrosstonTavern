@@ -32,8 +32,8 @@ public class NotebookLocationsPanel : MainNotebookTab
     {
         //Debug.Log(fact);
 
-        if(fact is WorldFactResource) {
-            WorldFactResource resourceFact = (WorldFactResource)fact;
+        if(fact is WorldFactResource resourceFact) {
+
             featurePanelDict[resourceFact.featureId].AddItem(resourceFact.potentialBinding);
 
             return true;
@@ -51,15 +51,22 @@ public class NotebookLocationsPanel : MainNotebookTab
 
     void AddFeature(Feature feature)
     {
-        if( !locationSelectorDict.ContainsKey(feature.location)) {
-            LocationSelectorPanel newPanel = Instantiate(locationSelectorPanelPrefab,
-                                                    locationSelectorHolder).GetComponent<LocationSelectorPanel>();
-            newPanel.Init(this, featureButtonPrefab);
+        string location = feature.location;
 
-            locationSelectorDict.Add(feature.location, newPanel);
+        if (location.Contains("House")) {
+            location = "Townie's Houses";
         }
 
-        LocationSelectorPanel selectorPanel = locationSelectorDict[feature.location];
+
+        if ( !locationSelectorDict.ContainsKey(location)) {
+            LocationSelectorPanel newPanel = Instantiate(locationSelectorPanelPrefab,
+                                                    locationSelectorHolder).GetComponent<LocationSelectorPanel>();
+            newPanel.Init(this, featureButtonPrefab, location);
+
+            locationSelectorDict.Add(location, newPanel);
+        }
+
+        LocationSelectorPanel selectorPanel = locationSelectorDict[location];
         selectorPanel.AddFeature(feature.id);
 
         FeatureContentPanel contentPanel = Instantiate(featureContentPanel, featureHolder).GetComponent<FeatureContentPanel>();

@@ -11,10 +11,14 @@ public class LocationSelectorPanel : MonoBehaviour
 
     public GameObject featureButtonPrefab;
 
-    public void Init(MainNotebookTab mainNotebook, GameObject featureButtonPrefab)
+    public void Init(MainNotebookTab mainNotebook, GameObject featureButtonPrefab, string location)
     {
         this.mainNotebook = mainNotebook;
         this.featureButtonPrefab = featureButtonPrefab;
+
+
+        mainLocationName.text = VerbalizationDictionary.CapFirstLetter(
+                                VerbalizationDictionary.Replace(location));
     }
 
     public void AddFeature(string featureId)
@@ -23,7 +27,7 @@ public class LocationSelectorPanel : MonoBehaviour
 
         button.Init(featureId, mainNotebook);
 
-        mainLocationName.text = FeatureInitializer.GetAllFeatures()[featureId].location;
+        
     }
 
 }
