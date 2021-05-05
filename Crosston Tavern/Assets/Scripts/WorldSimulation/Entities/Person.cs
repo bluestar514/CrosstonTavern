@@ -14,6 +14,7 @@ public class Person: Feature
     public List<Goal> knownGoals;
     public Schedule schedule;
 
+
     public Person(string id, string location, int maxUsers,
             List<GenericAction> providedActions, Dictionary<string, List<string>> relevantResources, string profession,
             Dictionary<string, int> stockTable = null) :
@@ -35,6 +36,9 @@ public class Person: Feature
         preference = new ItemPreference();
 
         schedule = new Schedule();
+
+
+        inventory = f.inventory.Copy(true);
     }
 
     public override Feature Copy(bool perfect)

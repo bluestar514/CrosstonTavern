@@ -384,22 +384,25 @@ public class ActionInitializer
             new Precondition(new List<Condition>() {
                 new Condition_NotYou("#b#"),
                 new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.Tag.dating), false),
-                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.Tag.in_love_with), true)
+                new Condition_IsState(new StateRelation("#a#", "#b#", Relationship.Tag.crushing_on), true)
             }),
             new List<Outcome>() {
                 new Outcome( //success:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 60, 100), true),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 30, 60), true),
                     new List<Effect>() {
-                        new EffectRelationship("#a#", "#b#", Relationship.Tag.dating, true, true)
+                        new EffectRelationship("#a#", "#b#", Relationship.Tag.dating, true, true, new VerbilizationEffect("they said yes(!)")),
+                        new EffectStatusEffect("#a#", new EntityStatusEffect("happy_asked_out", EntityStatusEffectType.happy, stepsInDay, 10, new List<string>(){"#b#"})),
+                        new EffectStatusEffect("#b#", new EntityStatusEffect("happy_asked_out", EntityStatusEffectType.happy, stepsInDay, 10, new List<string>(){"#a#"}))
                     }
                 ),
                 new Outcome( //failure:
-                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 60, 100), false),
+                    new ChanceModifierSocial(new StateSocial("#b#", "#a#", Relationship.Axis.romantic, 30, 60), false),
                     new List<Effect>() {
-                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -largeIncrease, -mediumIncrease),
+                        new EffectSocialVariable("#b#", "#a#", Relationship.Axis.friendly, -largeIncrease, -mediumIncrease, new VerbilizationEffect("they said no")),
                         new EffectSocialVariable("#b#", "#a#", Relationship.Axis.romantic, -largeIncrease*2, -largeIncrease),
                         new EffectSocialVariable("#a#", "#b#", Relationship.Axis.romantic, -mediumIncrease, 0),
-                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, 0)
+                        new EffectSocialVariable("#a#", "#b#", Relationship.Axis.friendly, -mediumIncrease, 0),
+                        new EffectStatusEffect("#a#", new EntityStatusEffect("sad_rejected", EntityStatusEffectType.sad, stepsInDay, 3, new List<string>(){"#b#"}))
                     }
                 ),
             },
@@ -476,14 +479,14 @@ public class ActionInitializer
                     new ChanceModifierSkill(new StateSkill("#b#", "vitality", 3, 5), true),
                     new List<Effect>() {
                         new EffectSkill("#b#", "vitality", -4),
-                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 1, 3)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 1, 3, new VerbilizationEffectItemGather("harvested"))
                     }
                 ),
                 new Outcome(
                     new ChanceModifierSkill(new StateSkill("#b#", "vitality", 4, 8), true),
                     new List<Effect>() {
                         new EffectSkill("#b#", "vitality", -5),
-                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 4, 6)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#crop#"}, 4, 6, new VerbilizationEffectItemGather("harvested"))
                     }
                 )
             },
@@ -508,7 +511,7 @@ public class ActionInitializer
                     new ChanceModifierSkill(new StateSkill("#b#", "vitality", 0, 10), true),
                     new List<Effect>() {
                         new EffectSkill("#b#", "vitality", -10),
-                        new EffectInventoryVariable("#a#", new List<string>(){"#animal_product#"}, 1, 1)
+                        new EffectInventoryVariable("#a#", new List<string>(){"#animal_product#"}, 1, 1, new VerbilizationEffectItemGather("collected"))
                     }
                 )
             },

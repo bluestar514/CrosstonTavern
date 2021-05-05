@@ -71,6 +71,14 @@ public class WorldTime : IComparable
         return month + "/" + day + "/" + year;
     }
 
+    public int GetDays()
+    {
+        return ((year - 1) * MonthInYear) +
+                ((month - 1) * DayInMonth) +
+                 day;
+
+    }
+
     public void Tick(int i = 1)
     {
         minute += i;

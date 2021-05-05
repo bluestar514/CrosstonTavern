@@ -9,6 +9,6 @@ public class DaySeperator : MonoBehaviour
 
     public void Initialize(WorldTime date)
     {
-        text.text = date.GetDate();
+        text.text = "Day "+ date.GetDays();
     }
 }

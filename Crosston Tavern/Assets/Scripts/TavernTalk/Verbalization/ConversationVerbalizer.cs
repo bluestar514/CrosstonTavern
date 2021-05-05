@@ -299,6 +299,12 @@ public class ConversationVerbalizer
                 break;
 
             case "tellWhyAction#":
+
+                if (facts.Count <= 0) {
+                    verbalization = "No real reason.";
+                    break;
+                }
+
                 foreach (WorldFact fact in facts) {
                     if (fact is WorldFactGoal) {
                         goalFact = (WorldFactGoal)fact;
@@ -1070,9 +1076,10 @@ public class ConversationVerbalizer
         //But I can't figure out how to B or C. 
         //But I can't figure out how to do any of that.
 
-        string completedActions = "";
+        string completedActions = "I haven't had a chance to do anything toward that yet.";
         string todoGoals = "";
         string stuckGoals = "";
+
         foreach(SocialMove move in socialMove.socialMoves) {
             if(move.verb == "listActionsTaken" && move.mentionedFacts.Count > 0) {
                 completedActions = VerbalizeAllEvents(move.mentionedFacts);

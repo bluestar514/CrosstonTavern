@@ -46,7 +46,7 @@ public class ItemInitializer
 
     public static Dictionary<ItemClass, List<string>> GetSortedItems()
     {
-        Dictionary<ItemClass, List<string>> sortedItems = itemsOfType;
+        Dictionary<ItemClass, List<string>> sortedItems = new Dictionary<ItemClass, List<string>>(itemsOfType);
         
         foreach(KeyValuePair<string, FoodItem> pair in menu) {
             List<string> addableItems = new List<string>( pair.Value.ingredients);
@@ -70,7 +70,9 @@ public class ItemInitializer
         } else if (itemClass == ItemClass.none) {
             return false;
         } else {
-            return GetSortedItems()[itemClass].Contains(item);
+            Dictionary<ItemClass, List<string>> sortedItems = GetSortedItems();
+            List<string> itemsOfClass = sortedItems[itemClass];
+            return itemsOfClass.Contains(item);
         }
     }
 

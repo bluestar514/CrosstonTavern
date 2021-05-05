@@ -19,7 +19,11 @@ public class Inventory
     {
         this.owner = owner;
         inventory = new StringIntDictionary();
-        inventory.CopyFrom(inv);
+
+        foreach(KeyValuePair<string, int> pair in inv) {
+            inventory.Add(pair.Key, pair.Value);
+        }
+
     }
 
     public Inventory Copy(bool perfect)

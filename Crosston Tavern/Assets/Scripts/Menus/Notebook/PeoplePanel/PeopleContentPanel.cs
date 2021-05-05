@@ -160,9 +160,9 @@ public class PeopleContentPanel : MonoBehaviour
 
     public void MarkPlayerSpecifiedGoals(List<WorldFact> facts)
     {
-        foreach (WorldFactDisplayObj obj in knownGoals) {
-            obj.RemoveModifier(WorldFactGoal.Modifier.player);
-        }
+        //foreach (WorldFactDisplayObj obj in knownGoals) {
+        //    obj.RemoveModifier(WorldFactGoal.Modifier.player);
+        //}
 
         foreach (WorldFact fact in facts) {
             if (fact is WorldFactGoal factGoal &&

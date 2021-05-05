@@ -48,7 +48,17 @@ public class SocialMoveFactory
                     List<Goal> childGoals = speaker.gm.GetChildGoals(goal);
                     List<Goal> stuckGoals = speaker.gm.GetStuckGoals();
 
-                    List<WorldFact> facts = new List<WorldFact>();
+                    childGoals = new List<Goal>(from g in childGoals
+                                                where !(g is GoalState goalState &&
+                                                goalState.state is StateRecentActivity)
+                                                select g);
+
+                    stuckGoals = new List<Goal>(from g in stuckGoals
+                                                where !(g is GoalState goalState &&
+                                                goalState.state is StateRecentActivity)
+                                                select g);
+
+                    List < WorldFact > facts = new List<WorldFact>();
                     foreach(Goal child in childGoals) {
                         if (child is GoalState goalState &&
                             goalState.state.InEffect(speaker.ws, new BoundBindingCollection(), new FeatureResources()))
@@ -408,6 +418,10 @@ public class SocialMoveFactory
     {
         List<ExecutedAction> completeHistory = speaker.ws.knownFacts.GetHistory();
         List<ExecutedAction> todaysHistory = completeHistory.FindAll(x => x.executionTime.SameDay(speaker.ws.Time));
+
+        todaysHistory = new List<ExecutedAction>(from action in todaysHistory
+                                                 where action.Action.Id != "move"
+                                                 select action);
 
         return todaysHistory;
     }

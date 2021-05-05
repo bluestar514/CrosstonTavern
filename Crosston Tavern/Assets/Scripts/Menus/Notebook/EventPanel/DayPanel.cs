@@ -14,7 +14,7 @@ public class DayPanel : MonoBehaviour
     {
         this.eventPrefab = eventPrefab;
 
-        dateText.text = date.GetDate();
+        dateText.text = "Day "+date.GetDays();
 
         gameObject.name = gameObject.name.Replace("Clone", date.GetDate());
     }
