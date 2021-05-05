@@ -10,9 +10,11 @@ public class RecordDisplay : DisplayPanel<DialogueUnit>
     public VerticalLayoutGroup contentPositioner;
 
     float textSpeed = .05f;
-    public void Init(float textSpeed)
+    public void Init(float textSpeed, int textSize)
     {
         this.textSpeed = textSpeed;
+        nameTag.fontSize = textSize;
+        factText.fontSize = textSize;
     }
 
     public override IEnumerator Fill(DialogueUnit fact)

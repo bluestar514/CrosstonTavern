@@ -47,7 +47,7 @@ public class Condition_IsYou : Condition
 
     public override bool InEffect(Person actor, WorldState ws, BoundBindingCollection bindings, FeatureResources featureResources)
     {
-        Debug.Log(actor.id + "=?=" + bindings.BindString(featureId) + "(" + featureId + ") - "+ (actor.id == bindings.BindString(featureId)));
+        //Debug.Log(actor.id + "=?=" + bindings.BindString(featureId) + "(" + featureId + ") - "+ (actor.id == bindings.BindString(featureId)));
         return actor.id == bindings.BindString(featureId);
     }
 }

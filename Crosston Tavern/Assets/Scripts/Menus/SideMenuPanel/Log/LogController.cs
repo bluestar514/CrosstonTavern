@@ -12,6 +12,8 @@ public class LogController: MonoBehaviour
 
     public DialogueBoxController dialogueBoxController;
 
+    public Text copyTextSize;
+
     public ScrollRect scrollRect;
 
     List<RecordDisplay> displayPanels = new List<RecordDisplay>();
@@ -41,7 +43,7 @@ public class LogController: MonoBehaviour
 
         scrollDown = true;
 
-        panel.Init(dialogueDefaultTextSpeed);
+        panel.Init(dialogueDefaultTextSpeed, copyTextSize.cachedTextGenerator.fontSizeUsedForBestFit);
         yield return panel.Fill(element);
 
         displayPanels.Add(panel);

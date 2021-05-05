@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerTextBoxController : MenuElement
 {
@@ -9,6 +10,8 @@ public class PlayerTextBoxController : MenuElement
     public GameObject playerChoiceButtonPrefab;
 
     BarSpaceController mainMenu;
+
+    public Text copySize;
 
     public override void Open()
     {
@@ -34,7 +37,7 @@ public class PlayerTextBoxController : MenuElement
     {
         foreach(DialogueUnit playerChoice in playerChoices) {
             GameObject button = Instantiate(playerChoiceButtonPrefab, buttonHolder);
-            button.GetComponent<PlayerChoiceButton>().LabelButton(playerChoice, mainMenu);
+            button.GetComponent<PlayerChoiceButton>().LabelButton(playerChoice, mainMenu, copySize.cachedTextGenerator.fontSizeUsedForBestFit);
         }
 
     }

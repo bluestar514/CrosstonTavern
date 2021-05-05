@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WriteConversation : LogController
 {
+    
+
     FileHandler fh = new FileHandler("conversation", "Log");
 
     public override void AddConversationSeperator()

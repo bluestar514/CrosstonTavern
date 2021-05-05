@@ -159,7 +159,12 @@ public class VerbalizationActionItemConsume : VerbilizationActionItem
         base.Verbilize(actor, feature, presentTense, includeSubject);
         string item = VerbalizationDictionary.Replace(itemBinding);
 
-        return this.actor + " " + this.verb + " a " + item;
+        string str = this.actor + " " + this.verb + " a " + item;
+
+        if (presentTense)
+            return str + " for lunch";
+        else
+            return str;
     }
 }
 
