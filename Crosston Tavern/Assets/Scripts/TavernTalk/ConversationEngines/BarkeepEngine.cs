@@ -323,6 +323,7 @@ public class BarkeepEngine : ConversationEngine
 
             if (possibleAction.FeatureId == "barkeep") continue;
             if (possibleAction.FeatureId.Contains("door")) continue;
+            if (possibleAction.FeatureId == possibleAction.ActorId) continue;
 
             if (speaker.ws.map.GetFeature(possibleAction.FeatureId).type == Feature.FeatureType.kitchen) {
                 if(!possibleAction.FeatureId.Contains(patron.id)) continue;
@@ -426,6 +427,16 @@ public class BarkeepEngine : ConversationEngine
             bindings.Add(new BoundBindingPort(port.tag, "..."));
         }
 
+
+        VerbilizationAction verbalization = new VerbilizationAction(baseAction.verbilizationInfo.verbPresent,
+                                                                    baseAction.verbilizationInfo.verbPast);
+        if (baseAction.verbilizationInfo.verbPresent == "bake" ||
+            baseAction.verbilizationInfo.verbPresent == "make") {
+            verbalization = new VerbalizationActionCooking("cook", "cooked", "...");
+            
+
+        }
+
         return 
             new WorldFactPotentialAction(
                 new BoundAction(baseAction,
@@ -433,7 +444,7 @@ public class BarkeepEngine : ConversationEngine
                                 specifyFeature,
                                 specifyLocation,
                                 new BoundBindingCollection(bindings),
-                                baseAction.verbilizationInfo)
+                                verbalization)
                 );
     }
 

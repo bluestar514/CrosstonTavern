@@ -125,7 +125,9 @@ public class SocialMoveFactory
             subGoals =new List<Goal>( from g in subGoals
                                  where !(g is GoalState state &&
                                         state.state is StatePosition)
-                                 select g);
+                                 where !(g is GoalState state &&
+                                        state.state is StateRecentActivity)
+                                      select g);
 
             subGoals.Insert(0, goal);
 
@@ -608,7 +610,10 @@ public class SocialMoveFactory
 
     static List<Goal> GetStuckGoals(Townie speaker)
     {
-        return speaker.gm.GetStuckGoals();
+        return new List<Goal> (from goal in speaker.gm.GetStuckGoals()
+                               where !(goal is GoalState state &&
+                                        state.state is StateRecentActivity)
+                               select goal);
     }
 
     static List<Goal> GetHighPriorityGoals(Townie speaker)
